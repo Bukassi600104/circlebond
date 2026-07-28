@@ -540,3 +540,161 @@ test("Firebase persists secure invitations, approvals, revocation and multi-circ
   });
   assert.equal(approval.data.invitationAcceptances[0].status, "accepted");
 });
+
+test("Firebase receipt review accumulates partial payments, rejects, replaces, and audits", async () => {
+  const creatorId = `receipt-creator-${randomUUID()}`;
+  const memberId = `receipt-member-${randomUUID()}`;
+  await Promise.all([
+    dataConnect.upsert("user", {
+      id: creatorId,
+      displayName: "Receipt Creator",
+      email: `${creatorId}@example.test`,
+    }),
+    dataConnect.upsert("user", {
+      id: memberId,
+      displayName: "Receipt Member",
+      email: `${memberId}@example.test`,
+    }),
+  ]);
+  const now = new Date().toISOString();
+  const created = await dataConnect.executeMutation("CreateCircleDraft", {
+    creatorId,
+    name: "Receipt Review Circle",
+    type: "gift",
+    description: "Milestone 10 receipt verification.",
+    targetAmount: 100000,
+    pricingPlan: "free",
+    memberLimit: 3,
+    activationPrice: 0,
+    deadline: "2026-10-31",
+    eventDate: null,
+    visibility: "private",
+    createdAt: now,
+    updatedAt: now,
+  });
+  const circleId = created.data.circle_insert.id;
+  await dataConnect.executeMutation("AddCircleMemberWithAudit", {
+    circleId,
+    actorId: creatorId,
+    memberId,
+    role: "member",
+    createdAt: new Date().toISOString(),
+  });
+  await dataConnect.executeMutation("SetGiftMemberAllocation", {
+    circleId,
+    memberId,
+    expectedAmount: 100000,
+    contributionStatus: "joined",
+  });
+
+  async function submit(amount, status = "awaiting_confirmation") {
+    const receiptId = randomUUID();
+    await dataConnect.executeMutation("SubmitReceiptWithAudit", {
+      receiptId,
+      circleId,
+      uploaderId: memberId,
+      amount,
+      note: "Bank transfer",
+      imageUrl: `/api/circles/${circleId}/receipts/${receiptId}/image`,
+      imageStoragePath: `receipts/${circleId}/${memberId}/${receiptId}.jpg`,
+      contentType: "image/jpeg",
+      status,
+      overpaymentAmount: status === "overpayment_review" ? 10000 : 0,
+      submittedAt: new Date().toISOString(),
+    });
+    return receiptId;
+  }
+
+  async function review(
+    receiptId,
+    amount,
+    fromAmount,
+    decision,
+    reason = null,
+  ) {
+    const nextAmount =
+      decision === "approve" ? fromAmount + amount : fromAmount;
+    await dataConnect.executeMutation("ReviewReceiptWithAudit", {
+      receiptId,
+      circleId,
+      uploaderId: memberId,
+      reviewerId: creatorId,
+      receiptStatus: decision === "approve" ? "confirmed" : "rejected",
+      rejectionReason: reason,
+      reviewedAt: new Date().toISOString(),
+      membershipStatus:
+        decision === "reject"
+          ? fromAmount > 0
+            ? "part_paid"
+            : "rejected"
+          : nextAmount >= 100000
+            ? "paid"
+            : "part_paid",
+      nextConfirmedAmount: nextAmount,
+      nextCircleContributedAmount: nextAmount,
+      auditAction:
+        decision === "approve" ? "receipt_confirmed" : "receipt_rejected",
+      materialChanges: JSON.stringify({
+        receiptId,
+        amount,
+        rejectionReason: reason,
+      }),
+    });
+  }
+
+  const first = await submit(40000);
+  await review(first, 40000, 0, "approve");
+  const second = await submit(30000);
+  await review(second, 30000, 40000, "approve");
+  const rejected = await submit(40000, "overpayment_review");
+  await review(rejected, 40000, 70000, "reject", "Amount exceeds balance.");
+
+  const replacement = randomUUID();
+  await dataConnect.executeMutation("ReplaceReceiptWithAudit", {
+    receiptId: replacement,
+    replacedReceiptId: rejected,
+    circleId,
+    uploaderId: memberId,
+    amount: 30000,
+    note: "Corrected transfer",
+    imageUrl: `/api/circles/${circleId}/receipts/${replacement}/image`,
+    imageStoragePath: `receipts/${circleId}/${memberId}/${replacement}.jpg`,
+    contentType: "image/jpeg",
+    status: "awaiting_confirmation",
+    overpaymentAmount: 0,
+    submittedAt: new Date().toISOString(),
+  });
+  await review(replacement, 30000, 70000, "approve");
+
+  const workspace = await dataConnect.executeQuery("GetContributionWorkspace", {
+    circleId,
+  });
+  const membership = workspace.data.circleMemberships.find(
+    (item) => item.user.id === memberId,
+  );
+  assert.equal(membership.confirmedAmount, 100000);
+  assert.equal(membership.contributionStatus, "paid");
+  assert.equal(workspace.data.circle.contributedAmount, 100000);
+  assert.deepEqual(
+    workspace.data.receipts.map((receipt) => receipt.status).sort(),
+    ["confirmed", "confirmed", "confirmed", "replaced"],
+  );
+  const audit = await dataConnect.executeQuery("GetCircleAuditEntries", {
+    circleId,
+  });
+  assert.deepEqual(
+    audit.data.circleAuditEntries
+      .filter((entry) => entry.action.startsWith("receipt_"))
+      .map((entry) => entry.action),
+    [
+      "receipt_uploaded",
+      "receipt_confirmed",
+      "receipt_uploaded",
+      "receipt_confirmed",
+      "receipt_uploaded",
+      "receipt_rejected",
+      "receipt_replaced",
+      "receipt_confirmed",
+    ],
+  );
+});

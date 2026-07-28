@@ -23,6 +23,12 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*FindUserByEmail*](#finduserbyemail)
   - [*GetGiftCircleDetail*](#getgiftcircledetail)
   - [*GetCircleAuditEntries*](#getcircleauditentries)
+  - [*GetAsoEbiCircleDetail*](#getasoebicircledetail)
+  - [*GetSupportCircleDetail*](#getsupportcircledetail)
+  - [*GetInvitationByTokenHash*](#getinvitationbytokenhash)
+  - [*GetCircleInvitations*](#getcircleinvitations)
+  - [*GetInvitationAcceptances*](#getinvitationacceptances)
+  - [*GetContributionWorkspace*](#getcontributionworkspace)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -31,6 +37,25 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*AddCircleMemberWithAudit*](#addcirclememberwithaudit)
   - [*ConfigureGiftCircle*](#configuregiftcircle)
   - [*SetGiftMemberAllocation*](#setgiftmemberallocation)
+  - [*ConfigureAsoEbiCircle*](#configureasoebicircle)
+  - [*CreateAsoEbiTier*](#createasoebitier)
+  - [*SelectAsoEbiTier*](#selectasoebitier)
+  - [*UpdateAsoEbiFulfilment*](#updateasoebifulfilment)
+  - [*ConfigureSupportCircle*](#configuresupportcircle)
+  - [*RecordSupportPledge*](#recordsupportpledge)
+  - [*SetSupportMemberAllocation*](#setsupportmemberallocation)
+  - [*CreateSupportUpdate*](#createsupportupdate)
+  - [*SetSupportCompletionType*](#setsupportcompletiontype)
+  - [*CreateInvitation*](#createinvitation)
+  - [*UpdateInvitationState*](#updateinvitationstate)
+  - [*AcceptInvitationWithMembership*](#acceptinvitationwithmembership)
+  - [*RequestInvitationApproval*](#requestinvitationapproval)
+  - [*SubmitReceiptWithAudit*](#submitreceiptwithaudit)
+  - [*ReplaceReceiptWithAudit*](#replacereceiptwithaudit)
+  - [*ReviewReceiptWithAudit*](#reviewreceiptwithaudit)
+  - [*ApproveInvitationMembership*](#approveinvitationmembership)
+  - [*DeclineInvitation*](#declineinvitation)
+  - [*RequestReplacementInvitation*](#requestreplacementinvitation)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `bondcircle`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -234,6 +259,8 @@ export interface GetDashboardCirclesData {
         imageUrl?: string | null;
         targetAmount: number;
         contributedAmount: number;
+        showTargetToMembers: boolean;
+        showConfirmedTotalToMembers: boolean;
         memberCount: number;
         memberLimit: number;
         deadline?: DateString | null;
@@ -698,6 +725,717 @@ export default function GetCircleAuditEntriesComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.circleAuditEntries);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetAsoEbiCircleDetail
+You can execute the `GetAsoEbiCircleDetail` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetAsoEbiCircleDetail(dc: DataConnect, vars: GetAsoEbiCircleDetailVariables, options?: useDataConnectQueryOptions<GetAsoEbiCircleDetailData>): UseDataConnectQueryResult<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetAsoEbiCircleDetail(vars: GetAsoEbiCircleDetailVariables, options?: useDataConnectQueryOptions<GetAsoEbiCircleDetailData>): UseDataConnectQueryResult<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+```
+
+### Variables
+The `GetAsoEbiCircleDetail` Query requires an argument of type `GetAsoEbiCircleDetailVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetAsoEbiCircleDetailVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetAsoEbiCircleDetail` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetAsoEbiCircleDetail` Query is of type `GetAsoEbiCircleDetailData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetAsoEbiCircleDetailData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    description: string;
+    imageUrl?: string | null;
+    imageStoragePath?: string | null;
+    eventType?: string | null;
+    organizerName?: string | null;
+    paymentBankName?: string | null;
+    paymentAccountName?: string | null;
+    paymentAccountNumber?: string | null;
+    memberLimit: number;
+    contributedAmount: number;
+    eventDate?: DateString | null;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    asoEbiTiers: ({
+      id: UUIDString;
+      name: string;
+      price: number;
+      fabricDescription: string;
+      fabricImageUrl?: string | null;
+      fabricImageStoragePath?: string | null;
+      appreciationGiftName?: string | null;
+      appreciationGiftImageUrl?: string | null;
+      appreciationGiftImageStoragePath?: string | null;
+      availabilityNote?: string | null;
+      deliveryDetails?: string | null;
+      sortOrder: number;
+    } & AsoEbiTier_Key)[];
+      circleMemberships: ({
+        role: string;
+        membershipStatus: string;
+        contributionStatus: string;
+        fulfilmentStatus: string;
+        expectedAmount: number;
+        confirmedAmount: number;
+        selectedAsoEbiTier?: {
+          id: UUIDString;
+          name: string;
+          price: number;
+        } & AsoEbiTier_Key;
+          user: {
+            id: string;
+            displayName: string;
+            email?: string | null;
+            profileImage?: string | null;
+          } & User_Key;
+      })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetAsoEbiCircleDetail`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetAsoEbiCircleDetailVariables } from '@bondcircle/dataconnect';
+import { useGetAsoEbiCircleDetail } from '@bondcircle/dataconnect/react'
+
+export default function GetAsoEbiCircleDetailComponent() {
+  // The `useGetAsoEbiCircleDetail` Query hook requires an argument of type `GetAsoEbiCircleDetailVariables`:
+  const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetAsoEbiCircleDetail(getAsoEbiCircleDetailVars);
+  // Variables can be defined inline as well.
+  const query = useGetAsoEbiCircleDetail({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetAsoEbiCircleDetail(dataConnect, getAsoEbiCircleDetailVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAsoEbiCircleDetail(getAsoEbiCircleDetailVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAsoEbiCircleDetail(dataConnect, getAsoEbiCircleDetailVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.asoEbiTiers);
+    console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetSupportCircleDetail
+You can execute the `GetSupportCircleDetail` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetSupportCircleDetail(dc: DataConnect, vars: GetSupportCircleDetailVariables, options?: useDataConnectQueryOptions<GetSupportCircleDetailData>): UseDataConnectQueryResult<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetSupportCircleDetail(vars: GetSupportCircleDetailVariables, options?: useDataConnectQueryOptions<GetSupportCircleDetailData>): UseDataConnectQueryResult<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+```
+
+### Variables
+The `GetSupportCircleDetail` Query requires an argument of type `GetSupportCircleDetailVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetSupportCircleDetailVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetSupportCircleDetail` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetSupportCircleDetail` Query is of type `GetSupportCircleDetailData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetSupportCircleDetailData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    description: string;
+    imageUrl?: string | null;
+    imageStoragePath?: string | null;
+    supportType?: string | null;
+    beneficiaryName?: string | null;
+    beneficiaryRelationship?: string | null;
+    showBeneficiaryName: boolean;
+    showTargetToMembers: boolean;
+    showConfirmedTotalToMembers: boolean;
+    hideIndividualAmounts: boolean;
+    requireCreatorApproval: boolean;
+    completionType?: string | null;
+    contributionMode?: string | null;
+    paymentBankName?: string | null;
+    paymentAccountName?: string | null;
+    paymentAccountNumber?: string | null;
+    targetAmount: number;
+    contributedAmount: number;
+    memberLimit: number;
+    deadline?: DateString | null;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      contributionStatus: string;
+      expectedAmount: number;
+      pledgedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        email?: string | null;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      supportUpdates: ({
+        id: UUIDString;
+        body: string;
+        createdAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & SupportUpdate_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetSupportCircleDetail`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetSupportCircleDetailVariables } from '@bondcircle/dataconnect';
+import { useGetSupportCircleDetail } from '@bondcircle/dataconnect/react'
+
+export default function GetSupportCircleDetailComponent() {
+  // The `useGetSupportCircleDetail` Query hook requires an argument of type `GetSupportCircleDetailVariables`:
+  const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetSupportCircleDetail(getSupportCircleDetailVars);
+  // Variables can be defined inline as well.
+  const query = useGetSupportCircleDetail({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetSupportCircleDetail(dataConnect, getSupportCircleDetailVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetSupportCircleDetail(getSupportCircleDetailVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetSupportCircleDetail(dataConnect, getSupportCircleDetailVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.supportUpdates);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetInvitationByTokenHash
+You can execute the `GetInvitationByTokenHash` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetInvitationByTokenHash(dc: DataConnect, vars: GetInvitationByTokenHashVariables, options?: useDataConnectQueryOptions<GetInvitationByTokenHashData>): UseDataConnectQueryResult<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetInvitationByTokenHash(vars: GetInvitationByTokenHashVariables, options?: useDataConnectQueryOptions<GetInvitationByTokenHashData>): UseDataConnectQueryResult<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+```
+
+### Variables
+The `GetInvitationByTokenHash` Query requires an argument of type `GetInvitationByTokenHashVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetInvitationByTokenHashVariables {
+  tokenHash: string;
+}
+```
+### Return Type
+Recall that calling the `GetInvitationByTokenHash` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetInvitationByTokenHash` Query is of type `GetInvitationByTokenHashData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetInvitationByTokenHashData {
+  invitations: ({
+    id: UUIDString;
+    tokenHash: string;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    openedAt?: TimestampString | null;
+    acceptedAt?: TimestampString | null;
+    revokedAt?: TimestampString | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      description: string;
+      imageUrl?: string | null;
+      memberCount: number;
+      memberLimit: number;
+      status: string;
+      requireCreatorApproval: boolean;
+      contributionMode?: string | null;
+      targetAmount: number;
+      creator: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+    } & Circle_Key;
+      invitedBy: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+        acceptedBy?: {
+          id: string;
+        } & User_Key;
+  } & Invitation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetInvitationByTokenHash`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetInvitationByTokenHashVariables } from '@bondcircle/dataconnect';
+import { useGetInvitationByTokenHash } from '@bondcircle/dataconnect/react'
+
+export default function GetInvitationByTokenHashComponent() {
+  // The `useGetInvitationByTokenHash` Query hook requires an argument of type `GetInvitationByTokenHashVariables`:
+  const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
+    tokenHash: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetInvitationByTokenHash(getInvitationByTokenHashVars);
+  // Variables can be defined inline as well.
+  const query = useGetInvitationByTokenHash({ tokenHash: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetInvitationByTokenHash(dataConnect, getInvitationByTokenHashVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationByTokenHash(getInvitationByTokenHashVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationByTokenHash(dataConnect, getInvitationByTokenHashVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleInvitations
+You can execute the `GetCircleInvitations` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleInvitations(dc: DataConnect, vars: GetCircleInvitationsVariables, options?: useDataConnectQueryOptions<GetCircleInvitationsData>): UseDataConnectQueryResult<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleInvitations(vars: GetCircleInvitationsVariables, options?: useDataConnectQueryOptions<GetCircleInvitationsData>): UseDataConnectQueryResult<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+```
+
+### Variables
+The `GetCircleInvitations` Query requires an argument of type `GetCircleInvitationsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleInvitationsVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleInvitations` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleInvitations` Query is of type `GetCircleInvitationsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleInvitationsData {
+  invitations: ({
+    id: UUIDString;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & Invitation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleInvitations`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleInvitationsVariables } from '@bondcircle/dataconnect';
+import { useGetCircleInvitations } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleInvitationsComponent() {
+  // The `useGetCircleInvitations` Query hook requires an argument of type `GetCircleInvitationsVariables`:
+  const getCircleInvitationsVars: GetCircleInvitationsVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleInvitations(getCircleInvitationsVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleInvitations({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleInvitations(dataConnect, getCircleInvitationsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitations(getCircleInvitationsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitations(dataConnect, getCircleInvitationsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetInvitationAcceptances
+You can execute the `GetInvitationAcceptances` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetInvitationAcceptances(dc: DataConnect, vars: GetInvitationAcceptancesVariables, options?: useDataConnectQueryOptions<GetInvitationAcceptancesData>): UseDataConnectQueryResult<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetInvitationAcceptances(vars: GetInvitationAcceptancesVariables, options?: useDataConnectQueryOptions<GetInvitationAcceptancesData>): UseDataConnectQueryResult<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+```
+
+### Variables
+The `GetInvitationAcceptances` Query requires an argument of type `GetInvitationAcceptancesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetInvitationAcceptancesVariables {
+  invitationId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetInvitationAcceptances` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetInvitationAcceptances` Query is of type `GetInvitationAcceptancesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetInvitationAcceptancesData {
+  invitationAcceptances: ({
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetInvitationAcceptances`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetInvitationAcceptancesVariables } from '@bondcircle/dataconnect';
+import { useGetInvitationAcceptances } from '@bondcircle/dataconnect/react'
+
+export default function GetInvitationAcceptancesComponent() {
+  // The `useGetInvitationAcceptances` Query hook requires an argument of type `GetInvitationAcceptancesVariables`:
+  const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
+    invitationId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetInvitationAcceptances(getInvitationAcceptancesVars);
+  // Variables can be defined inline as well.
+  const query = useGetInvitationAcceptances({ invitationId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetInvitationAcceptances(dataConnect, getInvitationAcceptancesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationAcceptances(getInvitationAcceptancesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationAcceptances(dataConnect, getInvitationAcceptancesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitationAcceptances);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetContributionWorkspace
+You can execute the `GetContributionWorkspace` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetContributionWorkspace(dc: DataConnect, vars: GetContributionWorkspaceVariables, options?: useDataConnectQueryOptions<GetContributionWorkspaceData>): UseDataConnectQueryResult<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetContributionWorkspace(vars: GetContributionWorkspaceVariables, options?: useDataConnectQueryOptions<GetContributionWorkspaceData>): UseDataConnectQueryResult<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+```
+
+### Variables
+The `GetContributionWorkspace` Query requires an argument of type `GetContributionWorkspaceVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetContributionWorkspaceVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetContributionWorkspace` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetContributionWorkspace` Query is of type `GetContributionWorkspaceData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetContributionWorkspaceData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    contributedAmount: number;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      contributionStatus: string;
+      expectedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      receipts: ({
+        id: UUIDString;
+        amount: number;
+        note?: string | null;
+        imageUrl: string;
+        imageStoragePath: string;
+        contentType: string;
+        status: string;
+        overpaymentAmount: number;
+        replacementOfId?: UUIDString | null;
+        rejectionReason?: string | null;
+        submittedAt: TimestampString;
+        reviewedAt?: TimestampString | null;
+        uploadedBy: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+          reviewedBy?: {
+            id: string;
+            displayName: string;
+          } & User_Key;
+      } & Receipt_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetContributionWorkspace`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetContributionWorkspaceVariables } from '@bondcircle/dataconnect';
+import { useGetContributionWorkspace } from '@bondcircle/dataconnect/react'
+
+export default function GetContributionWorkspaceComponent() {
+  // The `useGetContributionWorkspace` Query hook requires an argument of type `GetContributionWorkspaceVariables`:
+  const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetContributionWorkspace(getContributionWorkspaceVars);
+  // Variables can be defined inline as well.
+  const query = useGetContributionWorkspace({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetContributionWorkspace(dataConnect, getContributionWorkspaceVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionWorkspace(getContributionWorkspaceVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionWorkspace(dataConnect, getContributionWorkspaceVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.receipts);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -1501,6 +2239,2118 @@ export default function SetGiftMemberAllocationComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.circleMembership_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ConfigureAsoEbiCircle
+You can execute the `ConfigureAsoEbiCircle` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useConfigureAsoEbiCircle(options?: useDataConnectMutationOptions<ConfigureAsoEbiCircleData, FirebaseError, ConfigureAsoEbiCircleVariables>): UseDataConnectMutationResult<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useConfigureAsoEbiCircle(dc: DataConnect, options?: useDataConnectMutationOptions<ConfigureAsoEbiCircleData, FirebaseError, ConfigureAsoEbiCircleVariables>): UseDataConnectMutationResult<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+```
+
+### Variables
+The `ConfigureAsoEbiCircle` Mutation requires an argument of type `ConfigureAsoEbiCircleVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ConfigureAsoEbiCircleVariables {
+  circleId: UUIDString;
+  actorId: string;
+  eventType: string;
+  organizerName: string;
+  paymentBankName: string;
+  paymentAccountName: string;
+  paymentAccountNumber: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ConfigureAsoEbiCircle` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ConfigureAsoEbiCircle` Mutation is of type `ConfigureAsoEbiCircleData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ConfigureAsoEbiCircleData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ConfigureAsoEbiCircle`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ConfigureAsoEbiCircleVariables } from '@bondcircle/dataconnect';
+import { useConfigureAsoEbiCircle } from '@bondcircle/dataconnect/react'
+
+export default function ConfigureAsoEbiCircleComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useConfigureAsoEbiCircle();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useConfigureAsoEbiCircle(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useConfigureAsoEbiCircle(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useConfigureAsoEbiCircle(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useConfigureAsoEbiCircle` Mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
+  const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    eventType: ..., 
+    organizerName: ..., 
+    paymentBankName: ..., 
+    paymentAccountName: ..., 
+    paymentAccountNumber: ..., 
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(configureAsoEbiCircleVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., eventType: ..., organizerName: ..., paymentBankName: ..., paymentAccountName: ..., paymentAccountNumber: ..., imageUrl: ..., imageStoragePath: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(configureAsoEbiCircleVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateAsoEbiTier
+You can execute the `CreateAsoEbiTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateAsoEbiTier(options?: useDataConnectMutationOptions<CreateAsoEbiTierData, FirebaseError, CreateAsoEbiTierVariables>): UseDataConnectMutationResult<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateAsoEbiTier(dc: DataConnect, options?: useDataConnectMutationOptions<CreateAsoEbiTierData, FirebaseError, CreateAsoEbiTierVariables>): UseDataConnectMutationResult<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+```
+
+### Variables
+The `CreateAsoEbiTier` Mutation requires an argument of type `CreateAsoEbiTierVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateAsoEbiTierVariables {
+  tierId: UUIDString;
+  circleId: UUIDString;
+  name: string;
+  price: number;
+  fabricDescription: string;
+  fabricImageUrl?: string | null;
+  fabricImageStoragePath?: string | null;
+  appreciationGiftName?: string | null;
+  appreciationGiftImageUrl?: string | null;
+  appreciationGiftImageStoragePath?: string | null;
+  availabilityNote?: string | null;
+  deliveryDetails?: string | null;
+  sortOrder: number;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateAsoEbiTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateAsoEbiTier` Mutation is of type `CreateAsoEbiTierData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateAsoEbiTierData {
+  asoEbiTier_insert: AsoEbiTier_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateAsoEbiTier`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateAsoEbiTierVariables } from '@bondcircle/dataconnect';
+import { useCreateAsoEbiTier } from '@bondcircle/dataconnect/react'
+
+export default function CreateAsoEbiTierComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateAsoEbiTier();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateAsoEbiTier(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateAsoEbiTier(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateAsoEbiTier(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateAsoEbiTier` Mutation requires an argument of type `CreateAsoEbiTierVariables`:
+  const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
+    tierId: ..., 
+    circleId: ..., 
+    name: ..., 
+    price: ..., 
+    fabricDescription: ..., 
+    fabricImageUrl: ..., // optional
+    fabricImageStoragePath: ..., // optional
+    appreciationGiftName: ..., // optional
+    appreciationGiftImageUrl: ..., // optional
+    appreciationGiftImageStoragePath: ..., // optional
+    availabilityNote: ..., // optional
+    deliveryDetails: ..., // optional
+    sortOrder: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(createAsoEbiTierVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ tierId: ..., circleId: ..., name: ..., price: ..., fabricDescription: ..., fabricImageUrl: ..., fabricImageStoragePath: ..., appreciationGiftName: ..., appreciationGiftImageUrl: ..., appreciationGiftImageStoragePath: ..., availabilityNote: ..., deliveryDetails: ..., sortOrder: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createAsoEbiTierVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.asoEbiTier_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SelectAsoEbiTier
+You can execute the `SelectAsoEbiTier` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSelectAsoEbiTier(options?: useDataConnectMutationOptions<SelectAsoEbiTierData, FirebaseError, SelectAsoEbiTierVariables>): UseDataConnectMutationResult<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSelectAsoEbiTier(dc: DataConnect, options?: useDataConnectMutationOptions<SelectAsoEbiTierData, FirebaseError, SelectAsoEbiTierVariables>): UseDataConnectMutationResult<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+```
+
+### Variables
+The `SelectAsoEbiTier` Mutation requires an argument of type `SelectAsoEbiTierVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SelectAsoEbiTierVariables {
+  circleId: UUIDString;
+  memberId: string;
+  tierId: UUIDString;
+  expectedAmount: number;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `SelectAsoEbiTier` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SelectAsoEbiTier` Mutation is of type `SelectAsoEbiTierData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SelectAsoEbiTierData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SelectAsoEbiTier`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SelectAsoEbiTierVariables } from '@bondcircle/dataconnect';
+import { useSelectAsoEbiTier } from '@bondcircle/dataconnect/react'
+
+export default function SelectAsoEbiTierComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSelectAsoEbiTier();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSelectAsoEbiTier(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSelectAsoEbiTier(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSelectAsoEbiTier(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSelectAsoEbiTier` Mutation requires an argument of type `SelectAsoEbiTierVariables`:
+  const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
+    circleId: ..., 
+    memberId: ..., 
+    tierId: ..., 
+    expectedAmount: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(selectAsoEbiTierVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., memberId: ..., tierId: ..., expectedAmount: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(selectAsoEbiTierVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateAsoEbiFulfilment
+You can execute the `UpdateAsoEbiFulfilment` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateAsoEbiFulfilment(options?: useDataConnectMutationOptions<UpdateAsoEbiFulfilmentData, FirebaseError, UpdateAsoEbiFulfilmentVariables>): UseDataConnectMutationResult<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateAsoEbiFulfilment(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateAsoEbiFulfilmentData, FirebaseError, UpdateAsoEbiFulfilmentVariables>): UseDataConnectMutationResult<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+```
+
+### Variables
+The `UpdateAsoEbiFulfilment` Mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateAsoEbiFulfilmentVariables {
+  circleId: UUIDString;
+  actorId: string;
+  memberId: string;
+  status: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `UpdateAsoEbiFulfilment` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateAsoEbiFulfilment` Mutation is of type `UpdateAsoEbiFulfilmentData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateAsoEbiFulfilmentData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateAsoEbiFulfilment`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateAsoEbiFulfilmentVariables } from '@bondcircle/dataconnect';
+import { useUpdateAsoEbiFulfilment } from '@bondcircle/dataconnect/react'
+
+export default function UpdateAsoEbiFulfilmentComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateAsoEbiFulfilment();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateAsoEbiFulfilment(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateAsoEbiFulfilment(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateAsoEbiFulfilment(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateAsoEbiFulfilment` Mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
+  const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    memberId: ..., 
+    status: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(updateAsoEbiFulfilmentVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., memberId: ..., status: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateAsoEbiFulfilmentVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ConfigureSupportCircle
+You can execute the `ConfigureSupportCircle` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useConfigureSupportCircle(options?: useDataConnectMutationOptions<ConfigureSupportCircleData, FirebaseError, ConfigureSupportCircleVariables>): UseDataConnectMutationResult<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useConfigureSupportCircle(dc: DataConnect, options?: useDataConnectMutationOptions<ConfigureSupportCircleData, FirebaseError, ConfigureSupportCircleVariables>): UseDataConnectMutationResult<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+```
+
+### Variables
+The `ConfigureSupportCircle` Mutation requires an argument of type `ConfigureSupportCircleVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ConfigureSupportCircleVariables {
+  circleId: UUIDString;
+  actorId: string;
+  supportType: string;
+  beneficiaryName: string;
+  beneficiaryRelationship?: string | null;
+  contributionMode: string;
+  showBeneficiaryName: boolean;
+  showTargetToMembers: boolean;
+  showConfirmedTotalToMembers: boolean;
+  hideIndividualAmounts: boolean;
+  requireCreatorApproval: boolean;
+  paymentBankName: string;
+  paymentAccountName: string;
+  paymentAccountNumber: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ConfigureSupportCircle` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ConfigureSupportCircle` Mutation is of type `ConfigureSupportCircleData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ConfigureSupportCircleData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ConfigureSupportCircle`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ConfigureSupportCircleVariables } from '@bondcircle/dataconnect';
+import { useConfigureSupportCircle } from '@bondcircle/dataconnect/react'
+
+export default function ConfigureSupportCircleComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useConfigureSupportCircle();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useConfigureSupportCircle(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useConfigureSupportCircle(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useConfigureSupportCircle(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useConfigureSupportCircle` Mutation requires an argument of type `ConfigureSupportCircleVariables`:
+  const configureSupportCircleVars: ConfigureSupportCircleVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    supportType: ..., 
+    beneficiaryName: ..., 
+    beneficiaryRelationship: ..., // optional
+    contributionMode: ..., 
+    showBeneficiaryName: ..., 
+    showTargetToMembers: ..., 
+    showConfirmedTotalToMembers: ..., 
+    hideIndividualAmounts: ..., 
+    requireCreatorApproval: ..., 
+    paymentBankName: ..., 
+    paymentAccountName: ..., 
+    paymentAccountNumber: ..., 
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(configureSupportCircleVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., supportType: ..., beneficiaryName: ..., beneficiaryRelationship: ..., contributionMode: ..., showBeneficiaryName: ..., showTargetToMembers: ..., showConfirmedTotalToMembers: ..., hideIndividualAmounts: ..., requireCreatorApproval: ..., paymentBankName: ..., paymentAccountName: ..., paymentAccountNumber: ..., imageUrl: ..., imageStoragePath: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(configureSupportCircleVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RecordSupportPledge
+You can execute the `RecordSupportPledge` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRecordSupportPledge(options?: useDataConnectMutationOptions<RecordSupportPledgeData, FirebaseError, RecordSupportPledgeVariables>): UseDataConnectMutationResult<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRecordSupportPledge(dc: DataConnect, options?: useDataConnectMutationOptions<RecordSupportPledgeData, FirebaseError, RecordSupportPledgeVariables>): UseDataConnectMutationResult<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+```
+
+### Variables
+The `RecordSupportPledge` Mutation requires an argument of type `RecordSupportPledgeVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RecordSupportPledgeVariables {
+  circleId: UUIDString;
+  memberId: string;
+  amount: number;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RecordSupportPledge` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RecordSupportPledge` Mutation is of type `RecordSupportPledgeData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RecordSupportPledgeData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RecordSupportPledge`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RecordSupportPledgeVariables } from '@bondcircle/dataconnect';
+import { useRecordSupportPledge } from '@bondcircle/dataconnect/react'
+
+export default function RecordSupportPledgeComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRecordSupportPledge();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRecordSupportPledge(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordSupportPledge(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordSupportPledge(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRecordSupportPledge` Mutation requires an argument of type `RecordSupportPledgeVariables`:
+  const recordSupportPledgeVars: RecordSupportPledgeVariables = {
+    circleId: ..., 
+    memberId: ..., 
+    amount: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(recordSupportPledgeVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., memberId: ..., amount: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(recordSupportPledgeVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SetSupportMemberAllocation
+You can execute the `SetSupportMemberAllocation` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSetSupportMemberAllocation(options?: useDataConnectMutationOptions<SetSupportMemberAllocationData, FirebaseError, SetSupportMemberAllocationVariables>): UseDataConnectMutationResult<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSetSupportMemberAllocation(dc: DataConnect, options?: useDataConnectMutationOptions<SetSupportMemberAllocationData, FirebaseError, SetSupportMemberAllocationVariables>): UseDataConnectMutationResult<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+```
+
+### Variables
+The `SetSupportMemberAllocation` Mutation requires an argument of type `SetSupportMemberAllocationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SetSupportMemberAllocationVariables {
+  circleId: UUIDString;
+  memberId: string;
+  expectedAmount: number;
+  contributionStatus: string;
+}
+```
+### Return Type
+Recall that calling the `SetSupportMemberAllocation` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SetSupportMemberAllocation` Mutation is of type `SetSupportMemberAllocationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SetSupportMemberAllocationData {
+  circleMembership_update?: CircleMembership_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SetSupportMemberAllocation`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SetSupportMemberAllocationVariables } from '@bondcircle/dataconnect';
+import { useSetSupportMemberAllocation } from '@bondcircle/dataconnect/react'
+
+export default function SetSupportMemberAllocationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSetSupportMemberAllocation();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSetSupportMemberAllocation(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetSupportMemberAllocation(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetSupportMemberAllocation(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSetSupportMemberAllocation` Mutation requires an argument of type `SetSupportMemberAllocationVariables`:
+  const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
+    circleId: ..., 
+    memberId: ..., 
+    expectedAmount: ..., 
+    contributionStatus: ..., 
+  };
+  mutation.mutate(setSupportMemberAllocationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., memberId: ..., expectedAmount: ..., contributionStatus: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(setSupportMemberAllocationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateSupportUpdate
+You can execute the `CreateSupportUpdate` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateSupportUpdate(options?: useDataConnectMutationOptions<CreateSupportUpdateData, FirebaseError, CreateSupportUpdateVariables>): UseDataConnectMutationResult<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateSupportUpdate(dc: DataConnect, options?: useDataConnectMutationOptions<CreateSupportUpdateData, FirebaseError, CreateSupportUpdateVariables>): UseDataConnectMutationResult<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+```
+
+### Variables
+The `CreateSupportUpdate` Mutation requires an argument of type `CreateSupportUpdateVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateSupportUpdateVariables {
+  circleId: UUIDString;
+  authorId: string;
+  body: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateSupportUpdate` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateSupportUpdate` Mutation is of type `CreateSupportUpdateData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateSupportUpdateData {
+  supportUpdate_insert: SupportUpdate_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateSupportUpdate`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateSupportUpdateVariables } from '@bondcircle/dataconnect';
+import { useCreateSupportUpdate } from '@bondcircle/dataconnect/react'
+
+export default function CreateSupportUpdateComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateSupportUpdate();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateSupportUpdate(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateSupportUpdate(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateSupportUpdate(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateSupportUpdate` Mutation requires an argument of type `CreateSupportUpdateVariables`:
+  const createSupportUpdateVars: CreateSupportUpdateVariables = {
+    circleId: ..., 
+    authorId: ..., 
+    body: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(createSupportUpdateVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., authorId: ..., body: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createSupportUpdateVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.supportUpdate_insert);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SetSupportCompletionType
+You can execute the `SetSupportCompletionType` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSetSupportCompletionType(options?: useDataConnectMutationOptions<SetSupportCompletionTypeData, FirebaseError, SetSupportCompletionTypeVariables>): UseDataConnectMutationResult<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSetSupportCompletionType(dc: DataConnect, options?: useDataConnectMutationOptions<SetSupportCompletionTypeData, FirebaseError, SetSupportCompletionTypeVariables>): UseDataConnectMutationResult<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+```
+
+### Variables
+The `SetSupportCompletionType` Mutation requires an argument of type `SetSupportCompletionTypeVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SetSupportCompletionTypeVariables {
+  circleId: UUIDString;
+  actorId: string;
+  completionType: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `SetSupportCompletionType` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SetSupportCompletionType` Mutation is of type `SetSupportCompletionTypeData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SetSupportCompletionTypeData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SetSupportCompletionType`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SetSupportCompletionTypeVariables } from '@bondcircle/dataconnect';
+import { useSetSupportCompletionType } from '@bondcircle/dataconnect/react'
+
+export default function SetSupportCompletionTypeComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSetSupportCompletionType();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSetSupportCompletionType(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetSupportCompletionType(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetSupportCompletionType(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSetSupportCompletionType` Mutation requires an argument of type `SetSupportCompletionTypeVariables`:
+  const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    completionType: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(setSupportCompletionTypeVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., completionType: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(setSupportCompletionTypeVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateInvitation
+You can execute the `CreateInvitation` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateInvitation(options?: useDataConnectMutationOptions<CreateInvitationData, FirebaseError, CreateInvitationVariables>): UseDataConnectMutationResult<CreateInvitationData, CreateInvitationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateInvitation(dc: DataConnect, options?: useDataConnectMutationOptions<CreateInvitationData, FirebaseError, CreateInvitationVariables>): UseDataConnectMutationResult<CreateInvitationData, CreateInvitationVariables>;
+```
+
+### Variables
+The `CreateInvitation` Mutation requires an argument of type `CreateInvitationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateInvitationVariables {
+  circleId: UUIDString;
+  invitedById: string;
+  tokenHash: string;
+  mode: string;
+  recipientName?: string | null;
+  recipientEmail?: string | null;
+  recipientPhone?: string | null;
+  expectedAmount: number;
+  requireApproval: boolean;
+  maxUses: number;
+  expiresAt: TimestampString;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateInvitation` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateInvitation` Mutation is of type `CreateInvitationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateInvitationData {
+  invitation_insert: Invitation_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateInvitation`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateInvitationVariables } from '@bondcircle/dataconnect';
+import { useCreateInvitation } from '@bondcircle/dataconnect/react'
+
+export default function CreateInvitationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateInvitation();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateInvitation(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateInvitation(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateInvitation(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateInvitation` Mutation requires an argument of type `CreateInvitationVariables`:
+  const createInvitationVars: CreateInvitationVariables = {
+    circleId: ..., 
+    invitedById: ..., 
+    tokenHash: ..., 
+    mode: ..., 
+    recipientName: ..., // optional
+    recipientEmail: ..., // optional
+    recipientPhone: ..., // optional
+    expectedAmount: ..., 
+    requireApproval: ..., 
+    maxUses: ..., 
+    expiresAt: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(createInvitationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., invitedById: ..., tokenHash: ..., mode: ..., recipientName: ..., recipientEmail: ..., recipientPhone: ..., expectedAmount: ..., requireApproval: ..., maxUses: ..., expiresAt: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createInvitationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitation_insert);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateInvitationState
+You can execute the `UpdateInvitationState` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateInvitationState(options?: useDataConnectMutationOptions<UpdateInvitationStateData, FirebaseError, UpdateInvitationStateVariables>): UseDataConnectMutationResult<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateInvitationState(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateInvitationStateData, FirebaseError, UpdateInvitationStateVariables>): UseDataConnectMutationResult<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+```
+
+### Variables
+The `UpdateInvitationState` Mutation requires an argument of type `UpdateInvitationStateVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateInvitationStateVariables {
+  invitationId: UUIDString;
+  actorId: string;
+  circleId: UUIDString;
+  state: string;
+  openedAt?: TimestampString | null;
+  revokedAt?: TimestampString | null;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `UpdateInvitationState` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateInvitationState` Mutation is of type `UpdateInvitationStateData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateInvitationStateData {
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateInvitationState`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateInvitationStateVariables } from '@bondcircle/dataconnect';
+import { useUpdateInvitationState } from '@bondcircle/dataconnect/react'
+
+export default function UpdateInvitationStateComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateInvitationState();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateInvitationState(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateInvitationState(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateInvitationState(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateInvitationState` Mutation requires an argument of type `UpdateInvitationStateVariables`:
+  const updateInvitationStateVars: UpdateInvitationStateVariables = {
+    invitationId: ..., 
+    actorId: ..., 
+    circleId: ..., 
+    state: ..., 
+    openedAt: ..., // optional
+    revokedAt: ..., // optional
+    updatedAt: ..., 
+  };
+  mutation.mutate(updateInvitationStateVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., actorId: ..., circleId: ..., state: ..., openedAt: ..., revokedAt: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateInvitationStateVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AcceptInvitationWithMembership
+You can execute the `AcceptInvitationWithMembership` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useAcceptInvitationWithMembership(options?: useDataConnectMutationOptions<AcceptInvitationWithMembershipData, FirebaseError, AcceptInvitationWithMembershipVariables>): UseDataConnectMutationResult<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAcceptInvitationWithMembership(dc: DataConnect, options?: useDataConnectMutationOptions<AcceptInvitationWithMembershipData, FirebaseError, AcceptInvitationWithMembershipVariables>): UseDataConnectMutationResult<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+```
+
+### Variables
+The `AcceptInvitationWithMembership` Mutation requires an argument of type `AcceptInvitationWithMembershipVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AcceptInvitationWithMembershipVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  role: string;
+  expectedAmount: number;
+  nextMemberCount: number;
+  nextInvitationState: string;
+  nextUseCount: number;
+  respondedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `AcceptInvitationWithMembership` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AcceptInvitationWithMembership` Mutation is of type `AcceptInvitationWithMembershipData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AcceptInvitationWithMembershipData {
+  circleMembership_insert: CircleMembership_Key;
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  circle_update?: Circle_Key | null;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AcceptInvitationWithMembership`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AcceptInvitationWithMembershipVariables } from '@bondcircle/dataconnect';
+import { useAcceptInvitationWithMembership } from '@bondcircle/dataconnect/react'
+
+export default function AcceptInvitationWithMembershipComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAcceptInvitationWithMembership();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAcceptInvitationWithMembership(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAcceptInvitationWithMembership(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAcceptInvitationWithMembership(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAcceptInvitationWithMembership` Mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
+  const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    role: ..., 
+    expectedAmount: ..., 
+    nextMemberCount: ..., 
+    nextInvitationState: ..., 
+    nextUseCount: ..., 
+    respondedAt: ..., 
+  };
+  mutation.mutate(acceptInvitationWithMembershipVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., circleId: ..., userId: ..., role: ..., expectedAmount: ..., nextMemberCount: ..., nextInvitationState: ..., nextUseCount: ..., respondedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(acceptInvitationWithMembershipVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_insert);
+    console.log(mutation.data.invitationAcceptance_insert);
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RequestInvitationApproval
+You can execute the `RequestInvitationApproval` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRequestInvitationApproval(options?: useDataConnectMutationOptions<RequestInvitationApprovalData, FirebaseError, RequestInvitationApprovalVariables>): UseDataConnectMutationResult<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRequestInvitationApproval(dc: DataConnect, options?: useDataConnectMutationOptions<RequestInvitationApprovalData, FirebaseError, RequestInvitationApprovalVariables>): UseDataConnectMutationResult<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+```
+
+### Variables
+The `RequestInvitationApproval` Mutation requires an argument of type `RequestInvitationApprovalVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RequestInvitationApprovalVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  respondedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RequestInvitationApproval` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RequestInvitationApproval` Mutation is of type `RequestInvitationApprovalData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RequestInvitationApprovalData {
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RequestInvitationApproval`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RequestInvitationApprovalVariables } from '@bondcircle/dataconnect';
+import { useRequestInvitationApproval } from '@bondcircle/dataconnect/react'
+
+export default function RequestInvitationApprovalComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRequestInvitationApproval();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRequestInvitationApproval(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRequestInvitationApproval(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRequestInvitationApproval(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRequestInvitationApproval` Mutation requires an argument of type `RequestInvitationApprovalVariables`:
+  const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    respondedAt: ..., 
+  };
+  mutation.mutate(requestInvitationApprovalVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., circleId: ..., userId: ..., respondedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(requestInvitationApprovalVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitationAcceptance_insert);
+    console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SubmitReceiptWithAudit
+You can execute the `SubmitReceiptWithAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSubmitReceiptWithAudit(options?: useDataConnectMutationOptions<SubmitReceiptWithAuditData, FirebaseError, SubmitReceiptWithAuditVariables>): UseDataConnectMutationResult<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSubmitReceiptWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<SubmitReceiptWithAuditData, FirebaseError, SubmitReceiptWithAuditVariables>): UseDataConnectMutationResult<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+```
+
+### Variables
+The `SubmitReceiptWithAudit` Mutation requires an argument of type `SubmitReceiptWithAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SubmitReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  amount: number;
+  note?: string | null;
+  imageUrl: string;
+  imageStoragePath: string;
+  contentType: string;
+  status: string;
+  overpaymentAmount: number;
+  submittedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `SubmitReceiptWithAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SubmitReceiptWithAudit` Mutation is of type `SubmitReceiptWithAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SubmitReceiptWithAuditData {
+  receipt_insert: Receipt_Key;
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SubmitReceiptWithAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SubmitReceiptWithAuditVariables } from '@bondcircle/dataconnect';
+import { useSubmitReceiptWithAudit } from '@bondcircle/dataconnect/react'
+
+export default function SubmitReceiptWithAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSubmitReceiptWithAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSubmitReceiptWithAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSubmitReceiptWithAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSubmitReceiptWithAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSubmitReceiptWithAudit` Mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
+  const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
+    receiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    amount: ..., 
+    note: ..., // optional
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    contentType: ..., 
+    status: ..., 
+    overpaymentAmount: ..., 
+    submittedAt: ..., 
+  };
+  mutation.mutate(submitReceiptWithAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ receiptId: ..., circleId: ..., uploaderId: ..., amount: ..., note: ..., imageUrl: ..., imageStoragePath: ..., contentType: ..., status: ..., overpaymentAmount: ..., submittedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(submitReceiptWithAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.receipt_insert);
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ReplaceReceiptWithAudit
+You can execute the `ReplaceReceiptWithAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useReplaceReceiptWithAudit(options?: useDataConnectMutationOptions<ReplaceReceiptWithAuditData, FirebaseError, ReplaceReceiptWithAuditVariables>): UseDataConnectMutationResult<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useReplaceReceiptWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<ReplaceReceiptWithAuditData, FirebaseError, ReplaceReceiptWithAuditVariables>): UseDataConnectMutationResult<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+```
+
+### Variables
+The `ReplaceReceiptWithAudit` Mutation requires an argument of type `ReplaceReceiptWithAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ReplaceReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  replacedReceiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  amount: number;
+  note?: string | null;
+  imageUrl: string;
+  imageStoragePath: string;
+  contentType: string;
+  status: string;
+  overpaymentAmount: number;
+  submittedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ReplaceReceiptWithAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ReplaceReceiptWithAudit` Mutation is of type `ReplaceReceiptWithAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ReplaceReceiptWithAuditData {
+  receipt_update?: Receipt_Key | null;
+  receipt_insert: Receipt_Key;
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ReplaceReceiptWithAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ReplaceReceiptWithAuditVariables } from '@bondcircle/dataconnect';
+import { useReplaceReceiptWithAudit } from '@bondcircle/dataconnect/react'
+
+export default function ReplaceReceiptWithAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useReplaceReceiptWithAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useReplaceReceiptWithAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useReplaceReceiptWithAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useReplaceReceiptWithAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useReplaceReceiptWithAudit` Mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
+  const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
+    receiptId: ..., 
+    replacedReceiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    amount: ..., 
+    note: ..., // optional
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    contentType: ..., 
+    status: ..., 
+    overpaymentAmount: ..., 
+    submittedAt: ..., 
+  };
+  mutation.mutate(replaceReceiptWithAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ receiptId: ..., replacedReceiptId: ..., circleId: ..., uploaderId: ..., amount: ..., note: ..., imageUrl: ..., imageStoragePath: ..., contentType: ..., status: ..., overpaymentAmount: ..., submittedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(replaceReceiptWithAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.receipt_update);
+    console.log(mutation.data.receipt_insert);
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ReviewReceiptWithAudit
+You can execute the `ReviewReceiptWithAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useReviewReceiptWithAudit(options?: useDataConnectMutationOptions<ReviewReceiptWithAuditData, FirebaseError, ReviewReceiptWithAuditVariables>): UseDataConnectMutationResult<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useReviewReceiptWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<ReviewReceiptWithAuditData, FirebaseError, ReviewReceiptWithAuditVariables>): UseDataConnectMutationResult<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+```
+
+### Variables
+The `ReviewReceiptWithAudit` Mutation requires an argument of type `ReviewReceiptWithAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ReviewReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  reviewerId: string;
+  receiptStatus: string;
+  rejectionReason?: string | null;
+  reviewedAt: TimestampString;
+  membershipStatus: string;
+  nextConfirmedAmount: number;
+  nextCircleContributedAmount: number;
+  auditAction: string;
+  materialChanges: string;
+}
+```
+### Return Type
+Recall that calling the `ReviewReceiptWithAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ReviewReceiptWithAudit` Mutation is of type `ReviewReceiptWithAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ReviewReceiptWithAuditData {
+  receipt_update?: Receipt_Key | null;
+  circleMembership_update?: CircleMembership_Key | null;
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ReviewReceiptWithAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ReviewReceiptWithAuditVariables } from '@bondcircle/dataconnect';
+import { useReviewReceiptWithAudit } from '@bondcircle/dataconnect/react'
+
+export default function ReviewReceiptWithAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useReviewReceiptWithAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useReviewReceiptWithAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useReviewReceiptWithAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useReviewReceiptWithAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useReviewReceiptWithAudit` Mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
+  const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
+    receiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    reviewerId: ..., 
+    receiptStatus: ..., 
+    rejectionReason: ..., // optional
+    reviewedAt: ..., 
+    membershipStatus: ..., 
+    nextConfirmedAmount: ..., 
+    nextCircleContributedAmount: ..., 
+    auditAction: ..., 
+    materialChanges: ..., 
+  };
+  mutation.mutate(reviewReceiptWithAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ receiptId: ..., circleId: ..., uploaderId: ..., reviewerId: ..., receiptStatus: ..., rejectionReason: ..., reviewedAt: ..., membershipStatus: ..., nextConfirmedAmount: ..., nextCircleContributedAmount: ..., auditAction: ..., materialChanges: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(reviewReceiptWithAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.receipt_update);
+    console.log(mutation.data.circleMembership_update);
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ApproveInvitationMembership
+You can execute the `ApproveInvitationMembership` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useApproveInvitationMembership(options?: useDataConnectMutationOptions<ApproveInvitationMembershipData, FirebaseError, ApproveInvitationMembershipVariables>): UseDataConnectMutationResult<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useApproveInvitationMembership(dc: DataConnect, options?: useDataConnectMutationOptions<ApproveInvitationMembershipData, FirebaseError, ApproveInvitationMembershipVariables>): UseDataConnectMutationResult<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+```
+
+### Variables
+The `ApproveInvitationMembership` Mutation requires an argument of type `ApproveInvitationMembershipVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ApproveInvitationMembershipVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  userId: string;
+  role: string;
+  expectedAmount: number;
+  nextMemberCount: number;
+  nextInvitationState: string;
+  nextUseCount: number;
+  respondedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ApproveInvitationMembership` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ApproveInvitationMembership` Mutation is of type `ApproveInvitationMembershipData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ApproveInvitationMembershipData {
+  circleMembership_insert: CircleMembership_Key;
+  invitationAcceptance_update?: InvitationAcceptance_Key | null;
+  circle_update?: Circle_Key | null;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ApproveInvitationMembership`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ApproveInvitationMembershipVariables } from '@bondcircle/dataconnect';
+import { useApproveInvitationMembership } from '@bondcircle/dataconnect/react'
+
+export default function ApproveInvitationMembershipComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useApproveInvitationMembership();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useApproveInvitationMembership(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useApproveInvitationMembership(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useApproveInvitationMembership(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useApproveInvitationMembership` Mutation requires an argument of type `ApproveInvitationMembershipVariables`:
+  const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
+    invitationId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    userId: ..., 
+    role: ..., 
+    expectedAmount: ..., 
+    nextMemberCount: ..., 
+    nextInvitationState: ..., 
+    nextUseCount: ..., 
+    respondedAt: ..., 
+  };
+  mutation.mutate(approveInvitationMembershipVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., circleId: ..., actorId: ..., userId: ..., role: ..., expectedAmount: ..., nextMemberCount: ..., nextInvitationState: ..., nextUseCount: ..., respondedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(approveInvitationMembershipVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_insert);
+    console.log(mutation.data.invitationAcceptance_update);
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DeclineInvitation
+You can execute the `DeclineInvitation` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useDeclineInvitation(options?: useDataConnectMutationOptions<DeclineInvitationData, FirebaseError, DeclineInvitationVariables>): UseDataConnectMutationResult<DeclineInvitationData, DeclineInvitationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDeclineInvitation(dc: DataConnect, options?: useDataConnectMutationOptions<DeclineInvitationData, FirebaseError, DeclineInvitationVariables>): UseDataConnectMutationResult<DeclineInvitationData, DeclineInvitationVariables>;
+```
+
+### Variables
+The `DeclineInvitation` Mutation requires an argument of type `DeclineInvitationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DeclineInvitationVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  state: string;
+  respondedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `DeclineInvitation` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DeclineInvitation` Mutation is of type `DeclineInvitationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DeclineInvitationData {
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DeclineInvitation`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DeclineInvitationVariables } from '@bondcircle/dataconnect';
+import { useDeclineInvitation } from '@bondcircle/dataconnect/react'
+
+export default function DeclineInvitationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDeclineInvitation();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDeclineInvitation(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeclineInvitation(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeclineInvitation(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDeclineInvitation` Mutation requires an argument of type `DeclineInvitationVariables`:
+  const declineInvitationVars: DeclineInvitationVariables = {
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    state: ..., 
+    respondedAt: ..., 
+  };
+  mutation.mutate(declineInvitationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., circleId: ..., userId: ..., state: ..., respondedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(declineInvitationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitationAcceptance_insert);
+    console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RequestReplacementInvitation
+You can execute the `RequestReplacementInvitation` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRequestReplacementInvitation(options?: useDataConnectMutationOptions<RequestReplacementInvitationData, FirebaseError, RequestReplacementInvitationVariables>): UseDataConnectMutationResult<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRequestReplacementInvitation(dc: DataConnect, options?: useDataConnectMutationOptions<RequestReplacementInvitationData, FirebaseError, RequestReplacementInvitationVariables>): UseDataConnectMutationResult<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+```
+
+### Variables
+The `RequestReplacementInvitation` Mutation requires an argument of type `RequestReplacementInvitationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RequestReplacementInvitationVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  requestedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RequestReplacementInvitation` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RequestReplacementInvitation` Mutation is of type `RequestReplacementInvitationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RequestReplacementInvitationData {
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RequestReplacementInvitation`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RequestReplacementInvitationVariables } from '@bondcircle/dataconnect';
+import { useRequestReplacementInvitation } from '@bondcircle/dataconnect/react'
+
+export default function RequestReplacementInvitationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRequestReplacementInvitation();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRequestReplacementInvitation(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRequestReplacementInvitation(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRequestReplacementInvitation(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRequestReplacementInvitation` Mutation requires an argument of type `RequestReplacementInvitationVariables`:
+  const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
+    invitationId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    requestedAt: ..., 
+  };
+  mutation.mutate(requestReplacementInvitationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., circleId: ..., actorId: ..., requestedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(requestReplacementInvitationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleAuditEntry_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

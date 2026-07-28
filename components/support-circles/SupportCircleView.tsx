@@ -22,6 +22,7 @@ import type {
   SupportCircleMember,
 } from "@/server/repositories/support-circles";
 import { InvitationManager } from "@/components/invitations/InvitationManager";
+import { ContributionWorkspace } from "@/components/contributions/ContributionWorkspace";
 
 const naira = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -281,6 +282,11 @@ export function SupportCircleView({
               approved receipt-review process.
             </small>
           </section>
+
+          <ContributionWorkspace
+            circleId={circle.id}
+            heading="Your support contribution"
+          />
 
           <section className="bc-support-members">
             <header>

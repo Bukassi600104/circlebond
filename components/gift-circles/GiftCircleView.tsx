@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Building2,
-  Check,
   ChevronDown,
   ChevronUp,
   Clock3,
@@ -16,7 +15,6 @@ import {
   MessageCircle,
   Megaphone,
   Plus,
-  ReceiptText,
   ShieldCheck,
   Trash2,
   X,
@@ -27,6 +25,7 @@ import type {
   GiftCircleMember,
 } from "@/server/repositories/gift-circles";
 import { InvitationManager } from "@/components/invitations/InvitationManager";
+import { ContributionWorkspace } from "@/components/contributions/ContributionWorkspace";
 
 const tabs = [
   { id: "announcements", label: "Announcements", icon: Megaphone },
@@ -405,13 +404,6 @@ export function GiftCircleView({
     { length: circle.memberLimit },
     (_, index) => circle.members[index] ?? null,
   );
-  const reviewQueue = creator
-    ? circle.members.filter(
-        (member) =>
-          member.contributionStatus === "receipt_submitted" ||
-          member.contributionStatus === "awaiting_confirmation",
-      )
-    : [];
 
   useEffect(() => {
     if (!selected) return;
@@ -581,28 +573,6 @@ export function GiftCircleView({
         </div>
       </div>
 
-      {creator && (
-        <section className="bc-gift-review">
-          <header>
-            <ReceiptText size={18} aria-hidden="true" />
-            <div>
-              <h2>Review queue</h2>
-              <p>Only creators and authorised reviewers can see this queue.</p>
-            </div>
-            <span>{reviewQueue.length}</span>
-          </header>
-          {reviewQueue.length ? (
-            reviewQueue.map((member) => (
-              <p key={member.id}>
-                {member.displayName} · {money(member.pledgedAmount)}
-              </p>
-            ))
-          ) : (
-            <p>No payment proofs are waiting for review.</p>
-          )}
-        </section>
-      )}
-
       <section className="bc-gift-tabs">
         <nav aria-label="Circle updates">
           {tabs.map(({ icon: Icon, id, label }) => (
@@ -678,13 +648,7 @@ export function GiftCircleView({
               </div>
             </dl>
             {selected.id === viewerId ? (
-              <div className="bc-gift-panel__self">
-                <Check size={16} aria-hidden="true" />
-                <p>
-                  This is your private contribution panel. Payment proof upload
-                  becomes available in the contribution milestone.
-                </p>
-              </div>
+              <ContributionWorkspace circleId={circle.id} />
             ) : (
               <div className="bc-gift-panel__private">
                 <Clock3 size={16} aria-hidden="true" />

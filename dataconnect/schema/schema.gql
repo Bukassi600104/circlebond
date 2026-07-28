@@ -75,6 +75,24 @@ type CircleMembership @table(key: ["circle", "user"]) {
   joinedAt: Timestamp! @default(expr: "request.time")
 }
 
+type Receipt @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  uploadedBy: User!
+  amount: Int!
+  note: String
+  imageUrl: String!
+  imageStoragePath: String!
+  contentType: String!
+  status: String! @default(value: "awaiting_confirmation")
+  overpaymentAmount: Int! @default(value: 0)
+  replacementOfId: UUID
+  rejectionReason: String
+  reviewedBy: User
+  submittedAt: Timestamp! @default(expr: "request.time")
+  reviewedAt: Timestamp
+}
+
 type AsoEbiTier @table {
   id: UUID! @default(expr: "uuidV4()")
   circle: Circle!

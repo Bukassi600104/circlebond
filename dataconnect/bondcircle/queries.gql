@@ -531,7 +531,7 @@ mutation SelectAsoEbiTier(
       circle: { id: $circleId }
       actor: { id: $memberId }
       action: "tier_selected"
-      materialChanges: $tierId
+      materialChanges: "aso_ebi_tier_selected"
       createdAt: $updatedAt
     }
   )
@@ -685,7 +685,7 @@ mutation RecordSupportPledge(
       circle: { id: $circleId }
       actor: { id: $memberId }
       action: "support_pledged"
-      materialChanges: $amount
+      materialChanges: "support_pledge_updated"
       createdAt: $updatedAt
     }
   )
@@ -961,7 +961,7 @@ mutation AcceptInvitationWithMembership(
       circle: { id: $circleId }
       actor: { id: $userId }
       action: "invitation_accepted"
-      materialChanges: $invitationId
+      materialChanges: "invitation_accepted"
       createdAt: $respondedAt
     }
   )
@@ -995,8 +995,206 @@ mutation RequestInvitationApproval(
       circle: { id: $circleId }
       actor: { id: $userId }
       action: "membership_approval_requested"
-      materialChanges: $invitationId
+      materialChanges: "membership_approval_requested"
       createdAt: $respondedAt
+    }
+  )
+}
+
+query GetContributionWorkspace($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    contributedAmount
+    status
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    expectedAmount
+    confirmedAmount
+    user {
+      id
+      displayName
+      profileImage
+    }
+  }
+  receipts(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { submittedAt: DESC }
+  ) {
+    id
+    amount
+    note
+    imageUrl
+    imageStoragePath
+    contentType
+    status
+    overpaymentAmount
+    replacementOfId
+    rejectionReason
+    submittedAt
+    reviewedAt
+    uploadedBy {
+      id
+      displayName
+    }
+    reviewedBy {
+      id
+      displayName
+    }
+  }
+}
+
+mutation SubmitReceiptWithAudit(
+  $receiptId: UUID!
+  $circleId: UUID!
+  $uploaderId: String!
+  $amount: Int!
+  $note: String
+  $imageUrl: String!
+  $imageStoragePath: String!
+  $contentType: String!
+  $status: String!
+  $overpaymentAmount: Int!
+  $submittedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  receipt_insert(
+    data: {
+      id: $receiptId
+      circle: { id: $circleId }
+      uploadedBy: { id: $uploaderId }
+      amount: $amount
+      note: $note
+      imageUrl: $imageUrl
+      imageStoragePath: $imageStoragePath
+      contentType: $contentType
+      status: $status
+      overpaymentAmount: $overpaymentAmount
+      submittedAt: $submittedAt
+    }
+  )
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $uploaderId }
+    data: {
+      contributionStatus: $status
+      receiptStoragePath: $imageStoragePath
+      receiptSubmittedAt: $submittedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $uploaderId }
+      action: "receipt_uploaded"
+      materialChanges: "receipt_uploaded"
+      createdAt: $submittedAt
+    }
+  )
+}
+
+mutation ReplaceReceiptWithAudit(
+  $receiptId: UUID!
+  $replacedReceiptId: UUID!
+  $circleId: UUID!
+  $uploaderId: String!
+  $amount: Int!
+  $note: String
+  $imageUrl: String!
+  $imageStoragePath: String!
+  $contentType: String!
+  $status: String!
+  $overpaymentAmount: Int!
+  $submittedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  receipt_update(key: { id: $replacedReceiptId }, data: { status: "replaced" })
+  receipt_insert(
+    data: {
+      id: $receiptId
+      circle: { id: $circleId }
+      uploadedBy: { id: $uploaderId }
+      amount: $amount
+      note: $note
+      imageUrl: $imageUrl
+      imageStoragePath: $imageStoragePath
+      contentType: $contentType
+      status: $status
+      overpaymentAmount: $overpaymentAmount
+      replacementOfId: $replacedReceiptId
+      submittedAt: $submittedAt
+    }
+  )
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $uploaderId }
+    data: {
+      contributionStatus: $status
+      receiptStoragePath: $imageStoragePath
+      receiptSubmittedAt: $submittedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $uploaderId }
+      action: "receipt_replaced"
+      materialChanges: "receipt_replaced"
+      createdAt: $submittedAt
+    }
+  )
+}
+
+mutation ReviewReceiptWithAudit(
+  $receiptId: UUID!
+  $circleId: UUID!
+  $uploaderId: String!
+  $reviewerId: String!
+  $receiptStatus: String!
+  $rejectionReason: String
+  $reviewedAt: Timestamp!
+  $membershipStatus: String!
+  $nextConfirmedAmount: Int!
+  $nextCircleContributedAmount: Int!
+  $auditAction: String!
+  $materialChanges: String!
+) @auth(level: NO_ACCESS) @transaction {
+  receipt_update(
+    key: { id: $receiptId }
+    data: {
+      status: $receiptStatus
+      rejectionReason: $rejectionReason
+      reviewedBy: { id: $reviewerId }
+      reviewedAt: $reviewedAt
+    }
+  )
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $uploaderId }
+    data: {
+      contributionStatus: $membershipStatus
+      confirmedAmount: $nextConfirmedAmount
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      contributedAmount: $nextCircleContributedAmount
+      updatedAt: $reviewedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $reviewerId }
+      action: $auditAction
+      materialChanges: $materialChanges
+      createdAt: $reviewedAt
     }
   )
 }
@@ -1078,7 +1276,7 @@ mutation DeclineInvitation(
       circle: { id: $circleId }
       actor: { id: $userId }
       action: "invitation_declined"
-      materialChanges: $invitationId
+      materialChanges: "invitation_declined"
       createdAt: $respondedAt
     }
   )
@@ -1095,7 +1293,7 @@ mutation RequestReplacementInvitation(
       circle: { id: $circleId }
       actor: { id: $actorId }
       action: "replacement_invitation_requested"
-      materialChanges: $invitationId
+      materialChanges: "replacement_invitation_requested"
       createdAt: $requestedAt
     }
   )

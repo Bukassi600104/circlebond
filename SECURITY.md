@@ -2,7 +2,7 @@
 
 ## Current status
 
-BondCircle is in active pre-launch development. The `main` branch is the supported line, but production deployment and post-launch verification are not complete until Milestones 17 and 18 pass.
+BondCircle has a live deployment under production-environment testing. The `main` branch is the supported line, but formal production deployment and post-launch verification are not complete until Milestones 17 and 18 pass.
 
 ## Reporting a vulnerability
 

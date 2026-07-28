@@ -10,6 +10,26 @@ export type DateString = string;
 
 
 
+export interface AcceptInvitationWithMembershipData {
+  circleMembership_insert: CircleMembership_Key;
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  circle_update?: Circle_Key | null;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface AcceptInvitationWithMembershipVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  role: string;
+  expectedAmount: number;
+  nextMemberCount: number;
+  nextInvitationState: string;
+  nextUseCount: number;
+  respondedAt: TimestampString;
+}
+
 export interface AddCircleMemberWithAuditData {
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -21,6 +41,27 @@ export interface AddCircleMemberWithAuditVariables {
   memberId: string;
   role: string;
   createdAt: TimestampString;
+}
+
+export interface ApproveInvitationMembershipData {
+  circleMembership_insert: CircleMembership_Key;
+  invitationAcceptance_update?: InvitationAcceptance_Key | null;
+  circle_update?: Circle_Key | null;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ApproveInvitationMembershipVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  userId: string;
+  role: string;
+  expectedAmount: number;
+  nextMemberCount: number;
+  nextInvitationState: string;
+  nextUseCount: number;
+  respondedAt: TimestampString;
 }
 
 export interface AsoEbiTier_Key {
@@ -49,6 +90,24 @@ export interface Circle_Key {
   __typename?: 'Circle_Key';
 }
 
+export interface ConfigureAsoEbiCircleData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ConfigureAsoEbiCircleVariables {
+  circleId: UUIDString;
+  actorId: string;
+  eventType: string;
+  organizerName: string;
+  paymentBankName: string;
+  paymentAccountName: string;
+  paymentAccountNumber: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  updatedAt: TimestampString;
+}
+
 export interface ConfigureGiftCircleData {
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -65,6 +124,52 @@ export interface ConfigureGiftCircleVariables {
   imageUrl: string;
   imageStoragePath: string;
   updatedAt: TimestampString;
+}
+
+export interface ConfigureSupportCircleData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ConfigureSupportCircleVariables {
+  circleId: UUIDString;
+  actorId: string;
+  supportType: string;
+  beneficiaryName: string;
+  beneficiaryRelationship?: string | null;
+  contributionMode: string;
+  showBeneficiaryName: boolean;
+  showTargetToMembers: boolean;
+  showConfirmedTotalToMembers: boolean;
+  hideIndividualAmounts: boolean;
+  requireCreatorApproval: boolean;
+  paymentBankName: string;
+  paymentAccountName: string;
+  paymentAccountNumber: string;
+  imageUrl: string;
+  imageStoragePath: string;
+  updatedAt: TimestampString;
+}
+
+export interface CreateAsoEbiTierData {
+  asoEbiTier_insert: AsoEbiTier_Key;
+}
+
+export interface CreateAsoEbiTierVariables {
+  tierId: UUIDString;
+  circleId: UUIDString;
+  name: string;
+  price: number;
+  fabricDescription: string;
+  fabricImageUrl?: string | null;
+  fabricImageStoragePath?: string | null;
+  appreciationGiftName?: string | null;
+  appreciationGiftImageUrl?: string | null;
+  appreciationGiftImageStoragePath?: string | null;
+  availabilityNote?: string | null;
+  deliveryDetails?: string | null;
+  sortOrder: number;
+  createdAt: TimestampString;
 }
 
 export interface CreateCircleDraftData {
@@ -89,6 +194,52 @@ export interface CreateCircleDraftVariables {
   updatedAt: TimestampString;
 }
 
+export interface CreateInvitationData {
+  invitation_insert: Invitation_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface CreateInvitationVariables {
+  circleId: UUIDString;
+  invitedById: string;
+  tokenHash: string;
+  mode: string;
+  recipientName?: string | null;
+  recipientEmail?: string | null;
+  recipientPhone?: string | null;
+  expectedAmount: number;
+  requireApproval: boolean;
+  maxUses: number;
+  expiresAt: TimestampString;
+  createdAt: TimestampString;
+}
+
+export interface CreateSupportUpdateData {
+  supportUpdate_insert: SupportUpdate_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface CreateSupportUpdateVariables {
+  circleId: UUIDString;
+  authorId: string;
+  body: string;
+  createdAt: TimestampString;
+}
+
+export interface DeclineInvitationData {
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface DeclineInvitationVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  state: string;
+  respondedAt: TimestampString;
+}
+
 export interface FindUserByEmailData {
   users: ({
     id: string;
@@ -102,6 +253,66 @@ export interface FindUserByEmailData {
 
 export interface FindUserByEmailVariables {
   email: string;
+}
+
+export interface GetAsoEbiCircleDetailData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    description: string;
+    imageUrl?: string | null;
+    imageStoragePath?: string | null;
+    eventType?: string | null;
+    organizerName?: string | null;
+    paymentBankName?: string | null;
+    paymentAccountName?: string | null;
+    paymentAccountNumber?: string | null;
+    memberLimit: number;
+    contributedAmount: number;
+    eventDate?: DateString | null;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    asoEbiTiers: ({
+      id: UUIDString;
+      name: string;
+      price: number;
+      fabricDescription: string;
+      fabricImageUrl?: string | null;
+      fabricImageStoragePath?: string | null;
+      appreciationGiftName?: string | null;
+      appreciationGiftImageUrl?: string | null;
+      appreciationGiftImageStoragePath?: string | null;
+      availabilityNote?: string | null;
+      deliveryDetails?: string | null;
+      sortOrder: number;
+    } & AsoEbiTier_Key)[];
+      circleMemberships: ({
+        role: string;
+        membershipStatus: string;
+        contributionStatus: string;
+        fulfilmentStatus: string;
+        expectedAmount: number;
+        confirmedAmount: number;
+        selectedAsoEbiTier?: {
+          id: UUIDString;
+          name: string;
+          price: number;
+        } & AsoEbiTier_Key;
+          user: {
+            id: string;
+            displayName: string;
+            email?: string | null;
+            profileImage?: string | null;
+          } & User_Key;
+      })[];
+}
+
+export interface GetAsoEbiCircleDetailVariables {
+  circleId: UUIDString;
 }
 
 export interface GetCircleAuditEntriesData {
@@ -158,6 +369,79 @@ export interface GetCircleEngineRecordVariables {
   circleId: UUIDString;
 }
 
+export interface GetCircleInvitationsData {
+  invitations: ({
+    id: UUIDString;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & Invitation_Key)[];
+}
+
+export interface GetCircleInvitationsVariables {
+  circleId: UUIDString;
+}
+
+export interface GetContributionWorkspaceData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    contributedAmount: number;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      contributionStatus: string;
+      expectedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      receipts: ({
+        id: UUIDString;
+        amount: number;
+        note?: string | null;
+        imageUrl: string;
+        imageStoragePath: string;
+        contentType: string;
+        status: string;
+        overpaymentAmount: number;
+        replacementOfId?: UUIDString | null;
+        rejectionReason?: string | null;
+        submittedAt: TimestampString;
+        reviewedAt?: TimestampString | null;
+        uploadedBy: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+          reviewedBy?: {
+            id: string;
+            displayName: string;
+          } & User_Key;
+      } & Receipt_Key)[];
+}
+
+export interface GetContributionWorkspaceVariables {
+  circleId: UUIDString;
+}
+
 export interface GetCurrentUserData {
   user?: {
     id: string;
@@ -185,6 +469,8 @@ export interface GetDashboardCirclesData {
         imageUrl?: string | null;
         targetAmount: number;
         contributedAmount: number;
+        showTargetToMembers: boolean;
+        showConfirmedTotalToMembers: boolean;
         memberCount: number;
         memberLimit: number;
         deadline?: DateString | null;
@@ -242,6 +528,243 @@ export interface GetGiftCircleDetailVariables {
   circleId: UUIDString;
 }
 
+export interface GetInvitationAcceptancesData {
+  invitationAcceptances: ({
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+
+export interface GetInvitationAcceptancesVariables {
+  invitationId: UUIDString;
+}
+
+export interface GetInvitationByTokenHashData {
+  invitations: ({
+    id: UUIDString;
+    tokenHash: string;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    openedAt?: TimestampString | null;
+    acceptedAt?: TimestampString | null;
+    revokedAt?: TimestampString | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      description: string;
+      imageUrl?: string | null;
+      memberCount: number;
+      memberLimit: number;
+      status: string;
+      requireCreatorApproval: boolean;
+      contributionMode?: string | null;
+      targetAmount: number;
+      creator: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+    } & Circle_Key;
+      invitedBy: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+        acceptedBy?: {
+          id: string;
+        } & User_Key;
+  } & Invitation_Key)[];
+}
+
+export interface GetInvitationByTokenHashVariables {
+  tokenHash: string;
+}
+
+export interface GetSupportCircleDetailData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    description: string;
+    imageUrl?: string | null;
+    imageStoragePath?: string | null;
+    supportType?: string | null;
+    beneficiaryName?: string | null;
+    beneficiaryRelationship?: string | null;
+    showBeneficiaryName: boolean;
+    showTargetToMembers: boolean;
+    showConfirmedTotalToMembers: boolean;
+    hideIndividualAmounts: boolean;
+    requireCreatorApproval: boolean;
+    completionType?: string | null;
+    contributionMode?: string | null;
+    paymentBankName?: string | null;
+    paymentAccountName?: string | null;
+    paymentAccountNumber?: string | null;
+    targetAmount: number;
+    contributedAmount: number;
+    memberLimit: number;
+    deadline?: DateString | null;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      contributionStatus: string;
+      expectedAmount: number;
+      pledgedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        email?: string | null;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      supportUpdates: ({
+        id: UUIDString;
+        body: string;
+        createdAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & SupportUpdate_Key)[];
+}
+
+export interface GetSupportCircleDetailVariables {
+  circleId: UUIDString;
+}
+
+export interface InvitationAcceptance_Key {
+  invitationId: UUIDString;
+  userId: string;
+  __typename?: 'InvitationAcceptance_Key';
+}
+
+export interface Invitation_Key {
+  id: UUIDString;
+  __typename?: 'Invitation_Key';
+}
+
+export interface Receipt_Key {
+  id: UUIDString;
+  __typename?: 'Receipt_Key';
+}
+
+export interface RecordSupportPledgeData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface RecordSupportPledgeVariables {
+  circleId: UUIDString;
+  memberId: string;
+  amount: number;
+  updatedAt: TimestampString;
+}
+
+export interface ReplaceReceiptWithAuditData {
+  receipt_update?: Receipt_Key | null;
+  receipt_insert: Receipt_Key;
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ReplaceReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  replacedReceiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  amount: number;
+  note?: string | null;
+  imageUrl: string;
+  imageStoragePath: string;
+  contentType: string;
+  status: string;
+  overpaymentAmount: number;
+  submittedAt: TimestampString;
+}
+
+export interface RequestInvitationApprovalData {
+  invitationAcceptance_insert: InvitationAcceptance_Key;
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface RequestInvitationApprovalVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  userId: string;
+  respondedAt: TimestampString;
+}
+
+export interface RequestReplacementInvitationData {
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface RequestReplacementInvitationVariables {
+  invitationId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  requestedAt: TimestampString;
+}
+
+export interface ReviewReceiptWithAuditData {
+  receipt_update?: Receipt_Key | null;
+  circleMembership_update?: CircleMembership_Key | null;
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ReviewReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  reviewerId: string;
+  receiptStatus: string;
+  rejectionReason?: string | null;
+  reviewedAt: TimestampString;
+  membershipStatus: string;
+  nextConfirmedAmount: number;
+  nextCircleContributedAmount: number;
+  auditAction: string;
+  materialChanges: string;
+}
+
+export interface SelectAsoEbiTierData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface SelectAsoEbiTierVariables {
+  circleId: UUIDString;
+  memberId: string;
+  tierId: UUIDString;
+  expectedAmount: number;
+  updatedAt: TimestampString;
+}
+
 export interface SetGiftMemberAllocationData {
   circleMembership_update?: CircleMembership_Key | null;
 }
@@ -251,6 +774,54 @@ export interface SetGiftMemberAllocationVariables {
   memberId: string;
   expectedAmount: number;
   contributionStatus: string;
+}
+
+export interface SetSupportCompletionTypeData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface SetSupportCompletionTypeVariables {
+  circleId: UUIDString;
+  actorId: string;
+  completionType: string;
+  updatedAt: TimestampString;
+}
+
+export interface SetSupportMemberAllocationData {
+  circleMembership_update?: CircleMembership_Key | null;
+}
+
+export interface SetSupportMemberAllocationVariables {
+  circleId: UUIDString;
+  memberId: string;
+  expectedAmount: number;
+  contributionStatus: string;
+}
+
+export interface SubmitReceiptWithAuditData {
+  receipt_insert: Receipt_Key;
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface SubmitReceiptWithAuditVariables {
+  receiptId: UUIDString;
+  circleId: UUIDString;
+  uploaderId: string;
+  amount: number;
+  note?: string | null;
+  imageUrl: string;
+  imageStoragePath: string;
+  contentType: string;
+  status: string;
+  overpaymentAmount: number;
+  submittedAt: TimestampString;
+}
+
+export interface SupportUpdate_Key {
+  id: UUIDString;
+  __typename?: 'SupportUpdate_Key';
 }
 
 export interface TransitionCircleWithAuditData {
@@ -267,6 +838,19 @@ export interface TransitionCircleWithAuditVariables {
   completedAt?: TimestampString | null;
   archiveAt?: TimestampString | null;
   purgeAt?: TimestampString | null;
+}
+
+export interface UpdateAsoEbiFulfilmentData {
+  circleMembership_update?: CircleMembership_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface UpdateAsoEbiFulfilmentVariables {
+  circleId: UUIDString;
+  actorId: string;
+  memberId: string;
+  status: string;
+  updatedAt: TimestampString;
 }
 
 export interface UpdateCircleConfigurationWithAuditData {
@@ -290,6 +874,21 @@ export interface UpdateCircleConfigurationWithAuditVariables {
   visibility: string;
   updatedAt: TimestampString;
   materialChanges: string;
+}
+
+export interface UpdateInvitationStateData {
+  invitation_update?: Invitation_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface UpdateInvitationStateVariables {
+  invitationId: UUIDString;
+  actorId: string;
+  circleId: UUIDString;
+  state: string;
+  openedAt?: TimestampString | null;
+  revokedAt?: TimestampString | null;
+  updatedAt: TimestampString;
 }
 
 export interface UpsertCurrentUserData {
@@ -465,4 +1064,304 @@ export const setGiftMemberAllocationRef: SetGiftMemberAllocationRef;
 
 export function setGiftMemberAllocation(vars: SetGiftMemberAllocationVariables): MutationPromise<SetGiftMemberAllocationData, SetGiftMemberAllocationVariables>;
 export function setGiftMemberAllocation(dc: DataConnect, vars: SetGiftMemberAllocationVariables): MutationPromise<SetGiftMemberAllocationData, SetGiftMemberAllocationVariables>;
+
+interface GetAsoEbiCircleDetailRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetAsoEbiCircleDetailVariables): QueryRef<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetAsoEbiCircleDetailVariables): QueryRef<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+  operationName: string;
+}
+export const getAsoEbiCircleDetailRef: GetAsoEbiCircleDetailRef;
+
+export function getAsoEbiCircleDetail(vars: GetAsoEbiCircleDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+export function getAsoEbiCircleDetail(dc: DataConnect, vars: GetAsoEbiCircleDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetAsoEbiCircleDetailData, GetAsoEbiCircleDetailVariables>;
+
+interface ConfigureAsoEbiCircleRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ConfigureAsoEbiCircleVariables): MutationRef<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ConfigureAsoEbiCircleVariables): MutationRef<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+  operationName: string;
+}
+export const configureAsoEbiCircleRef: ConfigureAsoEbiCircleRef;
+
+export function configureAsoEbiCircle(vars: ConfigureAsoEbiCircleVariables): MutationPromise<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+export function configureAsoEbiCircle(dc: DataConnect, vars: ConfigureAsoEbiCircleVariables): MutationPromise<ConfigureAsoEbiCircleData, ConfigureAsoEbiCircleVariables>;
+
+interface CreateAsoEbiTierRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateAsoEbiTierVariables): MutationRef<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateAsoEbiTierVariables): MutationRef<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+  operationName: string;
+}
+export const createAsoEbiTierRef: CreateAsoEbiTierRef;
+
+export function createAsoEbiTier(vars: CreateAsoEbiTierVariables): MutationPromise<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+export function createAsoEbiTier(dc: DataConnect, vars: CreateAsoEbiTierVariables): MutationPromise<CreateAsoEbiTierData, CreateAsoEbiTierVariables>;
+
+interface SelectAsoEbiTierRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SelectAsoEbiTierVariables): MutationRef<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SelectAsoEbiTierVariables): MutationRef<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+  operationName: string;
+}
+export const selectAsoEbiTierRef: SelectAsoEbiTierRef;
+
+export function selectAsoEbiTier(vars: SelectAsoEbiTierVariables): MutationPromise<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+export function selectAsoEbiTier(dc: DataConnect, vars: SelectAsoEbiTierVariables): MutationPromise<SelectAsoEbiTierData, SelectAsoEbiTierVariables>;
+
+interface UpdateAsoEbiFulfilmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateAsoEbiFulfilmentVariables): MutationRef<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateAsoEbiFulfilmentVariables): MutationRef<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+  operationName: string;
+}
+export const updateAsoEbiFulfilmentRef: UpdateAsoEbiFulfilmentRef;
+
+export function updateAsoEbiFulfilment(vars: UpdateAsoEbiFulfilmentVariables): MutationPromise<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+export function updateAsoEbiFulfilment(dc: DataConnect, vars: UpdateAsoEbiFulfilmentVariables): MutationPromise<UpdateAsoEbiFulfilmentData, UpdateAsoEbiFulfilmentVariables>;
+
+interface GetSupportCircleDetailRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSupportCircleDetailVariables): QueryRef<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetSupportCircleDetailVariables): QueryRef<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+  operationName: string;
+}
+export const getSupportCircleDetailRef: GetSupportCircleDetailRef;
+
+export function getSupportCircleDetail(vars: GetSupportCircleDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+export function getSupportCircleDetail(dc: DataConnect, vars: GetSupportCircleDetailVariables, options?: ExecuteQueryOptions): QueryPromise<GetSupportCircleDetailData, GetSupportCircleDetailVariables>;
+
+interface ConfigureSupportCircleRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ConfigureSupportCircleVariables): MutationRef<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ConfigureSupportCircleVariables): MutationRef<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+  operationName: string;
+}
+export const configureSupportCircleRef: ConfigureSupportCircleRef;
+
+export function configureSupportCircle(vars: ConfigureSupportCircleVariables): MutationPromise<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+export function configureSupportCircle(dc: DataConnect, vars: ConfigureSupportCircleVariables): MutationPromise<ConfigureSupportCircleData, ConfigureSupportCircleVariables>;
+
+interface RecordSupportPledgeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordSupportPledgeVariables): MutationRef<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RecordSupportPledgeVariables): MutationRef<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+  operationName: string;
+}
+export const recordSupportPledgeRef: RecordSupportPledgeRef;
+
+export function recordSupportPledge(vars: RecordSupportPledgeVariables): MutationPromise<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+export function recordSupportPledge(dc: DataConnect, vars: RecordSupportPledgeVariables): MutationPromise<RecordSupportPledgeData, RecordSupportPledgeVariables>;
+
+interface SetSupportMemberAllocationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetSupportMemberAllocationVariables): MutationRef<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SetSupportMemberAllocationVariables): MutationRef<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+  operationName: string;
+}
+export const setSupportMemberAllocationRef: SetSupportMemberAllocationRef;
+
+export function setSupportMemberAllocation(vars: SetSupportMemberAllocationVariables): MutationPromise<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+export function setSupportMemberAllocation(dc: DataConnect, vars: SetSupportMemberAllocationVariables): MutationPromise<SetSupportMemberAllocationData, SetSupportMemberAllocationVariables>;
+
+interface CreateSupportUpdateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateSupportUpdateVariables): MutationRef<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateSupportUpdateVariables): MutationRef<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+  operationName: string;
+}
+export const createSupportUpdateRef: CreateSupportUpdateRef;
+
+export function createSupportUpdate(vars: CreateSupportUpdateVariables): MutationPromise<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+export function createSupportUpdate(dc: DataConnect, vars: CreateSupportUpdateVariables): MutationPromise<CreateSupportUpdateData, CreateSupportUpdateVariables>;
+
+interface SetSupportCompletionTypeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetSupportCompletionTypeVariables): MutationRef<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SetSupportCompletionTypeVariables): MutationRef<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+  operationName: string;
+}
+export const setSupportCompletionTypeRef: SetSupportCompletionTypeRef;
+
+export function setSupportCompletionType(vars: SetSupportCompletionTypeVariables): MutationPromise<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+export function setSupportCompletionType(dc: DataConnect, vars: SetSupportCompletionTypeVariables): MutationPromise<SetSupportCompletionTypeData, SetSupportCompletionTypeVariables>;
+
+interface GetInvitationByTokenHashRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetInvitationByTokenHashVariables): QueryRef<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetInvitationByTokenHashVariables): QueryRef<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+  operationName: string;
+}
+export const getInvitationByTokenHashRef: GetInvitationByTokenHashRef;
+
+export function getInvitationByTokenHash(vars: GetInvitationByTokenHashVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+export function getInvitationByTokenHash(dc: DataConnect, vars: GetInvitationByTokenHashVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationByTokenHashData, GetInvitationByTokenHashVariables>;
+
+interface GetCircleInvitationsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleInvitationsVariables): QueryRef<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCircleInvitationsVariables): QueryRef<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+  operationName: string;
+}
+export const getCircleInvitationsRef: GetCircleInvitationsRef;
+
+export function getCircleInvitations(vars: GetCircleInvitationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+export function getCircleInvitations(dc: DataConnect, vars: GetCircleInvitationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationsData, GetCircleInvitationsVariables>;
+
+interface GetInvitationAcceptancesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetInvitationAcceptancesVariables): QueryRef<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetInvitationAcceptancesVariables): QueryRef<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+  operationName: string;
+}
+export const getInvitationAcceptancesRef: GetInvitationAcceptancesRef;
+
+export function getInvitationAcceptances(vars: GetInvitationAcceptancesVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+export function getInvitationAcceptances(dc: DataConnect, vars: GetInvitationAcceptancesVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationAcceptancesData, GetInvitationAcceptancesVariables>;
+
+interface CreateInvitationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateInvitationVariables): MutationRef<CreateInvitationData, CreateInvitationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateInvitationVariables): MutationRef<CreateInvitationData, CreateInvitationVariables>;
+  operationName: string;
+}
+export const createInvitationRef: CreateInvitationRef;
+
+export function createInvitation(vars: CreateInvitationVariables): MutationPromise<CreateInvitationData, CreateInvitationVariables>;
+export function createInvitation(dc: DataConnect, vars: CreateInvitationVariables): MutationPromise<CreateInvitationData, CreateInvitationVariables>;
+
+interface UpdateInvitationStateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateInvitationStateVariables): MutationRef<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateInvitationStateVariables): MutationRef<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+  operationName: string;
+}
+export const updateInvitationStateRef: UpdateInvitationStateRef;
+
+export function updateInvitationState(vars: UpdateInvitationStateVariables): MutationPromise<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+export function updateInvitationState(dc: DataConnect, vars: UpdateInvitationStateVariables): MutationPromise<UpdateInvitationStateData, UpdateInvitationStateVariables>;
+
+interface AcceptInvitationWithMembershipRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AcceptInvitationWithMembershipVariables): MutationRef<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: AcceptInvitationWithMembershipVariables): MutationRef<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+  operationName: string;
+}
+export const acceptInvitationWithMembershipRef: AcceptInvitationWithMembershipRef;
+
+export function acceptInvitationWithMembership(vars: AcceptInvitationWithMembershipVariables): MutationPromise<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+export function acceptInvitationWithMembership(dc: DataConnect, vars: AcceptInvitationWithMembershipVariables): MutationPromise<AcceptInvitationWithMembershipData, AcceptInvitationWithMembershipVariables>;
+
+interface RequestInvitationApprovalRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RequestInvitationApprovalVariables): MutationRef<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RequestInvitationApprovalVariables): MutationRef<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+  operationName: string;
+}
+export const requestInvitationApprovalRef: RequestInvitationApprovalRef;
+
+export function requestInvitationApproval(vars: RequestInvitationApprovalVariables): MutationPromise<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+export function requestInvitationApproval(dc: DataConnect, vars: RequestInvitationApprovalVariables): MutationPromise<RequestInvitationApprovalData, RequestInvitationApprovalVariables>;
+
+interface GetContributionWorkspaceRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetContributionWorkspaceVariables): QueryRef<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetContributionWorkspaceVariables): QueryRef<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+  operationName: string;
+}
+export const getContributionWorkspaceRef: GetContributionWorkspaceRef;
+
+export function getContributionWorkspace(vars: GetContributionWorkspaceVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+export function getContributionWorkspace(dc: DataConnect, vars: GetContributionWorkspaceVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionWorkspaceData, GetContributionWorkspaceVariables>;
+
+interface SubmitReceiptWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SubmitReceiptWithAuditVariables): MutationRef<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SubmitReceiptWithAuditVariables): MutationRef<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+  operationName: string;
+}
+export const submitReceiptWithAuditRef: SubmitReceiptWithAuditRef;
+
+export function submitReceiptWithAudit(vars: SubmitReceiptWithAuditVariables): MutationPromise<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+export function submitReceiptWithAudit(dc: DataConnect, vars: SubmitReceiptWithAuditVariables): MutationPromise<SubmitReceiptWithAuditData, SubmitReceiptWithAuditVariables>;
+
+interface ReplaceReceiptWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReplaceReceiptWithAuditVariables): MutationRef<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ReplaceReceiptWithAuditVariables): MutationRef<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+  operationName: string;
+}
+export const replaceReceiptWithAuditRef: ReplaceReceiptWithAuditRef;
+
+export function replaceReceiptWithAudit(vars: ReplaceReceiptWithAuditVariables): MutationPromise<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+export function replaceReceiptWithAudit(dc: DataConnect, vars: ReplaceReceiptWithAuditVariables): MutationPromise<ReplaceReceiptWithAuditData, ReplaceReceiptWithAuditVariables>;
+
+interface ReviewReceiptWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReviewReceiptWithAuditVariables): MutationRef<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ReviewReceiptWithAuditVariables): MutationRef<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+  operationName: string;
+}
+export const reviewReceiptWithAuditRef: ReviewReceiptWithAuditRef;
+
+export function reviewReceiptWithAudit(vars: ReviewReceiptWithAuditVariables): MutationPromise<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+export function reviewReceiptWithAudit(dc: DataConnect, vars: ReviewReceiptWithAuditVariables): MutationPromise<ReviewReceiptWithAuditData, ReviewReceiptWithAuditVariables>;
+
+interface ApproveInvitationMembershipRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ApproveInvitationMembershipVariables): MutationRef<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ApproveInvitationMembershipVariables): MutationRef<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+  operationName: string;
+}
+export const approveInvitationMembershipRef: ApproveInvitationMembershipRef;
+
+export function approveInvitationMembership(vars: ApproveInvitationMembershipVariables): MutationPromise<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+export function approveInvitationMembership(dc: DataConnect, vars: ApproveInvitationMembershipVariables): MutationPromise<ApproveInvitationMembershipData, ApproveInvitationMembershipVariables>;
+
+interface DeclineInvitationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeclineInvitationVariables): MutationRef<DeclineInvitationData, DeclineInvitationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeclineInvitationVariables): MutationRef<DeclineInvitationData, DeclineInvitationVariables>;
+  operationName: string;
+}
+export const declineInvitationRef: DeclineInvitationRef;
+
+export function declineInvitation(vars: DeclineInvitationVariables): MutationPromise<DeclineInvitationData, DeclineInvitationVariables>;
+export function declineInvitation(dc: DataConnect, vars: DeclineInvitationVariables): MutationPromise<DeclineInvitationData, DeclineInvitationVariables>;
+
+interface RequestReplacementInvitationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RequestReplacementInvitationVariables): MutationRef<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RequestReplacementInvitationVariables): MutationRef<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+  operationName: string;
+}
+export const requestReplacementInvitationRef: RequestReplacementInvitationRef;
+
+export function requestReplacementInvitation(vars: RequestReplacementInvitationVariables): MutationPromise<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+export function requestReplacementInvitation(dc: DataConnect, vars: RequestReplacementInvitationVariables): MutationPromise<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
 

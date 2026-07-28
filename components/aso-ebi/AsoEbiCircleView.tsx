@@ -20,6 +20,7 @@ import type {
   AsoEbiMember,
 } from "@/server/repositories/aso-ebi-circles";
 import { InvitationManager } from "@/components/invitations/InvitationManager";
+import { ContributionWorkspace } from "@/components/contributions/ContributionWorkspace";
 
 const naira = new Intl.NumberFormat("en-NG", {
   style: "currency",
@@ -173,6 +174,10 @@ export function AsoEbiCircleView({
 
       <div className="bc-aso-view__layout">
         <main>
+          <ContributionWorkspace
+            circleId={circle.id}
+            heading="Your Aso-Ebi contribution"
+          />
           <section className="bc-aso-tier-picker">
             <header>
               <div>
