@@ -1,0 +1,359 @@
+BondCircle — Product Requirements Document (PRD)
+
+Version: 1.0 (Launch V1)Status: Locked for DevelopmentProduct Manager: ChatGPT (acting on behalf of the founder)Founder: User
+
+1. Product Vision
+
+BondCircle is a collaborative contribution platform that helps people organize group gifting, Aso-Ebi collections, and support campaigns without acting as a wallet or holding users' money.
+
+BondCircle is not a payment company.
+
+It is a coordination platform.
+
+The platform focuses on transparency, accountability, simplicity, and trust.
+
+2. Core Principles
+
+The following principles cannot be violated.
+
+BondCircle never stores bank cards.
+
+BondCircle never acts as a wallet in V1.
+
+BondCircle never pools or escrows funds.
+
+Every action must be transparent.
+
+Every contributor should know the status of the circle.
+
+Every creator should easily manage members.
+
+Every screen should serve a real purpose.
+
+No dead buttons.
+
+No placeholder features.
+
+3. Product Modes
+
+A. Gift Circle
+
+Purpose:Coordinate contributions toward purchasing a gift.
+
+Examples:
+
+Birthday
+
+Anniversary
+
+Graduation
+
+Baby Shower
+
+Retirement
+
+Housewarming
+
+Surprise Party
+
+Corporate Gift
+
+B. Aso-Ebi Circle
+
+Purpose:Coordinate Aso-Ebi purchases.
+
+Event Type examples:
+
+Wedding
+
+Burial
+
+Birthday
+
+Thanksgiving
+
+Naming Ceremony
+
+Religious Celebration
+
+Other
+
+Optional tier pricing is supported.
+
+C. Support Circle
+
+Purpose:Coordinate voluntary support.
+
+Examples:
+
+Burial Support
+
+Medical Support
+
+Emergency Support
+
+Charity
+
+Community Support
+
+Family Support
+
+Other
+
+4. Roles
+
+Creator
+
+Owner of a circle.
+
+Can:
+
+create
+
+edit
+
+invite
+
+approve receipts
+
+reject receipts
+
+close circle
+
+archive circle
+
+assign co-admin
+
+Co-admin
+
+Can:
+
+review receipts
+
+send announcements
+
+moderate comments
+
+send reminders
+
+Cannot:
+
+delete circle
+
+transfer ownership
+
+change pricing
+
+Contributor
+
+Can:
+
+join circles
+
+upload receipts
+
+comment
+
+receive announcements
+
+receive reminders
+
+view progress
+
+Cannot:
+
+approve receipts
+
+edit circle settings
+
+5. Circle Lifecycle
+
+Draft
+
+↓
+
+Published
+
+↓
+
+Invitations Sent
+
+↓
+
+Members Joined
+
+↓
+
+Contributions Active
+
+↓
+
+Target Achieved
+
+↓
+
+Fulfilment
+
+↓
+
+Completed
+
+↓
+
+Archived
+
+↓
+
+Sensitive content removed after retention period
+
+6. Communication
+
+No full chat.
+
+Approved communication modules:
+
+Creator Announcements
+
+Circle Comments
+
+System Activity Feed
+
+7. Payment Philosophy
+
+V1 is tracking-only.
+
+Users pay outside the app.
+
+The app records:
+
+pledges
+
+receipts
+
+approvals
+
+contribution status
+
+No money custody.
+
+8. Notifications
+
+Critical:
+
+Invitation
+
+Receipt Submitted
+
+Receipt Approved
+
+Receipt Rejected
+
+Deadline Reminder
+
+Circle Completed
+
+Circle Cancelled
+
+General:
+
+Member Joined
+
+Comment
+
+Announcement
+
+Delivery Update
+
+Activity Summary
+
+9. Registration
+
+Required:
+
+Display Name
+
+Verified Phone OR Email
+
+OTP Verification
+
+Acceptance of Terms
+
+Optional:
+
+Profile Photo
+
+Secondary Email
+
+No gender collection in V1.
+
+10. Pricing
+
+Free
+
+Up to 3 members
+
+Starter
+
+₦1,000
+
+Up to 10 members
+
+Standard
+
+₦2,000
+
+Up to 30 members
+
+Premium
+
+₦3,500
+
+Up to 100 members
+
+Only creators pay platform fees.
+
+11. Security
+
+Role-based access control
+
+Audit log for administrative actions
+
+Signed invitation tokens
+
+Rate limiting
+
+Encrypted data in transit
+
+Encrypted sensitive data at rest
+
+Secure file storage
+
+Receipt visibility limited to creator/co-admin
+
+Automatic purge of temporary assets after retention window
+
+12. Success Criteria
+
+A launch-ready V1 should allow a user to:
+
+Register.
+
+Create any of the three circle types.
+
+Invite members.
+
+Track contributions.
+
+Review uploaded receipts.
+
+Publish announcements.
+
+Receive comments.
+
+Close the circle.
+
+Archive it.
+
+Return to create another circle from the same account.
+
+If those ten tasks work end-to-end without manual intervention or broken flows, BondCircle V1 is considered production-ready.

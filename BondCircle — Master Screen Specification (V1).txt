@@ -1,0 +1,627 @@
+BondCircle — Master Screen Specification (V1)
+
+Purpose
+
+This document defines every production screen required for BondCircle V1.
+
+Each screen specifies:
+
+Purpose
+
+Components
+
+User Actions
+
+Navigation
+
+Validation
+
+Empty States
+
+Error States
+
+Permissions
+
+This document is the UI blueprint for implementation.
+
+SCREEN 1
+
+Splash
+
+Purpose
+
+Launch application.
+
+Components
+
+BondCircle Logo
+
+Tagline
+
+Loading indicator
+
+Auto Navigation
+
+↓
+
+Onboarding
+
+or
+
+Dashboard
+
+SCREEN 2
+
+Onboarding
+
+Purpose
+
+Explain BondCircle.
+
+Pages
+
+1
+
+Group Gifts
+
+2
+
+Aso-Ebi
+
+3
+
+Support Circle
+
+Buttons
+
+Skip
+
+Next
+
+Get Started
+
+SCREEN 3
+
+Login
+
+Components
+
+Phone
+
+Email
+
+OTP
+
+Google Login
+
+Continue Button
+
+Forgot Password
+
+SCREEN 4
+
+Registration
+
+Fields
+
+Display Name
+
+Phone
+
+Email
+
+Accept Terms
+
+Profile Image (optional)
+
+Register
+
+SCREEN 5
+
+Dashboard
+
+Top
+
+Greeting
+
+Notification Bell
+
+Search
+
+Main Cards
+
+Gift Circle
+
+Aso-Ebi Circle
+
+Support Circle
+
+Sections
+
+Created By Me
+
+Joined Circles
+
+Pending Invitations
+
+Completed
+
+Archived
+
+Bottom Navigation
+
+Home
+
+Circles
+
+Create
+
+Activity
+
+Profile
+
+SCREEN 6
+
+Choose Circle Type
+
+Cards
+
+Gift
+
+Aso-Ebi
+
+Support
+
+Each card includes
+
+Icon
+
+Description
+
+CTA
+
+SCREEN 7
+
+Gift Circle Details
+
+Fields
+
+Circle Name
+
+Gift Title
+
+Gift Image
+
+Target Amount
+
+Deadline
+
+Notes
+
+Progress Indicator
+
+Step 1 of 3
+
+Continue
+
+SCREEN 8
+
+Invite Members
+
+Sections
+
+Contacts
+
+Manual Entry
+
+Copy Link
+
+Share
+
+Contribution
+
+Equal Split
+
+Custom Split
+
+Continue
+
+SCREEN 9
+
+Review
+
+Summary
+
+Gift
+
+Members
+
+Deadline
+
+Target
+
+Buttons
+
+Edit
+
+Create Circle
+
+SCREEN 10
+
+Gift Circle
+
+Header
+
+Gift Image
+
+Circle Name
+
+Deadline
+
+Progress
+
+Center
+
+Member Ring
+
+Creator
+
+Contributors
+
+Statuses
+
+Bottom
+
+Announcements
+
+Comments
+
+Activity
+
+SCREEN 11
+
+Contributor Panel
+
+Opened by tapping own avatar.
+
+Displays
+
+Expected
+
+Paid
+
+Remaining
+
+Buttons
+
+Upload Receipt
+
+Record Partial
+
+View Receipt
+
+SCREEN 12
+
+Upload Receipt
+
+Receipt Preview
+
+Upload
+
+Amount
+
+Note
+
+Submit
+
+Privacy Notice
+
+SCREEN 13
+
+Creator Review
+
+Pending Receipts
+
+Member
+
+Amount
+
+Receipt
+
+Approve
+
+Reject
+
+Reason Required on Rejection
+
+SCREEN 14
+
+Announcement
+
+Editor
+
+Title
+
+Message
+
+Post
+
+Pin Announcement
+
+SCREEN 15
+
+Comments
+
+Comment List
+
+Replies
+
+Reaction
+
+Delete Own Comment
+
+Report
+
+Creator Moderation
+
+SCREEN 16
+
+Activity Feed
+
+Joined
+
+Reminder
+
+Receipt Uploaded
+
+Receipt Approved
+
+Announcement
+
+Delivery
+
+Completion
+
+Filters
+
+All
+
+Payments
+
+Comments
+
+Reminders
+
+SCREEN 17
+
+Aso-Ebi Event
+
+Event
+
+Fabric
+
+Organizer
+
+Date
+
+Continue
+
+SCREEN 18
+
+Tier Builder
+
+Tier
+
+Price
+
+Gift
+
+Image
+
+Add Tier
+
+Continue
+
+SCREEN 19
+
+Aso-Ebi Circle
+
+Hero Image
+
+Tier Cards
+
+Member Status
+
+Delivery
+
+Announcements
+
+Comments
+
+SCREEN 20
+
+Support Circle
+
+Cause
+
+Beneficiary
+
+Target
+
+Support Image
+
+Description
+
+Members
+
+Updates
+
+Comments
+
+SCREEN 21
+
+Notifications
+
+Grouped
+
+Today
+
+Yesterday
+
+Earlier
+
+Actions
+
+Open
+
+Dismiss
+
+Mark All Read
+
+SCREEN 22
+
+Profile
+
+Photo
+
+Display Name
+
+Phone
+
+Email
+
+Circles Created
+
+Circles Joined
+
+Settings
+
+SCREEN 23
+
+Settings
+
+Notifications
+
+Privacy
+
+Appearance
+
+Help
+
+Terms
+
+Logout
+
+SCREEN 24
+
+Invitation Accepted
+
+Invitation Details
+
+Accept
+
+Decline
+
+SCREEN 25
+
+Expired Invitation
+
+Message
+
+Request New Link
+
+Return Home
+
+SCREEN 26
+
+Circle Completed
+
+Summary
+
+Contributors
+
+Timeline
+
+Archive Countdown
+
+Create New Circle
+
+SCREEN 27
+
+Archive
+
+Read Only
+
+Historical Summary
+
+No Editing
+
+No New Comments
+
+Receipt files scheduled for deletion
+
+Global Components
+
+The following components are reusable across every screen.
+
+• Primary Button
+
+• Secondary Button
+
+• Cards
+
+• Member Avatar
+
+• Progress Ring
+
+• Status Badge
+
+• Upload Modal
+
+• Confirmation Dialog
+
+• Toast Notification
+
+• Bottom Sheet
+
+• Empty State Card
+
+• Error Card
+
+• Loading Skeleton
+
+• Success Banner
+
+Design Rules
+
+Every screen must use
+
+8-point spacing grid
+
+Rounded cards
+
+Rounded buttons
+
+Soft shadows
+
+Consistent iconography
+
+Consistent typography
+
+Responsive layout
+
+Accessibility-compliant contrast
+
+Dark mode ready (future)
+
+No placeholder buttons
+
+No dead navigation
+
+Every tap must perform a real action.
+
+Development Rule
+
+No screen may be redesigned without updating this specification first.
+
+This document is the single source of truth for the BondCircle interface.

@@ -1,0 +1,629 @@
+BondCircle — Technical Architecture & Engineering Blueprint
+
+Version: 1.0 (Production Launch)Status: Engineering Source of Truth
+
+1. Engineering Philosophy
+
+BondCircle is a production-ready web application built mobile-first as a Progressive Web App (PWA), with Android and iOS wrappers planned later.
+
+The system must prioritize:
+
+Reliability
+
+Security
+
+Performance
+
+Scalability
+
+Maintainability
+
+Testability
+
+No prototype shortcuts.
+
+2. High-Level Architecture
+
+Client (PWA)
+
+↓
+
+API Layer
+
+↓
+
+Application Services
+
+↓
+
+Database
+
+↓
+
+Object Storage
+
+↓
+
+Notification Services
+
+↓
+
+Analytics & Monitoring
+
+The frontend never communicates directly with the database.
+
+3. Recommended Technology Stack
+
+Frontend
+
+Next.js (App Router)
+
+React
+
+TypeScript
+
+Tailwind CSS
+
+shadcn/ui
+
+TanStack Query
+
+React Hook Form
+
+Zod
+
+Backend
+
+Next.js Server Actions + Route Handlers (for V1)
+
+TypeScript
+
+Firebase Admin SDK for trusted server operations
+
+Firebase SQL Connect generated SDK for relational queries and mutations
+
+Database
+
+Firebase SQL Connect
+
+Managed Cloud SQL for PostgreSQL inside the Firebase project
+
+Core entities:
+
+Users
+
+Circles
+
+Members
+
+Invitations
+
+Announcements
+
+Comments
+
+Receipts
+
+Notifications
+
+Activity Logs
+
+Audit Logs
+
+File Storage
+
+Cloud Storage for Firebase for:
+
+Profile photos
+
+Gift images
+
+Aso-Ebi images
+
+Support images
+
+Receipt uploads
+
+Only URLs are stored in the database.
+
+4. Authentication
+
+Authentication provider:
+
+Firebase Authentication
+
+Supported methods:
+
+OTP via phone
+
+OTP via email
+
+Google Sign-In
+
+Session management:
+
+Firebase ID tokens exchanged for secure HTTP-only session cookies on the server
+
+Short-lived access session
+
+Refresh strategy
+
+No social login beyond Google in V1.
+
+5. Authorization
+
+Role-based access control (RBAC).
+
+Roles are scoped per circle:
+
+Creator
+
+Co-admin
+
+Contributor
+
+Every endpoint validates permissions before executing.
+
+6. Database Model
+
+User
+
+id
+
+displayName
+
+phone
+
+email
+
+profileImage
+
+createdAt
+
+Circle
+
+id
+
+type
+
+title
+
+description
+
+targetAmount
+
+deadline
+
+status
+
+creatorId
+
+CircleMember
+
+id
+
+userId
+
+circleId
+
+role
+
+contributionExpected
+
+contributionConfirmed
+
+status
+
+Invitation
+
+id
+
+circleId
+
+token
+
+expiresAt
+
+acceptedAt
+
+invitedBy
+
+Receipt
+
+id
+
+uploadedBy
+
+amount
+
+imageUrl
+
+status
+
+rejectionReason
+
+Announcement
+
+id
+
+circleId
+
+authorId
+
+title
+
+body
+
+pinned
+
+Comment
+
+id
+
+announcementId (nullable)
+
+circleId
+
+authorId
+
+body
+
+parentCommentId (nullable)
+
+Notification
+
+id
+
+recipientId
+
+type
+
+payload
+
+readAt
+
+ActivityLog
+
+Immutable timeline of system events.
+
+AuditLog
+
+Administrative actions only.
+
+7. API Design
+
+REST-style endpoints with clear versioning.
+
+Examples:
+
+/api/auth
+
+/api/circles
+
+/api/invitations
+
+/api/receipts
+
+/api/comments
+
+/api/announcements
+
+/api/notifications
+
+Responses are consistent:
+
+success
+
+data
+
+error
+
+metadata
+
+8. Validation
+
+All incoming requests validated using shared schemas.
+
+Never trust client input.
+
+Validation includes:
+
+Required fields
+
+Length
+
+File type
+
+File size
+
+Authorization
+
+Business rules
+
+9. Security
+
+Mandatory:
+
+HTTPS only
+
+CSRF protection
+
+XSS protection
+
+SQL injection prevention via ORM
+
+Rate limiting
+
+Secure upload validation
+
+Virus scanning for uploaded files (if available)
+
+Signed invitation tokens
+
+Audit logging
+
+10. File Handling
+
+Uploads:
+
+Images only
+
+Max 5 MB
+
+Auto-compression
+
+Thumbnail generation
+
+Receipts remain private to creator/co-admin.
+
+11. Notification Service
+
+Channels:
+
+In-app
+
+Email (critical events)
+
+Future:
+
+Push notifications
+
+SMS
+
+Notification preferences stored per user.
+
+12. Search
+
+Users can search:
+
+Circles
+
+Members
+
+Announcements
+
+Search does not include receipt images.
+
+13. Performance
+
+Targets:
+
+First load < 2s
+
+Lazy-loaded images
+
+Paginated lists
+
+Optimized bundles
+
+Caching for static assets
+
+14. Logging
+
+Application logs:
+
+Errors
+
+Warnings
+
+Performance
+
+Separate audit logs:
+
+Receipt approvals
+
+Role changes
+
+Circle closure
+
+Invitation revocations
+
+Audit logs are immutable.
+
+15. Analytics
+
+Track:
+
+Circle creation
+
+Circle completion
+
+Invitation acceptance
+
+Receipt submission
+
+Reminder usage
+
+Circle type popularity
+
+No sensitive personal analytics.
+
+16. Error Handling
+
+Consistent user-facing errors.
+
+Every error includes:
+
+Friendly message
+
+Technical log (server-side)
+
+Retry option where applicable
+
+17. Data Retention
+
+Temporary content:
+
+Receipts
+
+Comments
+
+Announcements
+
+Uploaded images
+
+Retention:
+
+30 days after circle closure
+
+Afterward:
+
+Permanent deletion of temporary assets
+
+Minimal historical metadata retained
+
+Anonymous analytics retained
+
+18. Deployment
+
+Environments:
+
+Development
+
+Staging
+
+Production
+
+Each environment has separate:
+
+Database
+
+Storage
+
+Secrets
+
+19. CI/CD
+
+Every change must:
+
+Run linting
+
+Run type checks
+
+Run unit tests
+
+Run integration tests
+
+Build successfully
+
+Only then deploy.
+
+20. Testing Strategy
+
+Unit Tests
+
+Business logic
+
+Integration Tests
+
+API endpoints
+
+End-to-End Tests
+
+Critical journeys:
+
+Registration
+
+Circle creation
+
+Invitation
+
+Receipt upload
+
+Receipt approval
+
+Circle completion
+
+21. Monitoring
+
+Monitor:
+
+API latency
+
+Error rates
+
+Upload failures
+
+Notification failures
+
+Authentication failures
+
+Alert on abnormal spikes.
+
+22. Scalability
+
+V1 prepared for future additions without redesign:
+
+Payment integrations (e.g. OPay, Paystack)
+
+Vendor marketplace
+
+Public gift catalog
+
+Native Android app
+
+Native iOS app
+
+Multi-language support
+
+Multi-currency support
+
+Organization/team accounts
+
+These are feature flags for future releases, not part of V1.
+
+23. Non-Negotiable Engineering Rules
+
+No hard-coded secrets.
+
+No direct database access from the client.
+
+Every API requires validation.
+
+Every privileged action requires authorization.
+
+Every critical action is audited.
+
+No orphaned files in storage.
+
+Every uploaded asset has an owner.
+
+Every deletion is intentional and logged where appropriate.
+
+24. Definition of Done
+
+BondCircle V1 is considered complete only when:
+
+All documented user journeys function end-to-end.
+
+Security requirements are met.
+
+Automated tests pass.
+
+Performance targets are achieved.
+
+Accessibility requirements are satisfied.
+
+No placeholder functionality remains.
+
+The application is deployable to production with confidence.

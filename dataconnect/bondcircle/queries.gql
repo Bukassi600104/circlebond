@@ -1,0 +1,1102 @@
+query GetCurrentUser @auth(level: USER) {
+  user(key: { id_expr: "auth.uid" }) {
+    id
+    displayName
+    phone
+    email
+    profileImage
+    termsAcceptedAt
+    privacyAcceptedAt
+    createdAt
+  }
+}
+
+mutation UpsertCurrentUser(
+  $displayName: String!
+  $phone: String
+  $email: String
+  $profileImage: String
+  $termsAcceptedAt: Timestamp
+  $privacyAcceptedAt: Timestamp
+) @auth(level: USER) {
+  user_upsert(
+    data: {
+      id_expr: "auth.uid"
+      displayName: $displayName
+      phone: $phone
+      email: $email
+      profileImage: $profileImage
+      termsAcceptedAt: $termsAcceptedAt
+      privacyAcceptedAt: $privacyAcceptedAt
+    }
+  )
+}
+
+query GetDashboardCircles @auth(level: NO_ACCESS) {
+  circleMemberships(orderBy: { joinedAt: DESC }) {
+    role
+    membershipStatus
+    user {
+      id
+    }
+    circle {
+      id
+      name
+      type
+      imageUrl
+      targetAmount
+      contributedAmount
+      showTargetToMembers
+      showConfirmedTotalToMembers
+      memberCount
+      memberLimit
+      deadline
+      eventDate
+      status
+      createdAt
+      updatedAt
+      creator {
+        id
+      }
+    }
+  }
+}
+
+query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    description
+    targetAmount
+    pricingPlan
+    memberLimit
+    activationPrice
+    deadline
+    eventDate
+    status
+    visibility
+    createdAt
+    updatedAt
+    completedAt
+    archiveAt
+    purgeAt
+    creator {
+      id
+    }
+  }
+  circleMemberships(where: { circleId: { eq: $circleId } }) {
+    role
+    membershipStatus
+    user {
+      id
+    }
+  }
+}
+
+query FindUserByEmail($email: String!) @auth(level: NO_ACCESS) {
+  users(where: { email: { eq: $email } }, limit: 1) {
+    id
+    displayName
+    email
+    profileImage
+    termsAcceptedAt
+    privacyAcceptedAt
+  }
+}
+
+query GetGiftCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    description
+    imageUrl
+    imageStoragePath
+    giftTitle
+    contributionMode
+    paymentBankName
+    paymentAccountName
+    paymentAccountNumber
+    targetAmount
+    contributedAmount
+    memberLimit
+    deadline
+    status
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    expectedAmount
+    pledgedAmount
+    confirmedAmount
+    receiptSubmittedAt
+    user {
+      id
+      displayName
+      email
+      profileImage
+    }
+  }
+}
+
+query GetCircleAuditEntries($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circleAuditEntries(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: ASC }
+  ) {
+    id
+    action
+    fromStatus
+    toStatus
+    materialChanges
+    createdAt
+    actor {
+      id
+    }
+  }
+}
+
+mutation CreateCircleDraft(
+  $creatorId: String!
+  $name: String!
+  $type: String!
+  $description: String!
+  $targetAmount: Int!
+  $pricingPlan: String!
+  $memberLimit: Int!
+  $activationPrice: Int!
+  $deadline: Date
+  $eventDate: Date
+  $visibility: String!
+  $createdAt: Timestamp!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_insert(
+    data: {
+      creator: { id: $creatorId }
+      name: $name
+      type: $type
+      description: $description
+      targetAmount: $targetAmount
+      pricingPlan: $pricingPlan
+      memberLimit: $memberLimit
+      activationPrice: $activationPrice
+      deadline: $deadline
+      eventDate: $eventDate
+      status: "draft"
+      visibility: $visibility
+      createdAt: $createdAt
+      updatedAt: $updatedAt
+    }
+  )
+  circleMembership_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      user: { id: $creatorId }
+      role: "creator"
+      membershipStatus: "joined"
+      joinedAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      actor: { id: $creatorId }
+      action: "draft_created"
+      toStatus: "draft"
+      materialChanges: "{\"status\":\"draft\"}"
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation UpdateCircleConfigurationWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $action: String!
+  $status: String!
+  $name: String!
+  $description: String!
+  $targetAmount: Int!
+  $pricingPlan: String!
+  $memberLimit: Int!
+  $activationPrice: Int!
+  $deadline: Date
+  $eventDate: Date
+  $visibility: String!
+  $updatedAt: Timestamp!
+  $materialChanges: String!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      name: $name
+      description: $description
+      targetAmount: $targetAmount
+      pricingPlan: $pricingPlan
+      memberLimit: $memberLimit
+      activationPrice: $activationPrice
+      deadline: $deadline
+      eventDate: $eventDate
+      visibility: $visibility
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: $action
+      fromStatus: $status
+      toStatus: $status
+      materialChanges: $materialChanges
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation TransitionCircleWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $fromStatus: String!
+  $toStatus: String!
+  $updatedAt: Timestamp!
+  $completedAt: Timestamp
+  $archiveAt: Timestamp
+  $purgeAt: Timestamp
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      status: $toStatus
+      updatedAt: $updatedAt
+      completedAt: $completedAt
+      archiveAt: $archiveAt
+      purgeAt: $purgeAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "status_changed"
+      fromStatus: $fromStatus
+      toStatus: $toStatus
+      materialChanges: $toStatus
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation AddCircleMemberWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $memberId: String!
+  $role: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_insert(
+    data: {
+      circle: { id: $circleId }
+      user: { id: $memberId }
+      role: $role
+      membershipStatus: "invited"
+      contributionStatus: "invited"
+      fulfilmentStatus: "invited"
+      joinedAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "member_invited"
+      materialChanges: $memberId
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation ConfigureGiftCircle(
+  $circleId: UUID!
+  $actorId: String!
+  $giftTitle: String!
+  $contributionMode: String!
+  $paymentBankName: String!
+  $paymentAccountName: String!
+  $paymentAccountNumber: String!
+  $imageUrl: String!
+  $imageStoragePath: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      giftTitle: $giftTitle
+      contributionMode: $contributionMode
+      paymentBankName: $paymentBankName
+      paymentAccountName: $paymentAccountName
+      paymentAccountNumber: $paymentAccountNumber
+      imageUrl: $imageUrl
+      imageStoragePath: $imageStoragePath
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "gift_configured"
+      materialChanges: $contributionMode
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation SetGiftMemberAllocation(
+  $circleId: UUID!
+  $memberId: String!
+  $expectedAmount: Int!
+  $contributionStatus: String!
+) @auth(level: NO_ACCESS) {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $memberId }
+    data: {
+      expectedAmount: $expectedAmount
+      contributionStatus: $contributionStatus
+    }
+  )
+}
+
+query GetAsoEbiCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    description
+    imageUrl
+    imageStoragePath
+    eventType
+    organizerName
+    paymentBankName
+    paymentAccountName
+    paymentAccountNumber
+    memberLimit
+    contributedAmount
+    eventDate
+    status
+    creator {
+      id
+    }
+  }
+  asoEbiTiers(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { sortOrder: ASC }
+  ) {
+    id
+    name
+    price
+    fabricDescription
+    fabricImageUrl
+    fabricImageStoragePath
+    appreciationGiftName
+    appreciationGiftImageUrl
+    appreciationGiftImageStoragePath
+    availabilityNote
+    deliveryDetails
+    sortOrder
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    fulfilmentStatus
+    expectedAmount
+    confirmedAmount
+    selectedAsoEbiTier {
+      id
+      name
+      price
+    }
+    user {
+      id
+      displayName
+      email
+      profileImage
+    }
+  }
+}
+
+mutation ConfigureAsoEbiCircle(
+  $circleId: UUID!
+  $actorId: String!
+  $eventType: String!
+  $organizerName: String!
+  $paymentBankName: String!
+  $paymentAccountName: String!
+  $paymentAccountNumber: String!
+  $imageUrl: String!
+  $imageStoragePath: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      eventType: $eventType
+      organizerName: $organizerName
+      paymentBankName: $paymentBankName
+      paymentAccountName: $paymentAccountName
+      paymentAccountNumber: $paymentAccountNumber
+      imageUrl: $imageUrl
+      imageStoragePath: $imageStoragePath
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "aso_ebi_configured"
+      materialChanges: $eventType
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation CreateAsoEbiTier(
+  $tierId: UUID!
+  $circleId: UUID!
+  $name: String!
+  $price: Int!
+  $fabricDescription: String!
+  $fabricImageUrl: String
+  $fabricImageStoragePath: String
+  $appreciationGiftName: String
+  $appreciationGiftImageUrl: String
+  $appreciationGiftImageStoragePath: String
+  $availabilityNote: String
+  $deliveryDetails: String
+  $sortOrder: Int!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  asoEbiTier_insert(
+    data: {
+      id: $tierId
+      circle: { id: $circleId }
+      name: $name
+      price: $price
+      fabricDescription: $fabricDescription
+      fabricImageUrl: $fabricImageUrl
+      fabricImageStoragePath: $fabricImageStoragePath
+      appreciationGiftName: $appreciationGiftName
+      appreciationGiftImageUrl: $appreciationGiftImageUrl
+      appreciationGiftImageStoragePath: $appreciationGiftImageStoragePath
+      availabilityNote: $availabilityNote
+      deliveryDetails: $deliveryDetails
+      sortOrder: $sortOrder
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation SelectAsoEbiTier(
+  $circleId: UUID!
+  $memberId: String!
+  $tierId: UUID!
+  $expectedAmount: Int!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $memberId }
+    data: {
+      selectedAsoEbiTier: { id: $tierId }
+      expectedAmount: $expectedAmount
+      contributionStatus: "tier_selected"
+      fulfilmentStatus: "tier_selected"
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $memberId }
+      action: "tier_selected"
+      materialChanges: $tierId
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation UpdateAsoEbiFulfilment(
+  $circleId: UUID!
+  $actorId: String!
+  $memberId: String!
+  $status: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $memberId }
+    data: { fulfilmentStatus: $status }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "delivery_updated"
+      materialChanges: $status
+      createdAt: $updatedAt
+    }
+  )
+}
+
+query GetSupportCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    description
+    imageUrl
+    imageStoragePath
+    supportType
+    beneficiaryName
+    beneficiaryRelationship
+    showBeneficiaryName
+    showTargetToMembers
+    showConfirmedTotalToMembers
+    hideIndividualAmounts
+    requireCreatorApproval
+    completionType
+    contributionMode
+    paymentBankName
+    paymentAccountName
+    paymentAccountNumber
+    targetAmount
+    contributedAmount
+    memberLimit
+    deadline
+    status
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    expectedAmount
+    pledgedAmount
+    confirmedAmount
+    user {
+      id
+      displayName
+      email
+      profileImage
+    }
+  }
+  supportUpdates(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: DESC }
+  ) {
+    id
+    body
+    createdAt
+    author {
+      id
+      displayName
+    }
+  }
+}
+
+mutation ConfigureSupportCircle(
+  $circleId: UUID!
+  $actorId: String!
+  $supportType: String!
+  $beneficiaryName: String!
+  $beneficiaryRelationship: String
+  $contributionMode: String!
+  $showBeneficiaryName: Boolean!
+  $showTargetToMembers: Boolean!
+  $showConfirmedTotalToMembers: Boolean!
+  $hideIndividualAmounts: Boolean!
+  $requireCreatorApproval: Boolean!
+  $paymentBankName: String!
+  $paymentAccountName: String!
+  $paymentAccountNumber: String!
+  $imageUrl: String!
+  $imageStoragePath: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      supportType: $supportType
+      beneficiaryName: $beneficiaryName
+      beneficiaryRelationship: $beneficiaryRelationship
+      contributionMode: $contributionMode
+      showBeneficiaryName: $showBeneficiaryName
+      showTargetToMembers: $showTargetToMembers
+      showConfirmedTotalToMembers: $showConfirmedTotalToMembers
+      hideIndividualAmounts: $hideIndividualAmounts
+      requireCreatorApproval: $requireCreatorApproval
+      paymentBankName: $paymentBankName
+      paymentAccountName: $paymentAccountName
+      paymentAccountNumber: $paymentAccountNumber
+      imageUrl: $imageUrl
+      imageStoragePath: $imageStoragePath
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "support_configured"
+      materialChanges: $supportType
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation RecordSupportPledge(
+  $circleId: UUID!
+  $memberId: String!
+  $amount: Int!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $memberId }
+    data: { pledgedAmount: $amount, contributionStatus: "pledged" }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $memberId }
+      action: "support_pledged"
+      materialChanges: $amount
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation SetSupportMemberAllocation(
+  $circleId: UUID!
+  $memberId: String!
+  $expectedAmount: Int!
+  $contributionStatus: String!
+) @auth(level: NO_ACCESS) {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $memberId }
+    data: {
+      expectedAmount: $expectedAmount
+      contributionStatus: $contributionStatus
+    }
+  )
+}
+
+mutation CreateSupportUpdate(
+  $circleId: UUID!
+  $authorId: String!
+  $body: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  supportUpdate_insert(
+    data: {
+      circle: { id: $circleId }
+      author: { id: $authorId }
+      body: $body
+      createdAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $authorId }
+      action: "support_update_published"
+      materialChanges: $body
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation SetSupportCompletionType(
+  $circleId: UUID!
+  $actorId: String!
+  $completionType: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: { completionType: $completionType, updatedAt: $updatedAt }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "support_delivered_recorded"
+      materialChanges: $completionType
+      createdAt: $updatedAt
+    }
+  )
+}
+
+query GetInvitationByTokenHash($tokenHash: String!) @auth(level: NO_ACCESS) {
+  invitations(where: { tokenHash: { eq: $tokenHash } }, limit: 1) {
+    id
+    tokenHash
+    mode
+    recipientName
+    recipientEmail
+    recipientPhone
+    expectedAmount
+    requireApproval
+    state
+    maxUses
+    useCount
+    expiresAt
+    openedAt
+    acceptedAt
+    revokedAt
+    createdAt
+    updatedAt
+    circle {
+      id
+      name
+      type
+      description
+      imageUrl
+      memberCount
+      memberLimit
+      status
+      requireCreatorApproval
+      contributionMode
+      targetAmount
+      creator {
+        id
+        displayName
+      }
+    }
+    invitedBy {
+      id
+      displayName
+    }
+    acceptedBy {
+      id
+    }
+  }
+}
+
+query GetCircleInvitations($circleId: UUID!) @auth(level: NO_ACCESS) {
+  invitations(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: DESC }
+  ) {
+    id
+    mode
+    recipientName
+    recipientEmail
+    recipientPhone
+    expectedAmount
+    requireApproval
+    state
+    maxUses
+    useCount
+    expiresAt
+    createdAt
+    updatedAt
+  }
+}
+
+query GetInvitationAcceptances($invitationId: UUID!) @auth(level: NO_ACCESS) {
+  invitationAcceptances(
+    where: { invitationId: { eq: $invitationId } }
+    orderBy: { createdAt: ASC }
+  ) {
+    status
+    createdAt
+    respondedAt
+    user {
+      id
+      displayName
+      email
+      phone
+      profileImage
+    }
+  }
+}
+
+mutation CreateInvitation(
+  $circleId: UUID!
+  $invitedById: String!
+  $tokenHash: String!
+  $mode: String!
+  $recipientName: String
+  $recipientEmail: String
+  $recipientPhone: String
+  $expectedAmount: Int!
+  $requireApproval: Boolean!
+  $maxUses: Int!
+  $expiresAt: Timestamp!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  invitation_insert(
+    data: {
+      circle: { id: $circleId }
+      invitedBy: { id: $invitedById }
+      tokenHash: $tokenHash
+      mode: $mode
+      recipientName: $recipientName
+      recipientEmail: $recipientEmail
+      recipientPhone: $recipientPhone
+      expectedAmount: $expectedAmount
+      requireApproval: $requireApproval
+      state: "created"
+      maxUses: $maxUses
+      useCount: 0
+      expiresAt: $expiresAt
+      createdAt: $createdAt
+      updatedAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $invitedById }
+      action: "invitation_created"
+      materialChanges: $mode
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation UpdateInvitationState(
+  $invitationId: UUID!
+  $actorId: String!
+  $circleId: UUID!
+  $state: String!
+  $openedAt: Timestamp
+  $revokedAt: Timestamp
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  invitation_update(
+    key: { id: $invitationId }
+    data: {
+      state: $state
+      openedAt: $openedAt
+      revokedAt: $revokedAt
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "invitation_state_changed"
+      materialChanges: $state
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation AcceptInvitationWithMembership(
+  $invitationId: UUID!
+  $circleId: UUID!
+  $userId: String!
+  $role: String!
+  $expectedAmount: Int!
+  $nextMemberCount: Int!
+  $nextInvitationState: String!
+  $nextUseCount: Int!
+  $respondedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_insert(
+    data: {
+      circle: { id: $circleId }
+      user: { id: $userId }
+      role: $role
+      membershipStatus: "joined"
+      contributionStatus: "joined"
+      fulfilmentStatus: "joined"
+      expectedAmount: $expectedAmount
+      joinedAt: $respondedAt
+    }
+  )
+  invitationAcceptance_insert(
+    data: {
+      invitation: { id: $invitationId }
+      user: { id: $userId }
+      status: "accepted"
+      createdAt: $respondedAt
+      respondedAt: $respondedAt
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
+  )
+  invitation_update(
+    key: { id: $invitationId }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      acceptedBy: { id: $userId }
+      updatedAt: $respondedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $userId }
+      action: "invitation_accepted"
+      materialChanges: $invitationId
+      createdAt: $respondedAt
+    }
+  )
+}
+
+mutation RequestInvitationApproval(
+  $invitationId: UUID!
+  $circleId: UUID!
+  $userId: String!
+  $respondedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  invitationAcceptance_insert(
+    data: {
+      invitation: { id: $invitationId }
+      user: { id: $userId }
+      status: "pending"
+      createdAt: $respondedAt
+      respondedAt: $respondedAt
+    }
+  )
+  invitation_update(
+    key: { id: $invitationId }
+    data: {
+      state: "approval_pending"
+      acceptedBy: { id: $userId }
+      updatedAt: $respondedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $userId }
+      action: "membership_approval_requested"
+      materialChanges: $invitationId
+      createdAt: $respondedAt
+    }
+  )
+}
+
+mutation ApproveInvitationMembership(
+  $invitationId: UUID!
+  $circleId: UUID!
+  $actorId: String!
+  $userId: String!
+  $role: String!
+  $expectedAmount: Int!
+  $nextMemberCount: Int!
+  $nextInvitationState: String!
+  $nextUseCount: Int!
+  $respondedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleMembership_insert(
+    data: {
+      circle: { id: $circleId }
+      user: { id: $userId }
+      role: $role
+      membershipStatus: "joined"
+      contributionStatus: "joined"
+      fulfilmentStatus: "joined"
+      expectedAmount: $expectedAmount
+      joinedAt: $respondedAt
+    }
+  )
+  invitationAcceptance_update(
+    key: { invitationId: $invitationId, userId: $userId }
+    data: { status: "accepted", respondedAt: $respondedAt }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
+  )
+  invitation_update(
+    key: { id: $invitationId }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      updatedAt: $respondedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "membership_approved"
+      materialChanges: $userId
+      createdAt: $respondedAt
+    }
+  )
+}
+
+mutation DeclineInvitation(
+  $invitationId: UUID!
+  $circleId: UUID!
+  $userId: String!
+  $state: String!
+  $respondedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  invitationAcceptance_insert(
+    data: {
+      invitation: { id: $invitationId }
+      user: { id: $userId }
+      status: "declined"
+      createdAt: $respondedAt
+      respondedAt: $respondedAt
+    }
+  )
+  invitation_update(
+    key: { id: $invitationId }
+    data: { state: $state, updatedAt: $respondedAt }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $userId }
+      action: "invitation_declined"
+      materialChanges: $invitationId
+      createdAt: $respondedAt
+    }
+  )
+}
+
+mutation RequestReplacementInvitation(
+  $invitationId: UUID!
+  $circleId: UUID!
+  $actorId: String!
+  $requestedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "replacement_invitation_requested"
+      materialChanges: $invitationId
+      createdAt: $requestedAt
+    }
+  )
+}

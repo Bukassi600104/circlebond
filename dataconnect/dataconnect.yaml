@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "bondcircle-service"
+location: "europe-west2"
+schemas:
+  - source: "./schema"
+    datasource:
+      postgresql:
+        database: "bondcircle"
+        cloudSql:
+          instanceId: "bondcircle-sql"
+          schemaValidation: "COMPATIBLE"
+connectorDirs: ["./bondcircle"]

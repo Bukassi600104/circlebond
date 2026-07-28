@@ -1,0 +1,2032 @@
+BondCircle — Implementation Milestones & Acceptance Plan
+
+Version: 1.0Status: Approved for Engineering ExecutionBuild Type: Production Launch V1Primary Platform: Mobile-first Progressive Web AppImplementation Rule: Complete one milestone at a time. Do not build the full application in one uncontrolled pass.
+
+1. Delivery Strategy
+
+BondCircle must be implemented in controlled milestones.
+
+Each milestone contains:
+
+Scope
+
+Required outputs
+
+Acceptance criteria
+
+Test requirements
+
+Completion gate
+
+A milestone is not complete because the interface looks correct. It is complete only when:
+
+The interface works.
+
+The backend works.
+
+Permissions are enforced.
+
+Validation works.
+
+Error states work.
+
+Automated tests pass.
+
+The implementation matches the approved product documents.
+
+The engineering sequence is:
+
+Foundation
+
+Design System
+
+Authentication and Accounts
+
+Dashboard and Navigation
+
+Circle Engine
+
+Gift Circle
+
+Aso-Ebi Circle
+
+Support Circle
+
+Invitations and Membership
+
+Contributions and Receipt Review
+
+Announcements, Comments, and Activity
+
+Notifications
+
+Circle Completion and Retention
+
+Owner Administration
+
+Security Hardening
+
+Testing and Quality Assurance
+
+Production Deployment
+
+Post-launch Verification
+
+Milestone 1 — Project Foundation
+
+Objective
+
+Create the production-grade application foundation without implementing feature-specific business logic.
+
+Required Work
+
+Initialise Next.js using the App Router.
+
+Enable strict TypeScript.
+
+Configure linting and formatting.
+
+Configure environment-variable validation.
+
+Configure Firebase project integration.
+
+Configure Firebase Authentication.
+
+Configure Firebase SQL Connect with managed Cloud SQL for PostgreSQL.
+
+Configure Cloud Storage for Firebase.
+
+Configure Firebase emulators for local development.
+
+Set up development, staging, and production environment structure.
+
+Add base error handling.
+
+Add global logging.
+
+Add health-check endpoint.
+
+Configure secure HTTP headers.
+
+Configure CI pipeline.
+
+Configure test frameworks.
+
+Create the approved folder structure.
+
+Proposed Folder Structure
+
+app/
+  (auth)/
+  (dashboard)/
+  api/
+  invite/
+  legal/
+
+components/
+  ui/
+  layout/
+  feedback/
+  forms/
+
+features/
+  auth/
+  users/
+  circles/
+  invitations/
+  contributions/
+  receipts/
+  announcements/
+  comments/
+  activity/
+  notifications/
+  retention/
+  admin/
+
+server/
+  auth/
+  database/
+  permissions/
+  services/
+  repositories/
+  jobs/
+  storage/
+  notifications/
+  audit/
+
+lib/
+  validation/
+  security/
+  constants/
+  formatting/
+  analytics/
+
+types/
+tests/
+  unit/
+  integration/
+  e2e/
+
+Acceptance Criteria
+
+Application runs locally.
+
+Staging build succeeds.
+
+Production build succeeds.
+
+Firebase SQL Connect schema validation and migration run successfully.
+
+CI rejects linting, typing, test, or build failures.
+
+Secrets are never committed.
+
+Health endpoint reports application, Firebase configuration, and SQL Connect status.
+
+Global error page exists.
+
+No BondCircle feature logic is improvised during this milestone.
+
+Completion Gate
+
+The project foundation must be reviewed before any product screens are built.
+
+Milestone 2 — Brand System and Component Library
+
+Objective
+
+Implement the approved BondCircle visual system before creating full screens.
+
+Required Brand Tokens
+
+Primary
+
+Deep Teal: #0F4D46
+
+Muted Green: #6B8F7A
+
+Secondary
+
+Soft Coral: #F26D5A
+
+Coral Light: #FFE3DA
+
+Accent
+
+Warm Gold: #D9A441
+
+Gold Light: #F6E6BF
+
+Backgrounds
+
+Cream: #FFF8F1
+
+Soft Grey: #F1F3F2
+
+Mint Tint: #E9F1EC
+
+Text
+
+Text Primary: #1C2B2A
+
+Text Secondary: #6B6F72
+
+Typography
+
+Brand and selected marketing headings: Lora Semibold.
+
+Product interface: Inter.
+
+All font loading must use supported web-font mechanisms and graceful fallbacks.
+
+Required Components
+
+Button
+
+Icon button
+
+Text input
+
+Phone input
+
+Email input
+
+OTP input
+
+Amount input
+
+Date picker
+
+Textarea
+
+Upload field
+
+Card
+
+Circle card
+
+Tier card
+
+Member avatar
+
+Member status badge
+
+Progress bar
+
+Progress ring
+
+Modal
+
+Bottom sheet
+
+Confirmation dialog
+
+Toast
+
+Empty state
+
+Error state
+
+Loading skeleton
+
+Tabs
+
+Navigation bar
+
+Sidebar
+
+Notification item
+
+Activity item
+
+Comment
+
+Announcement card
+
+Accessibility Requirements
+
+Minimum 44 × 44 px touch targets.
+
+Visible focus indicators.
+
+Keyboard navigation.
+
+Screen-reader labels.
+
+Statuses must use text or icons in addition to colour.
+
+Text contrast must meet accepted accessibility standards.
+
+Acceptance Criteria
+
+Components match the approved brand board.
+
+Components have normal, hover, focus, disabled, loading, success, and error states where relevant.
+
+No page introduces arbitrary colours, spacing, or button styles.
+
+Components work on mobile and desktop.
+
+Component tests pass.
+
+Completion Gate
+
+Full screens cannot be built until the component library is approved.
+
+Milestone 3 — Authentication and User Accounts
+
+Objective
+
+Implement secure registration, sign-in, account verification, and account recovery.
+
+Required Authentication Methods
+
+Email OTP.
+
+Phone OTP.
+
+Google Sign-In.
+
+Secure authenticated sessions.
+
+Required Registration Data
+
+Display name.
+
+Verified email or verified phone number.
+
+Terms acceptance timestamp.
+
+Privacy Policy acceptance timestamp.
+
+Optional Data
+
+Profile image.
+
+Secondary verified contact method.
+
+Country confirmation.
+
+Explicitly Excluded
+
+Gender.
+
+Precise location.
+
+Bank details.
+
+Payment-card details.
+
+Anonymous guest accounts.
+
+Required Screens
+
+Splash.
+
+Onboarding.
+
+Sign in.
+
+Registration.
+
+OTP verification.
+
+Authentication error.
+
+Account recovery.
+
+Terms acceptance.
+
+Privacy acceptance.
+
+Security Requirements
+
+OTP expiry.
+
+OTP attempt limits.
+
+Login rate limiting.
+
+Secure HTTP-only cookies.
+
+Session invalidation after logout.
+
+Account enumeration protection.
+
+Audit events for login, logout, verification, and recovery.
+
+Email and phone normalization.
+
+Acceptance Criteria
+
+New users can register.
+
+Existing users can sign in.
+
+Google authentication works.
+
+OTP verification works.
+
+Expired and invalid OTPs fail safely.
+
+Terms acceptance is recorded.
+
+Logout invalidates the session.
+
+Protected routes reject unauthenticated access.
+
+Authentication E2E tests pass.
+
+Milestone 4 — Dashboard and Global Navigation
+
+Objective
+
+Create the main account experience and navigation system.
+
+Required Mobile Navigation
+
+Home
+
+Circles
+
+Create
+
+Activity
+
+Profile
+
+Required Desktop Navigation
+
+Dashboard
+
+Created by me
+
+Joined circles
+
+Pending invitations
+
+Completed
+
+Archived
+
+Activity
+
+Notifications
+
+Profile
+
+Settings
+
+Home Dashboard Sections
+
+Greeting.
+
+Create Gift Circle.
+
+Create Aso-Ebi Circle.
+
+Create Support Circle.
+
+Created by me.
+
+Joined circles.
+
+Pending invitations.
+
+Completed circles.
+
+Archived circles.
+
+Relevant empty states.
+
+Circle Cards
+
+Each card must show:
+
+Circle image or allowed placeholder.
+
+Circle name.
+
+Circle type.
+
+User's role.
+
+Member count.
+
+Progress.
+
+Deadline or event date.
+
+Current status.
+
+Acceptance Criteria
+
+Navigation works without dead links.
+
+Mobile PWA layout works.
+
+Desktop layout works.
+
+A user can distinguish circles they created from circles they joined.
+
+Empty states appear for new accounts.
+
+Loading and network-error states work.
+
+Data is loaded from the real database, not mock arrays.
+
+Milestone 5 — Core Circle Engine
+
+Objective
+
+Implement the shared business logic used by all three circle types.
+
+Supported Circle Types
+
+Gift Circle.
+
+Aso-Ebi Circle.
+
+Support Circle.
+
+Shared Circle States
+
+Draft.
+
+Published.
+
+Active.
+
+Target reached.
+
+Fulfilment.
+
+Completed.
+
+Cancelled.
+
+Archived.
+
+Purged.
+
+Required Shared Fields
+
+Circle ID.
+
+Type.
+
+Title.
+
+Description.
+
+Creator.
+
+Co-admins.
+
+Members.
+
+Pricing plan.
+
+Member limit.
+
+Deadline or event date.
+
+Status.
+
+Visibility.
+
+Created date.
+
+Completion date.
+
+Archive date.
+
+Purge date.
+
+Shared Rules
+
+Only creator can publish.
+
+Only creator can close or cancel.
+
+Co-admin permissions are limited.
+
+Members cannot edit circle configuration.
+
+Published circles retain an audit history of material changes.
+
+Member limits are enforced according to pricing tier.
+
+Pricing must be charged only to the creator.
+
+Contributors do not pay platform access fees.
+
+Pricing Rules
+
+Free
+
+₦0 per circle.
+
+Maximum 3 members.
+
+Starter
+
+₦1,000 per circle.
+
+Maximum 10 members.
+
+Standard
+
+₦2,000 per circle.
+
+Maximum 30 members.
+
+Premium
+
+₦3,500 per circle.
+
+Maximum 100 members.
+
+Important Payment Boundary
+
+BondCircle may charge the creator for activating a paid circle.
+
+BondCircle does not collect, pool, escrow, or disburse member contributions in V1.
+
+Acceptance Criteria
+
+All circle states are implemented.
+
+Invalid state transitions are blocked.
+
+Pricing limits are enforced.
+
+Permissions are enforced server-side.
+
+Audit entries are created for critical changes.
+
+Draft circles can be resumed.
+
+Cancelled circles cannot accept new activity.
+
+Circle engine unit and integration tests pass.
+
+Milestone 6 — Gift Circle
+
+Objective
+
+Implement the full Gift Circle flow.
+
+Creation Fields
+
+Circle name.
+
+Gift title.
+
+Gift image.
+
+Target amount.
+
+Deadline.
+
+Description or note.
+
+Contribution mode.
+
+Invite members.
+
+Contribution Modes
+
+Equal split.
+
+Custom amounts.
+
+Active Circle Screen
+
+Must include:
+
+Gift image in the centre.
+
+Gift title.
+
+Target amount.
+
+Confirmed total.
+
+Percentage progress.
+
+Deadline.
+
+Member ring.
+
+Creator indicator.
+
+Member avatars.
+
+Member contribution statuses.
+
+Announcements tab.
+
+Comments tab.
+
+Activity tab.
+
+Review queue for authorised users.
+
+Member Ring Statuses
+
+Invited.
+
+Joined.
+
+Pledged.
+
+Receipt submitted.
+
+Awaiting confirmation.
+
+Part-paid.
+
+Paid.
+
+Declined.
+
+Removed.
+
+Acceptance Criteria
+
+Creator completes the full creation flow.
+
+Gift image appears in the active circle.
+
+Equal and custom contribution modes work.
+
+Member ring accurately reflects database state.
+
+Tapping the user's own avatar opens their contribution panel.
+
+Tapping another member does not reveal private receipt information.
+
+Gift Circle E2E tests pass.
+
+Milestone 7 — Aso-Ebi Circle
+
+Objective
+
+Implement Aso-Ebi coordination for any event type.
+
+Event Types
+
+Wedding.
+
+Burial.
+
+Birthday.
+
+Anniversary.
+
+Thanksgiving.
+
+Naming ceremony.
+
+Religious event.
+
+Other.
+
+The interface must not describe Aso-Ebi as wedding-only.
+
+Creation Fields
+
+Event title.
+
+Event type.
+
+Event date.
+
+Organizer name.
+
+Fabric image.
+
+Description.
+
+Tier configuration.
+
+Invite members.
+
+Tier Fields
+
+Each tier may contain:
+
+Tier name.
+
+Price.
+
+Fabric description.
+
+Fabric image.
+
+Appreciation gift name.
+
+Appreciation gift image.
+
+Quantity or availability note.
+
+Delivery or collection details.
+
+Tier Rules
+
+At least one tier is required.
+
+Additional tiers are optional.
+
+Members choose one tier.
+
+Creator can configure custom tiers.
+
+The system must not hard-code only three tiers.
+
+Three tiers may be displayed as an example or common layout.
+
+Member Fulfilment Statuses
+
+Invited.
+
+Joined.
+
+Tier selected.
+
+Receipt submitted.
+
+Awaiting confirmation.
+
+Part-paid.
+
+Paid.
+
+Preparing.
+
+Ready for collection.
+
+Dispatched.
+
+Delivered.
+
+Collected.
+
+Cancelled.
+
+Acceptance Criteria
+
+Aso-Ebi works for burial, birthday, wedding, and other event types.
+
+Creator can create one or several tiers.
+
+Members can select a tier.
+
+Tier price determines expected contribution.
+
+Creator can update delivery or collection status.
+
+Appreciation gifts are displayed correctly.
+
+Aso-Ebi E2E tests pass.
+
+Milestone 8 — Support Circle
+
+Objective
+
+Implement coordinated support for personal and community needs.
+
+Support Types
+
+Burial support.
+
+Medical support.
+
+Emergency support.
+
+Charity.
+
+Community support.
+
+Family support.
+
+Other.
+
+Creation Fields
+
+Support title.
+
+Support type.
+
+Beneficiary name.
+
+Relationship to beneficiary, where appropriate.
+
+Target amount.
+
+Deadline.
+
+Supporting image.
+
+Description.
+
+Invite members.
+
+Contribution mode.
+
+Required Product Language
+
+Use respectful, neutral language.
+
+Do not frame support as investment, lending, profit, or guaranteed fundraising.
+
+Privacy Controls
+
+Creator selects:
+
+Show beneficiary name.
+
+Show target to members only.
+
+Show confirmed total to members.
+
+Hide individual amounts from other contributors.
+
+Require creator approval for membership.
+
+Acceptance Criteria
+
+Creator can create all approved support subtypes.
+
+Privacy settings are enforced.
+
+Members can submit and track their own contributions.
+
+Creator can publish updates.
+
+Support Circle completion is recorded as support delivered.
+
+Support Circle E2E tests pass.
+
+Milestone 9 — Invitations and Membership
+
+Objective
+
+Implement secure circle invitations and multi-circle membership.
+
+Invite Methods
+
+Add from contacts.
+
+Enter phone number.
+
+Enter email address.
+
+Copy secure link.
+
+Share using native share sheet.
+
+Share through WhatsApp, SMS, email, or other installed applications.
+
+Invite Link Behaviour
+
+New user:
+
+Open link
+→ Register
+→ Verify account
+→ View invitation
+→ Accept
+→ Join intended circle
+
+Existing user:
+
+Open link
+→ Sign in if required
+→ View invitation
+→ Accept
+→ Join intended circle
+
+Link Modes
+
+Named invite.
+
+Open link with capacity limit.
+
+Creator approval required.
+
+Invite States
+
+Created.
+
+Sent.
+
+Opened.
+
+Accepted.
+
+Declined.
+
+Expired.
+
+Revoked.
+
+Security Requirements
+
+Cryptographically secure tokens.
+
+Expiring invitations.
+
+Token hashing where appropriate.
+
+Capacity checks.
+
+Revocation support.
+
+Reuse protection for restricted invites.
+
+No unauthenticated circle access.
+
+Membership Rules
+
+One user may join multiple circles.
+
+One user may create multiple circles.
+
+The same user may have different roles in different circles.
+
+Membership is unique per user and circle.
+
+A user may leave a circle subject to contribution-history rules.
+
+Removing a user does not erase audit history.
+
+Acceptance Criteria
+
+All invite methods work.
+
+Registration returns users to the intended circle.
+
+Expired links show a recovery screen.
+
+Revoked links cannot be reused.
+
+Member limits are enforced.
+
+Multi-circle membership works.
+
+Invitation E2E tests pass.
+
+Milestone 10 — Contributions and Receipt Review
+
+Objective
+
+Implement the complete tracking-only contribution workflow.
+
+Contributor Flow
+
+Open circle
+→ Tap own avatar
+→ View Your Contribution panel
+→ Upload receipt or record partial contribution
+→ Submit
+→ Await creator review
+
+Contribution Panel
+
+Must show:
+
+Expected amount.
+
+Confirmed amount.
+
+Pending amount.
+
+Remaining amount.
+
+Status.
+
+Upload receipt.
+
+Record partial payment.
+
+View submitted receipts.
+
+Re-upload after rejection.
+
+Receipt Upload
+
+Required:
+
+Receipt image.
+
+Amount paid.
+
+Optional note.
+
+Submission timestamp.
+
+Uploader identity.
+
+Receipt Privacy
+
+Visible only to:
+
+Contributor who uploaded it.
+
+Circle creator.
+
+Authorised co-admin.
+
+Not visible to ordinary members.
+
+Creator Review Flow
+
+Creator or authorised co-admin can:
+
+Open pending review.
+
+View receipt.
+
+Compare submitted amount.
+
+Confirm.
+
+Reject.
+
+Enter rejection reason.
+
+Status Flow
+
+Joined
+→ Receipt submitted
+→ Awaiting confirmation
+→ Part-paid or Paid
+
+Rejected flow:
+
+Awaiting confirmation
+→ Rejected
+→ Contributor notified
+→ Replacement receipt permitted
+
+Audit Requirements
+
+Log:
+
+Receipt uploaded.
+
+Receipt replaced.
+
+Receipt confirmed.
+
+Receipt rejected.
+
+Rejection reason.
+
+Reviewer identity.
+
+Amount change.
+
+Acceptance Criteria
+
+Users can upload only for themselves.
+
+Creators cannot fabricate a contributor receipt.
+
+Confirmed totals update correctly.
+
+Partial contributions accumulate correctly.
+
+Overpayments are flagged for review.
+
+Rejection requires a reason.
+
+Receipt access rules are enforced server-side.
+
+Contribution E2E tests pass.
+
+Milestone 11 — Announcements, Comments, and Activity
+
+Objective
+
+Implement controlled circle communication without creating a full chat system.
+
+Announcements
+
+Creator and co-admin can:
+
+Create announcement.
+
+Edit announcement.
+
+Pin announcement.
+
+Close comments on announcement.
+
+Delete announcement subject to audit rules.
+
+Members can:
+
+View.
+
+Comment when enabled.
+
+Circle Comments
+
+Approved capabilities:
+
+Plain-text comments.
+
+Replies.
+
+Delete own comment.
+
+Report comment.
+
+Creator/co-admin moderation.
+
+Disable comments for a circle.
+
+Comment rate limiting.
+
+Explicitly excluded:
+
+Private messages.
+
+Voice notes.
+
+Videos.
+
+GIFs.
+
+File attachments.
+
+Images in comments.
+
+Real-time typing indicators.
+
+Read receipts.
+
+Online presence.
+
+Activity Feed
+
+System-generated events include:
+
+Circle created.
+
+Member invited.
+
+Member joined.
+
+Tier selected.
+
+Receipt submitted.
+
+Receipt confirmed.
+
+Receipt rejected.
+
+Reminder sent.
+
+Announcement posted.
+
+Delivery updated.
+
+Target reached.
+
+Circle completed.
+
+Circle cancelled.
+
+Acceptance Criteria
+
+Announcements and comments are clearly separated.
+
+Members cannot create official announcements.
+
+Activity events cannot be manually edited by members.
+
+Comment moderation is audited.
+
+Rate limiting works.
+
+Communication tests pass.
+
+Milestone 12 — Notifications
+
+Objective
+
+Deliver useful notifications without overwhelming users.
+
+In-App Notifications
+
+Required for:
+
+Invitation received.
+
+Invitation accepted.
+
+Announcement posted.
+
+Comment reply.
+
+Contribution reminder.
+
+Receipt submitted.
+
+Receipt confirmed.
+
+Receipt rejected.
+
+Target reached.
+
+Deadline approaching.
+
+Delivery updated.
+
+Circle completed.
+
+Circle cancelled.
+
+Email Notifications
+
+Required for critical events:
+
+New invitation.
+
+Receipt rejected.
+
+Important announcement.
+
+Deadline approaching.
+
+Circle completed.
+
+Account security events.
+
+Web Push
+
+May be included only after:
+
+User permission.
+
+Notification preferences.
+
+Reliable service-worker implementation.
+
+It is not required for initial production launch if it risks delaying release.
+
+Preferences
+
+Users can control:
+
+Email notifications.
+
+Browser push.
+
+Comments and replies.
+
+Contribution reminders.
+
+Circle updates.
+
+Marketing communication.
+
+Anti-Spam Rules
+
+No notification for every minor activity.
+
+Batch non-critical updates where appropriate.
+
+Do not repeatedly remind a member more than the configured frequency.
+
+Respect muted circles.
+
+Acceptance Criteria
+
+Notification deep links open the correct screen.
+
+Read and unread states work.
+
+Preferences are respected.
+
+Failed email deliveries are logged.
+
+Notifications never expose receipt details in insecure previews.
+
+Milestone 13 — Circle Completion, Archive, and Data Retention
+
+Objective
+
+Implement the final lifecycle stages and privacy rules.
+
+Completion Types
+
+Gift Circle:
+
+Gift purchased.
+
+Gift delivered.
+
+Aso-Ebi Circle:
+
+Fabric distributed.
+
+Fabric collected.
+
+Deliveries completed.
+
+Support Circle:
+
+Support delivered.
+
+Campaign completed.
+
+Closing Behaviour
+
+When completed:
+
+Contributions lock.
+
+New receipts stop.
+
+Membership changes stop.
+
+Announcements and comments become read-only.
+
+Circle summary remains visible.
+
+Thirty-day retention countdown begins.
+
+Retention Policy
+
+Thirty days after completion or cancellation, delete:
+
+Receipt files.
+
+Receipt notes.
+
+Circle comments.
+
+Temporary communication content.
+
+Temporary gift, Aso-Ebi, or support uploads where the retention policy requires deletion.
+
+Retain only approved minimal records:
+
+Circle ID.
+
+Circle type.
+
+Creator ID where legally and operationally appropriate.
+
+Completion date.
+
+Member count.
+
+Pricing plan.
+
+Aggregated non-sensitive analytics.
+
+Required audit records.
+
+Important Refinement
+
+Profile images belong to the user account and are not deleted merely because one circle closes.
+
+Brand and product images may be retained while another active circle references them. File deletion must be reference-aware.
+
+Required Background Job
+
+A scheduled retention job must:
+
+Find eligible circles.
+
+Delete private files.
+
+Remove or anonymise records.
+
+Record deletion results.
+
+Retry failed deletions.
+
+Prevent orphaned storage files.
+
+Acceptance Criteria
+
+Completed circles are read-only.
+
+Retention countdown is displayed.
+
+Data is purged automatically.
+
+File deletion is verified.
+
+Shared files are not deleted prematurely.
+
+Purge failures generate alerts.
+
+Retention tests pass.
+
+Milestone 14 — Owner Administration
+
+Objective
+
+Provide the BondCircle business owner with a secure operational dashboard.
+
+Administrator Capabilities
+
+View platform metrics.
+
+View user counts.
+
+View circle counts.
+
+View circle types.
+
+View active, completed, cancelled, and archived circles.
+
+View pricing-plan usage.
+
+View invitation acceptance rate.
+
+View upload failure rate.
+
+View reported comments.
+
+Review abuse reports.
+
+Suspend abusive accounts.
+
+Disable compromised invite links.
+
+View system health.
+
+View retention-job status.
+
+Export approved operational reports.
+
+Restrictions
+
+Administrators must not casually browse private receipts or sensitive circle content.
+
+Access to sensitive material must be:
+
+Purpose-limited.
+
+Permission-controlled.
+
+Audited.
+
+Used only for support, fraud, security, or legal reasons.
+
+Acceptance Criteria
+
+Admin access is separate from normal user access.
+
+Admin actions are audited.
+
+Sensitive access is restricted.
+
+No public admin registration exists.
+
+Administrative tests pass.
+
+Milestone 15 — Security Hardening
+
+Objective
+
+Perform a dedicated security pass after feature completion.
+
+Required Reviews
+
+Authentication.
+
+Session management.
+
+Role permissions.
+
+Invitation tokens.
+
+Upload security.
+
+File access.
+
+Cross-site scripting.
+
+Cross-site request forgery.
+
+Rate limiting.
+
+Database access.
+
+Error-message leakage.
+
+Secret handling.
+
+Logging.
+
+Privacy controls.
+
+Dependency vulnerabilities.
+
+Upload Controls
+
+Allow approved image formats only.
+
+Validate MIME type and file signature.
+
+Reject executable or disguised files.
+
+Strip unnecessary metadata where appropriate.
+
+Generate safe internal filenames.
+
+Use private storage for receipts.
+
+Use signed, expiring access URLs.
+
+Scan files where supported.
+
+Enforce upload size limits.
+
+Abuse Controls
+
+Comment spam limits.
+
+Invitation creation limits.
+
+OTP limits.
+
+Receipt upload limits.
+
+Login attempt limits.
+
+Account suspension.
+
+Report handling.
+
+Acceptance Criteria
+
+No critical or high-severity unresolved security findings.
+
+Permission tests cover every role.
+
+Private file URLs expire.
+
+Direct object reference attacks are blocked.
+
+Security regression suite passes.
+
+Milestone 16 — Testing and Quality Assurance
+
+Objective
+
+Verify the full product from first launch through data purge.
+
+Required Test Levels
+
+Unit Tests
+
+Pricing limits.
+
+Status transitions.
+
+Contribution calculations.
+
+Receipt states.
+
+Permissions.
+
+Notification rules.
+
+Retention eligibility.
+
+Integration Tests
+
+Database operations.
+
+API endpoints.
+
+Authentication.
+
+Invitations.
+
+Uploads.
+
+Email delivery integration.
+
+Scheduled jobs.
+
+End-to-End Tests
+
+Register and verify.
+
+Create Gift Circle.
+
+Create Aso-Ebi Circle.
+
+Create Support Circle.
+
+Activate paid circle.
+
+Invite member.
+
+Accept invitation.
+
+Join multiple circles.
+
+Upload receipt.
+
+Record partial payment.
+
+Approve receipt.
+
+Reject and replace receipt.
+
+Post announcement.
+
+Add comment.
+
+Send reminder.
+
+Update delivery.
+
+Complete circle.
+
+Verify read-only mode.
+
+Run retention purge.
+
+Device Coverage
+
+Current iPhone Safari.
+
+Current Android Chrome.
+
+Desktop Chrome.
+
+Desktop Safari.
+
+Desktop Edge.
+
+Tablet layout.
+
+Installed PWA mode.
+
+Required Manual QA
+
+Visual comparison with approved mobile mockups.
+
+Visual comparison with approved desktop mockups.
+
+Accessibility.
+
+Slow-network testing.
+
+Offline-state behaviour.
+
+Keyboard navigation.
+
+Screen-reader verification.
+
+File-upload testing.
+
+Notification deep links.
+
+Acceptance Criteria
+
+All critical journeys pass.
+
+No blocker or critical defects remain.
+
+No dead buttons.
+
+No fake data in production.
+
+No placeholder pages.
+
+No unhandled loading or error state.
+
+Product owner acceptance test passes.
+
+Milestone 17 — Production Deployment
+
+Objective
+
+Deploy BondCircle safely to its production environment.
+
+Required Infrastructure
+
+Production database.
+
+Production storage.
+
+Production authentication configuration.
+
+Production email provider.
+
+Monitoring.
+
+Error tracking.
+
+Analytics.
+
+Scheduled retention jobs.
+
+Domain and SSL.
+
+Backup plan.
+
+Incident-response contacts.
+
+Release Checklist
+
+Production environment variables verified.
+
+Database migration backup created.
+
+Terms and Privacy Policy published.
+
+Pricing displayed correctly.
+
+Support contact available.
+
+Email templates reviewed.
+
+PWA manifest valid.
+
+Icons installed.
+
+Service worker tested.
+
+Robots and metadata configured.
+
+Analytics privacy checked.
+
+Security headers verified.
+
+Admin dashboard secured.
+
+Staging sign-off completed.
+
+Deployment Rule
+
+Deploy from staging after successful acceptance.
+
+Do not manually patch production code without version control.
+
+Acceptance Criteria
+
+Production site loads securely.
+
+Registration works.
+
+Email and OTP work.
+
+Circle creation works.
+
+File uploads work.
+
+Notifications work.
+
+Monitoring receives real events.
+
+Rollback procedure is tested.
+
+Milestone 18 — Post-Launch Verification
+
+Objective
+
+Confirm that the live product behaves correctly with real users and real infrastructure.
+
+First-Launch Monitoring
+
+Track:
+
+Registration completion rate.
+
+Circle creation rate.
+
+Invitation acceptance rate.
+
+Receipt submission success.
+
+Upload failure rate.
+
+Notification delivery rate.
+
+Circle completion rate.
+
+User-reported confusion.
+
+Page performance.
+
+Error rate.
+
+Launch Support Procedures
+
+Review errors daily during early launch.
+
+Respond to failed uploads.
+
+Monitor suspicious invitation activity.
+
+Review comments and abuse reports.
+
+Confirm retention jobs.
+
+Confirm backups.
+
+Fix critical defects before adding new features.
+
+Initial Product Questions
+
+Do creators understand the three circle modes?
+
+Do invited users complete registration?
+
+Do users understand that BondCircle does not hold money?
+
+Can contributors find their receipt-upload action?
+
+Can creators review receipts without confusion?
+
+Are comments sufficient without full chat?
+
+Do pricing limits match actual circle sizes?
+
+Are users completing circles successfully?
+
+Version 1.1 Eligibility
+
+Do not begin Version 1.1 until:
+
+Launch is stable.
+
+Critical bugs are resolved.
+
+User behaviour is measured.
+
+Retention jobs are verified.
+
+Core workflows are consistently completed.
+
+Codex Execution Rules
+
+Codex must follow these rules during every milestone:
+
+Read the relevant approved specification before editing.
+
+Implement only the current milestone.
+
+Do not silently redesign.
+
+Do not invent new business rules.
+
+Do not add placeholder APIs or fake production flows.
+
+Do not leave TODO buttons in completed milestones.
+
+Use real database-backed states.
+
+Add tests with each feature.
+
+Run linting, typing, tests, and build checks before completion.
+
+Report unresolved decisions instead of improvising.
+
+Preserve the BondCircle brand system.
+
+Preserve mobile-first responsive behaviour.
+
+Enforce authorization on the server, not merely in the interface.
+
+Update technical documentation when implementation changes.
+
+Do not begin the next milestone until the current acceptance gate passes.
+
+Final Production Standard
+
+BondCircle is ready to launch only when:
+
+All eighteen milestones are complete.
+
+All critical user journeys work end-to-end.
+
+Mobile and desktop interfaces match the approved visual direction.
+
+Users can register, create, join, contribute, communicate, complete, and archive without manual intervention.
+
+Private receipts are protected.
+
+Data retention runs automatically.
+
+Monitoring and backups are operational.
+
+There are no dead screens, fake controls, or prototype-only behaviours.
+
+This milestone plan is the approved execution order for BondCircle Version 1.

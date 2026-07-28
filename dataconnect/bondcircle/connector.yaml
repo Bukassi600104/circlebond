@@ -1,0 +1,7 @@
+connectorId: bondcircle
+generate:
+  javascriptSdk:
+    outputDir: ../../generated/dataconnect
+    package: "@bondcircle/dataconnect"
+    packageJsonDir: ../..
+    react: true

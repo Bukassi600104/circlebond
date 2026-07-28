@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "bond-circle",
+    "development": "bond-circle"
+  }
+}

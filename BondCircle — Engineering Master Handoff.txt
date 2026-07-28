@@ -1,0 +1,415 @@
+BondCircle — Engineering Master Handoff
+
+Project: BondCircleVersion: 1.0 (Production Launch)Status: Approved for Engineering Implementation
+
+Executive Summary
+
+BondCircle is a production-ready, mobile-first Progressive Web App (PWA) for organizing collaborative Gift Circles, Aso-Ebi Circles, and Support Circles.
+
+The application does not custody funds or operate as a wallet in Version 1.
+
+Its responsibility is to organize people, track contributions, coordinate communication, and provide transparency throughout the lifecycle of a circle.
+
+This is a production build, not a prototype, proof of concept, or UI demo.
+
+Product Mission
+
+Help people coordinate celebrations and support initiatives through a trusted, elegant, and simple collaboration platform.
+
+Core values:
+
+Trust
+
+Transparency
+
+Simplicity
+
+Accountability
+
+Community
+
+Approved Product Scope
+
+The application supports exactly three production modules:
+
+1. Gift Circle
+
+For collaborative gift purchases.
+
+2. Aso-Ebi Circle
+
+For coordinated attire contributions for any event.
+
+3. Support Circle
+
+For:
+
+Burial Support
+
+Medical Support
+
+Emergency Support
+
+Charity
+
+Community Support
+
+Family Support
+
+Other support campaigns
+
+No additional modules are included in Version 1.
+
+Product Constraints
+
+Version 1 SHALL NOT:
+
+Hold money
+
+Operate a wallet
+
+Escrow funds
+
+Process card payments
+
+Include private messaging
+
+Include video or voice communication
+
+Approved Communication Model
+
+Every circle contains:
+
+Creator Announcements
+
+Circle Comments
+
+Automatic Activity Feed
+
+No real-time chat.
+
+User Roles
+
+Per-circle roles:
+
+Creator
+
+Co-admin
+
+Contributor
+
+Permissions are role-based and enforced at every API endpoint.
+
+Registration Requirements
+
+Every participant must have an account.
+
+Supported authentication:
+
+Firebase Authentication
+
+Verified phone (OTP)
+
+Verified email (OTP)
+
+Google Sign-In
+
+Guests are not permitted.
+
+Circle Lifecycle
+
+Draft
+
+↓
+
+Published
+
+↓
+
+Invitations
+
+↓
+
+Members Joined
+
+↓
+
+Contributions
+
+↓
+
+Completion
+
+↓
+
+Archive
+
+↓
+
+Retention Countdown
+
+↓
+
+Sensitive Data Purged
+
+Pricing
+
+Creator pays.
+
+Contributors never pay platform fees.
+
+Pricing:
+
+Free
+
+Starter
+
+Standard
+
+Premium
+
+As defined in the PRD.
+
+Required Engineering Deliverables
+
+The implementation must follow these documents in order:
+
+PRD
+
+UX Workflow Specification
+
+Master Screen Specification
+
+Design System & Component Library
+
+Technical Architecture & Engineering Blueprint
+
+No implementation may contradict those documents.
+
+Folder Structure (Conceptual)
+
+app/
+components/
+features/
+lib/
+hooks/
+services/
+server/
+styles/
+types/
+utils/
+tests/
+
+Each feature is self-contained with:
+
+UI
+
+Logic
+
+Validation
+
+Tests
+
+Coding Standards
+
+TypeScript throughout
+
+Strict typing enabled
+
+Shared validation schemas
+
+Reusable components
+
+No duplicated business logic
+
+Clear naming conventions
+
+Small, focused functions
+
+UI Rules
+
+Mobile-first
+
+Responsive
+
+Accessible
+
+Consistent spacing
+
+Consistent typography
+
+Consistent colour system
+
+No redesign without updating the Master Screen Specification.
+
+Security Rules
+
+Every request must:
+
+Authenticate
+
+Authorize
+
+Validate
+
+Log critical actions
+
+Uploads:
+
+Images only
+
+Validated
+
+Size-limited
+
+Stored securely
+
+Performance Targets
+
+Fast initial load
+
+Optimised images
+
+Lazy loading
+
+Efficient caching
+
+Smooth interactions
+
+Performance is a feature, not an enhancement.
+
+Testing Requirements
+
+Before release:
+
+Unit Tests
+
+Integration Tests
+
+End-to-End Tests
+
+Critical flows must pass:
+
+Registration
+
+Circle creation
+
+Invitation acceptance
+
+Receipt upload
+
+Receipt approval
+
+Announcement posting
+
+Circle completion
+
+Deployment Pipeline
+
+Development
+
+↓
+
+Staging
+
+↓
+
+Production
+
+No direct deployments to Production.
+
+Every deployment requires:
+
+Lint
+
+Type check
+
+Build
+
+Test
+
+Out of Scope (Version 1)
+
+The following are intentionally excluded:
+
+Wallets
+
+Escrow
+
+Payment processing
+
+Vendor marketplace
+
+AI recommendations
+
+Native Android app
+
+Native iOS app
+
+Push notifications
+
+SMS notifications
+
+Multi-language support
+
+Multi-currency support
+
+These belong to future releases.
+
+Future Expansion Readiness
+
+The architecture must allow future integration of:
+
+OPay
+
+Paystack
+
+Flutterwave
+
+Vendor onboarding
+
+Marketplace
+
+Gift catalogues
+
+Analytics dashboards
+
+Native mobile applications
+
+without requiring a major architectural rewrite.
+
+Acceptance Criteria
+
+BondCircle Version 1 is complete only when:
+
+Every approved screen is implemented.
+
+Every documented workflow functions end-to-end.
+
+Every role behaves according to specification.
+
+Every validation rule is enforced.
+
+Every notification behaves correctly.
+
+Every upload is secure.
+
+Every API is tested.
+
+Every major user journey passes automated tests.
+
+The application is production deployable.
+
+Non-Negotiable Rule for Engineering
+
+Do not invent functionality.
+
+Do not redesign screens.
+
+Do not add undocumented features.
+
+Do not remove approved features.
+
+If implementation requires a decision not covered by the approved documentation, stop implementation and request clarification rather than making assumptions.
+
+This document, together with the PRD, UX Workflow Specification, Master Screen Specification, Design System & Component Library, and Technical Architecture & Engineering Blueprint, constitutes the complete implementation authority for BondCircle Version 1.

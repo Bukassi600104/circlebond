@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "react-phone-number-input/style.css";
+@import "./tokens.css";
+@import "./components.css";
+@import "./auth.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-text-primary);
+  font-family: var(--font-product);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--color-gold-light);
+  color: var(--color-text-primary);
+}

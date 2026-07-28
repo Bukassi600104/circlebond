@@ -1,0 +1,143 @@
+type User @table {
+  id: String! @col(name: "firebase_uid")
+  displayName: String!
+  phone: String
+  email: String
+  profileImage: String
+  termsAcceptedAt: Timestamp
+  privacyAcceptedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type AuthAuditEvent @table {
+  id: UUID! @default(expr: "uuidV4()")
+  userId: String
+  event: String!
+  channel: String
+  outcome: String!
+  occurredAt: Timestamp! @default(expr: "request.time")
+}
+
+type Circle @table {
+  id: UUID! @default(expr: "uuidV4()")
+  creator: User!
+  name: String!
+  type: String!
+  description: String! @default(value: "")
+  imageUrl: String
+  imageStoragePath: String
+  giftTitle: String
+  contributionMode: String
+  eventType: String
+  organizerName: String
+  supportType: String
+  beneficiaryName: String
+  beneficiaryRelationship: String
+  showBeneficiaryName: Boolean! @default(value: true)
+  showTargetToMembers: Boolean! @default(value: true)
+  showConfirmedTotalToMembers: Boolean! @default(value: true)
+  hideIndividualAmounts: Boolean! @default(value: true)
+  requireCreatorApproval: Boolean! @default(value: false)
+  completionType: String
+  paymentBankName: String
+  paymentAccountName: String
+  paymentAccountNumber: String
+  targetAmount: Int!
+  contributedAmount: Int! @default(value: 0)
+  memberCount: Int! @default(value: 1)
+  pricingPlan: String! @default(value: "free")
+  memberLimit: Int! @default(value: 3)
+  activationPrice: Int! @default(value: 0)
+  deadline: Date
+  eventDate: Date
+  status: String! @default(value: "draft")
+  visibility: String! @default(value: "private")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  completedAt: Timestamp
+  archiveAt: Timestamp
+  purgeAt: Timestamp
+}
+
+type CircleMembership @table(key: ["circle", "user"]) {
+  circle: Circle!
+  user: User!
+  role: String!
+  membershipStatus: String! @default(value: "joined")
+  contributionStatus: String! @default(value: "joined")
+  expectedAmount: Int! @default(value: 0)
+  pledgedAmount: Int! @default(value: 0)
+  confirmedAmount: Int! @default(value: 0)
+  receiptStoragePath: String
+  receiptSubmittedAt: Timestamp
+  selectedAsoEbiTier: AsoEbiTier
+  fulfilmentStatus: String! @default(value: "joined")
+  joinedAt: Timestamp! @default(expr: "request.time")
+}
+
+type AsoEbiTier @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  name: String!
+  price: Int!
+  fabricDescription: String!
+  fabricImageUrl: String
+  fabricImageStoragePath: String
+  appreciationGiftName: String
+  appreciationGiftImageUrl: String
+  appreciationGiftImageStoragePath: String
+  availabilityNote: String
+  deliveryDetails: String
+  sortOrder: Int! @default(value: 0)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type SupportUpdate @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  author: User!
+  body: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Invitation @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  invitedBy: User!
+  tokenHash: String!
+  mode: String!
+  recipientName: String
+  recipientEmail: String
+  recipientPhone: String
+  expectedAmount: Int! @default(value: 0)
+  requireApproval: Boolean! @default(value: false)
+  state: String! @default(value: "created")
+  maxUses: Int! @default(value: 1)
+  useCount: Int! @default(value: 0)
+  expiresAt: Timestamp!
+  openedAt: Timestamp
+  acceptedAt: Timestamp
+  acceptedBy: User
+  revokedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type InvitationAcceptance @table(key: ["invitation", "user"]) {
+  invitation: Invitation!
+  user: User!
+  status: String! @default(value: "pending")
+  createdAt: Timestamp! @default(expr: "request.time")
+  respondedAt: Timestamp
+}
+
+type CircleAuditEntry @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  actor: User!
+  action: String!
+  fromStatus: String
+  toStatus: String
+  materialChanges: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}

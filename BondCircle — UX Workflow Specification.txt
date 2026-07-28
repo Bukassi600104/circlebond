@@ -1,0 +1,669 @@
+BondCircle — UX Workflow Specification
+
+Version: 1.0Status: Locked for Development
+
+1. Global User Journey
+
+User opens BondCircle
+
+↓
+
+Splash Screen
+
+↓
+
+Onboarding (first-time users only)
+
+↓
+
+Login / Register
+
+↓
+
+Dashboard
+
+↓
+
+User chooses an action
+
+Create Circle
+
+Join Circle
+
+Continue Existing Circle
+
+View Notifications
+
+View Activity
+
+2. Creator Journey
+
+Dashboard
+
+↓
+
+Tap Create Circle
+
+↓
+
+Choose Circle Type
+
+Gift Circle
+
+Aso-Ebi Circle
+
+Support Circle
+
+↓
+
+Step 1
+
+Enter circle information
+
+↓
+
+Step 2
+
+Upload image(s)
+
+↓
+
+Step 3
+
+Invite members
+
+↓
+
+Step 4
+
+Review
+
+↓
+
+Publish
+
+↓
+
+Circle becomes Active
+
+3. Gift Circle Flow
+
+Creator enters
+
+Circle name
+
+Gift title
+
+Target amount
+
+Deadline
+
+Notes
+
+Gift image
+
+↓
+
+System validates
+
+↓
+
+Creator continues
+
+↓
+
+Invite members
+
+↓
+
+Review
+
+↓
+
+Publish
+
+↓
+
+Active Gift Circle
+
+4. Aso-Ebi Flow
+
+Creator enters
+
+Event title
+
+Event date
+
+Organizer
+
+Fabric image
+
+↓
+
+Optional tier setup
+
+Tier A
+
+Tier B
+
+Tier C
+
+↓
+
+Invite members
+
+↓
+
+Publish
+
+↓
+
+Members choose tier
+
+↓
+
+Upload receipts
+
+↓
+
+Creator confirms
+
+↓
+
+Delivery tracking
+
+↓
+
+Completed
+
+5. Support Circle Flow
+
+Creator enters
+
+Cause title
+
+Beneficiary
+
+Target amount
+
+Deadline
+
+Supporting image
+
+Description
+
+↓
+
+Invite supporters
+
+↓
+
+Publish
+
+↓
+
+Members contribute
+
+↓
+
+Creator confirms
+
+↓
+
+Support completed
+
+6. Invitation Workflow
+
+Creator chooses
+
+Contacts
+
+Manual phone
+
+Manual email
+
+Copy link
+
+Share sheet (WhatsApp, SMS, Email, etc.)
+
+↓
+
+Invitation token generated
+
+↓
+
+Invite sent
+
+↓
+
+Recipient opens link
+
+↓
+
+System checks
+
+Valid?
+
+If No
+
+↓
+
+Expired / Invalid screen
+
+If Yes
+
+↓
+
+Already registered?
+
+If Yes
+
+↓
+
+Login
+
+↓
+
+Invitation displayed
+
+↓
+
+Accept
+
+↓
+
+Member added
+
+If No
+
+↓
+
+Register
+
+↓
+
+Verify
+
+↓
+
+Invitation displayed
+
+↓
+
+Accept
+
+↓
+
+Member added
+
+7. Contributor Workflow
+
+Member opens circle
+
+↓
+
+Views contribution
+
+↓
+
+Tap own avatar
+
+↓
+
+Contribution panel opens
+
+↓
+
+Choose
+
+Upload receipt
+
+OR
+
+Record partial payment
+
+↓
+
+Receipt uploaded
+
+↓
+
+Status becomes
+
+Receipt Submitted
+
+↓
+
+Creator notified
+
+↓
+
+Creator reviews
+
+↓
+
+Approve
+
+OR
+
+Reject
+
+↓
+
+Member notified
+
+8. Creator Receipt Workflow
+
+Notification received
+
+↓
+
+Open Review Queue
+
+↓
+
+View receipt
+
+↓
+
+View uploaded amount
+
+↓
+
+Compare against expected amount
+
+↓
+
+Approve
+
+OR
+
+Reject
+
+↓
+
+System updates member status
+
+Paid
+
+Part-paid
+
+Rejected
+
+9. Announcement Workflow
+
+Creator
+
+↓
+
+Create announcement
+
+↓
+
+Publish
+
+↓
+
+Members notified
+
+↓
+
+Members can comment
+
+↓
+
+Creator may close comments if needed
+
+10. Comment Workflow
+
+Member writes comment
+
+↓
+
+Comment posted
+
+↓
+
+Creator notified (optional)
+
+↓
+
+Replies allowed
+
+↓
+
+Creator/co-admin may remove inappropriate comments
+
+11. Reminder Workflow
+
+Creator
+
+↓
+
+Select members
+
+↓
+
+Send reminder
+
+↓
+
+Member notified
+
+↓
+
+Reminder appears in Activity Feed
+
+12. Circle Completion Workflow
+
+Creator selects
+
+Complete Circle
+
+↓
+
+Confirmation dialog
+
+↓
+
+Choose completion type
+
+Gift Purchased
+
+Support Delivered
+
+Aso-Ebi Distributed
+
+↓
+
+Circle locked
+
+↓
+
+Announcements become read-only
+
+↓
+
+Comments become read-only
+
+↓
+
+Archive countdown begins
+
+13. Archive Workflow
+
+30 days after completion
+
+↓
+
+Receipts deleted
+
+↓
+
+Uploaded temporary files deleted
+
+↓
+
+Comments removed
+
+↓
+
+Announcements archived
+
+↓
+
+Analytics retained
+
+14. Notification Matrix
+
+Invitation Sent → Invitee
+
+Invitation Accepted → Creator
+
+Receipt Submitted → Creator
+
+Receipt Approved → Contributor
+
+Receipt Rejected → Contributor
+
+Announcement → Members
+
+Comment Reply → Comment author
+
+Reminder → Selected members
+
+Circle Completed → All members
+
+Circle Archived → Creator
+
+15. Error Handling
+
+Invalid invite
+
+↓
+
+Show recovery screen
+
+Expired invite
+
+↓
+
+Request new invitation
+
+Upload failure
+
+↓
+
+Retry upload
+
+Network unavailable
+
+↓
+
+Offline mode
+
+Receipt rejected
+
+↓
+
+Upload replacement receipt
+
+16. Permissions Matrix
+
+Creator
+
+✓ Everything inside owned circle
+
+Co-admin
+
+✓ Moderate and assist
+
+Contributor
+
+✓ Participate only
+
+Guest
+
+✗ No access
+
+17. Empty States
+
+No circles created
+
+↓
+
+Encourage first circle
+
+No invitations
+
+↓
+
+Friendly illustration
+
+No notifications
+
+↓
+
+Empty notification screen
+
+No comments
+
+↓
+
+Invite conversation
+
+No receipts
+
+↓
+
+Prompt contributors
+
+18. Success Path
+
+The ideal experience is:
+
+Register
+
+↓
+
+Create circle
+
+↓
+
+Invite members
+
+↓
+
+Members join
+
+↓
+
+Members upload receipts
+
+↓
+
+Creator approves
+
+↓
+
+Announcements and comments keep everyone informed
+
+↓
+
+Circle reaches goal
+
+↓
+
+Gift or support is fulfilled
+
+↓
+
+Circle closes
+
+↓
+
+Archive
+
+↓
+
+Creator starts another circle

@@ -1,0 +1,45 @@
+import { GetCurrentUserData, UpsertCurrentUserData, UpsertCurrentUserVariables, GetDashboardCirclesData, GetCircleEngineRecordData, GetCircleEngineRecordVariables, FindUserByEmailData, FindUserByEmailVariables, GetGiftCircleDetailData, GetGiftCircleDetailVariables, GetCircleAuditEntriesData, GetCircleAuditEntriesVariables, CreateCircleDraftData, CreateCircleDraftVariables, UpdateCircleConfigurationWithAuditData, UpdateCircleConfigurationWithAuditVariables, TransitionCircleWithAuditData, TransitionCircleWithAuditVariables, AddCircleMemberWithAuditData, AddCircleMemberWithAuditVariables, ConfigureGiftCircleData, ConfigureGiftCircleVariables, SetGiftMemberAllocationData, SetGiftMemberAllocationVariables } from '../';
+import { UseDataConnectQueryResult, useDataConnectQueryOptions, UseDataConnectMutationResult, useDataConnectMutationOptions} from '@tanstack-query-firebase/react/data-connect';
+import { UseQueryResult, UseMutationResult} from '@tanstack/react-query';
+import { DataConnect } from 'firebase/data-connect';
+import { FirebaseError } from 'firebase/app';
+
+
+export function useGetCurrentUser(options?: useDataConnectQueryOptions<GetCurrentUserData>): UseDataConnectQueryResult<GetCurrentUserData, undefined>;
+export function useGetCurrentUser(dc: DataConnect, options?: useDataConnectQueryOptions<GetCurrentUserData>): UseDataConnectQueryResult<GetCurrentUserData, undefined>;
+
+export function useUpsertCurrentUser(options?: useDataConnectMutationOptions<UpsertCurrentUserData, FirebaseError, UpsertCurrentUserVariables>): UseDataConnectMutationResult<UpsertCurrentUserData, UpsertCurrentUserVariables>;
+export function useUpsertCurrentUser(dc: DataConnect, options?: useDataConnectMutationOptions<UpsertCurrentUserData, FirebaseError, UpsertCurrentUserVariables>): UseDataConnectMutationResult<UpsertCurrentUserData, UpsertCurrentUserVariables>;
+
+export function useGetDashboardCircles(options?: useDataConnectQueryOptions<GetDashboardCirclesData>): UseDataConnectQueryResult<GetDashboardCirclesData, undefined>;
+export function useGetDashboardCircles(dc: DataConnect, options?: useDataConnectQueryOptions<GetDashboardCirclesData>): UseDataConnectQueryResult<GetDashboardCirclesData, undefined>;
+
+export function useGetCircleEngineRecord(vars: GetCircleEngineRecordVariables, options?: useDataConnectQueryOptions<GetCircleEngineRecordData>): UseDataConnectQueryResult<GetCircleEngineRecordData, GetCircleEngineRecordVariables>;
+export function useGetCircleEngineRecord(dc: DataConnect, vars: GetCircleEngineRecordVariables, options?: useDataConnectQueryOptions<GetCircleEngineRecordData>): UseDataConnectQueryResult<GetCircleEngineRecordData, GetCircleEngineRecordVariables>;
+
+export function useFindUserByEmail(vars: FindUserByEmailVariables, options?: useDataConnectQueryOptions<FindUserByEmailData>): UseDataConnectQueryResult<FindUserByEmailData, FindUserByEmailVariables>;
+export function useFindUserByEmail(dc: DataConnect, vars: FindUserByEmailVariables, options?: useDataConnectQueryOptions<FindUserByEmailData>): UseDataConnectQueryResult<FindUserByEmailData, FindUserByEmailVariables>;
+
+export function useGetGiftCircleDetail(vars: GetGiftCircleDetailVariables, options?: useDataConnectQueryOptions<GetGiftCircleDetailData>): UseDataConnectQueryResult<GetGiftCircleDetailData, GetGiftCircleDetailVariables>;
+export function useGetGiftCircleDetail(dc: DataConnect, vars: GetGiftCircleDetailVariables, options?: useDataConnectQueryOptions<GetGiftCircleDetailData>): UseDataConnectQueryResult<GetGiftCircleDetailData, GetGiftCircleDetailVariables>;
+
+export function useGetCircleAuditEntries(vars: GetCircleAuditEntriesVariables, options?: useDataConnectQueryOptions<GetCircleAuditEntriesData>): UseDataConnectQueryResult<GetCircleAuditEntriesData, GetCircleAuditEntriesVariables>;
+export function useGetCircleAuditEntries(dc: DataConnect, vars: GetCircleAuditEntriesVariables, options?: useDataConnectQueryOptions<GetCircleAuditEntriesData>): UseDataConnectQueryResult<GetCircleAuditEntriesData, GetCircleAuditEntriesVariables>;
+
+export function useCreateCircleDraft(options?: useDataConnectMutationOptions<CreateCircleDraftData, FirebaseError, CreateCircleDraftVariables>): UseDataConnectMutationResult<CreateCircleDraftData, CreateCircleDraftVariables>;
+export function useCreateCircleDraft(dc: DataConnect, options?: useDataConnectMutationOptions<CreateCircleDraftData, FirebaseError, CreateCircleDraftVariables>): UseDataConnectMutationResult<CreateCircleDraftData, CreateCircleDraftVariables>;
+
+export function useUpdateCircleConfigurationWithAudit(options?: useDataConnectMutationOptions<UpdateCircleConfigurationWithAuditData, FirebaseError, UpdateCircleConfigurationWithAuditVariables>): UseDataConnectMutationResult<UpdateCircleConfigurationWithAuditData, UpdateCircleConfigurationWithAuditVariables>;
+export function useUpdateCircleConfigurationWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateCircleConfigurationWithAuditData, FirebaseError, UpdateCircleConfigurationWithAuditVariables>): UseDataConnectMutationResult<UpdateCircleConfigurationWithAuditData, UpdateCircleConfigurationWithAuditVariables>;
+
+export function useTransitionCircleWithAudit(options?: useDataConnectMutationOptions<TransitionCircleWithAuditData, FirebaseError, TransitionCircleWithAuditVariables>): UseDataConnectMutationResult<TransitionCircleWithAuditData, TransitionCircleWithAuditVariables>;
+export function useTransitionCircleWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<TransitionCircleWithAuditData, FirebaseError, TransitionCircleWithAuditVariables>): UseDataConnectMutationResult<TransitionCircleWithAuditData, TransitionCircleWithAuditVariables>;
+
+export function useAddCircleMemberWithAudit(options?: useDataConnectMutationOptions<AddCircleMemberWithAuditData, FirebaseError, AddCircleMemberWithAuditVariables>): UseDataConnectMutationResult<AddCircleMemberWithAuditData, AddCircleMemberWithAuditVariables>;
+export function useAddCircleMemberWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<AddCircleMemberWithAuditData, FirebaseError, AddCircleMemberWithAuditVariables>): UseDataConnectMutationResult<AddCircleMemberWithAuditData, AddCircleMemberWithAuditVariables>;
+
+export function useConfigureGiftCircle(options?: useDataConnectMutationOptions<ConfigureGiftCircleData, FirebaseError, ConfigureGiftCircleVariables>): UseDataConnectMutationResult<ConfigureGiftCircleData, ConfigureGiftCircleVariables>;
+export function useConfigureGiftCircle(dc: DataConnect, options?: useDataConnectMutationOptions<ConfigureGiftCircleData, FirebaseError, ConfigureGiftCircleVariables>): UseDataConnectMutationResult<ConfigureGiftCircleData, ConfigureGiftCircleVariables>;
+
+export function useSetGiftMemberAllocation(options?: useDataConnectMutationOptions<SetGiftMemberAllocationData, FirebaseError, SetGiftMemberAllocationVariables>): UseDataConnectMutationResult<SetGiftMemberAllocationData, SetGiftMemberAllocationVariables>;
+export function useSetGiftMemberAllocation(dc: DataConnect, options?: useDataConnectMutationOptions<SetGiftMemberAllocationData, FirebaseError, SetGiftMemberAllocationVariables>): UseDataConnectMutationResult<SetGiftMemberAllocationData, SetGiftMemberAllocationVariables>;

@@ -1,0 +1,619 @@
+BondCircle — Design System & Component Library (V1)
+
+Status: Locked for DevelopmentPurpose: This document defines every reusable design token, UI component, spacing rule, and interaction pattern. It is the visual source of truth for BondCircle.
+
+1. Design Principles
+
+BondCircle should feel:
+
+Trustworthy
+
+Warm
+
+Premium
+
+Calm
+
+Collaborative
+
+Modern
+
+Human
+
+Avoid:
+
+Loud gradients
+
+Overcrowded screens
+
+Neon colours
+
+Heavy animations
+
+Visual clutter
+
+2. Colour System
+
+Primary
+
+Deep Teal
+
+Usage:
+
+Primary buttons
+
+Navigation
+
+Progress
+
+Active states
+
+Secondary
+
+Warm Gold
+
+Usage:
+
+Highlights
+
+Premium badges
+
+Important indicators
+
+Brand accents
+
+Accent
+
+Soft Coral
+
+Usage:
+
+Warnings
+
+Pending states
+
+Reminder badges
+
+Success
+
+Green
+
+Usage:
+
+Paid
+
+Confirmed
+
+Completed
+
+Error
+
+Soft Red
+
+Usage:
+
+Rejected
+
+Failed uploads
+
+Validation errors
+
+Information
+
+Sky Blue
+
+Usage:
+
+Information banners
+
+Tips
+
+Help cards
+
+Neutral Palette
+
+Cream background
+
+White cards
+
+Light Grey borders
+
+Dark text
+
+Medium Grey secondary text
+
+3. Typography
+
+Brand Font
+
+Elegant Serif
+
+Used only for:
+
+Logo
+
+Marketing
+
+Hero headings
+
+Product Font
+
+Modern Sans Serif
+
+Weights
+
+Regular
+
+Medium
+
+SemiBold
+
+Bold
+
+Hierarchy
+
+Display
+
+H1
+
+H2
+
+H3
+
+Body
+
+Caption
+
+Button
+
+Label
+
+4. Spacing System
+
+Base unit
+
+8 px
+
+Spacing scale
+
+4
+
+8
+
+12
+
+16
+
+24
+
+32
+
+40
+
+48
+
+64
+
+96
+
+No arbitrary spacing.
+
+5. Border Radius
+
+Small
+
+8 px
+
+Medium
+
+16 px
+
+Large
+
+24 px
+
+Circle
+
+50%
+
+6. Shadows
+
+Level 1
+
+Cards
+
+Level 2
+
+Floating Panels
+
+Level 3
+
+Modals
+
+No heavy shadows.
+
+7. Buttons
+
+Primary
+
+Filled Teal
+
+White text
+
+Secondary
+
+Outlined
+
+Ghost
+
+Text only
+
+Danger
+
+Red
+
+Disabled
+
+Grey
+
+Loading
+
+Spinner
+
+8. Inputs
+
+Text
+
+Number
+
+Phone
+
+Email
+
+Date
+
+Amount
+
+Search
+
+Textarea
+
+Upload
+
+OTP
+
+Every input includes:
+
+Label
+
+Placeholder
+
+Validation
+
+Error message
+
+Helper text (optional)
+
+9. Cards
+
+Circle Card
+
+Gift Card
+
+Member Card
+
+Tier Card
+
+Notification Card
+
+Comment Card
+
+Announcement Card
+
+Archive Card
+
+10. Status Badges
+
+Draft
+
+Active
+
+Pending
+
+Invited
+
+Joined
+
+Receipt Submitted
+
+Awaiting Review
+
+Part-paid
+
+Paid
+
+Completed
+
+Archived
+
+Rejected
+
+Cancelled
+
+Delivered
+
+11. Avatars
+
+Default Placeholder
+
+Profile Photo
+
+Creator Badge
+
+Co-admin Badge
+
+Member Badge
+
+Online indicator reserved for future versions
+
+12. Icons
+
+Rounded style only.
+
+Core icons:
+
+Gift
+
+Support
+
+Fabric
+
+Announcement
+
+Comment
+
+Bell
+
+Upload
+
+Receipt
+
+Reminder
+
+Search
+
+Settings
+
+Profile
+
+Archive
+
+Delete
+
+Share
+
+Contacts
+
+Calendar
+
+Target
+
+Progress
+
+Delivery
+
+13. Progress Components
+
+Progress Ring
+
+Linear Progress
+
+Completion Percentage
+
+Contribution Counter
+
+Deadline Countdown
+
+14. Modals
+
+Confirmation
+
+Delete
+
+Close Circle
+
+Reject Receipt
+
+Assign Co-admin
+
+Reminder
+
+Upload Success
+
+15. Bottom Sheets
+
+Contributor Panel
+
+Receipt Options
+
+Member Actions
+
+Share Options
+
+Notification Filters
+
+16. Navigation
+
+Bottom Navigation
+
+Home
+
+Circles
+
+Create
+
+Activity
+
+Profile
+
+Top Navigation
+
+Back
+
+Search
+
+Notifications
+
+Overflow Menu
+
+17. Empty States
+
+No circles
+
+No comments
+
+No announcements
+
+No notifications
+
+No invitations
+
+No uploads
+
+No archived circles
+
+Each includes:
+
+Illustration
+
+Message
+
+Primary action
+
+18. Error States
+
+Network Error
+
+Upload Failed
+
+Expired Link
+
+Permission Denied
+
+Unexpected Error
+
+Each includes:
+
+Explanation
+
+Retry action
+
+Support link
+
+19. Loading States
+
+Skeleton Cards
+
+Skeleton Lists
+
+Skeleton Member Ring
+
+Skeleton Profile
+
+Skeleton Activity Feed
+
+20. Animation Guidelines
+
+Subtle only.
+
+Maximum duration:
+
+300 ms
+
+Use animations for:
+
+Page transitions
+
+Modal appearance
+
+Successful uploads
+
+Status changes
+
+Avoid decorative animation.
+
+21. Accessibility
+
+Minimum touch target: 44 × 44 px
+
+Support Dynamic Type
+
+High colour contrast
+
+Visible focus states
+
+Screen reader labels
+
+Do not rely on colour alone to indicate status
+
+22. Responsive Behaviour
+
+Mobile First (Primary)
+
+Optimised for phones.
+
+Tablet
+
+Two-column layouts where appropriate.
+
+Desktop
+
+Left navigation
+
+Top toolbar
+
+Expanded member tables
+
+Resizable content panels
+
+23. File Upload Standards
+
+Supported:
+
+JPG
+
+PNG
+
+HEIC (converted if needed)
+
+Maximum size:
+
+5 MB
+
+Image compression before upload
+
+Receipt preview before submission
+
+24. Performance Standards
+
+Initial load target: under 2 seconds on a good connection
+
+Optimised image loading
+
+Lazy loading for archived circles
+
+Pagination for long activity feeds
+
+25. Development Rules
+
+Every UI element must come from this component library.
+
+Do not create duplicate button styles.
+
+Do not invent new colours without updating the design system.
+
+Do not change spacing rules.
+
+Do not create one-off components when an existing component can be reused.
+
+This design system is the foundation for all current and future BondCircle interfaces.

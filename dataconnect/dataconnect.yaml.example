@@ -1,0 +1,13 @@
+specVersion: "v1beta"
+serviceId: bondcircle-service
+location: YOUR_SQL_CONNECT_LOCATION
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: bondcircle
+      cloudSql:
+        instanceId: YOUR_CLOUD_SQL_INSTANCE_ID
+        schemaValidation: COMPATIBLE
+connectorDirs:
+  - ./bondcircle

@@ -1,0 +1,218 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const root = new URL("../../", import.meta.url);
+
+async function source(path) {
+  return readFile(new URL(path, root), "utf8");
+}
+
+test("Milestone 3 includes every locked authentication screen", async () => {
+  const screens = [
+    "app/page.tsx",
+    "app/onboarding/page.tsx",
+    "app/sign-in/page.tsx",
+    "app/register/page.tsx",
+    "app/verify/page.tsx",
+    "app/auth/error/page.tsx",
+    "app/account-recovery/page.tsx",
+    "app/legal/terms/page.tsx",
+    "app/legal/privacy/page.tsx",
+  ];
+  await Promise.all(screens.map((screen) => source(screen)));
+});
+
+test("OTP controls encode expiry, attempt limits, normalization, and rate limiting", async () => {
+  const security = await source("server/auth/security.ts");
+  assert.match(security, /OTP_TTL_MS = 10 \* 60 \* 1000/);
+  assert.match(security, /OTP_MAX_ATTEMPTS = 5/);
+  assert.match(security, /timingSafeEqual|createHash/);
+  assert.match(security, /normalizeEmail/);
+  assert.match(security, /normalizePhone/);
+  assert.match(security, /enforceRateLimit/);
+  assert.match(security, /aes-256-gcm/);
+  assert.match(security, /OTP_ATTEMPTS_COOKIE/);
+});
+
+test("official logo assets replace the temporary reconstructed mark", async () => {
+  const brand = await source("components/layout/index.tsx");
+  assert.match(brand, /bond-circle-mark\.png/);
+  assert.match(brand, /bond-circle-wordmark\.png/);
+  assert.doesNotMatch(brand, /<i\s*\/>|<Gift/);
+  await Promise.all([
+    source("public/brand/bond-circle-mark.png"),
+    source("public/brand/bond-circle-wordmark.png"),
+    source("public/brand/favicon.png"),
+  ]);
+});
+
+test("server sessions are HTTP-only, CSRF protected, revocable, and enforced", async () => {
+  const session = await source("server/auth/index.ts");
+  const route = await source("app/api/auth/session/route.ts");
+  const request = await source("server/auth/request.ts");
+  const account = await source("app/account/page.tsx");
+
+  assert.match(session, /httpOnly: true/);
+  assert.match(session, /sameSite: "strict"/);
+  assert.match(session, /verifySessionCookie\(session, true\)/);
+  assert.match(route, /revokeRefreshTokens/);
+  assert.match(request, /x-csrf-token/);
+  assert.match(request, /timingSafeEqual/);
+  assert.match(account, /requireSession/);
+});
+
+test("registration records both legal timestamps and excludes prohibited fields", async () => {
+  const schema = await source("dataconnect/schema/schema.gql");
+  const registration = await source("features/auth/components.tsx");
+  assert.match(schema, /termsAcceptedAt: Timestamp/);
+  assert.match(schema, /privacyAcceptedAt: Timestamp/);
+  assert.match(registration, /Display name/);
+  assert.match(registration, /profile image \(optional\)/i);
+  assert.doesNotMatch(
+    registration,
+    /gender|precise location|bank details|card details/i,
+  );
+});
+
+test("login, logout, verification, and recovery audit events are defined", async () => {
+  const audit = await source("server/audit/index.ts");
+  for (const event of ["login", "logout", "verification", "recovery"]) {
+    assert.match(audit, new RegExp(`"${event}"`));
+  }
+});
+
+test("desktop authentication layout stays aligned within one viewport", async () => {
+  const shell = await source("components/auth/AuthShell.tsx");
+  const styles = await source("app/auth.css");
+
+  assert.match(shell, /bc-auth-panel__brand/);
+  assert.match(shell, /bc-auth-story__art/);
+  assert.match(shell, /auth-community\.png/);
+  await source("public/illustrations/auth-community.png");
+  assert.match(styles, /\.bc-auth-page[\s\S]*height: 100svh/);
+  assert.match(styles, /\.bc-auth-story[\s\S]*height: 100svh/);
+  assert.match(styles, /\.bc-auth-panel[\s\S]*height: 100svh/);
+  assert.match(styles, /\.bc-auth-panel[\s\S]*overflow-y: auto/);
+});
+
+test("phone authentication supplies a country selector and normalized E.164 value", async () => {
+  const registration = await source("features/auth/components.tsx");
+  const forms = await source("components/forms/index.tsx");
+
+  assert.match(registration, /CountryPhoneInput/);
+  assert.match(forms, /react-phone-number-input/);
+  assert.match(forms, /defaultCountry="NG"/);
+});
+
+test("email OTP delivery is honest and validates before challenge creation", async () => {
+  const registration = await source("features/auth/components.tsx");
+  const route = await source("app/api/auth/email-otp/request/route.ts");
+  const security = await source("server/auth/security.ts");
+
+  assert.match(registration, /No email was sent\s+in this local preview/);
+  assert.match(route, /sendEmailOtp/);
+  assert.match(security, /validateEmailAddress/);
+  assert.match(security, /resolveMx/);
+});
+
+test("registration legal review uses an in-place modal and preserves form state", async () => {
+  const registration = await source("features/auth/components.tsx");
+  const legal = await source("components/legal/LegalModal.tsx");
+  const styles = await source("app/auth.css");
+
+  assert.match(registration, /LegalModal/);
+  assert.match(registration, /setLegalDocument/);
+  assert.match(registration, /onAgree/);
+  assert.doesNotMatch(registration, /href="\/legal\/(terms|privacy)"/);
+  assert.match(legal, /role="dialog"/);
+  assert.match(legal, /aria-modal="true"/);
+  assert.match(legal, /bc-legal-modal__dialog/);
+  assert.match(styles, /\.bc-legal-modal[\s\S]*backdrop-filter: blur/);
+  assert.match(
+    styles,
+    /\.bc-legal-modal__dialog[\s\S]*height: min\(78svh, 42rem\)/,
+  );
+  assert.match(
+    styles,
+    /\.bc-legal-modal \.bc-button[\s\S]*min-height: 2\.25rem/,
+  );
+  assert.match(
+    styles,
+    /\.bc-legal-modal__dialog > article[\s\S]*padding: var\(--space-4\) var\(--space-6\)/,
+  );
+  assert.doesNotMatch(styles, /--space-5/);
+});
+
+test("registration density and illustration scale match the desktop composition", async () => {
+  const styles = await source("app/auth.css");
+
+  assert.match(styles, /bc-auth-story__art img[\s\S]*44rem/);
+  assert.match(
+    styles,
+    /bc-auth-page--registration \.bc-auth-check[\s\S]*min-height: 0/,
+  );
+  assert.match(
+    styles,
+    /bc-auth-page--registration \.bc-upload label[\s\S]*min-height: 4rem/,
+  );
+});
+
+test("valid OTPs never surface backend outages as invalid codes", async () => {
+  const verifyRoute = await source("app/api/auth/email-otp/verify/route.ts");
+  const developmentRunner = await source("scripts/run-development.mjs");
+  const packageJson = await source("package.json");
+
+  assert.match(
+    verifyRoute,
+    /Authentication service is temporarily unavailable/,
+  );
+  assert.match(verifyRoute, /status: 503/);
+  assert.match(developmentRunner, /emulators:start/);
+  assert.match(developmentRunner, /waitForPort/);
+  assert.match(packageJson, /scripts\/run-development\.mjs/);
+});
+
+test("local sign-in restores an emulator user from persisted Firebase data", async () => {
+  const verifyRoute = await source("app/api/auth/email-otp/verify/route.ts");
+  const userRepository = await source("server/repositories/users.ts");
+  const operations = await source("dataconnect/bondcircle/queries.gql");
+
+  assert.match(verifyRoute, /FIREBASE_AUTH_EMULATOR_HOST/);
+  assert.match(verifyRoute, /findPersistedUserByEmail/);
+  assert.match(verifyRoute, /uid: persisted\.id/);
+  assert.match(
+    verifyRoute,
+    /!persisted\s*&&\s*!process\.env\.FIREBASE_AUTH_EMULATOR_HOST/,
+  );
+  assert.match(userRepository, /findPersistedUserByEmail/);
+  assert.match(
+    operations,
+    /query FindUserByEmail[\s\S]*termsAcceptedAt[\s\S]*privacyAcceptedAt/,
+  );
+});
+
+test("email OTP verification resends in place, counts down, and submits on digit six", async () => {
+  const components = await source("features/auth/components.tsx");
+  const requestRoute = await source("app/api/auth/email-otp/request/route.ts");
+  const styles = await source("app/auth.css");
+  const otpComponent = components.slice(
+    components.indexOf("export function OtpVerificationForm"),
+    components.indexOf("export function RecoveryForm"),
+  );
+
+  assert.match(requestRoute, /expiresAt: challenge\.expiresAt/);
+  assert.match(otpComponent, /Code expires in/);
+  assert.match(otpComponent, /async function resend/);
+  assert.match(otpComponent, /setActiveChallengeId/);
+  assert.match(otpComponent, /Request a new code/);
+  assert.doesNotMatch(
+    otpComponent,
+    /<Link[^>]*>[\s\S]*Request a new code[\s\S]*<\/Link>/,
+  );
+  assert.match(otpComponent, /nextDigits\.every\(Boolean\)/);
+  assert.match(otpComponent, /Verifying code/);
+  assert.doesNotMatch(otpComponent, /Verify &amp; continue/);
+  assert.match(otpComponent, /window\.location\.replace/);
+  assert.match(styles, /\.bc-auth-story__copy\s*\{[\s\S]*text-align:\s*center/);
+});

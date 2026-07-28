@@ -1,0 +1,67 @@
+{
+  "name": "bondcircle",
+  "version": "0.1.0",
+  "description": "Trusted circles for gifts, Aso-Ebi events, and community support.",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bukassi600104/circlebond.git"
+  },
+  "keywords": [
+    "nextjs",
+    "firebase",
+    "data-connect",
+    "gift-circle",
+    "aso-ebi",
+    "support-circle"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "node scripts/run-development.mjs",
+    "dev:next": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "npm run build && node --test tests/*.test.mjs tests/unit/*.test.mjs tests/integration/*.test.mjs && npm run test:auth-e2e && npm run test:circle-engine-e2e",
+    "test:auth-e2e": "node scripts/run-auth-e2e.mjs",
+    "test:circle-engine-e2e": "node scripts/run-circle-engine-e2e.mjs",
+    "lint": "eslint app components features lib server types tests --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "firebase:emulators": "firebase emulators:start --only auth,dataconnect,storage",
+    "firebase:sdk": "firebase dataconnect:sdk:generate",
+    "firebase:migrate": "firebase dataconnect:sql:migrate",
+    "firebase:deploy:data": "firebase deploy --only dataconnect"
+  },
+  "dependencies": {
+    "@bondcircle/dataconnect": "file:generated/dataconnect",
+    "@fontsource/inter": "5.2.8",
+    "@fontsource/lora": "5.2.8",
+    "firebase": "^12.15.0",
+    "firebase-admin": "^14.0.0",
+    "lucide-react": "0.468.0",
+    "next": "16.2.6",
+    "nodemailer": "^9.0.3",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-phone-number-input": "^3.4.17"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/nodemailer": "^8.0.1",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "eslint-config-prettier": "10.1.8",
+    "firebase-tools": "^15.18.0",
+    "prettier": "3.6.2",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3"
+  },
+  "type": "module"
+}

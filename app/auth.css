@@ -1,0 +1,842 @@
+.bc-splash {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--color-teal);
+  color: var(--color-white);
+}
+
+.bc-splash > a {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.bc-splash .bc-brand {
+  padding: var(--space-4) var(--space-6);
+}
+
+.bc-splash .bc-brand__mark {
+  width: var(--space-16);
+  height: var(--space-16);
+}
+
+.bc-splash .bc-brand__wordmark {
+  width: 13rem;
+}
+
+.bc-splash p {
+  max-width: 16rem;
+  margin: 0;
+  text-align: center;
+}
+
+.bc-splash__loader {
+  width: var(--space-6);
+  height: var(--space-6);
+  margin-top: var(--space-6);
+  border: 2px solid var(--color-green);
+  border-top-color: var(--color-gold);
+  border-radius: var(--radius-circle);
+  animation: bc-spin 800ms linear infinite;
+}
+
+.bc-onboarding {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--space-6);
+  background: var(--color-cream);
+}
+
+.bc-onboarding header,
+.bc-onboarding footer {
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bc-onboarding header > button {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: 0;
+  background: transparent;
+  color: var(--color-teal);
+  cursor: pointer;
+}
+
+.bc-onboarding section {
+  width: min(100%, 30rem);
+  margin: auto;
+  text-align: center;
+}
+
+.bc-onboarding__art {
+  width: min(74vw, 18rem);
+  aspect-ratio: 1;
+  margin: 0 auto var(--space-8);
+  border-radius: var(--radius-large);
+  display: grid;
+  place-items: center;
+  background: var(--color-mint);
+  color: var(--color-teal);
+  position: relative;
+  overflow: hidden;
+}
+
+.bc-onboarding__art::before,
+.bc-onboarding__art::after {
+  content: "";
+  position: absolute;
+  width: 8rem;
+  aspect-ratio: 1;
+  border-radius: var(--radius-circle);
+}
+
+.bc-onboarding__art::before {
+  top: -2rem;
+  right: -2rem;
+  background: var(--color-gold-light);
+}
+
+.bc-onboarding__art::after {
+  bottom: -3rem;
+  left: -2rem;
+  background: var(--color-coral-light);
+}
+
+.bc-onboarding__art svg {
+  width: 5rem;
+  height: 5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.bc-onboarding__art svg + svg {
+  width: 3rem;
+  height: 3rem;
+  margin-top: -8rem;
+  color: var(--color-coral);
+}
+
+.bc-onboarding h1,
+.bc-account-page h1,
+.bc-legal-page h1 {
+  font-family: var(--font-brand);
+  font-size: var(--text-h1);
+}
+
+.bc-onboarding section > p:not(.bc-auth-eyebrow) {
+  color: var(--color-text-secondary);
+}
+
+.bc-onboarding__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+}
+
+.bc-onboarding__dots span {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-circle);
+  background: var(--color-green);
+}
+
+.bc-onboarding__dots span.active {
+  width: var(--space-6);
+  border-radius: var(--radius-small);
+  background: var(--color-teal);
+}
+
+.bc-onboarding footer {
+  justify-content: flex-end;
+}
+
+.bc-auth-page {
+  min-height: 100svh;
+  display: grid;
+  background: var(--color-cream);
+}
+
+.bc-auth-story {
+  display: none;
+}
+
+.bc-auth-panel {
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.bc-auth-panel__top {
+  min-height: var(--space-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.bc-auth-panel__brand {
+  display: flex;
+  justify-content: center;
+}
+
+.bc-auth-panel__brand .bc-brand {
+  justify-content: center;
+}
+
+.bc-auth-back,
+.bc-auth-text-link,
+.bc-auth-switch a,
+.bc-auth-check a,
+.bc-legal-page a {
+  color: var(--color-teal);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
+}
+
+.bc-auth-back {
+  min-height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  position: absolute;
+  left: 0;
+}
+
+.bc-auth-card {
+  width: min(100%, 29rem);
+  margin: var(--space-6) auto;
+}
+
+.bc-auth-card h2 {
+  margin: var(--space-1) 0 var(--space-2);
+  font-family: var(--font-brand);
+  font-size: var(--text-h1);
+  line-height: 1.2;
+}
+
+.bc-auth-eyebrow {
+  margin: 0;
+  color: var(--color-coral);
+  font-size: var(--text-label);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bc-auth-description,
+.bc-auth-help,
+.bc-auth-switch {
+  color: var(--color-text-secondary);
+}
+
+.bc-auth-description {
+  margin: 0 0 var(--space-6);
+  line-height: 1.6;
+}
+
+.bc-auth-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.bc-auth-form > .bc-button,
+.bc-google-button,
+.bc-auth-state + .bc-button {
+  width: 100%;
+}
+
+.bc-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  padding: var(--space-1);
+  border-radius: var(--radius-small);
+  background: var(--color-soft-grey);
+}
+
+.bc-auth-tabs button {
+  min-height: var(--touch-target);
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bc-auth-tabs button[aria-selected="true"] {
+  background: var(--color-white);
+  color: var(--color-teal);
+  box-shadow: var(--shadow-1);
+}
+
+.bc-auth-divider {
+  margin: var(--space-6) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+.bc-auth-divider::before,
+.bc-auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--color-soft-grey);
+}
+
+.bc-google-button b {
+  color: var(--color-coral);
+  font-size: var(--text-h3);
+}
+
+.bc-auth-switch,
+.bc-auth-help {
+  margin: var(--space-4) 0 0;
+  text-align: center;
+  font-size: var(--text-label);
+}
+
+.bc-auth-text-link {
+  min-height: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-label);
+}
+
+.bc-auth-resend {
+  width: fit-content;
+  margin-inline: auto;
+  padding-inline: var(--space-2);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bc-auth-resend:disabled {
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.bc-auth-processing {
+  min-height: 2.5rem;
+  margin: 0;
+  color: var(--color-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+
+.bc-auth-processing > span {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--color-green);
+  border-top-color: var(--color-teal);
+  border-radius: 50%;
+  animation: bc-spin 700ms linear infinite;
+}
+
+.bc-auth-check {
+  min-height: var(--touch-target);
+  display: grid;
+  grid-template-columns: var(--space-6) 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  font-size: var(--text-label);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.bc-auth-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: var(--space-1);
+  accent-color: var(--color-teal);
+}
+
+.bc-legal-trigger {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-teal);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.bc-legal-trigger:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.bc-auth-error,
+.bc-development-code {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-small);
+  font-size: var(--text-label);
+}
+
+.bc-auth-error {
+  background: var(--color-coral-light);
+  color: var(--color-text-primary);
+}
+
+.bc-development-code {
+  border: 1px dashed var(--color-gold);
+  background: var(--color-gold-light);
+}
+
+.bc-verify-destination,
+.bc-account-verified,
+.bc-auth-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-medium);
+}
+
+.bc-verify-destination {
+  flex-wrap: wrap;
+  background: var(--color-mint);
+  color: var(--color-teal);
+  font-size: var(--text-label);
+}
+
+.bc-verify-destination--local {
+  border: 1px solid var(--color-gold);
+  background: var(--color-gold-light);
+  color: var(--color-text-primary);
+}
+
+.bc-country-phone {
+  min-height: var(--touch-target);
+  border: 1px solid var(--color-soft-grey);
+  border-radius: var(--radius-small);
+  background: var(--color-white);
+  padding: 0 var(--space-3);
+}
+
+.bc-country-phone:focus-within {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.bc-country-phone .PhoneInputCountry {
+  padding-right: var(--space-3);
+  border-right: 1px solid var(--color-soft-grey);
+}
+
+.bc-country-phone .PhoneInputCountrySelect {
+  cursor: pointer;
+}
+
+.bc-country-phone .PhoneInputInput {
+  min-width: 0;
+  min-height: calc(var(--touch-target) - 2px);
+  border: 0;
+  outline: 0;
+  padding-left: var(--space-3);
+}
+
+.bc-auth-state {
+  margin-bottom: var(--space-4);
+  background: var(--color-coral-light);
+  color: var(--color-text-primary);
+}
+
+.bc-account-page,
+.bc-legal-page {
+  min-height: 100svh;
+  padding: var(--space-4);
+  background: var(--color-cream);
+}
+
+.bc-account-page > header {
+  width: min(100%, 60rem);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.bc-account-page > header > span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-teal);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.bc-account-card,
+.bc-legal-page article {
+  width: min(100%, 38rem);
+  margin: var(--space-16) auto;
+  padding: var(--space-6);
+  border: var(--border);
+  border-radius: var(--radius-large);
+  background: var(--color-white);
+  box-shadow: var(--shadow-2);
+}
+
+.bc-account-verified {
+  margin: var(--space-6) 0;
+  background: var(--color-mint);
+  color: var(--color-teal);
+}
+
+.bc-account-verified p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.bc-account-card dl {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.bc-account-card dl div {
+  padding-bottom: var(--space-3);
+  border-bottom: var(--border);
+}
+
+.bc-account-card dt {
+  color: var(--color-text-secondary);
+  font-size: var(--text-label);
+}
+
+.bc-account-card dd {
+  margin: var(--space-1) 0 0;
+  font-weight: 600;
+}
+
+.bc-legal-page > .bc-brand {
+  margin: 0 auto;
+  width: min(100%, 60rem);
+}
+
+.bc-legal-page article p:not(.bc-auth-eyebrow) {
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.bc-legal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgb(0 46 42 / 24%);
+  backdrop-filter: blur(7px);
+  color: var(--color-text-primary);
+}
+
+.bc-legal-modal__dialog {
+  width: min(100%, 40rem);
+  height: min(78svh, 42rem);
+  max-height: calc(100svh - var(--space-8));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: var(--border);
+  border-radius: var(--radius-medium);
+  background: var(--color-cream);
+  box-shadow: 0 1.5rem 4rem rgb(0 46 42 / 28%);
+}
+
+.bc-legal-modal__dialog > header,
+.bc-legal-modal__dialog > footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: var(--border);
+  background: var(--color-white);
+}
+
+.bc-legal-modal__dialog > header {
+  justify-content: space-between;
+}
+
+.bc-legal-modal__dialog > header .bc-brand__mark {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.bc-legal-modal__dialog > header .bc-brand__wordmark {
+  width: 7.5rem;
+}
+
+.bc-legal-modal__dialog > header .bc-icon-button {
+  width: 2.25rem;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  min-height: 2.25rem;
+}
+
+.bc-legal-modal__dialog > footer {
+  justify-content: flex-end;
+  border-top: var(--border);
+  border-bottom: 0;
+}
+
+.bc-legal-modal__dialog > article {
+  padding: var(--space-4) var(--space-6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.bc-legal-modal h2 {
+  margin: var(--space-1) 0 var(--space-2);
+  font-family: var(--font-brand);
+  font-size: 1.4rem;
+  line-height: 1.25;
+}
+
+.bc-legal-modal h3 {
+  margin: var(--space-6) 0 var(--space-1);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.bc-legal-modal p,
+.bc-legal-modal li {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.bc-legal-modal p {
+  margin-block: var(--space-2);
+}
+
+.bc-legal-modal ul {
+  margin-block: var(--space-2);
+  padding-left: var(--space-6);
+}
+
+.bc-legal-modal__summary {
+  padding: var(--space-3);
+  border-left: 0.1875rem solid var(--color-gold);
+  background: var(--color-gold-light);
+}
+
+.bc-legal-modal a {
+  overflow-wrap: anywhere;
+  color: var(--color-teal);
+}
+
+.bc-legal-modal .bc-button {
+  width: auto;
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8125rem;
+}
+
+@media (min-width: 56rem) {
+  .bc-auth-page {
+    grid-template-columns: minmax(22rem, 0.8fr) minmax(32rem, 1.2fr);
+    height: 100svh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .bc-auth-story {
+    height: 100svh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-10);
+    background: var(--color-teal);
+    color: var(--color-white);
+    overflow: hidden;
+  }
+
+  .bc-auth-story__art {
+    min-height: 0;
+    flex: 1 1 48%;
+    display: grid;
+    place-items: center;
+  }
+
+  .bc-auth-story__art img {
+    width: min(140%, 44rem);
+    max-width: none;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--radius-large);
+    filter: drop-shadow(0 1.25rem 2.5rem rgb(0 0 0 / 18%));
+  }
+
+  .bc-auth-story__copy {
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: auto;
+    flex: 0 0 auto;
+    text-align: center;
+  }
+
+  .bc-auth-story__motif {
+    color: var(--color-gold);
+    letter-spacing: var(--space-2);
+  }
+
+  .bc-auth-story h1 {
+    margin: var(--space-4) 0;
+    font-family: var(--font-brand);
+    font-size: var(--text-display);
+    line-height: 1.08;
+  }
+
+  .bc-auth-story p {
+    color: var(--color-mint);
+    line-height: 1.7;
+  }
+
+  .bc-auth-panel {
+    height: 100svh;
+    min-height: 0;
+    padding: var(--space-6) var(--space-8);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .bc-auth-card {
+    margin: var(--space-4) auto var(--space-8);
+  }
+
+  .bc-auth-page--registration .bc-auth-panel {
+    padding-block: var(--space-3);
+  }
+
+  .bc-auth-page--registration .bc-auth-panel__top {
+    min-height: 3.5rem;
+  }
+
+  .bc-auth-page--registration .bc-auth-card {
+    margin-block: var(--space-6) var(--space-4);
+  }
+
+  .bc-auth-page--registration .bc-auth-card h2 {
+    font-size: clamp(1.75rem, 2.2vw, 2.25rem);
+  }
+
+  .bc-auth-page--registration .bc-auth-description {
+    margin-bottom: var(--space-3);
+  }
+
+  .bc-auth-page--registration .bc-auth-form {
+    gap: var(--space-2);
+  }
+
+  .bc-auth-page--registration .bc-auth-tabs {
+    margin-bottom: 0;
+  }
+
+  .bc-auth-page--registration .bc-field input,
+  .bc-auth-page--registration .bc-auth-tabs button,
+  .bc-auth-page--registration .bc-country-phone {
+    min-height: 2.75rem;
+  }
+
+  .bc-auth-page--registration .bc-field input {
+    padding-block: var(--space-2);
+  }
+
+  .bc-auth-page--registration .bc-country-phone .PhoneInputInput {
+    min-height: calc(2.75rem - 2px);
+  }
+
+  .bc-auth-page--registration .bc-upload label {
+    min-height: 4rem;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "icon title"
+      "icon helper";
+    justify-items: start;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .bc-auth-page--registration .bc-upload label svg {
+    grid-area: icon;
+    align-self: center;
+  }
+
+  .bc-auth-page--registration .bc-upload label strong {
+    grid-area: title;
+    align-self: end;
+  }
+
+  .bc-auth-page--registration .bc-upload label span {
+    grid-area: helper;
+    align-self: start;
+  }
+
+  .bc-auth-page--registration .bc-auth-check {
+    min-height: 0;
+    align-items: center;
+    line-height: 1.3;
+  }
+
+  .bc-auth-page--registration .bc-auth-check input {
+    margin-top: 0;
+  }
+
+  .bc-auth-page--registration .bc-auth-switch {
+    margin-top: var(--space-1);
+  }
+}
+
+@media (max-width: 24rem) {
+  .bc-auth-panel,
+  .bc-onboarding {
+    padding: var(--space-3);
+  }
+
+  .bc-otp > div {
+    gap: var(--space-1);
+  }
+
+  .bc-otp input {
+    min-width: 2.5rem;
+  }
+
+  .bc-legal-modal {
+    padding: var(--space-2);
+  }
+
+  .bc-legal-modal__dialog {
+    height: min(86svh, 42rem);
+    max-height: calc(100svh - var(--space-4));
+  }
+
+  .bc-legal-modal__dialog > footer {
+    display: grid;
+    grid-template-columns: auto auto;
+  }
+}

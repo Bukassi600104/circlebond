@@ -1,0 +1,235 @@
+BondCircle — Launch Scope (Locked)
+This is a production V1, not a prototype or demo.
+1. Product Modes (Locked)
+Three primary circle types only:
+Gift Circle
+Birthdays
+Anniversaries
+Baby showers
+Graduations
+Housewarming
+Surprise gifts
+Corporate gifts
+Any gift event
+
+Aso-Ebi Circle
+Wedding
+Burial
+Birthday
+Anniversary
+Thanksgiving
+Naming ceremony
+Religious events
+Any event requiring coordinated attire
+
+Support Circle
+Burial support
+Medical support
+Emergency support
+Charity
+Community support
+Family support
+Other support causes
+
+No fourth mode in V1.
+2. User Roles (Locked)
+Creator
+Owns the circle.
+Can:
+Create circles
+Edit circle
+Upload gift images
+Invite members
+Appoint co-admin
+Review receipts
+Approve/reject receipts
+Send announcements
+Close circle
+Archive circle
+Co-admin
+Creator's assistant.
+Can:
+Review receipts
+Send announcements
+Moderate comments
+Send reminders
+Cannot:
+Delete circle
+Transfer ownership
+Change pricing
+Contributor
+Can
+Join circles
+Upload receipt
+Comment
+View announcements
+View progress
+Receive reminders
+Cannot
+Edit circle
+Approve receipts
+Delete announcements
+3. Circle Lifecycle (Locked)
+Draft
+↓
+Published
+↓
+Members Invited
+↓
+Members Joined
+↓
+Contributions Ongoing
+↓
+Target Reached
+↓
+Gift Purchased / Support Released / Aso-Ebi Ready
+↓
+Completed
+↓
+Archived
+↓
+Sensitive data deleted after 30 days
+4. Pricing (Locked)
+Free
+Up to 3 members
+₦0
+Starter
+Up to 10 members
+₦1,000
+Standard
+Up to 30 members
+₦2,000
+Premium
+Up to 100 members
+₦3,500
+Only the creator pays.
+Invitees never pay platform fees.
+5. Brand System (Locked)
+Brand Name
+BondCircle
+Tagline
+Bring everyone into the circle.
+Style
+Warm
+Elegant
+Trustworthy
+Premium
+African-inspired without clichés
+Primary Color
+Deep Teal
+Secondary
+Warm Gold
+Accent
+Soft Coral
+Background
+Cream
+Icons
+Rounded
+Friendly
+Minimal
+Typography
+Elegant Serif for brand
+Clean Sans-serif for UI
+6. Complete Screen List (Locked)
+Authentication
+Splash
+
+Onboarding
+
+Login
+
+Register
+
+OTP Verification
+
+Forgot Password
+
+Dashboard
+Home
+
+Notifications
+
+Activity
+
+Profile
+
+Settings
+
+Circle Creation
+Choose Circle Type
+
+Gift Details
+
+Invite Members
+
+Review
+
+Publish
+
+Gift Circle
+Active Circle
+
+Member Detail
+
+Contributor Action Sheet
+
+Upload Receipt
+
+Creator Review
+
+Activity Feed
+
+Announcements
+
+Comments
+
+Completed Circle
+
+Aso-Ebi
+Event Details
+
+Tier Setup
+
+Active Circle
+
+Delivery Status
+
+Completed
+
+Support Circle
+Cause Details
+
+Beneficiary
+
+Active Support Circle
+
+Updates
+
+Completed Support
+
+General
+Invitation Accepted
+
+Invitation Expired
+
+Invalid Link
+
+Search
+
+Help
+
+About
+
+Terms
+
+Privacy
+
+Archive
+
+Empty States
+
+Error States
+
+Offline State
+
+Loading States
