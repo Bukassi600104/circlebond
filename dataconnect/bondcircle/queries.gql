@@ -11,6 +11,42 @@ query GetCurrentUser @auth(level: USER) {
   }
 }
 
+query GetRecentAbuseAttempts($bucketKey: String!, $since: Timestamp!)
+@auth(level: NO_ACCESS) {
+  abuseAttempts(
+    where: { bucketKey: { eq: $bucketKey }, occurredAt: { ge: $since } }
+    orderBy: { occurredAt: DESC }
+    limit: 100
+  ) {
+    id
+    occurredAt
+  }
+}
+
+mutation RecordAbuseAttempt(
+  $id: UUID!
+  $bucketKey: String!
+  $occurredAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  abuseAttempt_insert(
+    data: { id: $id, bucketKey: $bucketKey, occurredAt: $occurredAt }
+  )
+}
+
+query GetConsumedAuthChallenge($challengeHash: String!)
+@auth(level: NO_ACCESS) {
+  consumedAuthChallenge(key: { challengeHash: $challengeHash }) {
+    challengeHash
+  }
+}
+
+mutation ConsumeAuthChallenge($challengeHash: String!, $consumedAt: Timestamp!)
+@auth(level: NO_ACCESS) {
+  consumedAuthChallenge_insert(
+    data: { challengeHash: $challengeHash, consumedAt: $consumedAt }
+  )
+}
+
 mutation UpsertCurrentUser(
   $displayName: String!
   $phone: String

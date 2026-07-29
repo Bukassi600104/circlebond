@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
-import { assertTrustedMutation } from "@/server/auth/request";
+import { assertTrustedMutation, clientKey } from "@/server/auth/request";
 import {
   assertCanManageInvitations,
   createCircleInvitation,
   listCircleInvitations,
 } from "@/server/repositories/invitations";
 import { emitNewInvitation } from "@/server/repositories/notifications";
+import { enforceRateLimit } from "@/server/auth/security";
 
 export const runtime = "nodejs";
 
@@ -47,6 +48,18 @@ export async function POST(
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
     const { circleId } = await context.params;
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, `invite:${session.uid}:${circleId}`),
+        20,
+        60 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Invitation limit reached. Try again later." },
+        { status: 429 },
+      );
+    }
     const input = (await request.json()) as {
       mode?: "named" | "open";
       recipientName?: string;

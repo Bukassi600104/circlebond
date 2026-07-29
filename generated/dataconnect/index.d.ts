@@ -10,6 +10,11 @@ export type DateString = string;
 
 
 
+export interface AbuseAttempt_Key {
+  id: UUIDString;
+  __typename?: 'AbuseAttempt_Key';
+}
+
 export interface AcceptInvitationWithMembershipData {
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_insert: InvitationAcceptance_Key;
@@ -186,6 +191,20 @@ export interface ConfigureSupportCircleVariables {
   imageUrl: string;
   imageStoragePath: string;
   updatedAt: TimestampString;
+}
+
+export interface ConsumeAuthChallengeData {
+  consumedAuthChallenge_insert: ConsumedAuthChallenge_Key;
+}
+
+export interface ConsumeAuthChallengeVariables {
+  challengeHash: string;
+  consumedAt: TimestampString;
+}
+
+export interface ConsumedAuthChallenge_Key {
+  challengeHash: string;
+  __typename?: 'ConsumedAuthChallenge_Key';
 }
 
 export interface CreateAnnouncementWithActivityData {
@@ -761,6 +780,16 @@ export interface GetCircleRetentionPayloadVariables {
   circleId: UUIDString;
 }
 
+export interface GetConsumedAuthChallengeData {
+  consumedAuthChallenge?: {
+    challengeHash: string;
+  } & ConsumedAuthChallenge_Key;
+}
+
+export interface GetConsumedAuthChallengeVariables {
+  challengeHash: string;
+}
+
 export interface GetContributionWorkspaceData {
   circle?: {
     id: UUIDString;
@@ -1295,6 +1324,18 @@ export interface GetOwnerUserByIdentifierVariables {
   email: string;
 }
 
+export interface GetRecentAbuseAttemptsData {
+  abuseAttempts: ({
+    id: UUIDString;
+    occurredAt: TimestampString;
+  } & AbuseAttempt_Key)[];
+}
+
+export interface GetRecentAbuseAttemptsVariables {
+  bucketKey: string;
+  since: TimestampString;
+}
+
 export interface GetRecentCommentsByAuthorData {
   comments: ({
     createdAt: TimestampString;
@@ -1607,6 +1648,16 @@ export interface PurgeInvitationAcceptancesVariables {
 export interface Receipt_Key {
   id: UUIDString;
   __typename?: 'Receipt_Key';
+}
+
+export interface RecordAbuseAttemptData {
+  abuseAttempt_insert: AbuseAttempt_Key;
+}
+
+export interface RecordAbuseAttemptVariables {
+  id: UUIDString;
+  bucketKey: string;
+  occurredAt: TimestampString;
 }
 
 export interface RecordOperationalEventData {
@@ -2026,6 +2077,54 @@ export const getCurrentUserRef: GetCurrentUserRef;
 
 export function getCurrentUser(options?: ExecuteQueryOptions): QueryPromise<GetCurrentUserData, undefined>;
 export function getCurrentUser(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetCurrentUserData, undefined>;
+
+interface GetRecentAbuseAttemptsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRecentAbuseAttemptsVariables): QueryRef<GetRecentAbuseAttemptsData, GetRecentAbuseAttemptsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetRecentAbuseAttemptsVariables): QueryRef<GetRecentAbuseAttemptsData, GetRecentAbuseAttemptsVariables>;
+  operationName: string;
+}
+export const getRecentAbuseAttemptsRef: GetRecentAbuseAttemptsRef;
+
+export function getRecentAbuseAttempts(vars: GetRecentAbuseAttemptsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentAbuseAttemptsData, GetRecentAbuseAttemptsVariables>;
+export function getRecentAbuseAttempts(dc: DataConnect, vars: GetRecentAbuseAttemptsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentAbuseAttemptsData, GetRecentAbuseAttemptsVariables>;
+
+interface RecordAbuseAttemptRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordAbuseAttemptVariables): MutationRef<RecordAbuseAttemptData, RecordAbuseAttemptVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RecordAbuseAttemptVariables): MutationRef<RecordAbuseAttemptData, RecordAbuseAttemptVariables>;
+  operationName: string;
+}
+export const recordAbuseAttemptRef: RecordAbuseAttemptRef;
+
+export function recordAbuseAttempt(vars: RecordAbuseAttemptVariables): MutationPromise<RecordAbuseAttemptData, RecordAbuseAttemptVariables>;
+export function recordAbuseAttempt(dc: DataConnect, vars: RecordAbuseAttemptVariables): MutationPromise<RecordAbuseAttemptData, RecordAbuseAttemptVariables>;
+
+interface GetConsumedAuthChallengeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetConsumedAuthChallengeVariables): QueryRef<GetConsumedAuthChallengeData, GetConsumedAuthChallengeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetConsumedAuthChallengeVariables): QueryRef<GetConsumedAuthChallengeData, GetConsumedAuthChallengeVariables>;
+  operationName: string;
+}
+export const getConsumedAuthChallengeRef: GetConsumedAuthChallengeRef;
+
+export function getConsumedAuthChallenge(vars: GetConsumedAuthChallengeVariables, options?: ExecuteQueryOptions): QueryPromise<GetConsumedAuthChallengeData, GetConsumedAuthChallengeVariables>;
+export function getConsumedAuthChallenge(dc: DataConnect, vars: GetConsumedAuthChallengeVariables, options?: ExecuteQueryOptions): QueryPromise<GetConsumedAuthChallengeData, GetConsumedAuthChallengeVariables>;
+
+interface ConsumeAuthChallengeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ConsumeAuthChallengeVariables): MutationRef<ConsumeAuthChallengeData, ConsumeAuthChallengeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ConsumeAuthChallengeVariables): MutationRef<ConsumeAuthChallengeData, ConsumeAuthChallengeVariables>;
+  operationName: string;
+}
+export const consumeAuthChallengeRef: ConsumeAuthChallengeRef;
+
+export function consumeAuthChallenge(vars: ConsumeAuthChallengeVariables): MutationPromise<ConsumeAuthChallengeData, ConsumeAuthChallengeVariables>;
+export function consumeAuthChallenge(dc: DataConnect, vars: ConsumeAuthChallengeVariables): MutationPromise<ConsumeAuthChallengeData, ConsumeAuthChallengeVariables>;
 
 interface UpsertCurrentUserRef {
   /* Allow users to create refs without passing in DataConnect */

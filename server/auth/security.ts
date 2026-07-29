@@ -9,6 +9,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { resolve4, resolve6, resolveMx } from "node:dns/promises";
+import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 
 export const OTP_TTL_MS = 10 * 60 * 1000;
 export const OTP_MAX_ATTEMPTS = 5;
@@ -28,8 +29,6 @@ export type EmailOtpChallenge = {
   attempts: number;
   expiresAt: number;
 };
-
-const requestWindows = new Map<string, number[]>();
 
 function hash(value: string) {
   return createHash("sha256").update(value).digest("hex");
@@ -163,16 +162,54 @@ export function normalizeDisplayName(value: string) {
   return normalized;
 }
 
-export function enforceRateLimit(key: string, limit = 6, windowMs = 60_000) {
+export async function enforceRateLimit(
+  key: string,
+  limit = 6,
+  windowMs = 60_000,
+) {
   const now = Date.now();
-  const existing = requestWindows.get(hash(key)) ?? [];
-  const active = existing.filter((timestamp) => now - timestamp < windowMs);
-  if (active.length >= limit) {
+  const bucketKey = hash(key);
+  const dataConnect = getBondCircleDataConnect();
+  const response = await dataConnect.executeQuery<
+    { abuseAttempts: Array<{ id: string; occurredAt: string }> },
+    { bucketKey: string; since: string }
+  >("GetRecentAbuseAttempts", {
+    bucketKey,
+    since: new Date(now - windowMs).toISOString(),
+  });
+  if (response.data.abuseAttempts.length >= limit) {
     return false;
   }
-  active.push(now);
-  requestWindows.set(hash(key), active);
+  await dataConnect.executeMutation("RecordAbuseAttempt", {
+    id: randomUUID(),
+    bucketKey,
+    occurredAt: new Date(now).toISOString(),
+  });
   return true;
+}
+
+export function authChallengeFingerprint(challengeToken: string) {
+  return hash(challengeToken);
+}
+
+export async function consumeAuthChallenge(challengeToken: string) {
+  const challengeHash = authChallengeFingerprint(challengeToken);
+  const dataConnect = getBondCircleDataConnect();
+  const existing = await dataConnect.executeQuery<
+    { consumedAuthChallenge?: { challengeHash: string } | null },
+    { challengeHash: string }
+  >("GetConsumedAuthChallenge", { challengeHash });
+  if (existing.data.consumedAuthChallenge) return false;
+  try {
+    await dataConnect.executeMutation("ConsumeAuthChallenge", {
+      challengeHash,
+      consumedAt: new Date().toISOString(),
+    });
+    return true;
+  } catch {
+    // The challenge hash is a primary key, so concurrent redemption fails closed.
+    return false;
+  }
 }
 
 export function createEmailOtpChallenge(input: {
@@ -256,8 +293,4 @@ export function readOtpAttempts(
   return Number.isInteger(attempts) && attempts >= 0
     ? attempts
     : OTP_MAX_ATTEMPTS;
-}
-
-export function clearAuthSecurityStateForTests() {
-  requestWindows.clear();
 }

@@ -3,11 +3,12 @@ import { readSession } from "@/server/auth";
 import { canViewReceipt } from "@/server/contributions/engine";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { loadContributionWorkspace } from "@/server/repositories/contributions";
+import { verifyPrivateFileAccess } from "@/server/uploads/private-access";
 
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: {
     params: Promise<{ circleId: string; receiptId: string }>;
   },
@@ -15,6 +16,16 @@ export async function GET(
   const session = await readSession();
   if (!session) return new NextResponse(null, { status: 401 });
   const { circleId, receiptId } = await context.params;
+  const access = new URL(request.url).searchParams.get("access");
+  if (
+    !verifyPrivateFileAccess(access, {
+      circleId,
+      resourceId: receiptId,
+      viewerId: session.uid,
+    })
+  ) {
+    return new NextResponse(null, { status: 404 });
+  }
   const workspace = await loadContributionWorkspace(circleId, session.uid);
   if (!workspace) return new NextResponse(null, { status: 404 });
   const receipt = [...workspace.receipts, ...workspace.reviewQueue].find(

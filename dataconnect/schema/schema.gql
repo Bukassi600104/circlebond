@@ -57,6 +57,17 @@ type AuthAuditEvent @table {
   occurredAt: Timestamp! @default(expr: "request.time")
 }
 
+type AbuseAttempt @table {
+  id: UUID! @default(expr: "uuidV4()")
+  bucketKey: String!
+  occurredAt: Timestamp! @default(expr: "request.time")
+}
+
+type ConsumedAuthChallenge @table(key: ["challengeHash"]) {
+  challengeHash: String!
+  consumedAt: Timestamp! @default(expr: "request.time")
+}
+
 type Circle @table {
   id: UUID! @default(expr: "uuidV4()")
   creator: User!

@@ -12,10 +12,18 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetCurrentUser, useUpsertCurrentUser, useGetDashboardCircles, useGetCircleEngineRecord, useGetCircleLifecycleSummary, useFindUserByEmail, useGetGiftCircleDetail, useGetCircleAuditEntries, useCreateCircleDraft, useUpdateCircleConfigurationWithAudit } from '@bondcircle/dataconnect/react';
+import { useGetCurrentUser, useGetRecentAbuseAttempts, useRecordAbuseAttempt, useGetConsumedAuthChallenge, useConsumeAuthChallenge, useUpsertCurrentUser, useGetDashboardCircles, useGetCircleEngineRecord, useGetCircleLifecycleSummary, useFindUserByEmail } from '@bondcircle/dataconnect/react';
 // The types of these hooks are available in react/index.d.ts
 
 const { data, isPending, isSuccess, isError, error } = useGetCurrentUser();
+
+const { data, isPending, isSuccess, isError, error } = useGetRecentAbuseAttempts(getRecentAbuseAttemptsVars);
+
+const { data, isPending, isSuccess, isError, error } = useRecordAbuseAttempt(recordAbuseAttemptVars);
+
+const { data, isPending, isSuccess, isError, error } = useGetConsumedAuthChallenge(getConsumedAuthChallengeVars);
+
+const { data, isPending, isSuccess, isError, error } = useConsumeAuthChallenge(consumeAuthChallengeVars);
 
 const { data, isPending, isSuccess, isError, error } = useUpsertCurrentUser(upsertCurrentUserVars);
 
@@ -26,14 +34,6 @@ const { data, isPending, isSuccess, isError, error } = useGetCircleEngineRecord(
 const { data, isPending, isSuccess, isError, error } = useGetCircleLifecycleSummary(getCircleLifecycleSummaryVars);
 
 const { data, isPending, isSuccess, isError, error } = useFindUserByEmail(findUserByEmailVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetGiftCircleDetail(getGiftCircleDetailVars);
-
-const { data, isPending, isSuccess, isError, error } = useGetCircleAuditEntries(getCircleAuditEntriesVars);
-
-const { data, isPending, isSuccess, isError, error } = useCreateCircleDraft(createCircleDraftVars);
-
-const { data, isPending, isSuccess, isError, error } = useUpdateCircleConfigurationWithAudit(updateCircleConfigurationWithAuditVars);
 
 ```
 
@@ -72,11 +72,23 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getCurrentUser, upsertCurrentUser, getDashboardCircles, getCircleEngineRecord, getCircleLifecycleSummary, findUserByEmail, getGiftCircleDetail, getCircleAuditEntries, createCircleDraft, updateCircleConfigurationWithAudit } from '@bondcircle/dataconnect';
+import { getCurrentUser, getRecentAbuseAttempts, recordAbuseAttempt, getConsumedAuthChallenge, consumeAuthChallenge, upsertCurrentUser, getDashboardCircles, getCircleEngineRecord, getCircleLifecycleSummary, findUserByEmail } from '@bondcircle/dataconnect';
 
 
 // Operation GetCurrentUser: 
 const { data } = await GetCurrentUser(dataConnect);
+
+// Operation GetRecentAbuseAttempts:  For variables, look at type GetRecentAbuseAttemptsVars in ../index.d.ts
+const { data } = await GetRecentAbuseAttempts(dataConnect, getRecentAbuseAttemptsVars);
+
+// Operation RecordAbuseAttempt:  For variables, look at type RecordAbuseAttemptVars in ../index.d.ts
+const { data } = await RecordAbuseAttempt(dataConnect, recordAbuseAttemptVars);
+
+// Operation GetConsumedAuthChallenge:  For variables, look at type GetConsumedAuthChallengeVars in ../index.d.ts
+const { data } = await GetConsumedAuthChallenge(dataConnect, getConsumedAuthChallengeVars);
+
+// Operation ConsumeAuthChallenge:  For variables, look at type ConsumeAuthChallengeVars in ../index.d.ts
+const { data } = await ConsumeAuthChallenge(dataConnect, consumeAuthChallengeVars);
 
 // Operation UpsertCurrentUser:  For variables, look at type UpsertCurrentUserVars in ../index.d.ts
 const { data } = await UpsertCurrentUser(dataConnect, upsertCurrentUserVars);
@@ -92,18 +104,6 @@ const { data } = await GetCircleLifecycleSummary(dataConnect, getCircleLifecycle
 
 // Operation FindUserByEmail:  For variables, look at type FindUserByEmailVars in ../index.d.ts
 const { data } = await FindUserByEmail(dataConnect, findUserByEmailVars);
-
-// Operation GetGiftCircleDetail:  For variables, look at type GetGiftCircleDetailVars in ../index.d.ts
-const { data } = await GetGiftCircleDetail(dataConnect, getGiftCircleDetailVars);
-
-// Operation GetCircleAuditEntries:  For variables, look at type GetCircleAuditEntriesVars in ../index.d.ts
-const { data } = await GetCircleAuditEntries(dataConnect, getCircleAuditEntriesVars);
-
-// Operation CreateCircleDraft:  For variables, look at type CreateCircleDraftVars in ../index.d.ts
-const { data } = await CreateCircleDraft(dataConnect, createCircleDraftVars);
-
-// Operation UpdateCircleConfigurationWithAudit:  For variables, look at type UpdateCircleConfigurationWithAuditVars in ../index.d.ts
-const { data } = await UpdateCircleConfigurationWithAudit(dataConnect, updateCircleConfigurationWithAuditVars);
 
 
 ```

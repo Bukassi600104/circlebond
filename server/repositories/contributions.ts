@@ -9,6 +9,7 @@ import {
   receiptSubmissionStatus,
   reviewOutcome,
 } from "@/server/contributions/engine";
+import { createPrivateFileAccess } from "@/server/uploads/private-access";
 
 export type ContributionReceipt = {
   id: string;
@@ -107,7 +108,17 @@ export async function loadContributionWorkspace(
     .filter((receipt) =>
       canViewReceipt(receipt.uploadedBy.id, viewerId, viewer.role),
     )
-    .map(mapReceipt);
+    .map(mapReceipt)
+    .map((receipt) => ({
+      ...receipt,
+      imageUrl: `${receipt.imageUrl}?access=${encodeURIComponent(
+        createPrivateFileAccess({
+          circleId,
+          resourceId: receipt.id,
+          viewerId,
+        }),
+      )}`,
+    }));
   const ownPending = response.data.receipts
     .filter(
       (receipt) =>

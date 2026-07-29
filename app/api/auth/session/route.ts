@@ -37,7 +37,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     await assertTrustedMutation(request);
-    if (!enforceRateLimit(clientKey(request, "login"), 10, 60_000)) {
+    if (!(await enforceRateLimit(clientKey(request, "login"), 10, 60_000))) {
       return NextResponse.json(
         { error: "Please wait before trying again." },
         { status: 429, headers: { "Retry-After": "60" } },

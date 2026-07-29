@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
-import { assertTrustedMutation } from "@/server/auth/request";
+import { assertTrustedMutation, clientKey } from "@/server/auth/request";
+import { enforceRateLimit } from "@/server/auth/security";
 import {
   addCircleMember,
   createCircleDraft,
@@ -19,6 +20,7 @@ import {
 } from "@/server/repositories/gift-circles";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
+import { sanitizeUploadedImage } from "@/server/uploads/images";
 
 export const runtime = "nodejs";
 
@@ -26,17 +28,6 @@ type InviteInput = { email: string; amount?: number };
 
 function text(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
-}
-
-function validImageBytes(bytes: Uint8Array, type: string) {
-  if (type === "image/png") {
-    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e;
-  }
-  if (type === "image/jpeg") return bytes[0] === 0xff && bytes[1] === 0xd8;
-  if (type === "image/webp") {
-    return new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF";
-  }
-  return false;
 }
 
 export async function POST(request: Request) {
@@ -47,6 +38,18 @@ export async function POST(request: Request) {
     const session = await readSession();
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, `circle-create:${session.uid}`),
+        10,
+        60 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Circle creation limit reached. Try again later." },
+        { status: 429 },
+      );
     }
 
     const form = await request.formData();
@@ -101,13 +104,13 @@ export async function POST(request: Request) {
       );
     }
     uploadAttempted = true;
-    if (!(image instanceof File) || image.size < 1 || image.size > 5_000_000) {
+    if (!(image instanceof File)) {
       throw new Error("Add a JPG, PNG or WebP gift image up to 5 MB.");
     }
-    const bytes = new Uint8Array(await image.arrayBuffer());
-    if (!validImageBytes(bytes, image.type)) {
-      throw new Error("The selected gift image is not valid.");
-    }
+    const sanitized = await sanitizeUploadedImage(
+      image,
+      "Add a valid JPG, PNG or WebP gift image up to 5 MB.",
+    );
 
     const uniqueInvites = [
       ...new Map(
@@ -170,18 +173,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const extension =
-      image.type === "image/png"
-        ? "png"
-        : image.type === "image/webp"
-          ? "webp"
-          : "jpg";
-    const imageStoragePath = `circles/${circle.id}/gift/gift.${extension}`;
+    const imageStoragePath = `circles/${circle.id}/gift/gift.${sanitized.extension}`;
     await getFirebaseAdminStorage()
       .bucket()
       .file(imageStoragePath)
-      .save(Buffer.from(bytes), {
-        contentType: image.type,
+      .save(sanitized.bytes, {
+        contentType: sanitized.contentType,
         resumable: false,
         metadata: { cacheControl: "private, max-age=3600" },
       });

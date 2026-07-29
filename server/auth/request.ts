@@ -10,8 +10,18 @@ function safeEqual(left: string, right: string) {
 
 export async function assertTrustedMutation(request: Request) {
   const origin = request.headers.get("origin");
-  const host = request.headers.get("host");
-  if (origin && host && new URL(origin).host !== host) {
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (fetchSite && !["same-origin", "none"].includes(fetchSite)) {
+    throw new Error("Untrusted request origin.");
+  }
+  if (!origin || !host) throw new Error("Missing request origin.");
+  try {
+    if (new URL(origin).host !== host.split(",")[0].trim()) {
+      throw new Error("Untrusted request origin.");
+    }
+  } catch {
     throw new Error("Untrusted request origin.");
   }
 
@@ -23,6 +33,9 @@ export async function assertTrustedMutation(request: Request) {
 }
 
 export function clientKey(request: Request, identifier = "") {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0];
-  return `${forwarded ?? "local"}:${identifier}`;
+  const forwarded =
+    request.headers.get("x-vercel-forwarded-for") ??
+    request.headers.get("x-forwarded-for");
+  const address = forwarded?.split(",")[0]?.trim() || "local";
+  return `${address.slice(0, 64)}:${identifier.slice(0, 254)}`;
 }

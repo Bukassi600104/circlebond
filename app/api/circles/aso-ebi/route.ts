@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
-import { assertTrustedMutation } from "@/server/auth/request";
+import { assertTrustedMutation, clientKey } from "@/server/auth/request";
+import { enforceRateLimit } from "@/server/auth/security";
 import {
   assertAsoEbiEventType,
   assertAsoEbiTiers,
@@ -21,6 +22,10 @@ import {
 } from "@/server/repositories/aso-ebi-circles";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
+import {
+  sanitizeUploadedImage,
+  type SanitizedImage,
+} from "@/server/uploads/images";
 
 export const runtime = "nodejs";
 
@@ -36,36 +41,12 @@ function text(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
 }
 
-function validImageBytes(bytes: Uint8Array, type: string) {
-  if (type === "image/png") {
-    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e;
-  }
-  if (type === "image/jpeg") return bytes[0] === 0xff && bytes[1] === 0xd8;
-  if (type === "image/webp") {
-    return new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF";
-  }
-  return false;
-}
-
-function extensionFor(type: string) {
-  if (type === "image/png") return "png";
-  if (type === "image/webp") return "webp";
-  return "jpg";
-}
-
-async function saveImage(file: File, storagePath: string) {
-  if (file.size < 1 || file.size > 5_000_000) {
-    throw new Error("Every image must be a JPG, PNG or WebP up to 5 MB.");
-  }
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  if (!validImageBytes(bytes, file.type)) {
-    throw new Error("One of the selected images is not valid.");
-  }
+async function saveImage(image: SanitizedImage, storagePath: string) {
   await getFirebaseAdminStorage()
     .bucket()
     .file(storagePath)
-    .save(Buffer.from(bytes), {
-      contentType: file.type,
+    .save(image.bytes, {
+      contentType: image.contentType,
       resumable: false,
       metadata: { cacheControl: "private, max-age=3600" },
     });
@@ -84,6 +65,18 @@ export async function POST(request: Request) {
     const session = await readSession();
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, `circle-create:${session.uid}`),
+        10,
+        60 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Circle creation limit reached. Try again later." },
+        { status: 429 },
+      );
     }
 
     const form = await request.formData();
@@ -140,6 +133,10 @@ export async function POST(request: Request) {
     if (!(fabricImage instanceof File) || fabricImage.size < 1) {
       throw new Error("Add the main fabric image.");
     }
+    const sanitizedMainImage = await sanitizeUploadedImage(
+      fabricImage,
+      "Add a valid JPG, PNG or WebP main fabric image up to 5 MB.",
+    );
     for (const tier of tiers) {
       if (!/^[0-9a-f-]{36}$/i.test(tier.id)) {
         throw new Error("A tier identifier is invalid.");
@@ -201,8 +198,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const mainPath = `circles/${circle.id}/aso-ebi/event.${extensionFor(fabricImage.type)}`;
-    await saveImage(fabricImage, mainPath);
+    const mainPath = `circles/${circle.id}/aso-ebi/event.${sanitizedMainImage.extension}`;
+    await saveImage(sanitizedMainImage, mainPath);
     await configureAsoEbiCircle({
       circleId: circle.id,
       actorId: session.uid,
@@ -219,14 +216,24 @@ export async function POST(request: Request) {
       const tierId = randomUUID().replaceAll("-", "");
       const tierFabric = optionalFile(form, `tierFabricImage:${tier.id}`);
       const tierGift = optionalFile(form, `tierGiftImage:${tier.id}`);
+      const sanitizedTierFabric = tierFabric
+        ? await sanitizeUploadedImage(tierFabric)
+        : null;
+      const sanitizedTierGift = tierGift
+        ? await sanitizeUploadedImage(tierGift)
+        : null;
       const fabricPath = tierFabric
-        ? `circles/${circle.id}/aso-ebi/tiers/${tierId}/fabric.${extensionFor(tierFabric.type)}`
+        ? `circles/${circle.id}/aso-ebi/tiers/${tierId}/fabric.${sanitizedTierFabric!.extension}`
         : null;
       const giftPath = tierGift
-        ? `circles/${circle.id}/aso-ebi/tiers/${tierId}/gift.${extensionFor(tierGift.type)}`
+        ? `circles/${circle.id}/aso-ebi/tiers/${tierId}/gift.${sanitizedTierGift!.extension}`
         : null;
-      if (tierFabric && fabricPath) await saveImage(tierFabric, fabricPath);
-      if (tierGift && giftPath) await saveImage(tierGift, giftPath);
+      if (sanitizedTierFabric && fabricPath) {
+        await saveImage(sanitizedTierFabric, fabricPath);
+      }
+      if (sanitizedTierGift && giftPath) {
+        await saveImage(sanitizedTierGift, giftPath);
+      }
       await createAsoEbiTier({
         tierId,
         circleId: circle.id,

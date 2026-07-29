@@ -3,10 +3,14 @@ import { cookies } from "next/headers";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import {
   OTP_ATTEMPTS_COOKIE,
+  authChallengeFingerprint,
+  consumeAuthChallenge,
+  enforceRateLimit,
   readOtpAttempts,
   sealOtpAttempts,
   verifyEmailOtp,
 } from "@/server/auth/security";
+import { clientKey } from "@/server/auth/request";
 import { recordAuthAudit } from "@/server/audit";
 import {
   findPersistedUserByEmail,
@@ -21,6 +25,18 @@ export async function POST(request: Request) {
     };
     if (!challengeId || !/^\d{6}$/.test(code ?? "")) {
       throw new Error("Invalid verification request.");
+    }
+    if (
+      !(await enforceRateLimit(
+        clientKey(
+          request,
+          `otp-verify:${authChallengeFingerprint(challengeId)}`,
+        ),
+        5,
+        15 * 60_000,
+      ))
+    ) {
+      throw new Error("Verification attempts exhausted.");
     }
     const attemptsCookie = (await cookies()).get(OTP_ATTEMPTS_COOKIE)?.value;
     const attempts = readOtpAttempts(attemptsCookie, challengeId);
@@ -119,6 +135,12 @@ export async function POST(request: Request) {
       }
 
       const customToken = await auth.createCustomToken(user.uid);
+      if (!(await consumeAuthChallenge(challengeId))) {
+        return NextResponse.json(
+          { error: "That code has already been used. Request a new one." },
+          { status: 409 },
+        );
+      }
       recordAuthAudit({
         event:
           result.challenge.purpose === "recovery" ? "recovery" : "verification",
@@ -134,8 +156,10 @@ export async function POST(request: Request) {
         maxAge: 0,
       });
       return response;
-    } catch (error) {
-      console.error("Email OTP accepted but authentication failed.", error);
+    } catch {
+      console.error("Email OTP authentication failed.", {
+        reasonCode: "firebase_auth_unavailable",
+      });
       return NextResponse.json(
         {
           error:

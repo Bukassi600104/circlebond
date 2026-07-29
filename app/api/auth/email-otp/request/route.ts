@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       checkDomain: !developmentMode,
     });
     if (!input.purpose) throw new Error("Invalid purpose.");
-    if (!enforceRateLimit(clientKey(request, email), 5, 15 * 60_000)) {
+    if (!(await enforceRateLimit(clientKey(request, email), 5, 15 * 60_000))) {
       return NextResponse.json(
         { message: "If the address can be used, a code will arrive shortly." },
         { status: 202 },

@@ -8,29 +8,11 @@ import {
   submitContributionReceipt,
 } from "@/server/repositories/contributions";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
+import { clientKey } from "@/server/auth/request";
+import { enforceRateLimit } from "@/server/auth/security";
+import { sanitizeUploadedImage } from "@/server/uploads/images";
 
 export const runtime = "nodejs";
-
-const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-
-function isValidImage(bytes: Uint8Array, contentType: string) {
-  if (contentType === "image/jpeg") {
-    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  }
-  if (contentType === "image/png") {
-    return (
-      bytes[0] === 0x89 &&
-      bytes[1] === 0x50 &&
-      bytes[2] === 0x4e &&
-      bytes[3] === 0x47
-    );
-  }
-  return (
-    contentType === "image/webp" &&
-    new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
-    new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP"
-  );
-}
 
 function publicReceipt<T extends { imageStoragePath: string }>(
   receipt: T,
@@ -74,6 +56,18 @@ export async function POST(
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
     const { circleId } = await context.params;
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, `receipt:${session.uid}:${circleId}`),
+        8,
+        15 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Too many receipt uploads. Try again shortly." },
+        { status: 429 },
+      );
+    }
     metricCircleId = circleId;
     uploadAttempted = true;
     const form = await request.formData();
@@ -83,32 +77,21 @@ export async function POST(
     const replacementOfId =
       String(form.get("replacementOfId") ?? "").trim() || null;
 
-    if (
-      !(receiptImage instanceof File) ||
-      receiptImage.size < 1 ||
-      receiptImage.size > 5_000_000 ||
-      !allowedTypes.has(receiptImage.type)
-    ) {
+    if (!(receiptImage instanceof File)) {
       throw new Error("Add a JPG, PNG or WebP receipt image up to 5 MB.");
     }
-    const bytes = new Uint8Array(await receiptImage.arrayBuffer());
-    if (!isValidImage(bytes, receiptImage.type)) {
-      throw new Error("The selected receipt is not a valid image.");
-    }
+    const sanitized = await sanitizeUploadedImage(
+      receiptImage,
+      "Add a valid JPG, PNG or WebP receipt image up to 5 MB.",
+    );
 
     const receiptId = randomUUID();
-    const extension =
-      receiptImage.type === "image/png"
-        ? "png"
-        : receiptImage.type === "image/webp"
-          ? "webp"
-          : "jpg";
-    uploadedPath = `receipts/${circleId}/${session.uid}/${receiptId}.${extension}`;
+    uploadedPath = `receipts/${circleId}/${session.uid}/${receiptId}.${sanitized.extension}`;
     await getFirebaseAdminStorage()
       .bucket()
       .file(uploadedPath)
-      .save(Buffer.from(bytes), {
-        contentType: receiptImage.type,
+      .save(sanitized.bytes, {
+        contentType: sanitized.contentType,
         resumable: false,
         metadata: {
           cacheControl: "private, no-store",
@@ -124,7 +107,7 @@ export async function POST(
       note,
       imageUrl: `/api/circles/${circleId}/receipts/${receiptId}/image`,
       imageStoragePath: uploadedPath,
-      contentType: receiptImage.type,
+      contentType: sanitized.contentType,
       replacementOfId,
     });
     await recordUploadOutcome({
