@@ -7,6 +7,7 @@ import {
   loadSupportCircle,
   setSupportCompletionType,
 } from "@/server/repositories/support-circles";
+import { safelyEmitNotification } from "@/server/repositories/notifications";
 
 export async function POST(
   request: Request,
@@ -50,6 +51,12 @@ export async function POST(
       circleId,
       actorId: session.uid,
       completionType: "support_delivered",
+    });
+    await safelyEmitNotification({
+      circleId,
+      type: "circle_completed",
+      entityId: circleId,
+      actorId: session.uid,
     });
     return NextResponse.json({ ok: true });
   } catch (error) {

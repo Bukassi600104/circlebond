@@ -9,9 +9,11 @@ import { AsoEbiCircleForm } from "@/components/aso-ebi/AsoEbiCircleForm";
 import { SupportCircleForm } from "@/components/support-circles/SupportCircleForm";
 import { LogoutButton } from "@/features/auth/components";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { requireSession } from "@/server/auth";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
 import { loadUserActivity } from "@/server/repositories/communication";
+import { loadNotificationWorkspace } from "@/server/repositories/notifications";
 
 const collectionSections = {
   circles: {
@@ -134,6 +136,11 @@ export default async function AccountSectionPage({
         <ActivityFeed events={events} showCircleName />
       </section>
     );
+  }
+
+  if (section === "notifications") {
+    const workspace = await loadNotificationWorkspace(session.uid);
+    return <NotificationCenter workspace={workspace} />;
   }
 
   const information =

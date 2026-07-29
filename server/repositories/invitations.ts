@@ -14,6 +14,7 @@ import {
   type InvitationMode,
   type InvitationState,
 } from "@/server/invitations/rules";
+import { safelyEmitNotification } from "@/server/repositories/notifications";
 
 type InvitationRow = {
   id: string;
@@ -371,6 +372,12 @@ export async function respondToInvitation(
       respondedAt,
     },
   );
+  await safelyEmitNotification({
+    circleId: invitation.circle.id,
+    type: "invitation_accepted",
+    entityId: invitation.id,
+    actorId: user.id,
+  });
   return { status: "joined" as const };
 }
 
@@ -413,6 +420,12 @@ export async function approveInvitationMembership(
       respondedAt: new Date().toISOString(),
     },
   );
+  await safelyEmitNotification({
+    circleId,
+    type: "invitation_accepted",
+    entityId: invitationId,
+    actorId: userId,
+  });
 }
 
 export async function requestReplacementInvitation(

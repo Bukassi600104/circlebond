@@ -6,6 +6,12 @@ type User @table {
   profileImage: String
   termsAcceptedAt: Timestamp
   privacyAcceptedAt: Timestamp
+  emailNotifications: Boolean! @default(value: true)
+  browserPushNotifications: Boolean! @default(value: false)
+  commentNotifications: Boolean! @default(value: true)
+  contributionReminders: Boolean! @default(value: true)
+  circleUpdateNotifications: Boolean! @default(value: true)
+  marketingCommunication: Boolean! @default(value: false)
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
@@ -73,6 +79,7 @@ type CircleMembership @table(key: ["circle", "user"]) {
   receiptSubmittedAt: Timestamp
   selectedAsoEbiTier: AsoEbiTier
   fulfilmentStatus: String! @default(value: "joined")
+  notificationsMuted: Boolean! @default(value: false)
   joinedAt: Timestamp! @default(expr: "request.time")
 }
 
@@ -126,6 +133,7 @@ type Announcement @table {
   title: String!
   body: String!
   pinned: Boolean! @default(value: false)
+  important: Boolean! @default(value: false)
   commentsEnabled: Boolean! @default(value: true)
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
@@ -164,6 +172,33 @@ type ActivityLog @table {
   entityId: String!
   metadata: String! @default(value: "{}")
   createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Notification @table {
+  id: UUID! @default(expr: "uuidV4()")
+  recipient: User!
+  circle: Circle
+  type: String!
+  title: String!
+  body: String!
+  deepLink: String!
+  dedupeKey: String! @unique
+  readAt: Timestamp
+  dismissedAt: Timestamp
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type EmailDelivery @table {
+  id: UUID! @default(expr: "uuidV4()")
+  notification: Notification
+  recipient: User
+  eventType: String!
+  destinationMasked: String!
+  status: String!
+  providerMessageId: String
+  failureReason: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
 }
 
 type Invitation @table {

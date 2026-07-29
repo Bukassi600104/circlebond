@@ -4,6 +4,7 @@ import {
   assertFulfilmentTransition,
   type AsoEbiFulfilmentStatus,
 } from "@/server/circles/aso-ebi";
+import { safelyEmitNotification } from "@/server/repositories/notifications";
 
 export type AsoEbiTier = {
   id: string;
@@ -274,5 +275,12 @@ export async function updateAsoEbiFulfilment(input: {
     memberId: input.memberId,
     status: input.status,
     updatedAt: new Date().toISOString(),
+  });
+  await safelyEmitNotification({
+    circleId: input.circleId,
+    type: "delivery_updated",
+    entityId: `${input.memberId}:${input.status}`,
+    actorId: input.actorId,
+    recipientIds: [input.memberId],
   });
 }

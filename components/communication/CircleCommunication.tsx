@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Edit3,
   Flag,
+  BellRing,
   LockKeyhole,
   Megaphone,
   MessageCircle,
@@ -74,6 +75,8 @@ export function CircleCommunication({
   const [confirming, setConfirming] = useState<string | null>(null);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [reminderSelection, setReminderSelection] = useState<string[]>([]);
+  const [reminderMessage, setReminderMessage] = useState("");
   const readOnly = ["completed", "cancelled", "archived", "purged"].includes(
     workspace.circleStatus,
   );
@@ -143,6 +146,7 @@ export function CircleCommunication({
         title: String(form.get("title") ?? ""),
         body: String(form.get("body") ?? ""),
         pinned: form.get("pinned") === "on",
+        important: form.get("important") === "on",
         commentsEnabled: form.get("commentsEnabled") === "on",
       },
       editing ? `announcement:${editing.id}` : "announcement:new",
@@ -166,6 +170,24 @@ export function CircleCommunication({
     if (ok) {
       event.currentTarget.reset();
       setReplyTo(null);
+    }
+  }
+
+  async function sendReminders() {
+    setReminderMessage("");
+    const ok = await mutate(
+      `/api/circles/${workspace.circleId}/reminders`,
+      "POST",
+      { recipientIds: reminderSelection },
+      "reminders",
+    );
+    if (ok) {
+      setReminderSelection([]);
+      setReminderMessage(
+        reminderSelection.length === 1
+          ? "Reminder sent."
+          : `${reminderSelection.length} reminders sent.`,
+      );
     }
   }
 
@@ -372,9 +394,60 @@ export function CircleCommunication({
           {error}
         </p>
       ) : null}
+      {reminderMessage ? (
+        <p className="bc-communication-success" role="status">
+          {reminderMessage}
+        </p>
+      ) : null}
 
       {tab === "announcements" ? (
         <section className="bc-announcements" role="tabpanel">
+          {workspace.viewerCanManage &&
+          !readOnly &&
+          workspace.reminderCandidates.length ? (
+            <aside className="bc-reminder-panel">
+              <div>
+                <span className="bc-reminder-panel__icon">
+                  <BellRing size={16} aria-hidden="true" />
+                </span>
+                <div>
+                  <strong>Contribution reminders</strong>
+                  <p>
+                    Select unpaid members. Each person can be reminded at most
+                    once every 24 hours.
+                  </p>
+                </div>
+              </div>
+              <div className="bc-reminder-members">
+                {workspace.reminderCandidates.map((member) => (
+                  <label key={member.id}>
+                    <input
+                      type="checkbox"
+                      checked={reminderSelection.includes(member.id)}
+                      onChange={(event) =>
+                        setReminderSelection((current) =>
+                          event.target.checked
+                            ? [...current, member.id]
+                            : current.filter((id) => id !== member.id),
+                        )
+                      }
+                    />
+                    <span>{member.name}</span>
+                  </label>
+                ))}
+              </div>
+              <button
+                type="button"
+                disabled={!reminderSelection.length || busy === "reminders"}
+                onClick={sendReminders}
+              >
+                <BellRing size={14} aria-hidden="true" />
+                {busy === "reminders"
+                  ? "Sending…"
+                  : `Send reminder${reminderSelection.length === 1 ? "" : "s"}`}
+              </button>
+            </aside>
+          ) : null}
           <header>
             <div>
               <h3>Official announcements</h3>
@@ -441,6 +514,14 @@ export function CircleCommunication({
                           defaultChecked={editing?.pinned ?? false}
                         />
                         Pin announcement
+                      </label>
+                      <label>
+                        <input
+                          name="important"
+                          type="checkbox"
+                          defaultChecked={editing?.important ?? false}
+                        />
+                        Important update
                       </label>
                       <label>
                         <input

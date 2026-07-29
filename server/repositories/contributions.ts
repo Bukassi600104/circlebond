@@ -1,6 +1,7 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { recordSystemActivity } from "@/server/repositories/communication";
+import { safelyEmitNotification } from "@/server/repositories/notifications";
 import {
   canReviewReceipts,
   canViewReceipt,
@@ -203,6 +204,12 @@ export async function submitContributionReceipt(input: {
       ? { ...variables, replacedReceiptId: input.replacementOfId }
       : variables,
   );
+  await safelyEmitNotification({
+    circleId: input.circleId,
+    type: "receipt_submitted",
+    entityId: input.receiptId,
+    actorId: input.uploaderId,
+  });
   return { ...submission, submittedAt };
 }
 
@@ -282,6 +289,14 @@ export async function reviewContributionReceipt(input: {
       rejectionReason: input.decision === "reject" ? reason : null,
     }),
   });
+  await safelyEmitNotification({
+    circleId: input.circleId,
+    type:
+      input.decision === "approve" ? "receipt_confirmed" : "receipt_rejected",
+    entityId: receipt.id,
+    actorId: input.reviewerId,
+    recipientIds: [receipt.uploaderId],
+  });
   if (
     input.decision === "approve" &&
     workspace.circle.targetAmount > 0 &&
@@ -297,6 +312,12 @@ export async function reviewContributionReceipt(input: {
         targetAmount: workspace.circle.targetAmount,
         contributedAmount: nextCircleContributedAmount,
       },
+    });
+    await safelyEmitNotification({
+      circleId: input.circleId,
+      type: "target_reached",
+      entityId: input.circleId,
+      actorId: input.reviewerId,
     });
   }
   return { receiptStatus, membershipStatus, reviewedAt };

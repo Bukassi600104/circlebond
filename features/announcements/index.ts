@@ -3,6 +3,7 @@ export type Announcement = {
   title: string;
   body: string;
   pinned: boolean;
+  important: boolean;
   commentsEnabled: boolean;
   authorId: string;
   authorName: string;

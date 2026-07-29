@@ -1427,6 +1427,8 @@ query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
   ) {
     role
     membershipStatus
+    expectedAmount
+    confirmedAmount
     user {
       id
       displayName
@@ -1442,6 +1444,7 @@ query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
     title
     body
     pinned
+    important
     commentsEnabled
     createdAt
     updatedAt
@@ -1568,6 +1571,7 @@ mutation CreateAnnouncementWithActivity(
   $title: String!
   $body: String!
   $pinned: Boolean!
+  $important: Boolean! = false
   $commentsEnabled: Boolean!
   $createdAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
@@ -1579,6 +1583,7 @@ mutation CreateAnnouncementWithActivity(
       title: $title
       body: $body
       pinned: $pinned
+      important: $important
       commentsEnabled: $commentsEnabled
       createdAt: $createdAt
       updatedAt: $createdAt
@@ -1613,6 +1618,7 @@ mutation UpdateAnnouncementWithAudit(
   $title: String!
   $body: String!
   $pinned: Boolean!
+  $important: Boolean! = false
   $commentsEnabled: Boolean!
   $updatedAt: Timestamp!
   $materialChanges: String!
@@ -1623,6 +1629,7 @@ mutation UpdateAnnouncementWithAudit(
       title: $title
       body: $body
       pinned: $pinned
+      important: $important
       commentsEnabled: $commentsEnabled
       updatedAt: $updatedAt
     }
@@ -1826,6 +1833,262 @@ mutation RecordSystemActivity(
       entityId: $entityId
       metadata: $metadata
       createdAt: $createdAt
+    }
+  )
+}
+
+query GetUserNotifications($userId: String!) @auth(level: NO_ACCESS) {
+  user(key: { id: $userId }) {
+    id
+    emailNotifications
+    browserPushNotifications
+    commentNotifications
+    contributionReminders
+    circleUpdateNotifications
+    marketingCommunication
+  }
+  notifications(
+    where: { recipientId: { eq: $userId }, dismissedAt: { isNull: true } }
+    orderBy: { createdAt: DESC }
+    limit: 200
+  ) {
+    id
+    type
+    title
+    body
+    deepLink
+    readAt
+    createdAt
+    circle {
+      id
+      name
+      type
+    }
+  }
+  circleMemberships(where: { userId: { eq: $userId } }) {
+    notificationsMuted
+    membershipStatus
+    circle {
+      id
+      name
+      type
+    }
+  }
+}
+
+query GetNotificationContext($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    status
+    deadline
+    creator {
+      id
+      displayName
+      email
+      emailNotifications
+      commentNotifications
+      contributionReminders
+      circleUpdateNotifications
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+  ) {
+    role
+    notificationsMuted
+    expectedAmount
+    confirmedAmount
+    user {
+      id
+      displayName
+      email
+      emailNotifications
+      commentNotifications
+      contributionReminders
+      circleUpdateNotifications
+    }
+  }
+}
+
+query GetNotificationDedupe($recipientId: String!, $dedupeKey: String!)
+@auth(level: NO_ACCESS) {
+  notifications(
+    where: { recipientId: { eq: $recipientId }, dedupeKey: { eq: $dedupeKey } }
+    limit: 1
+  ) {
+    id
+  }
+}
+
+query GetRecentReminderNotifications(
+  $circleId: UUID!
+  $recipientId: String!
+  $since: Timestamp!
+) @auth(level: NO_ACCESS) {
+  notifications(
+    where: {
+      circleId: { eq: $circleId }
+      recipientId: { eq: $recipientId }
+      type: { eq: "contribution_reminder" }
+      createdAt: { ge: $since }
+    }
+    limit: 1
+  ) {
+    id
+  }
+}
+
+query FindNotificationRecipientByEmail($email: String!)
+@auth(level: NO_ACCESS) {
+  users(where: { email: { eq: $email } }, limit: 1) {
+    id
+    displayName
+    email
+    emailNotifications
+    commentNotifications
+    contributionReminders
+    circleUpdateNotifications
+  }
+}
+
+query GetDeadlineNotificationCandidates($from: Date!, $to: Date!)
+@auth(level: NO_ACCESS) {
+  circles(
+    where: {
+      deadline: { ge: $from, le: $to }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+    }
+    limit: 200
+  ) {
+    id
+    name
+    type
+    deadline
+  }
+}
+
+mutation CreateNotification(
+  $notificationId: UUID!
+  $recipientId: String!
+  $circleId: UUID
+  $type: String!
+  $title: String!
+  $body: String!
+  $deepLink: String!
+  $dedupeKey: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  notification_insert(
+    data: {
+      id: $notificationId
+      recipient: { id: $recipientId }
+      circleId: $circleId
+      type: $type
+      title: $title
+      body: $body
+      deepLink: $deepLink
+      dedupeKey: $dedupeKey
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation MarkNotificationRead(
+  $notificationId: UUID!
+  $recipientId: String!
+  $readAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  notification_updateMany(
+    where: {
+      id: { eq: $notificationId }
+      recipientId: { eq: $recipientId }
+      dismissedAt: { isNull: true }
+    }
+    data: { readAt: $readAt }
+  )
+}
+
+mutation DismissNotification(
+  $notificationId: UUID!
+  $recipientId: String!
+  $dismissedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  notification_updateMany(
+    where: { id: { eq: $notificationId }, recipientId: { eq: $recipientId } }
+    data: { dismissedAt: $dismissedAt, readAt: $dismissedAt }
+  )
+}
+
+mutation MarkAllNotificationsRead($recipientId: String!, $readAt: Timestamp!)
+@auth(level: NO_ACCESS) {
+  notification_updateMany(
+    where: {
+      recipientId: { eq: $recipientId }
+      readAt: { isNull: true }
+      dismissedAt: { isNull: true }
+    }
+    data: { readAt: $readAt }
+  )
+}
+
+mutation UpdateNotificationPreferences(
+  $userId: String!
+  $emailNotifications: Boolean!
+  $browserPushNotifications: Boolean!
+  $commentNotifications: Boolean!
+  $contributionReminders: Boolean!
+  $circleUpdateNotifications: Boolean!
+  $marketingCommunication: Boolean!
+) @auth(level: NO_ACCESS) {
+  user_update(
+    key: { id: $userId }
+    data: {
+      emailNotifications: $emailNotifications
+      browserPushNotifications: $browserPushNotifications
+      commentNotifications: $commentNotifications
+      contributionReminders: $contributionReminders
+      circleUpdateNotifications: $circleUpdateNotifications
+      marketingCommunication: $marketingCommunication
+    }
+  )
+}
+
+mutation SetCircleNotificationMute(
+  $circleId: UUID!
+  $userId: String!
+  $notificationsMuted: Boolean!
+) @auth(level: NO_ACCESS) {
+  circleMembership_update(
+    key: { circleId: $circleId, userId: $userId }
+    data: { notificationsMuted: $notificationsMuted }
+  )
+}
+
+mutation CreateEmailDelivery(
+  $deliveryId: UUID!
+  $notificationId: UUID
+  $recipientId: String
+  $eventType: String!
+  $destinationMasked: String!
+  $status: String!
+  $providerMessageId: String
+  $failureReason: String
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  emailDelivery_insert(
+    data: {
+      id: $deliveryId
+      notificationId: $notificationId
+      recipientId: $recipientId
+      eventType: $eventType
+      destinationMasked: $destinationMasked
+      status: $status
+      providerMessageId: $providerMessageId
+      failureReason: $failureReason
+      createdAt: $createdAt
+      updatedAt: $createdAt
     }
   )
 }

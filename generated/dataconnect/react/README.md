@@ -33,6 +33,12 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetRecentCommentsByAuthor*](#getrecentcommentsbyauthor)
   - [*GetOpenCommentReportsByReporter*](#getopencommentreportsbyreporter)
   - [*GetActivityLogsForCircles*](#getactivitylogsforcircles)
+  - [*GetUserNotifications*](#getusernotifications)
+  - [*GetNotificationContext*](#getnotificationcontext)
+  - [*GetNotificationDedupe*](#getnotificationdedupe)
+  - [*GetRecentReminderNotifications*](#getrecentremindernotifications)
+  - [*FindNotificationRecipientByEmail*](#findnotificationrecipientbyemail)
+  - [*GetDeadlineNotificationCandidates*](#getdeadlinenotificationcandidates)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -69,6 +75,13 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*ModerateCommentWithAudit*](#moderatecommentwithaudit)
   - [*ReportCommentWithAudit*](#reportcommentwithaudit)
   - [*RecordSystemActivity*](#recordsystemactivity)
+  - [*CreateNotification*](#createnotification)
+  - [*MarkNotificationRead*](#marknotificationread)
+  - [*DismissNotification*](#dismissnotification)
+  - [*MarkAllNotificationsRead*](#markallnotificationsread)
+  - [*UpdateNotificationPreferences*](#updatenotificationpreferences)
+  - [*SetCircleNotificationMute*](#setcirclenotificationmute)
+  - [*CreateEmailDelivery*](#createemaildelivery)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `bondcircle`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -404,7 +417,7 @@ import { useGetCircleEngineRecord } from '@bondcircle/dataconnect/react'
 export default function GetCircleEngineRecordComponent() {
   // The `useGetCircleEngineRecord` Query hook requires an argument of type `GetCircleEngineRecordVariables`:
   const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -494,7 +507,7 @@ import { useFindUserByEmail } from '@bondcircle/dataconnect/react'
 export default function FindUserByEmailComponent() {
   // The `useFindUserByEmail` Query hook requires an argument of type `FindUserByEmailVariables`:
   const findUserByEmailVars: FindUserByEmailVariables = {
-    email: ..., 
+    email: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -611,7 +624,7 @@ import { useGetGiftCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetGiftCircleDetailComponent() {
   // The `useGetGiftCircleDetail` Query hook requires an argument of type `GetGiftCircleDetailVariables`:
   const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -704,7 +717,7 @@ import { useGetCircleAuditEntries } from '@bondcircle/dataconnect/react'
 export default function GetCircleAuditEntriesComponent() {
   // The `useGetCircleAuditEntries` Query hook requires an argument of type `GetCircleAuditEntriesVariables`:
   const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -838,7 +851,7 @@ import { useGetAsoEbiCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetAsoEbiCircleDetailComponent() {
   // The `useGetAsoEbiCircleDetail` Query hook requires an argument of type `GetAsoEbiCircleDetailVariables`:
   const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -973,7 +986,7 @@ import { useGetSupportCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetSupportCircleDetailComponent() {
   // The `useGetSupportCircleDetail` Query hook requires an argument of type `GetSupportCircleDetailVariables`:
   const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1099,7 +1112,7 @@ import { useGetInvitationByTokenHash } from '@bondcircle/dataconnect/react'
 export default function GetInvitationByTokenHashComponent() {
   // The `useGetInvitationByTokenHash` Query hook requires an argument of type `GetInvitationByTokenHashVariables`:
   const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-    tokenHash: ..., 
+    tokenHash: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1195,7 +1208,7 @@ import { useGetCircleInvitations } from '@bondcircle/dataconnect/react'
 export default function GetCircleInvitationsComponent() {
   // The `useGetCircleInvitations` Query hook requires an argument of type `GetCircleInvitationsVariables`:
   const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1288,7 +1301,7 @@ import { useGetInvitationAcceptances } from '@bondcircle/dataconnect/react'
 export default function GetInvitationAcceptancesComponent() {
   // The `useGetInvitationAcceptances` Query hook requires an argument of type `GetInvitationAcceptancesVariables`:
   const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-    invitationId: ..., 
+    invitationId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1414,7 +1427,7 @@ import { useGetContributionWorkspace } from '@bondcircle/dataconnect/react'
 export default function GetContributionWorkspaceComponent() {
   // The `useGetContributionWorkspace` Query hook requires an argument of type `GetContributionWorkspaceVariables`:
   const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1495,6 +1508,8 @@ export interface GetCircleCommunicationData {
     circleMemberships: ({
       role: string;
       membershipStatus: string;
+      expectedAmount: number;
+      confirmedAmount: number;
       user: {
         id: string;
         displayName: string;
@@ -1506,6 +1521,7 @@ export interface GetCircleCommunicationData {
         title: string;
         body: string;
         pinned: boolean;
+        important: boolean;
         commentsEnabled: boolean;
         createdAt: TimestampString;
         updatedAt: TimestampString;
@@ -1569,7 +1585,7 @@ import { useGetCircleCommunication } from '@bondcircle/dataconnect/react'
 export default function GetCircleCommunicationComponent() {
   // The `useGetCircleCommunication` Query hook requires an argument of type `GetCircleCommunicationVariables`:
   const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-    circleId: ..., 
+    circleId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1660,9 +1676,9 @@ import { useGetRecentCommentsByAuthor } from '@bondcircle/dataconnect/react'
 export default function GetRecentCommentsByAuthorComponent() {
   // The `useGetRecentCommentsByAuthor` Query hook requires an argument of type `GetRecentCommentsByAuthorVariables`:
   const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-    circleId: ..., 
-    authorId: ..., 
-    since: ..., 
+    circleId: ...,
+    authorId: ...,
+    since: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1747,8 +1763,8 @@ import { useGetOpenCommentReportsByReporter } from '@bondcircle/dataconnect/reac
 export default function GetOpenCommentReportsByReporterComponent() {
   // The `useGetOpenCommentReportsByReporter` Query hook requires an argument of type `GetOpenCommentReportsByReporterVariables`:
   const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-    commentId: ..., 
-    reporterId: ..., 
+    commentId: ...,
+    reporterId: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1845,7 +1861,7 @@ import { useGetActivityLogsForCircles } from '@bondcircle/dataconnect/react'
 export default function GetActivityLogsForCirclesComponent() {
   // The `useGetActivityLogsForCircles` Query hook requires an argument of type `GetActivityLogsForCirclesVariables`:
   const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-    circleIds: ..., 
+    circleIds: ...,
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1879,6 +1895,587 @@ export default function GetActivityLogsForCirclesComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.activityLogs);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserNotifications
+You can execute the `GetUserNotifications` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserNotifications(dc: DataConnect, vars: GetUserNotificationsVariables, options?: useDataConnectQueryOptions<GetUserNotificationsData>): UseDataConnectQueryResult<GetUserNotificationsData, GetUserNotificationsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserNotifications(vars: GetUserNotificationsVariables, options?: useDataConnectQueryOptions<GetUserNotificationsData>): UseDataConnectQueryResult<GetUserNotificationsData, GetUserNotificationsVariables>;
+```
+
+### Variables
+The `GetUserNotifications` Query requires an argument of type `GetUserNotificationsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserNotificationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserNotifications` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserNotifications` Query is of type `GetUserNotificationsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserNotificationsData {
+  user?: {
+    id: string;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+  } & User_Key;
+    notifications: ({
+      id: UUIDString;
+      type: string;
+      title: string;
+      body: string;
+      deepLink: string;
+      readAt?: TimestampString | null;
+      createdAt: TimestampString;
+      circle?: {
+        id: UUIDString;
+        name: string;
+        type: string;
+      } & Circle_Key;
+    } & Notification_Key)[];
+      circleMemberships: ({
+        notificationsMuted: boolean;
+        membershipStatus: string;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+      })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserNotifications`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserNotificationsVariables } from '@bondcircle/dataconnect';
+import { useGetUserNotifications } from '@bondcircle/dataconnect/react'
+
+export default function GetUserNotificationsComponent() {
+  // The `useGetUserNotifications` Query hook requires an argument of type `GetUserNotificationsVariables`:
+  const getUserNotificationsVars: GetUserNotificationsVariables = {
+    userId: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserNotifications(getUserNotificationsVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserNotifications({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserNotifications(dataConnect, getUserNotificationsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserNotifications(getUserNotificationsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserNotifications(dataConnect, getUserNotificationsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
+    console.log(query.data.notifications);
+    console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetNotificationContext
+You can execute the `GetNotificationContext` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetNotificationContext(dc: DataConnect, vars: GetNotificationContextVariables, options?: useDataConnectQueryOptions<GetNotificationContextData>): UseDataConnectQueryResult<GetNotificationContextData, GetNotificationContextVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetNotificationContext(vars: GetNotificationContextVariables, options?: useDataConnectQueryOptions<GetNotificationContextData>): UseDataConnectQueryResult<GetNotificationContextData, GetNotificationContextVariables>;
+```
+
+### Variables
+The `GetNotificationContext` Query requires an argument of type `GetNotificationContextVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetNotificationContextVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetNotificationContext` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetNotificationContext` Query is of type `GetNotificationContextData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetNotificationContextData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    deadline?: DateString | null;
+    creator: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      emailNotifications: boolean;
+      commentNotifications: boolean;
+      contributionReminders: boolean;
+      circleUpdateNotifications: boolean;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      notificationsMuted: boolean;
+      expectedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        email?: string | null;
+        emailNotifications: boolean;
+        commentNotifications: boolean;
+        contributionReminders: boolean;
+        circleUpdateNotifications: boolean;
+      } & User_Key;
+    })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetNotificationContext`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetNotificationContextVariables } from '@bondcircle/dataconnect';
+import { useGetNotificationContext } from '@bondcircle/dataconnect/react'
+
+export default function GetNotificationContextComponent() {
+  // The `useGetNotificationContext` Query hook requires an argument of type `GetNotificationContextVariables`:
+  const getNotificationContextVars: GetNotificationContextVariables = {
+    circleId: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetNotificationContext(getNotificationContextVars);
+  // Variables can be defined inline as well.
+  const query = useGetNotificationContext({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetNotificationContext(dataConnect, getNotificationContextVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetNotificationContext(getNotificationContextVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetNotificationContext(dataConnect, getNotificationContextVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetNotificationDedupe
+You can execute the `GetNotificationDedupe` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetNotificationDedupe(dc: DataConnect, vars: GetNotificationDedupeVariables, options?: useDataConnectQueryOptions<GetNotificationDedupeData>): UseDataConnectQueryResult<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetNotificationDedupe(vars: GetNotificationDedupeVariables, options?: useDataConnectQueryOptions<GetNotificationDedupeData>): UseDataConnectQueryResult<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+```
+
+### Variables
+The `GetNotificationDedupe` Query requires an argument of type `GetNotificationDedupeVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetNotificationDedupeVariables {
+  recipientId: string;
+  dedupeKey: string;
+}
+```
+### Return Type
+Recall that calling the `GetNotificationDedupe` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetNotificationDedupe` Query is of type `GetNotificationDedupeData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetNotificationDedupeData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetNotificationDedupe`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetNotificationDedupeVariables } from '@bondcircle/dataconnect';
+import { useGetNotificationDedupe } from '@bondcircle/dataconnect/react'
+
+export default function GetNotificationDedupeComponent() {
+  // The `useGetNotificationDedupe` Query hook requires an argument of type `GetNotificationDedupeVariables`:
+  const getNotificationDedupeVars: GetNotificationDedupeVariables = {
+    recipientId: ...,
+    dedupeKey: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetNotificationDedupe(getNotificationDedupeVars);
+  // Variables can be defined inline as well.
+  const query = useGetNotificationDedupe({ recipientId: ..., dedupeKey: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetNotificationDedupe(dataConnect, getNotificationDedupeVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetNotificationDedupe(getNotificationDedupeVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetNotificationDedupe(dataConnect, getNotificationDedupeVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.notifications);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetRecentReminderNotifications
+You can execute the `GetRecentReminderNotifications` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetRecentReminderNotifications(dc: DataConnect, vars: GetRecentReminderNotificationsVariables, options?: useDataConnectQueryOptions<GetRecentReminderNotificationsData>): UseDataConnectQueryResult<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetRecentReminderNotifications(vars: GetRecentReminderNotificationsVariables, options?: useDataConnectQueryOptions<GetRecentReminderNotificationsData>): UseDataConnectQueryResult<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+```
+
+### Variables
+The `GetRecentReminderNotifications` Query requires an argument of type `GetRecentReminderNotificationsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetRecentReminderNotificationsVariables {
+  circleId: UUIDString;
+  recipientId: string;
+  since: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `GetRecentReminderNotifications` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetRecentReminderNotifications` Query is of type `GetRecentReminderNotificationsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetRecentReminderNotificationsData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetRecentReminderNotifications`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetRecentReminderNotificationsVariables } from '@bondcircle/dataconnect';
+import { useGetRecentReminderNotifications } from '@bondcircle/dataconnect/react'
+
+export default function GetRecentReminderNotificationsComponent() {
+  // The `useGetRecentReminderNotifications` Query hook requires an argument of type `GetRecentReminderNotificationsVariables`:
+  const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
+    circleId: ...,
+    recipientId: ...,
+    since: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetRecentReminderNotifications(getRecentReminderNotificationsVars);
+  // Variables can be defined inline as well.
+  const query = useGetRecentReminderNotifications({ circleId: ..., recipientId: ..., since: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetRecentReminderNotifications(dataConnect, getRecentReminderNotificationsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRecentReminderNotifications(getRecentReminderNotificationsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRecentReminderNotifications(dataConnect, getRecentReminderNotificationsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.notifications);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## FindNotificationRecipientByEmail
+You can execute the `FindNotificationRecipientByEmail` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useFindNotificationRecipientByEmail(dc: DataConnect, vars: FindNotificationRecipientByEmailVariables, options?: useDataConnectQueryOptions<FindNotificationRecipientByEmailData>): UseDataConnectQueryResult<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useFindNotificationRecipientByEmail(vars: FindNotificationRecipientByEmailVariables, options?: useDataConnectQueryOptions<FindNotificationRecipientByEmailData>): UseDataConnectQueryResult<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+```
+
+### Variables
+The `FindNotificationRecipientByEmail` Query requires an argument of type `FindNotificationRecipientByEmailVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface FindNotificationRecipientByEmailVariables {
+  email: string;
+}
+```
+### Return Type
+Recall that calling the `FindNotificationRecipientByEmail` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `FindNotificationRecipientByEmail` Query is of type `FindNotificationRecipientByEmailData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface FindNotificationRecipientByEmailData {
+  users: ({
+    id: string;
+    displayName: string;
+    email?: string | null;
+    emailNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+  } & User_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `FindNotificationRecipientByEmail`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, FindNotificationRecipientByEmailVariables } from '@bondcircle/dataconnect';
+import { useFindNotificationRecipientByEmail } from '@bondcircle/dataconnect/react'
+
+export default function FindNotificationRecipientByEmailComponent() {
+  // The `useFindNotificationRecipientByEmail` Query hook requires an argument of type `FindNotificationRecipientByEmailVariables`:
+  const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
+    email: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useFindNotificationRecipientByEmail(findNotificationRecipientByEmailVars);
+  // Variables can be defined inline as well.
+  const query = useFindNotificationRecipientByEmail({ email: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useFindNotificationRecipientByEmail(dataConnect, findNotificationRecipientByEmailVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useFindNotificationRecipientByEmail(findNotificationRecipientByEmailVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useFindNotificationRecipientByEmail(dataConnect, findNotificationRecipientByEmailVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.users);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetDeadlineNotificationCandidates
+You can execute the `GetDeadlineNotificationCandidates` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetDeadlineNotificationCandidates(dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables, options?: useDataConnectQueryOptions<GetDeadlineNotificationCandidatesData>): UseDataConnectQueryResult<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetDeadlineNotificationCandidates(vars: GetDeadlineNotificationCandidatesVariables, options?: useDataConnectQueryOptions<GetDeadlineNotificationCandidatesData>): UseDataConnectQueryResult<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+```
+
+### Variables
+The `GetDeadlineNotificationCandidates` Query requires an argument of type `GetDeadlineNotificationCandidatesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetDeadlineNotificationCandidatesVariables {
+  from: DateString;
+  to: DateString;
+}
+```
+### Return Type
+Recall that calling the `GetDeadlineNotificationCandidates` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetDeadlineNotificationCandidates` Query is of type `GetDeadlineNotificationCandidatesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetDeadlineNotificationCandidatesData {
+  circles: ({
+    id: UUIDString;
+    name: string;
+    type: string;
+    deadline?: DateString | null;
+  } & Circle_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetDeadlineNotificationCandidates`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetDeadlineNotificationCandidatesVariables } from '@bondcircle/dataconnect';
+import { useGetDeadlineNotificationCandidates } from '@bondcircle/dataconnect/react'
+
+export default function GetDeadlineNotificationCandidatesComponent() {
+  // The `useGetDeadlineNotificationCandidates` Query hook requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
+  const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
+    from: ...,
+    to: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars);
+  // Variables can be defined inline as well.
+  const query = useGetDeadlineNotificationCandidates({ from: ..., to: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetDeadlineNotificationCandidates(dataConnect, getDeadlineNotificationCandidatesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetDeadlineNotificationCandidates(dataConnect, getDeadlineNotificationCandidatesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circles);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -1979,7 +2576,7 @@ export default function UpsertCurrentUserComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpsertCurrentUser` Mutation requires an argument of type `UpsertCurrentUserVariables`:
   const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-    displayName: ..., 
+    displayName: ...,
     phone: ..., // optional
     email: ..., // optional
     profileImage: ..., // optional
@@ -2093,19 +2690,19 @@ export default function CreateCircleDraftComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateCircleDraft` Mutation requires an argument of type `CreateCircleDraftVariables`:
   const createCircleDraftVars: CreateCircleDraftVariables = {
-    creatorId: ..., 
-    name: ..., 
-    type: ..., 
-    description: ..., 
-    targetAmount: ..., 
-    pricingPlan: ..., 
-    memberLimit: ..., 
-    activationPrice: ..., 
+    creatorId: ...,
+    name: ...,
+    type: ...,
+    description: ...,
+    targetAmount: ...,
+    pricingPlan: ...,
+    memberLimit: ...,
+    activationPrice: ...,
     deadline: ..., // optional
     eventDate: ..., // optional
-    visibility: ..., 
-    createdAt: ..., 
-    updatedAt: ..., 
+    visibility: ...,
+    createdAt: ...,
+    updatedAt: ...,
   };
   mutation.mutate(createCircleDraftVars);
   // Variables can be defined inline as well.
@@ -2217,21 +2814,21 @@ export default function UpdateCircleConfigurationWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateCircleConfigurationWithAudit` Mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
   const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    action: ..., 
-    status: ..., 
-    name: ..., 
-    description: ..., 
-    targetAmount: ..., 
-    pricingPlan: ..., 
-    memberLimit: ..., 
-    activationPrice: ..., 
+    circleId: ...,
+    actorId: ...,
+    action: ...,
+    status: ...,
+    name: ...,
+    description: ...,
+    targetAmount: ...,
+    pricingPlan: ...,
+    memberLimit: ...,
+    activationPrice: ...,
     deadline: ..., // optional
     eventDate: ..., // optional
-    visibility: ..., 
-    updatedAt: ..., 
-    materialChanges: ..., 
+    visibility: ...,
+    updatedAt: ...,
+    materialChanges: ...,
   };
   mutation.mutate(updateCircleConfigurationWithAuditVars);
   // Variables can be defined inline as well.
@@ -2335,11 +2932,11 @@ export default function TransitionCircleWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useTransitionCircleWithAudit` Mutation requires an argument of type `TransitionCircleWithAuditVariables`:
   const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    fromStatus: ..., 
-    toStatus: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    fromStatus: ...,
+    toStatus: ...,
+    updatedAt: ...,
     completedAt: ..., // optional
     archiveAt: ..., // optional
     purgeAt: ..., // optional
@@ -2444,11 +3041,11 @@ export default function AddCircleMemberWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAddCircleMemberWithAudit` Mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
   const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    memberId: ..., 
-    role: ..., 
-    createdAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    memberId: ...,
+    role: ...,
+    createdAt: ...,
   };
   mutation.mutate(addCircleMemberWithAuditVars);
   // Variables can be defined inline as well.
@@ -2554,16 +3151,16 @@ export default function ConfigureGiftCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureGiftCircle` Mutation requires an argument of type `ConfigureGiftCircleVariables`:
   const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    giftTitle: ..., 
-    contributionMode: ..., 
-    paymentBankName: ..., 
-    paymentAccountName: ..., 
-    paymentAccountNumber: ..., 
-    imageUrl: ..., 
-    imageStoragePath: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    giftTitle: ...,
+    contributionMode: ...,
+    paymentBankName: ...,
+    paymentAccountName: ...,
+    paymentAccountNumber: ...,
+    imageUrl: ...,
+    imageStoragePath: ...,
+    updatedAt: ...,
   };
   mutation.mutate(configureGiftCircleVars);
   // Variables can be defined inline as well.
@@ -2661,10 +3258,10 @@ export default function SetGiftMemberAllocationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetGiftMemberAllocation` Mutation requires an argument of type `SetGiftMemberAllocationVariables`:
   const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-    circleId: ..., 
-    memberId: ..., 
-    expectedAmount: ..., 
-    contributionStatus: ..., 
+    circleId: ...,
+    memberId: ...,
+    expectedAmount: ...,
+    contributionStatus: ...,
   };
   mutation.mutate(setGiftMemberAllocationVars);
   // Variables can be defined inline as well.
@@ -2768,16 +3365,16 @@ export default function ConfigureAsoEbiCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureAsoEbiCircle` Mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
   const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    eventType: ..., 
-    organizerName: ..., 
-    paymentBankName: ..., 
-    paymentAccountName: ..., 
-    paymentAccountNumber: ..., 
-    imageUrl: ..., 
-    imageStoragePath: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    eventType: ...,
+    organizerName: ...,
+    paymentBankName: ...,
+    paymentAccountName: ...,
+    paymentAccountNumber: ...,
+    imageUrl: ...,
+    imageStoragePath: ...,
+    updatedAt: ...,
   };
   mutation.mutate(configureAsoEbiCircleVars);
   // Variables can be defined inline as well.
@@ -2885,11 +3482,11 @@ export default function CreateAsoEbiTierComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateAsoEbiTier` Mutation requires an argument of type `CreateAsoEbiTierVariables`:
   const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-    tierId: ..., 
-    circleId: ..., 
-    name: ..., 
-    price: ..., 
-    fabricDescription: ..., 
+    tierId: ...,
+    circleId: ...,
+    name: ...,
+    price: ...,
+    fabricDescription: ...,
     fabricImageUrl: ..., // optional
     fabricImageStoragePath: ..., // optional
     appreciationGiftName: ..., // optional
@@ -2897,8 +3494,8 @@ export default function CreateAsoEbiTierComponent() {
     appreciationGiftImageStoragePath: ..., // optional
     availabilityNote: ..., // optional
     deliveryDetails: ..., // optional
-    sortOrder: ..., 
-    createdAt: ..., 
+    sortOrder: ...,
+    createdAt: ...,
   };
   mutation.mutate(createAsoEbiTierVars);
   // Variables can be defined inline as well.
@@ -2998,11 +3595,11 @@ export default function SelectAsoEbiTierComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSelectAsoEbiTier` Mutation requires an argument of type `SelectAsoEbiTierVariables`:
   const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-    circleId: ..., 
-    memberId: ..., 
-    tierId: ..., 
-    expectedAmount: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    memberId: ...,
+    tierId: ...,
+    expectedAmount: ...,
+    updatedAt: ...,
   };
   mutation.mutate(selectAsoEbiTierVars);
   // Variables can be defined inline as well.
@@ -3104,11 +3701,11 @@ export default function UpdateAsoEbiFulfilmentComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateAsoEbiFulfilment` Mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
   const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    memberId: ..., 
-    status: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    memberId: ...,
+    status: ...,
+    updatedAt: ...,
   };
   mutation.mutate(updateAsoEbiFulfilmentVars);
   // Variables can be defined inline as well.
@@ -3221,23 +3818,23 @@ export default function ConfigureSupportCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureSupportCircle` Mutation requires an argument of type `ConfigureSupportCircleVariables`:
   const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    supportType: ..., 
-    beneficiaryName: ..., 
+    circleId: ...,
+    actorId: ...,
+    supportType: ...,
+    beneficiaryName: ...,
     beneficiaryRelationship: ..., // optional
-    contributionMode: ..., 
-    showBeneficiaryName: ..., 
-    showTargetToMembers: ..., 
-    showConfirmedTotalToMembers: ..., 
-    hideIndividualAmounts: ..., 
-    requireCreatorApproval: ..., 
-    paymentBankName: ..., 
-    paymentAccountName: ..., 
-    paymentAccountNumber: ..., 
-    imageUrl: ..., 
-    imageStoragePath: ..., 
-    updatedAt: ..., 
+    contributionMode: ...,
+    showBeneficiaryName: ...,
+    showTargetToMembers: ...,
+    showConfirmedTotalToMembers: ...,
+    hideIndividualAmounts: ...,
+    requireCreatorApproval: ...,
+    paymentBankName: ...,
+    paymentAccountName: ...,
+    paymentAccountNumber: ...,
+    imageUrl: ...,
+    imageStoragePath: ...,
+    updatedAt: ...,
   };
   mutation.mutate(configureSupportCircleVars);
   // Variables can be defined inline as well.
@@ -3336,10 +3933,10 @@ export default function RecordSupportPledgeComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRecordSupportPledge` Mutation requires an argument of type `RecordSupportPledgeVariables`:
   const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-    circleId: ..., 
-    memberId: ..., 
-    amount: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    memberId: ...,
+    amount: ...,
+    updatedAt: ...,
   };
   mutation.mutate(recordSupportPledgeVars);
   // Variables can be defined inline as well.
@@ -3437,10 +4034,10 @@ export default function SetSupportMemberAllocationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetSupportMemberAllocation` Mutation requires an argument of type `SetSupportMemberAllocationVariables`:
   const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-    circleId: ..., 
-    memberId: ..., 
-    expectedAmount: ..., 
-    contributionStatus: ..., 
+    circleId: ...,
+    memberId: ...,
+    expectedAmount: ...,
+    contributionStatus: ...,
   };
   mutation.mutate(setSupportMemberAllocationVars);
   // Variables can be defined inline as well.
@@ -3538,10 +4135,10 @@ export default function CreateSupportUpdateComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateSupportUpdate` Mutation requires an argument of type `CreateSupportUpdateVariables`:
   const createSupportUpdateVars: CreateSupportUpdateVariables = {
-    circleId: ..., 
-    authorId: ..., 
-    body: ..., 
-    createdAt: ..., 
+    circleId: ...,
+    authorId: ...,
+    body: ...,
+    createdAt: ...,
   };
   mutation.mutate(createSupportUpdateVars);
   // Variables can be defined inline as well.
@@ -3640,10 +4237,10 @@ export default function SetSupportCompletionTypeComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetSupportCompletionType` Mutation requires an argument of type `SetSupportCompletionTypeVariables`:
   const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    completionType: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    completionType: ...,
+    updatedAt: ...,
   };
   mutation.mutate(setSupportCompletionTypeVars);
   // Variables can be defined inline as well.
@@ -3751,18 +4348,18 @@ export default function CreateInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateInvitation` Mutation requires an argument of type `CreateInvitationVariables`:
   const createInvitationVars: CreateInvitationVariables = {
-    circleId: ..., 
-    invitedById: ..., 
-    tokenHash: ..., 
-    mode: ..., 
+    circleId: ...,
+    invitedById: ...,
+    tokenHash: ...,
+    mode: ...,
     recipientName: ..., // optional
     recipientEmail: ..., // optional
     recipientPhone: ..., // optional
-    expectedAmount: ..., 
-    requireApproval: ..., 
-    maxUses: ..., 
-    expiresAt: ..., 
-    createdAt: ..., 
+    expectedAmount: ...,
+    requireApproval: ...,
+    maxUses: ...,
+    expiresAt: ...,
+    createdAt: ...,
   };
   mutation.mutate(createInvitationVars);
   // Variables can be defined inline as well.
@@ -3865,13 +4462,13 @@ export default function UpdateInvitationStateComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateInvitationState` Mutation requires an argument of type `UpdateInvitationStateVariables`:
   const updateInvitationStateVars: UpdateInvitationStateVariables = {
-    invitationId: ..., 
-    actorId: ..., 
-    circleId: ..., 
-    state: ..., 
+    invitationId: ...,
+    actorId: ...,
+    circleId: ...,
+    state: ...,
     openedAt: ..., // optional
     revokedAt: ..., // optional
-    updatedAt: ..., 
+    updatedAt: ...,
   };
   mutation.mutate(updateInvitationStateVars);
   // Variables can be defined inline as well.
@@ -3979,15 +4576,15 @@ export default function AcceptInvitationWithMembershipComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAcceptInvitationWithMembership` Mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
   const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-    invitationId: ..., 
-    circleId: ..., 
-    userId: ..., 
-    role: ..., 
-    expectedAmount: ..., 
-    nextMemberCount: ..., 
-    nextInvitationState: ..., 
-    nextUseCount: ..., 
-    respondedAt: ..., 
+    invitationId: ...,
+    circleId: ...,
+    userId: ...,
+    role: ...,
+    expectedAmount: ...,
+    nextMemberCount: ...,
+    nextInvitationState: ...,
+    nextUseCount: ...,
+    respondedAt: ...,
   };
   mutation.mutate(acceptInvitationWithMembershipVars);
   // Variables can be defined inline as well.
@@ -4091,10 +4688,10 @@ export default function RequestInvitationApprovalComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRequestInvitationApproval` Mutation requires an argument of type `RequestInvitationApprovalVariables`:
   const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-    invitationId: ..., 
-    circleId: ..., 
-    userId: ..., 
-    respondedAt: ..., 
+    invitationId: ...,
+    circleId: ...,
+    userId: ...,
+    respondedAt: ...,
   };
   mutation.mutate(requestInvitationApprovalVars);
   // Variables can be defined inline as well.
@@ -4203,17 +4800,17 @@ export default function SubmitReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSubmitReceiptWithAudit` Mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
   const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-    receiptId: ..., 
-    circleId: ..., 
-    uploaderId: ..., 
-    amount: ..., 
+    receiptId: ...,
+    circleId: ...,
+    uploaderId: ...,
+    amount: ...,
     note: ..., // optional
-    imageUrl: ..., 
-    imageStoragePath: ..., 
-    contentType: ..., 
-    status: ..., 
-    overpaymentAmount: ..., 
-    submittedAt: ..., 
+    imageUrl: ...,
+    imageStoragePath: ...,
+    contentType: ...,
+    status: ...,
+    overpaymentAmount: ...,
+    submittedAt: ...,
   };
   mutation.mutate(submitReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -4325,18 +4922,18 @@ export default function ReplaceReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReplaceReceiptWithAudit` Mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
   const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-    receiptId: ..., 
-    replacedReceiptId: ..., 
-    circleId: ..., 
-    uploaderId: ..., 
-    amount: ..., 
+    receiptId: ...,
+    replacedReceiptId: ...,
+    circleId: ...,
+    uploaderId: ...,
+    amount: ...,
     note: ..., // optional
-    imageUrl: ..., 
-    imageStoragePath: ..., 
-    contentType: ..., 
-    status: ..., 
-    overpaymentAmount: ..., 
-    submittedAt: ..., 
+    imageUrl: ...,
+    imageStoragePath: ...,
+    contentType: ...,
+    status: ...,
+    overpaymentAmount: ...,
+    submittedAt: ...,
   };
   mutation.mutate(replaceReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -4449,18 +5046,18 @@ export default function ReviewReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReviewReceiptWithAudit` Mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
   const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-    receiptId: ..., 
-    circleId: ..., 
-    uploaderId: ..., 
-    reviewerId: ..., 
-    receiptStatus: ..., 
+    receiptId: ...,
+    circleId: ...,
+    uploaderId: ...,
+    reviewerId: ...,
+    receiptStatus: ...,
     rejectionReason: ..., // optional
-    reviewedAt: ..., 
-    membershipStatus: ..., 
-    nextConfirmedAmount: ..., 
-    nextCircleContributedAmount: ..., 
-    auditAction: ..., 
-    materialChanges: ..., 
+    reviewedAt: ...,
+    membershipStatus: ...,
+    nextConfirmedAmount: ...,
+    nextCircleContributedAmount: ...,
+    auditAction: ...,
+    materialChanges: ...,
   };
   mutation.mutate(reviewReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -4572,16 +5169,16 @@ export default function ApproveInvitationMembershipComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useApproveInvitationMembership` Mutation requires an argument of type `ApproveInvitationMembershipVariables`:
   const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-    invitationId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    userId: ..., 
-    role: ..., 
-    expectedAmount: ..., 
-    nextMemberCount: ..., 
-    nextInvitationState: ..., 
-    nextUseCount: ..., 
-    respondedAt: ..., 
+    invitationId: ...,
+    circleId: ...,
+    actorId: ...,
+    userId: ...,
+    role: ...,
+    expectedAmount: ...,
+    nextMemberCount: ...,
+    nextInvitationState: ...,
+    nextUseCount: ...,
+    respondedAt: ...,
   };
   mutation.mutate(approveInvitationMembershipVars);
   // Variables can be defined inline as well.
@@ -4686,11 +5283,11 @@ export default function DeclineInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeclineInvitation` Mutation requires an argument of type `DeclineInvitationVariables`:
   const declineInvitationVars: DeclineInvitationVariables = {
-    invitationId: ..., 
-    circleId: ..., 
-    userId: ..., 
-    state: ..., 
-    respondedAt: ..., 
+    invitationId: ...,
+    circleId: ...,
+    userId: ...,
+    state: ...,
+    respondedAt: ...,
   };
   mutation.mutate(declineInvitationVars);
   // Variables can be defined inline as well.
@@ -4789,10 +5386,10 @@ export default function RequestReplacementInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRequestReplacementInvitation` Mutation requires an argument of type `RequestReplacementInvitationVariables`:
   const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-    invitationId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    requestedAt: ..., 
+    invitationId: ...,
+    circleId: ...,
+    actorId: ...,
+    requestedAt: ...,
   };
   mutation.mutate(requestReplacementInvitationVars);
   // Variables can be defined inline as well.
@@ -4844,6 +5441,7 @@ export interface CreateAnnouncementWithActivityVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   createdAt: TimestampString;
 }
@@ -4897,20 +5495,21 @@ export default function CreateAnnouncementWithActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateAnnouncementWithActivity` Mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
   const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-    announcementId: ..., 
-    announcementEntityId: ..., 
-    activityId: ..., 
-    circleId: ..., 
-    authorId: ..., 
-    title: ..., 
-    body: ..., 
-    pinned: ..., 
-    commentsEnabled: ..., 
-    createdAt: ..., 
+    announcementId: ...,
+    announcementEntityId: ...,
+    activityId: ...,
+    circleId: ...,
+    authorId: ...,
+    title: ...,
+    body: ...,
+    pinned: ...,
+    important: ..., // optional
+    commentsEnabled: ...,
+    createdAt: ...,
   };
   mutation.mutate(createAnnouncementWithActivityVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., createdAt: ..., });
+  mutation.mutate({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., createdAt: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
@@ -4958,6 +5557,7 @@ export interface UpdateAnnouncementWithAuditVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   updatedAt: TimestampString;
   materialChanges: string;
@@ -5011,19 +5611,20 @@ export default function UpdateAnnouncementWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateAnnouncementWithAudit` Mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
   const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-    announcementId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    title: ..., 
-    body: ..., 
-    pinned: ..., 
-    commentsEnabled: ..., 
-    updatedAt: ..., 
-    materialChanges: ..., 
+    announcementId: ...,
+    circleId: ...,
+    actorId: ...,
+    title: ...,
+    body: ...,
+    pinned: ...,
+    important: ..., // optional
+    commentsEnabled: ...,
+    updatedAt: ...,
+    materialChanges: ...,
   };
   mutation.mutate(updateAnnouncementWithAuditVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
+  mutation.mutate({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
@@ -5119,11 +5720,11 @@ export default function DeleteAnnouncementWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeleteAnnouncementWithAudit` Mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
   const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-    announcementId: ..., 
-    announcementEntityId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    deletedAt: ..., 
+    announcementId: ...,
+    announcementEntityId: ...,
+    circleId: ...,
+    actorId: ...,
+    deletedAt: ...,
   };
   mutation.mutate(deleteAnnouncementWithAuditVars);
   // Variables can be defined inline as well.
@@ -5223,11 +5824,11 @@ export default function SetCircleCommentsWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetCircleCommentsWithAudit` Mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
   const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-    circleId: ..., 
-    actorId: ..., 
-    commentsEnabled: ..., 
-    materialChanges: ..., 
-    updatedAt: ..., 
+    circleId: ...,
+    actorId: ...,
+    commentsEnabled: ...,
+    materialChanges: ...,
+    updatedAt: ...,
   };
   mutation.mutate(setCircleCommentsWithAuditVars);
   // Variables can be defined inline as well.
@@ -5331,15 +5932,15 @@ export default function CreateCommentWithActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateCommentWithActivity` Mutation requires an argument of type `CreateCommentWithActivityVariables`:
   const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-    commentId: ..., 
-    commentEntityId: ..., 
-    activityId: ..., 
-    circleId: ..., 
-    authorId: ..., 
+    commentId: ...,
+    commentEntityId: ...,
+    activityId: ...,
+    circleId: ...,
+    authorId: ...,
     announcementId: ..., // optional
     parentCommentId: ..., // optional
-    body: ..., 
-    createdAt: ..., 
+    body: ...,
+    createdAt: ...,
   };
   mutation.mutate(createCommentWithActivityVars);
   // Variables can be defined inline as well.
@@ -5439,11 +6040,11 @@ export default function DeleteOwnCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeleteOwnCommentWithAudit` Mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
   const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-    commentId: ..., 
-    commentEntityId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    deletedAt: ..., 
+    commentId: ...,
+    commentEntityId: ...,
+    circleId: ...,
+    actorId: ...,
+    deletedAt: ...,
   };
   mutation.mutate(deleteOwnCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -5544,11 +6145,11 @@ export default function ModerateCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useModerateCommentWithAudit` Mutation requires an argument of type `ModerateCommentWithAuditVariables`:
   const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-    commentId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    reason: ..., 
-    moderatedAt: ..., 
+    commentId: ...,
+    circleId: ...,
+    actorId: ...,
+    reason: ...,
+    moderatedAt: ...,
   };
   mutation.mutate(moderateCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -5651,13 +6252,13 @@ export default function ReportCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReportCommentWithAudit` Mutation requires an argument of type `ReportCommentWithAuditVariables`:
   const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-    reportId: ..., 
-    commentId: ..., 
-    commentEntityId: ..., 
-    circleId: ..., 
-    reporterId: ..., 
-    reason: ..., 
-    createdAt: ..., 
+    reportId: ...,
+    commentId: ...,
+    commentEntityId: ...,
+    circleId: ...,
+    reporterId: ...,
+    reason: ...,
+    createdAt: ...,
   };
   mutation.mutate(reportCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -5758,13 +6359,13 @@ export default function RecordSystemActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRecordSystemActivity` Mutation requires an argument of type `RecordSystemActivityVariables`:
   const recordSystemActivityVars: RecordSystemActivityVariables = {
-    activityId: ..., 
-    circleId: ..., 
-    actorId: ..., 
-    eventType: ..., 
-    entityId: ..., 
-    metadata: ..., 
-    createdAt: ..., 
+    activityId: ...,
+    circleId: ...,
+    actorId: ...,
+    eventType: ...,
+    entityId: ...,
+    metadata: ...,
+    createdAt: ...,
   };
   mutation.mutate(recordSystemActivityVars);
   // Variables can be defined inline as well.
@@ -5788,6 +6389,722 @@ export default function RecordSystemActivityComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.activityLog_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateNotification
+You can execute the `CreateNotification` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateNotification(options?: useDataConnectMutationOptions<CreateNotificationData, FirebaseError, CreateNotificationVariables>): UseDataConnectMutationResult<CreateNotificationData, CreateNotificationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateNotification(dc: DataConnect, options?: useDataConnectMutationOptions<CreateNotificationData, FirebaseError, CreateNotificationVariables>): UseDataConnectMutationResult<CreateNotificationData, CreateNotificationVariables>;
+```
+
+### Variables
+The `CreateNotification` Mutation requires an argument of type `CreateNotificationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  circleId?: UUIDString | null;
+  type: string;
+  title: string;
+  body: string;
+  deepLink: string;
+  dedupeKey: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateNotification` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateNotification` Mutation is of type `CreateNotificationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateNotificationData {
+  notification_insert: Notification_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateNotification`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateNotificationVariables } from '@bondcircle/dataconnect';
+import { useCreateNotification } from '@bondcircle/dataconnect/react'
+
+export default function CreateNotificationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateNotification();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateNotification(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateNotification(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateNotification(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateNotification` Mutation requires an argument of type `CreateNotificationVariables`:
+  const createNotificationVars: CreateNotificationVariables = {
+    notificationId: ...,
+    recipientId: ...,
+    circleId: ..., // optional
+    type: ...,
+    title: ...,
+    body: ...,
+    deepLink: ...,
+    dedupeKey: ...,
+    createdAt: ...,
+  };
+  mutation.mutate(createNotificationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ notificationId: ..., recipientId: ..., circleId: ..., type: ..., title: ..., body: ..., deepLink: ..., dedupeKey: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createNotificationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.notification_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## MarkNotificationRead
+You can execute the `MarkNotificationRead` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useMarkNotificationRead(options?: useDataConnectMutationOptions<MarkNotificationReadData, FirebaseError, MarkNotificationReadVariables>): UseDataConnectMutationResult<MarkNotificationReadData, MarkNotificationReadVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useMarkNotificationRead(dc: DataConnect, options?: useDataConnectMutationOptions<MarkNotificationReadData, FirebaseError, MarkNotificationReadVariables>): UseDataConnectMutationResult<MarkNotificationReadData, MarkNotificationReadVariables>;
+```
+
+### Variables
+The `MarkNotificationRead` Mutation requires an argument of type `MarkNotificationReadVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface MarkNotificationReadVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  readAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `MarkNotificationRead` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `MarkNotificationRead` Mutation is of type `MarkNotificationReadData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface MarkNotificationReadData {
+  notification_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `MarkNotificationRead`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, MarkNotificationReadVariables } from '@bondcircle/dataconnect';
+import { useMarkNotificationRead } from '@bondcircle/dataconnect/react'
+
+export default function MarkNotificationReadComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useMarkNotificationRead();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useMarkNotificationRead(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useMarkNotificationRead(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useMarkNotificationRead(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useMarkNotificationRead` Mutation requires an argument of type `MarkNotificationReadVariables`:
+  const markNotificationReadVars: MarkNotificationReadVariables = {
+    notificationId: ...,
+    recipientId: ...,
+    readAt: ...,
+  };
+  mutation.mutate(markNotificationReadVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ notificationId: ..., recipientId: ..., readAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(markNotificationReadVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.notification_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DismissNotification
+You can execute the `DismissNotification` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useDismissNotification(options?: useDataConnectMutationOptions<DismissNotificationData, FirebaseError, DismissNotificationVariables>): UseDataConnectMutationResult<DismissNotificationData, DismissNotificationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDismissNotification(dc: DataConnect, options?: useDataConnectMutationOptions<DismissNotificationData, FirebaseError, DismissNotificationVariables>): UseDataConnectMutationResult<DismissNotificationData, DismissNotificationVariables>;
+```
+
+### Variables
+The `DismissNotification` Mutation requires an argument of type `DismissNotificationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DismissNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  dismissedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `DismissNotification` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DismissNotification` Mutation is of type `DismissNotificationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DismissNotificationData {
+  notification_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DismissNotification`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DismissNotificationVariables } from '@bondcircle/dataconnect';
+import { useDismissNotification } from '@bondcircle/dataconnect/react'
+
+export default function DismissNotificationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDismissNotification();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDismissNotification(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDismissNotification(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDismissNotification(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDismissNotification` Mutation requires an argument of type `DismissNotificationVariables`:
+  const dismissNotificationVars: DismissNotificationVariables = {
+    notificationId: ...,
+    recipientId: ...,
+    dismissedAt: ...,
+  };
+  mutation.mutate(dismissNotificationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ notificationId: ..., recipientId: ..., dismissedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(dismissNotificationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.notification_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## MarkAllNotificationsRead
+You can execute the `MarkAllNotificationsRead` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useMarkAllNotificationsRead(options?: useDataConnectMutationOptions<MarkAllNotificationsReadData, FirebaseError, MarkAllNotificationsReadVariables>): UseDataConnectMutationResult<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useMarkAllNotificationsRead(dc: DataConnect, options?: useDataConnectMutationOptions<MarkAllNotificationsReadData, FirebaseError, MarkAllNotificationsReadVariables>): UseDataConnectMutationResult<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+```
+
+### Variables
+The `MarkAllNotificationsRead` Mutation requires an argument of type `MarkAllNotificationsReadVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface MarkAllNotificationsReadVariables {
+  recipientId: string;
+  readAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `MarkAllNotificationsRead` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `MarkAllNotificationsRead` Mutation is of type `MarkAllNotificationsReadData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface MarkAllNotificationsReadData {
+  notification_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `MarkAllNotificationsRead`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, MarkAllNotificationsReadVariables } from '@bondcircle/dataconnect';
+import { useMarkAllNotificationsRead } from '@bondcircle/dataconnect/react'
+
+export default function MarkAllNotificationsReadComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useMarkAllNotificationsRead();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useMarkAllNotificationsRead(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useMarkAllNotificationsRead(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useMarkAllNotificationsRead(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useMarkAllNotificationsRead` Mutation requires an argument of type `MarkAllNotificationsReadVariables`:
+  const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
+    recipientId: ...,
+    readAt: ...,
+  };
+  mutation.mutate(markAllNotificationsReadVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ recipientId: ..., readAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(markAllNotificationsReadVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.notification_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateNotificationPreferences
+You can execute the `UpdateNotificationPreferences` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateNotificationPreferences(options?: useDataConnectMutationOptions<UpdateNotificationPreferencesData, FirebaseError, UpdateNotificationPreferencesVariables>): UseDataConnectMutationResult<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateNotificationPreferences(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateNotificationPreferencesData, FirebaseError, UpdateNotificationPreferencesVariables>): UseDataConnectMutationResult<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+```
+
+### Variables
+The `UpdateNotificationPreferences` Mutation requires an argument of type `UpdateNotificationPreferencesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateNotificationPreferencesVariables {
+  userId: string;
+  emailNotifications: boolean;
+  browserPushNotifications: boolean;
+  commentNotifications: boolean;
+  contributionReminders: boolean;
+  circleUpdateNotifications: boolean;
+  marketingCommunication: boolean;
+}
+```
+### Return Type
+Recall that calling the `UpdateNotificationPreferences` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateNotificationPreferences` Mutation is of type `UpdateNotificationPreferencesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateNotificationPreferencesData {
+  user_update?: User_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateNotificationPreferences`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateNotificationPreferencesVariables } from '@bondcircle/dataconnect';
+import { useUpdateNotificationPreferences } from '@bondcircle/dataconnect/react'
+
+export default function UpdateNotificationPreferencesComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateNotificationPreferences();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateNotificationPreferences(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateNotificationPreferences(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateNotificationPreferences(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateNotificationPreferences` Mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
+  const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
+    userId: ...,
+    emailNotifications: ...,
+    browserPushNotifications: ...,
+    commentNotifications: ...,
+    contributionReminders: ...,
+    circleUpdateNotifications: ...,
+    marketingCommunication: ...,
+  };
+  mutation.mutate(updateNotificationPreferencesVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., emailNotifications: ..., browserPushNotifications: ..., commentNotifications: ..., contributionReminders: ..., circleUpdateNotifications: ..., marketingCommunication: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateNotificationPreferencesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SetCircleNotificationMute
+You can execute the `SetCircleNotificationMute` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSetCircleNotificationMute(options?: useDataConnectMutationOptions<SetCircleNotificationMuteData, FirebaseError, SetCircleNotificationMuteVariables>): UseDataConnectMutationResult<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSetCircleNotificationMute(dc: DataConnect, options?: useDataConnectMutationOptions<SetCircleNotificationMuteData, FirebaseError, SetCircleNotificationMuteVariables>): UseDataConnectMutationResult<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+```
+
+### Variables
+The `SetCircleNotificationMute` Mutation requires an argument of type `SetCircleNotificationMuteVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SetCircleNotificationMuteVariables {
+  circleId: UUIDString;
+  userId: string;
+  notificationsMuted: boolean;
+}
+```
+### Return Type
+Recall that calling the `SetCircleNotificationMute` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SetCircleNotificationMute` Mutation is of type `SetCircleNotificationMuteData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SetCircleNotificationMuteData {
+  circleMembership_update?: CircleMembership_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SetCircleNotificationMute`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SetCircleNotificationMuteVariables } from '@bondcircle/dataconnect';
+import { useSetCircleNotificationMute } from '@bondcircle/dataconnect/react'
+
+export default function SetCircleNotificationMuteComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSetCircleNotificationMute();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSetCircleNotificationMute(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetCircleNotificationMute(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetCircleNotificationMute(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSetCircleNotificationMute` Mutation requires an argument of type `SetCircleNotificationMuteVariables`:
+  const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
+    circleId: ...,
+    userId: ...,
+    notificationsMuted: ...,
+  };
+  mutation.mutate(setCircleNotificationMuteVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., userId: ..., notificationsMuted: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(setCircleNotificationMuteVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circleMembership_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateEmailDelivery
+You can execute the `CreateEmailDelivery` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateEmailDelivery(options?: useDataConnectMutationOptions<CreateEmailDeliveryData, FirebaseError, CreateEmailDeliveryVariables>): UseDataConnectMutationResult<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateEmailDelivery(dc: DataConnect, options?: useDataConnectMutationOptions<CreateEmailDeliveryData, FirebaseError, CreateEmailDeliveryVariables>): UseDataConnectMutationResult<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+```
+
+### Variables
+The `CreateEmailDelivery` Mutation requires an argument of type `CreateEmailDeliveryVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateEmailDeliveryVariables {
+  deliveryId: UUIDString;
+  notificationId?: UUIDString | null;
+  recipientId?: string | null;
+  eventType: string;
+  destinationMasked: string;
+  status: string;
+  providerMessageId?: string | null;
+  failureReason?: string | null;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateEmailDelivery` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateEmailDelivery` Mutation is of type `CreateEmailDeliveryData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateEmailDeliveryData {
+  emailDelivery_insert: EmailDelivery_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateEmailDelivery`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateEmailDeliveryVariables } from '@bondcircle/dataconnect';
+import { useCreateEmailDelivery } from '@bondcircle/dataconnect/react'
+
+export default function CreateEmailDeliveryComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateEmailDelivery();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateEmailDelivery(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateEmailDelivery(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateEmailDelivery(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateEmailDelivery` Mutation requires an argument of type `CreateEmailDeliveryVariables`:
+  const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
+    deliveryId: ...,
+    notificationId: ..., // optional
+    recipientId: ..., // optional
+    eventType: ...,
+    destinationMasked: ...,
+    status: ...,
+    providerMessageId: ..., // optional
+    failureReason: ..., // optional
+    createdAt: ...,
+  };
+  mutation.mutate(createEmailDeliveryVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ deliveryId: ..., notificationId: ..., recipientId: ..., eventType: ..., destinationMasked: ..., status: ..., providerMessageId: ..., failureReason: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createEmailDeliveryVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.emailDelivery_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

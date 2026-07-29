@@ -189,6 +189,7 @@ export interface CreateAnnouncementWithActivityVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   createdAt: TimestampString;
 }
@@ -254,6 +255,22 @@ export interface CreateCommentWithActivityVariables {
   createdAt: TimestampString;
 }
 
+export interface CreateEmailDeliveryData {
+  emailDelivery_insert: EmailDelivery_Key;
+}
+
+export interface CreateEmailDeliveryVariables {
+  deliveryId: UUIDString;
+  notificationId?: UUIDString | null;
+  recipientId?: string | null;
+  eventType: string;
+  destinationMasked: string;
+  status: string;
+  providerMessageId?: string | null;
+  failureReason?: string | null;
+  createdAt: TimestampString;
+}
+
 export interface CreateInvitationData {
   invitation_insert: Invitation_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -272,6 +289,22 @@ export interface CreateInvitationVariables {
   requireApproval: boolean;
   maxUses: number;
   expiresAt: TimestampString;
+  createdAt: TimestampString;
+}
+
+export interface CreateNotificationData {
+  notification_insert: Notification_Key;
+}
+
+export interface CreateNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  circleId?: UUIDString | null;
+  type: string;
+  title: string;
+  body: string;
+  deepLink: string;
+  dedupeKey: string;
   createdAt: TimestampString;
 }
 
@@ -325,6 +358,37 @@ export interface DeleteOwnCommentWithAuditVariables {
   circleId: UUIDString;
   actorId: string;
   deletedAt: TimestampString;
+}
+
+export interface DismissNotificationData {
+  notification_updateMany: number;
+}
+
+export interface DismissNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  dismissedAt: TimestampString;
+}
+
+export interface EmailDelivery_Key {
+  id: UUIDString;
+  __typename?: 'EmailDelivery_Key';
+}
+
+export interface FindNotificationRecipientByEmailData {
+  users: ({
+    id: string;
+    displayName: string;
+    email?: string | null;
+    emailNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+  } & User_Key)[];
+}
+
+export interface FindNotificationRecipientByEmailVariables {
+  email: string;
 }
 
 export interface FindUserByEmailData {
@@ -457,6 +521,8 @@ export interface GetCircleCommunicationData {
     circleMemberships: ({
       role: string;
       membershipStatus: string;
+      expectedAmount: number;
+      confirmedAmount: number;
       user: {
         id: string;
         displayName: string;
@@ -468,6 +534,7 @@ export interface GetCircleCommunicationData {
         title: string;
         body: string;
         pinned: boolean;
+        important: boolean;
         commentsEnabled: boolean;
         createdAt: TimestampString;
         updatedAt: TimestampString;
@@ -675,6 +742,20 @@ export interface GetDashboardCirclesData {
   })[];
 }
 
+export interface GetDeadlineNotificationCandidatesData {
+  circles: ({
+    id: UUIDString;
+    name: string;
+    type: string;
+    deadline?: DateString | null;
+  } & Circle_Key)[];
+}
+
+export interface GetDeadlineNotificationCandidatesVariables {
+  from: DateString;
+  to: DateString;
+}
+
 export interface GetGiftCircleDetailData {
   circle?: {
     id: UUIDString;
@@ -787,6 +868,55 @@ export interface GetInvitationByTokenHashVariables {
   tokenHash: string;
 }
 
+export interface GetNotificationContextData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    deadline?: DateString | null;
+    creator: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      emailNotifications: boolean;
+      commentNotifications: boolean;
+      contributionReminders: boolean;
+      circleUpdateNotifications: boolean;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      notificationsMuted: boolean;
+      expectedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        email?: string | null;
+        emailNotifications: boolean;
+        commentNotifications: boolean;
+        contributionReminders: boolean;
+        circleUpdateNotifications: boolean;
+      } & User_Key;
+    })[];
+}
+
+export interface GetNotificationContextVariables {
+  circleId: UUIDString;
+}
+
+export interface GetNotificationDedupeData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+
+export interface GetNotificationDedupeVariables {
+  recipientId: string;
+  dedupeKey: string;
+}
+
 export interface GetOpenCommentReportsByReporterData {
   commentReports: ({
     id: UUIDString;
@@ -807,6 +937,18 @@ export interface GetRecentCommentsByAuthorData {
 export interface GetRecentCommentsByAuthorVariables {
   circleId: UUIDString;
   authorId: string;
+  since: TimestampString;
+}
+
+export interface GetRecentReminderNotificationsData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+
+export interface GetRecentReminderNotificationsVariables {
+  circleId: UUIDString;
+  recipientId: string;
   since: TimestampString;
 }
 
@@ -869,6 +1011,45 @@ export interface GetSupportCircleDetailVariables {
   circleId: UUIDString;
 }
 
+export interface GetUserNotificationsData {
+  user?: {
+    id: string;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+  } & User_Key;
+    notifications: ({
+      id: UUIDString;
+      type: string;
+      title: string;
+      body: string;
+      deepLink: string;
+      readAt?: TimestampString | null;
+      createdAt: TimestampString;
+      circle?: {
+        id: UUIDString;
+        name: string;
+        type: string;
+      } & Circle_Key;
+    } & Notification_Key)[];
+      circleMemberships: ({
+        notificationsMuted: boolean;
+        membershipStatus: string;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+      })[];
+}
+
+export interface GetUserNotificationsVariables {
+  userId: string;
+}
+
 export interface InvitationAcceptance_Key {
   invitationId: UUIDString;
   userId: string;
@@ -878,6 +1059,25 @@ export interface InvitationAcceptance_Key {
 export interface Invitation_Key {
   id: UUIDString;
   __typename?: 'Invitation_Key';
+}
+
+export interface MarkAllNotificationsReadData {
+  notification_updateMany: number;
+}
+
+export interface MarkAllNotificationsReadVariables {
+  recipientId: string;
+  readAt: TimestampString;
+}
+
+export interface MarkNotificationReadData {
+  notification_updateMany: number;
+}
+
+export interface MarkNotificationReadVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  readAt: TimestampString;
 }
 
 export interface ModerateCommentWithAuditData {
@@ -892,6 +1092,11 @@ export interface ModerateCommentWithAuditVariables {
   actorId: string;
   reason: string;
   moderatedAt: TimestampString;
+}
+
+export interface Notification_Key {
+  id: UUIDString;
+  __typename?: 'Notification_Key';
 }
 
 export interface Receipt_Key {
@@ -1037,6 +1242,16 @@ export interface SetCircleCommentsWithAuditVariables {
   updatedAt: TimestampString;
 }
 
+export interface SetCircleNotificationMuteData {
+  circleMembership_update?: CircleMembership_Key | null;
+}
+
+export interface SetCircleNotificationMuteVariables {
+  circleId: UUIDString;
+  userId: string;
+  notificationsMuted: boolean;
+}
+
 export interface SetGiftMemberAllocationData {
   circleMembership_update?: CircleMembership_Key | null;
 }
@@ -1126,6 +1341,7 @@ export interface UpdateAnnouncementWithAuditVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   updatedAt: TimestampString;
   materialChanges: string;
@@ -1181,6 +1397,20 @@ export interface UpdateInvitationStateVariables {
   openedAt?: TimestampString | null;
   revokedAt?: TimestampString | null;
   updatedAt: TimestampString;
+}
+
+export interface UpdateNotificationPreferencesData {
+  user_update?: User_Key | null;
+}
+
+export interface UpdateNotificationPreferencesVariables {
+  userId: string;
+  emailNotifications: boolean;
+  browserPushNotifications: boolean;
+  commentNotifications: boolean;
+  contributionReminders: boolean;
+  circleUpdateNotifications: boolean;
+  marketingCommunication: boolean;
 }
 
 export interface UpsertCurrentUserData {
@@ -1812,4 +2042,160 @@ export const recordSystemActivityRef: RecordSystemActivityRef;
 
 export function recordSystemActivity(vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
 export function recordSystemActivity(dc: DataConnect, vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
+
+interface GetUserNotificationsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserNotificationsVariables): QueryRef<GetUserNotificationsData, GetUserNotificationsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserNotificationsVariables): QueryRef<GetUserNotificationsData, GetUserNotificationsVariables>;
+  operationName: string;
+}
+export const getUserNotificationsRef: GetUserNotificationsRef;
+
+export function getUserNotifications(vars: GetUserNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserNotificationsData, GetUserNotificationsVariables>;
+export function getUserNotifications(dc: DataConnect, vars: GetUserNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserNotificationsData, GetUserNotificationsVariables>;
+
+interface GetNotificationContextRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetNotificationContextVariables): QueryRef<GetNotificationContextData, GetNotificationContextVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetNotificationContextVariables): QueryRef<GetNotificationContextData, GetNotificationContextVariables>;
+  operationName: string;
+}
+export const getNotificationContextRef: GetNotificationContextRef;
+
+export function getNotificationContext(vars: GetNotificationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationContextData, GetNotificationContextVariables>;
+export function getNotificationContext(dc: DataConnect, vars: GetNotificationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationContextData, GetNotificationContextVariables>;
+
+interface GetNotificationDedupeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetNotificationDedupeVariables): QueryRef<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetNotificationDedupeVariables): QueryRef<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+  operationName: string;
+}
+export const getNotificationDedupeRef: GetNotificationDedupeRef;
+
+export function getNotificationDedupe(vars: GetNotificationDedupeVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+export function getNotificationDedupe(dc: DataConnect, vars: GetNotificationDedupeVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+
+interface GetRecentReminderNotificationsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRecentReminderNotificationsVariables): QueryRef<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetRecentReminderNotificationsVariables): QueryRef<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+  operationName: string;
+}
+export const getRecentReminderNotificationsRef: GetRecentReminderNotificationsRef;
+
+export function getRecentReminderNotifications(vars: GetRecentReminderNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+export function getRecentReminderNotifications(dc: DataConnect, vars: GetRecentReminderNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+
+interface FindNotificationRecipientByEmailRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: FindNotificationRecipientByEmailVariables): QueryRef<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: FindNotificationRecipientByEmailVariables): QueryRef<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+  operationName: string;
+}
+export const findNotificationRecipientByEmailRef: FindNotificationRecipientByEmailRef;
+
+export function findNotificationRecipientByEmail(vars: FindNotificationRecipientByEmailVariables, options?: ExecuteQueryOptions): QueryPromise<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+export function findNotificationRecipientByEmail(dc: DataConnect, vars: FindNotificationRecipientByEmailVariables, options?: ExecuteQueryOptions): QueryPromise<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+
+interface GetDeadlineNotificationCandidatesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDeadlineNotificationCandidatesVariables): QueryRef<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables): QueryRef<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+  operationName: string;
+}
+export const getDeadlineNotificationCandidatesRef: GetDeadlineNotificationCandidatesRef;
+
+export function getDeadlineNotificationCandidates(vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+export function getDeadlineNotificationCandidates(dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+
+interface CreateNotificationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateNotificationVariables): MutationRef<CreateNotificationData, CreateNotificationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateNotificationVariables): MutationRef<CreateNotificationData, CreateNotificationVariables>;
+  operationName: string;
+}
+export const createNotificationRef: CreateNotificationRef;
+
+export function createNotification(vars: CreateNotificationVariables): MutationPromise<CreateNotificationData, CreateNotificationVariables>;
+export function createNotification(dc: DataConnect, vars: CreateNotificationVariables): MutationPromise<CreateNotificationData, CreateNotificationVariables>;
+
+interface MarkNotificationReadRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkNotificationReadVariables): MutationRef<MarkNotificationReadData, MarkNotificationReadVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: MarkNotificationReadVariables): MutationRef<MarkNotificationReadData, MarkNotificationReadVariables>;
+  operationName: string;
+}
+export const markNotificationReadRef: MarkNotificationReadRef;
+
+export function markNotificationRead(vars: MarkNotificationReadVariables): MutationPromise<MarkNotificationReadData, MarkNotificationReadVariables>;
+export function markNotificationRead(dc: DataConnect, vars: MarkNotificationReadVariables): MutationPromise<MarkNotificationReadData, MarkNotificationReadVariables>;
+
+interface DismissNotificationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DismissNotificationVariables): MutationRef<DismissNotificationData, DismissNotificationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DismissNotificationVariables): MutationRef<DismissNotificationData, DismissNotificationVariables>;
+  operationName: string;
+}
+export const dismissNotificationRef: DismissNotificationRef;
+
+export function dismissNotification(vars: DismissNotificationVariables): MutationPromise<DismissNotificationData, DismissNotificationVariables>;
+export function dismissNotification(dc: DataConnect, vars: DismissNotificationVariables): MutationPromise<DismissNotificationData, DismissNotificationVariables>;
+
+interface MarkAllNotificationsReadRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkAllNotificationsReadVariables): MutationRef<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: MarkAllNotificationsReadVariables): MutationRef<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+  operationName: string;
+}
+export const markAllNotificationsReadRef: MarkAllNotificationsReadRef;
+
+export function markAllNotificationsRead(vars: MarkAllNotificationsReadVariables): MutationPromise<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+export function markAllNotificationsRead(dc: DataConnect, vars: MarkAllNotificationsReadVariables): MutationPromise<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+
+interface UpdateNotificationPreferencesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateNotificationPreferencesVariables): MutationRef<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateNotificationPreferencesVariables): MutationRef<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+  operationName: string;
+}
+export const updateNotificationPreferencesRef: UpdateNotificationPreferencesRef;
+
+export function updateNotificationPreferences(vars: UpdateNotificationPreferencesVariables): MutationPromise<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+export function updateNotificationPreferences(dc: DataConnect, vars: UpdateNotificationPreferencesVariables): MutationPromise<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+
+interface SetCircleNotificationMuteRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleNotificationMuteVariables): MutationRef<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SetCircleNotificationMuteVariables): MutationRef<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+  operationName: string;
+}
+export const setCircleNotificationMuteRef: SetCircleNotificationMuteRef;
+
+export function setCircleNotificationMute(vars: SetCircleNotificationMuteVariables): MutationPromise<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+export function setCircleNotificationMute(dc: DataConnect, vars: SetCircleNotificationMuteVariables): MutationPromise<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+
+interface CreateEmailDeliveryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateEmailDeliveryVariables): MutationRef<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateEmailDeliveryVariables): MutationRef<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+  operationName: string;
+}
+export const createEmailDeliveryRef: CreateEmailDeliveryRef;
+
+export function createEmailDelivery(vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+export function createEmailDelivery(dc: DataConnect, vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
 

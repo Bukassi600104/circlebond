@@ -23,6 +23,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       title?: string;
       body?: string;
       pinned?: boolean;
+      important?: boolean;
       commentsEnabled?: boolean;
     };
     const result = await updateAnnouncement({
@@ -32,6 +33,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       title: typeof body.title === "string" ? body.title : undefined,
       body: typeof body.body === "string" ? body.body : undefined,
       pinned: typeof body.pinned === "boolean" ? body.pinned : undefined,
+      important:
+        typeof body.important === "boolean" ? body.important : undefined,
       commentsEnabled:
         typeof body.commentsEnabled === "boolean"
           ? body.commentsEnabled

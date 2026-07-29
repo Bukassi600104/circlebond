@@ -63,6 +63,25 @@
   place-items: center;
   color: var(--color-teal);
   text-decoration: none;
+  position: relative;
+}
+
+.bc-notification-count {
+  align-items: center;
+  background: var(--color-coral);
+  border: 2px solid white;
+  border-radius: 999px;
+  color: white;
+  display: flex;
+  font-size: 0.56rem;
+  font-weight: 800;
+  height: 1.1rem;
+  justify-content: center;
+  min-width: 1.1rem;
+  padding: 0 0.2rem;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .bc-dashboard-topbar__actions > a:hover {

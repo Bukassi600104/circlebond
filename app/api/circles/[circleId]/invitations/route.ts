@@ -6,6 +6,7 @@ import {
   createCircleInvitation,
   listCircleInvitations,
 } from "@/server/repositories/invitations";
+import { emitNewInvitation } from "@/server/repositories/notifications";
 
 export const runtime = "nodejs";
 
@@ -61,10 +62,19 @@ export async function POST(
       mode: input.mode === "open" ? "open" : "named",
     });
     const origin = new URL(request.url).origin;
+    const deepLink = `/invite/${encodeURIComponent(invitation.token)}`;
+    if (input.mode !== "open" && input.recipientEmail) {
+      await emitNewInvitation({
+        circleId,
+        recipientEmail: input.recipientEmail,
+        invitationId: invitation.id,
+        deepLink,
+      });
+    }
     return NextResponse.json(
       {
         id: invitation.id,
-        link: `${origin}/invite/${encodeURIComponent(invitation.token)}`,
+        link: `${origin}${deepLink}`,
       },
       { status: 201 },
     );

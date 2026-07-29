@@ -26,6 +26,12 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetRecentCommentsByAuthor*](#getrecentcommentsbyauthor)
   - [*GetOpenCommentReportsByReporter*](#getopencommentreportsbyreporter)
   - [*GetActivityLogsForCircles*](#getactivitylogsforcircles)
+  - [*GetUserNotifications*](#getusernotifications)
+  - [*GetNotificationContext*](#getnotificationcontext)
+  - [*GetNotificationDedupe*](#getnotificationdedupe)
+  - [*GetRecentReminderNotifications*](#getrecentremindernotifications)
+  - [*FindNotificationRecipientByEmail*](#findnotificationrecipientbyemail)
+  - [*GetDeadlineNotificationCandidates*](#getdeadlinenotificationcandidates)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -62,6 +68,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*ModerateCommentWithAudit*](#moderatecommentwithaudit)
   - [*ReportCommentWithAudit*](#reportcommentwithaudit)
   - [*RecordSystemActivity*](#recordsystemactivity)
+  - [*CreateNotification*](#createnotification)
+  - [*MarkNotificationRead*](#marknotificationread)
+  - [*DismissNotification*](#dismissnotification)
+  - [*MarkAllNotificationsRead*](#markallnotificationsread)
+  - [*UpdateNotificationPreferences*](#updatenotificationpreferences)
+  - [*SetCircleNotificationMute*](#setcirclenotificationmute)
+  - [*CreateEmailDelivery*](#createemaildelivery)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bondcircle`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -407,7 +420,7 @@ import { connectorConfig, getCircleEngineRecord, GetCircleEngineRecordVariables 
 
 // The `GetCircleEngineRecord` query requires an argument of type `GetCircleEngineRecordVariables`:
 const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleEngineRecord()` function to execute the query.
@@ -439,7 +452,7 @@ import { connectorConfig, getCircleEngineRecordRef, GetCircleEngineRecordVariabl
 
 // The `GetCircleEngineRecord` query requires an argument of type `GetCircleEngineRecordVariables`:
 const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleEngineRecordRef()` function to get a reference to the query.
@@ -527,7 +540,7 @@ import { connectorConfig, findUserByEmail, FindUserByEmailVariables } from '@bon
 
 // The `FindUserByEmail` query requires an argument of type `FindUserByEmailVariables`:
 const findUserByEmailVars: FindUserByEmailVariables = {
-  email: ..., 
+  email: ...,
 };
 
 // Call the `findUserByEmail()` function to execute the query.
@@ -557,7 +570,7 @@ import { connectorConfig, findUserByEmailRef, FindUserByEmailVariables } from '@
 
 // The `FindUserByEmail` query requires an argument of type `FindUserByEmailVariables`:
 const findUserByEmailVars: FindUserByEmailVariables = {
-  email: ..., 
+  email: ...,
 };
 
 // Call the `findUserByEmailRef()` function to get a reference to the query.
@@ -671,7 +684,7 @@ import { connectorConfig, getGiftCircleDetail, GetGiftCircleDetailVariables } fr
 
 // The `GetGiftCircleDetail` query requires an argument of type `GetGiftCircleDetailVariables`:
 const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getGiftCircleDetail()` function to execute the query.
@@ -703,7 +716,7 @@ import { connectorConfig, getGiftCircleDetailRef, GetGiftCircleDetailVariables }
 
 // The `GetGiftCircleDetail` query requires an argument of type `GetGiftCircleDetailVariables`:
 const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getGiftCircleDetailRef()` function to get a reference to the query.
@@ -794,7 +807,7 @@ import { connectorConfig, getCircleAuditEntries, GetCircleAuditEntriesVariables 
 
 // The `GetCircleAuditEntries` query requires an argument of type `GetCircleAuditEntriesVariables`:
 const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleAuditEntries()` function to execute the query.
@@ -824,7 +837,7 @@ import { connectorConfig, getCircleAuditEntriesRef, GetCircleAuditEntriesVariabl
 
 // The `GetCircleAuditEntries` query requires an argument of type `GetCircleAuditEntriesVariables`:
 const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleAuditEntriesRef()` function to get a reference to the query.
@@ -955,7 +968,7 @@ import { connectorConfig, getAsoEbiCircleDetail, GetAsoEbiCircleDetailVariables 
 
 // The `GetAsoEbiCircleDetail` query requires an argument of type `GetAsoEbiCircleDetailVariables`:
 const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getAsoEbiCircleDetail()` function to execute the query.
@@ -989,7 +1002,7 @@ import { connectorConfig, getAsoEbiCircleDetailRef, GetAsoEbiCircleDetailVariabl
 
 // The `GetAsoEbiCircleDetail` query requires an argument of type `GetAsoEbiCircleDetailVariables`:
 const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getAsoEbiCircleDetailRef()` function to get a reference to the query.
@@ -1123,7 +1136,7 @@ import { connectorConfig, getSupportCircleDetail, GetSupportCircleDetailVariable
 
 // The `GetSupportCircleDetail` query requires an argument of type `GetSupportCircleDetailVariables`:
 const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getSupportCircleDetail()` function to execute the query.
@@ -1157,7 +1170,7 @@ import { connectorConfig, getSupportCircleDetailRef, GetSupportCircleDetailVaria
 
 // The `GetSupportCircleDetail` query requires an argument of type `GetSupportCircleDetailVariables`:
 const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getSupportCircleDetailRef()` function to get a reference to the query.
@@ -1282,7 +1295,7 @@ import { connectorConfig, getInvitationByTokenHash, GetInvitationByTokenHashVari
 
 // The `GetInvitationByTokenHash` query requires an argument of type `GetInvitationByTokenHashVariables`:
 const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-  tokenHash: ..., 
+  tokenHash: ...,
 };
 
 // Call the `getInvitationByTokenHash()` function to execute the query.
@@ -1312,7 +1325,7 @@ import { connectorConfig, getInvitationByTokenHashRef, GetInvitationByTokenHashV
 
 // The `GetInvitationByTokenHash` query requires an argument of type `GetInvitationByTokenHashVariables`:
 const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-  tokenHash: ..., 
+  tokenHash: ...,
 };
 
 // Call the `getInvitationByTokenHashRef()` function to get a reference to the query.
@@ -1405,7 +1418,7 @@ import { connectorConfig, getCircleInvitations, GetCircleInvitationsVariables } 
 
 // The `GetCircleInvitations` query requires an argument of type `GetCircleInvitationsVariables`:
 const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleInvitations()` function to execute the query.
@@ -1435,7 +1448,7 @@ import { connectorConfig, getCircleInvitationsRef, GetCircleInvitationsVariables
 
 // The `GetCircleInvitations` query requires an argument of type `GetCircleInvitationsVariables`:
 const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleInvitationsRef()` function to get a reference to the query.
@@ -1525,7 +1538,7 @@ import { connectorConfig, getInvitationAcceptances, GetInvitationAcceptancesVari
 
 // The `GetInvitationAcceptances` query requires an argument of type `GetInvitationAcceptancesVariables`:
 const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-  invitationId: ..., 
+  invitationId: ...,
 };
 
 // Call the `getInvitationAcceptances()` function to execute the query.
@@ -1555,7 +1568,7 @@ import { connectorConfig, getInvitationAcceptancesRef, GetInvitationAcceptancesV
 
 // The `GetInvitationAcceptances` query requires an argument of type `GetInvitationAcceptancesVariables`:
 const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-  invitationId: ..., 
+  invitationId: ...,
 };
 
 // Call the `getInvitationAcceptancesRef()` function to get a reference to the query.
@@ -1678,7 +1691,7 @@ import { connectorConfig, getContributionWorkspace, GetContributionWorkspaceVari
 
 // The `GetContributionWorkspace` query requires an argument of type `GetContributionWorkspaceVariables`:
 const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getContributionWorkspace()` function to execute the query.
@@ -1712,7 +1725,7 @@ import { connectorConfig, getContributionWorkspaceRef, GetContributionWorkspaceV
 
 // The `GetContributionWorkspace` query requires an argument of type `GetContributionWorkspaceVariables`:
 const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getContributionWorkspaceRef()` function to get a reference to the query.
@@ -1797,6 +1810,8 @@ export interface GetCircleCommunicationData {
     circleMemberships: ({
       role: string;
       membershipStatus: string;
+      expectedAmount: number;
+      confirmedAmount: number;
       user: {
         id: string;
         displayName: string;
@@ -1808,6 +1823,7 @@ export interface GetCircleCommunicationData {
         title: string;
         body: string;
         pinned: boolean;
+        important: boolean;
         commentsEnabled: boolean;
         createdAt: TimestampString;
         updatedAt: TimestampString;
@@ -1866,7 +1882,7 @@ import { connectorConfig, getCircleCommunication, GetCircleCommunicationVariable
 
 // The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
 const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleCommunication()` function to execute the query.
@@ -1906,7 +1922,7 @@ import { connectorConfig, getCircleCommunicationRef, GetCircleCommunicationVaria
 
 // The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
 const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-  circleId: ..., 
+  circleId: ...,
 };
 
 // Call the `getCircleCommunicationRef()` function to get a reference to the query.
@@ -1999,9 +2015,9 @@ import { connectorConfig, getRecentCommentsByAuthor, GetRecentCommentsByAuthorVa
 
 // The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
 const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-  circleId: ..., 
-  authorId: ..., 
-  since: ..., 
+  circleId: ...,
+  authorId: ...,
+  since: ...,
 };
 
 // Call the `getRecentCommentsByAuthor()` function to execute the query.
@@ -2031,9 +2047,9 @@ import { connectorConfig, getRecentCommentsByAuthorRef, GetRecentCommentsByAutho
 
 // The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
 const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-  circleId: ..., 
-  authorId: ..., 
-  since: ..., 
+  circleId: ...,
+  authorId: ...,
+  since: ...,
 };
 
 // Call the `getRecentCommentsByAuthorRef()` function to get a reference to the query.
@@ -2115,8 +2131,8 @@ import { connectorConfig, getOpenCommentReportsByReporter, GetOpenCommentReports
 
 // The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
 const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-  commentId: ..., 
-  reporterId: ..., 
+  commentId: ...,
+  reporterId: ...,
 };
 
 // Call the `getOpenCommentReportsByReporter()` function to execute the query.
@@ -2146,8 +2162,8 @@ import { connectorConfig, getOpenCommentReportsByReporterRef, GetOpenCommentRepo
 
 // The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
 const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-  commentId: ..., 
-  reporterId: ..., 
+  commentId: ...,
+  reporterId: ...,
 };
 
 // Call the `getOpenCommentReportsByReporterRef()` function to get a reference to the query.
@@ -2241,7 +2257,7 @@ import { connectorConfig, getActivityLogsForCircles, GetActivityLogsForCirclesVa
 
 // The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
 const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-  circleIds: ..., 
+  circleIds: ...,
 };
 
 // Call the `getActivityLogsForCircles()` function to execute the query.
@@ -2271,7 +2287,7 @@ import { connectorConfig, getActivityLogsForCirclesRef, GetActivityLogsForCircle
 
 // The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
 const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-  circleIds: ..., 
+  circleIds: ...,
 };
 
 // Call the `getActivityLogsForCirclesRef()` function to get a reference to the query.
@@ -2293,6 +2309,762 @@ console.log(data.activityLogs);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.activityLogs);
+});
+```
+
+## GetUserNotifications
+You can execute the `GetUserNotifications` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getUserNotifications(vars: GetUserNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserNotificationsData, GetUserNotificationsVariables>;
+
+interface GetUserNotificationsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserNotificationsVariables): QueryRef<GetUserNotificationsData, GetUserNotificationsVariables>;
+}
+export const getUserNotificationsRef: GetUserNotificationsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getUserNotifications(dc: DataConnect, vars: GetUserNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserNotificationsData, GetUserNotificationsVariables>;
+
+interface GetUserNotificationsRef {
+  ...
+  (dc: DataConnect, vars: GetUserNotificationsVariables): QueryRef<GetUserNotificationsData, GetUserNotificationsVariables>;
+}
+export const getUserNotificationsRef: GetUserNotificationsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getUserNotificationsRef:
+```typescript
+const name = getUserNotificationsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetUserNotifications` query requires an argument of type `GetUserNotificationsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetUserNotificationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetUserNotifications` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetUserNotificationsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetUserNotificationsData {
+  user?: {
+    id: string;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+  } & User_Key;
+    notifications: ({
+      id: UUIDString;
+      type: string;
+      title: string;
+      body: string;
+      deepLink: string;
+      readAt?: TimestampString | null;
+      createdAt: TimestampString;
+      circle?: {
+        id: UUIDString;
+        name: string;
+        type: string;
+      } & Circle_Key;
+    } & Notification_Key)[];
+      circleMemberships: ({
+        notificationsMuted: boolean;
+        membershipStatus: string;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+      })[];
+}
+```
+### Using `GetUserNotifications`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getUserNotifications, GetUserNotificationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserNotifications` query requires an argument of type `GetUserNotificationsVariables`:
+const getUserNotificationsVars: GetUserNotificationsVariables = {
+  userId: ...,
+};
+
+// Call the `getUserNotifications()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getUserNotifications(getUserNotificationsVars);
+// Variables can be defined inline as well.
+const { data } = await getUserNotifications({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getUserNotifications(dataConnect, getUserNotificationsVars);
+
+console.log(data.user);
+console.log(data.notifications);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+getUserNotifications(getUserNotificationsVars).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+  console.log(data.notifications);
+  console.log(data.circleMemberships);
+});
+```
+
+### Using `GetUserNotifications`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getUserNotificationsRef, GetUserNotificationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserNotifications` query requires an argument of type `GetUserNotificationsVariables`:
+const getUserNotificationsVars: GetUserNotificationsVariables = {
+  userId: ...,
+};
+
+// Call the `getUserNotificationsRef()` function to get a reference to the query.
+const ref = getUserNotificationsRef(getUserNotificationsVars);
+// Variables can be defined inline as well.
+const ref = getUserNotificationsRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getUserNotificationsRef(dataConnect, getUserNotificationsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.user);
+console.log(data.notifications);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+  console.log(data.notifications);
+  console.log(data.circleMemberships);
+});
+```
+
+## GetNotificationContext
+You can execute the `GetNotificationContext` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getNotificationContext(vars: GetNotificationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationContextData, GetNotificationContextVariables>;
+
+interface GetNotificationContextRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetNotificationContextVariables): QueryRef<GetNotificationContextData, GetNotificationContextVariables>;
+}
+export const getNotificationContextRef: GetNotificationContextRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getNotificationContext(dc: DataConnect, vars: GetNotificationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationContextData, GetNotificationContextVariables>;
+
+interface GetNotificationContextRef {
+  ...
+  (dc: DataConnect, vars: GetNotificationContextVariables): QueryRef<GetNotificationContextData, GetNotificationContextVariables>;
+}
+export const getNotificationContextRef: GetNotificationContextRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getNotificationContextRef:
+```typescript
+const name = getNotificationContextRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetNotificationContext` query requires an argument of type `GetNotificationContextVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetNotificationContextVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetNotificationContext` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetNotificationContextData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetNotificationContextData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    deadline?: DateString | null;
+    creator: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      emailNotifications: boolean;
+      commentNotifications: boolean;
+      contributionReminders: boolean;
+      circleUpdateNotifications: boolean;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      notificationsMuted: boolean;
+      expectedAmount: number;
+      confirmedAmount: number;
+      user: {
+        id: string;
+        displayName: string;
+        email?: string | null;
+        emailNotifications: boolean;
+        commentNotifications: boolean;
+        contributionReminders: boolean;
+        circleUpdateNotifications: boolean;
+      } & User_Key;
+    })[];
+}
+```
+### Using `GetNotificationContext`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getNotificationContext, GetNotificationContextVariables } from '@bondcircle/dataconnect';
+
+// The `GetNotificationContext` query requires an argument of type `GetNotificationContextVariables`:
+const getNotificationContextVars: GetNotificationContextVariables = {
+  circleId: ...,
+};
+
+// Call the `getNotificationContext()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getNotificationContext(getNotificationContextVars);
+// Variables can be defined inline as well.
+const { data } = await getNotificationContext({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getNotificationContext(dataConnect, getNotificationContextVars);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+getNotificationContext(getNotificationContextVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+});
+```
+
+### Using `GetNotificationContext`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getNotificationContextRef, GetNotificationContextVariables } from '@bondcircle/dataconnect';
+
+// The `GetNotificationContext` query requires an argument of type `GetNotificationContextVariables`:
+const getNotificationContextVars: GetNotificationContextVariables = {
+  circleId: ...,
+};
+
+// Call the `getNotificationContextRef()` function to get a reference to the query.
+const ref = getNotificationContextRef(getNotificationContextVars);
+// Variables can be defined inline as well.
+const ref = getNotificationContextRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getNotificationContextRef(dataConnect, getNotificationContextVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+});
+```
+
+## GetNotificationDedupe
+You can execute the `GetNotificationDedupe` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getNotificationDedupe(vars: GetNotificationDedupeVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+
+interface GetNotificationDedupeRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetNotificationDedupeVariables): QueryRef<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+}
+export const getNotificationDedupeRef: GetNotificationDedupeRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getNotificationDedupe(dc: DataConnect, vars: GetNotificationDedupeVariables, options?: ExecuteQueryOptions): QueryPromise<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+
+interface GetNotificationDedupeRef {
+  ...
+  (dc: DataConnect, vars: GetNotificationDedupeVariables): QueryRef<GetNotificationDedupeData, GetNotificationDedupeVariables>;
+}
+export const getNotificationDedupeRef: GetNotificationDedupeRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getNotificationDedupeRef:
+```typescript
+const name = getNotificationDedupeRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetNotificationDedupe` query requires an argument of type `GetNotificationDedupeVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetNotificationDedupeVariables {
+  recipientId: string;
+  dedupeKey: string;
+}
+```
+### Return Type
+Recall that executing the `GetNotificationDedupe` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetNotificationDedupeData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetNotificationDedupeData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+```
+### Using `GetNotificationDedupe`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getNotificationDedupe, GetNotificationDedupeVariables } from '@bondcircle/dataconnect';
+
+// The `GetNotificationDedupe` query requires an argument of type `GetNotificationDedupeVariables`:
+const getNotificationDedupeVars: GetNotificationDedupeVariables = {
+  recipientId: ...,
+  dedupeKey: ...,
+};
+
+// Call the `getNotificationDedupe()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getNotificationDedupe(getNotificationDedupeVars);
+// Variables can be defined inline as well.
+const { data } = await getNotificationDedupe({ recipientId: ..., dedupeKey: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getNotificationDedupe(dataConnect, getNotificationDedupeVars);
+
+console.log(data.notifications);
+
+// Or, you can use the `Promise` API.
+getNotificationDedupe(getNotificationDedupeVars).then((response) => {
+  const data = response.data;
+  console.log(data.notifications);
+});
+```
+
+### Using `GetNotificationDedupe`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getNotificationDedupeRef, GetNotificationDedupeVariables } from '@bondcircle/dataconnect';
+
+// The `GetNotificationDedupe` query requires an argument of type `GetNotificationDedupeVariables`:
+const getNotificationDedupeVars: GetNotificationDedupeVariables = {
+  recipientId: ...,
+  dedupeKey: ...,
+};
+
+// Call the `getNotificationDedupeRef()` function to get a reference to the query.
+const ref = getNotificationDedupeRef(getNotificationDedupeVars);
+// Variables can be defined inline as well.
+const ref = getNotificationDedupeRef({ recipientId: ..., dedupeKey: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getNotificationDedupeRef(dataConnect, getNotificationDedupeVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.notifications);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notifications);
+});
+```
+
+## GetRecentReminderNotifications
+You can execute the `GetRecentReminderNotifications` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getRecentReminderNotifications(vars: GetRecentReminderNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+
+interface GetRecentReminderNotificationsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRecentReminderNotificationsVariables): QueryRef<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+}
+export const getRecentReminderNotificationsRef: GetRecentReminderNotificationsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRecentReminderNotifications(dc: DataConnect, vars: GetRecentReminderNotificationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+
+interface GetRecentReminderNotificationsRef {
+  ...
+  (dc: DataConnect, vars: GetRecentReminderNotificationsVariables): QueryRef<GetRecentReminderNotificationsData, GetRecentReminderNotificationsVariables>;
+}
+export const getRecentReminderNotificationsRef: GetRecentReminderNotificationsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRecentReminderNotificationsRef:
+```typescript
+const name = getRecentReminderNotificationsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRecentReminderNotifications` query requires an argument of type `GetRecentReminderNotificationsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRecentReminderNotificationsVariables {
+  circleId: UUIDString;
+  recipientId: string;
+  since: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `GetRecentReminderNotifications` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRecentReminderNotificationsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRecentReminderNotificationsData {
+  notifications: ({
+    id: UUIDString;
+  } & Notification_Key)[];
+}
+```
+### Using `GetRecentReminderNotifications`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRecentReminderNotifications, GetRecentReminderNotificationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetRecentReminderNotifications` query requires an argument of type `GetRecentReminderNotificationsVariables`:
+const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
+  circleId: ...,
+  recipientId: ...,
+  since: ...,
+};
+
+// Call the `getRecentReminderNotifications()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRecentReminderNotifications(getRecentReminderNotificationsVars);
+// Variables can be defined inline as well.
+const { data } = await getRecentReminderNotifications({ circleId: ..., recipientId: ..., since: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRecentReminderNotifications(dataConnect, getRecentReminderNotificationsVars);
+
+console.log(data.notifications);
+
+// Or, you can use the `Promise` API.
+getRecentReminderNotifications(getRecentReminderNotificationsVars).then((response) => {
+  const data = response.data;
+  console.log(data.notifications);
+});
+```
+
+### Using `GetRecentReminderNotifications`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRecentReminderNotificationsRef, GetRecentReminderNotificationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetRecentReminderNotifications` query requires an argument of type `GetRecentReminderNotificationsVariables`:
+const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
+  circleId: ...,
+  recipientId: ...,
+  since: ...,
+};
+
+// Call the `getRecentReminderNotificationsRef()` function to get a reference to the query.
+const ref = getRecentReminderNotificationsRef(getRecentReminderNotificationsVars);
+// Variables can be defined inline as well.
+const ref = getRecentReminderNotificationsRef({ circleId: ..., recipientId: ..., since: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRecentReminderNotificationsRef(dataConnect, getRecentReminderNotificationsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.notifications);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notifications);
+});
+```
+
+## FindNotificationRecipientByEmail
+You can execute the `FindNotificationRecipientByEmail` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+findNotificationRecipientByEmail(vars: FindNotificationRecipientByEmailVariables, options?: ExecuteQueryOptions): QueryPromise<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+
+interface FindNotificationRecipientByEmailRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: FindNotificationRecipientByEmailVariables): QueryRef<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+}
+export const findNotificationRecipientByEmailRef: FindNotificationRecipientByEmailRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+findNotificationRecipientByEmail(dc: DataConnect, vars: FindNotificationRecipientByEmailVariables, options?: ExecuteQueryOptions): QueryPromise<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+
+interface FindNotificationRecipientByEmailRef {
+  ...
+  (dc: DataConnect, vars: FindNotificationRecipientByEmailVariables): QueryRef<FindNotificationRecipientByEmailData, FindNotificationRecipientByEmailVariables>;
+}
+export const findNotificationRecipientByEmailRef: FindNotificationRecipientByEmailRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the findNotificationRecipientByEmailRef:
+```typescript
+const name = findNotificationRecipientByEmailRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `FindNotificationRecipientByEmail` query requires an argument of type `FindNotificationRecipientByEmailVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface FindNotificationRecipientByEmailVariables {
+  email: string;
+}
+```
+### Return Type
+Recall that executing the `FindNotificationRecipientByEmail` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `FindNotificationRecipientByEmailData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface FindNotificationRecipientByEmailData {
+  users: ({
+    id: string;
+    displayName: string;
+    email?: string | null;
+    emailNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+  } & User_Key)[];
+}
+```
+### Using `FindNotificationRecipientByEmail`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, findNotificationRecipientByEmail, FindNotificationRecipientByEmailVariables } from '@bondcircle/dataconnect';
+
+// The `FindNotificationRecipientByEmail` query requires an argument of type `FindNotificationRecipientByEmailVariables`:
+const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
+  email: ...,
+};
+
+// Call the `findNotificationRecipientByEmail()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await findNotificationRecipientByEmail(findNotificationRecipientByEmailVars);
+// Variables can be defined inline as well.
+const { data } = await findNotificationRecipientByEmail({ email: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await findNotificationRecipientByEmail(dataConnect, findNotificationRecipientByEmailVars);
+
+console.log(data.users);
+
+// Or, you can use the `Promise` API.
+findNotificationRecipientByEmail(findNotificationRecipientByEmailVars).then((response) => {
+  const data = response.data;
+  console.log(data.users);
+});
+```
+
+### Using `FindNotificationRecipientByEmail`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, findNotificationRecipientByEmailRef, FindNotificationRecipientByEmailVariables } from '@bondcircle/dataconnect';
+
+// The `FindNotificationRecipientByEmail` query requires an argument of type `FindNotificationRecipientByEmailVariables`:
+const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
+  email: ...,
+};
+
+// Call the `findNotificationRecipientByEmailRef()` function to get a reference to the query.
+const ref = findNotificationRecipientByEmailRef(findNotificationRecipientByEmailVars);
+// Variables can be defined inline as well.
+const ref = findNotificationRecipientByEmailRef({ email: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = findNotificationRecipientByEmailRef(dataConnect, findNotificationRecipientByEmailVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.users);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.users);
+});
+```
+
+## GetDeadlineNotificationCandidates
+You can execute the `GetDeadlineNotificationCandidates` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDeadlineNotificationCandidates(vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+
+interface GetDeadlineNotificationCandidatesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDeadlineNotificationCandidatesVariables): QueryRef<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+}
+export const getDeadlineNotificationCandidatesRef: GetDeadlineNotificationCandidatesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDeadlineNotificationCandidates(dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+
+interface GetDeadlineNotificationCandidatesRef {
+  ...
+  (dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables): QueryRef<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+}
+export const getDeadlineNotificationCandidatesRef: GetDeadlineNotificationCandidatesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDeadlineNotificationCandidatesRef:
+```typescript
+const name = getDeadlineNotificationCandidatesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDeadlineNotificationCandidates` query requires an argument of type `GetDeadlineNotificationCandidatesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDeadlineNotificationCandidatesVariables {
+  from: DateString;
+  to: DateString;
+}
+```
+### Return Type
+Recall that executing the `GetDeadlineNotificationCandidates` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDeadlineNotificationCandidatesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDeadlineNotificationCandidatesData {
+  circles: ({
+    id: UUIDString;
+    name: string;
+    type: string;
+    deadline?: DateString | null;
+  } & Circle_Key)[];
+}
+```
+### Using `GetDeadlineNotificationCandidates`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDeadlineNotificationCandidates, GetDeadlineNotificationCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetDeadlineNotificationCandidates` query requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
+const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
+  from: ...,
+  to: ...,
+};
+
+// Call the `getDeadlineNotificationCandidates()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars);
+// Variables can be defined inline as well.
+const { data } = await getDeadlineNotificationCandidates({ from: ..., to: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDeadlineNotificationCandidates(dataConnect, getDeadlineNotificationCandidatesVars);
+
+console.log(data.circles);
+
+// Or, you can use the `Promise` API.
+getDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+});
+```
+
+### Using `GetDeadlineNotificationCandidates`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDeadlineNotificationCandidatesRef, GetDeadlineNotificationCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetDeadlineNotificationCandidates` query requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
+const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
+  from: ...,
+  to: ...,
+};
+
+// Call the `getDeadlineNotificationCandidatesRef()` function to get a reference to the query.
+const ref = getDeadlineNotificationCandidatesRef(getDeadlineNotificationCandidatesVars);
+// Variables can be defined inline as well.
+const ref = getDeadlineNotificationCandidatesRef({ from: ..., to: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDeadlineNotificationCandidatesRef(dataConnect, getDeadlineNotificationCandidatesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circles);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
 });
 ```
 
@@ -2370,7 +3142,7 @@ import { connectorConfig, upsertCurrentUser, UpsertCurrentUserVariables } from '
 
 // The `UpsertCurrentUser` mutation requires an argument of type `UpsertCurrentUserVariables`:
 const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-  displayName: ..., 
+  displayName: ...,
   phone: ..., // optional
   email: ..., // optional
   profileImage: ..., // optional
@@ -2405,7 +3177,7 @@ import { connectorConfig, upsertCurrentUserRef, UpsertCurrentUserVariables } fro
 
 // The `UpsertCurrentUser` mutation requires an argument of type `UpsertCurrentUserVariables`:
 const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-  displayName: ..., 
+  displayName: ...,
   phone: ..., // optional
   email: ..., // optional
   profileImage: ..., // optional
@@ -2504,19 +3276,19 @@ import { connectorConfig, createCircleDraft, CreateCircleDraftVariables } from '
 
 // The `CreateCircleDraft` mutation requires an argument of type `CreateCircleDraftVariables`:
 const createCircleDraftVars: CreateCircleDraftVariables = {
-  creatorId: ..., 
-  name: ..., 
-  type: ..., 
-  description: ..., 
-  targetAmount: ..., 
-  pricingPlan: ..., 
-  memberLimit: ..., 
-  activationPrice: ..., 
+  creatorId: ...,
+  name: ...,
+  type: ...,
+  description: ...,
+  targetAmount: ...,
+  pricingPlan: ...,
+  memberLimit: ...,
+  activationPrice: ...,
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ..., 
-  createdAt: ..., 
-  updatedAt: ..., 
+  visibility: ...,
+  createdAt: ...,
+  updatedAt: ...,
 };
 
 // Call the `createCircleDraft()` function to execute the mutation.
@@ -2552,19 +3324,19 @@ import { connectorConfig, createCircleDraftRef, CreateCircleDraftVariables } fro
 
 // The `CreateCircleDraft` mutation requires an argument of type `CreateCircleDraftVariables`:
 const createCircleDraftVars: CreateCircleDraftVariables = {
-  creatorId: ..., 
-  name: ..., 
-  type: ..., 
-  description: ..., 
-  targetAmount: ..., 
-  pricingPlan: ..., 
-  memberLimit: ..., 
-  activationPrice: ..., 
+  creatorId: ...,
+  name: ...,
+  type: ...,
+  description: ...,
+  targetAmount: ...,
+  pricingPlan: ...,
+  memberLimit: ...,
+  activationPrice: ...,
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ..., 
-  createdAt: ..., 
-  updatedAt: ..., 
+  visibility: ...,
+  createdAt: ...,
+  updatedAt: ...,
 };
 
 // Call the `createCircleDraftRef()` function to get a reference to the mutation.
@@ -2664,21 +3436,21 @@ import { connectorConfig, updateCircleConfigurationWithAudit, UpdateCircleConfig
 
 // The `UpdateCircleConfigurationWithAudit` mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
 const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  action: ..., 
-  status: ..., 
-  name: ..., 
-  description: ..., 
-  targetAmount: ..., 
-  pricingPlan: ..., 
-  memberLimit: ..., 
-  activationPrice: ..., 
+  circleId: ...,
+  actorId: ...,
+  action: ...,
+  status: ...,
+  name: ...,
+  description: ...,
+  targetAmount: ...,
+  pricingPlan: ...,
+  memberLimit: ...,
+  activationPrice: ...,
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ..., 
-  updatedAt: ..., 
-  materialChanges: ..., 
+  visibility: ...,
+  updatedAt: ...,
+  materialChanges: ...,
 };
 
 // Call the `updateCircleConfigurationWithAudit()` function to execute the mutation.
@@ -2710,21 +3482,21 @@ import { connectorConfig, updateCircleConfigurationWithAuditRef, UpdateCircleCon
 
 // The `UpdateCircleConfigurationWithAudit` mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
 const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  action: ..., 
-  status: ..., 
-  name: ..., 
-  description: ..., 
-  targetAmount: ..., 
-  pricingPlan: ..., 
-  memberLimit: ..., 
-  activationPrice: ..., 
+  circleId: ...,
+  actorId: ...,
+  action: ...,
+  status: ...,
+  name: ...,
+  description: ...,
+  targetAmount: ...,
+  pricingPlan: ...,
+  memberLimit: ...,
+  activationPrice: ...,
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ..., 
-  updatedAt: ..., 
-  materialChanges: ..., 
+  visibility: ...,
+  updatedAt: ...,
+  materialChanges: ...,
 };
 
 // Call the `updateCircleConfigurationWithAuditRef()` function to get a reference to the mutation.
@@ -2814,11 +3586,11 @@ import { connectorConfig, transitionCircleWithAudit, TransitionCircleWithAuditVa
 
 // The `TransitionCircleWithAudit` mutation requires an argument of type `TransitionCircleWithAuditVariables`:
 const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  fromStatus: ..., 
-  toStatus: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  fromStatus: ...,
+  toStatus: ...,
+  updatedAt: ...,
   completedAt: ..., // optional
   archiveAt: ..., // optional
   purgeAt: ..., // optional
@@ -2855,11 +3627,11 @@ import { connectorConfig, transitionCircleWithAuditRef, TransitionCircleWithAudi
 
 // The `TransitionCircleWithAudit` mutation requires an argument of type `TransitionCircleWithAuditVariables`:
 const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  fromStatus: ..., 
-  toStatus: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  fromStatus: ...,
+  toStatus: ...,
+  updatedAt: ...,
   completedAt: ..., // optional
   archiveAt: ..., // optional
   purgeAt: ..., // optional
@@ -2951,11 +3723,11 @@ import { connectorConfig, addCircleMemberWithAudit, AddCircleMemberWithAuditVari
 
 // The `AddCircleMemberWithAudit` mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
 const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  memberId: ..., 
-  role: ..., 
-  createdAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  memberId: ...,
+  role: ...,
+  createdAt: ...,
 };
 
 // Call the `addCircleMemberWithAudit()` function to execute the mutation.
@@ -2989,11 +3761,11 @@ import { connectorConfig, addCircleMemberWithAuditRef, AddCircleMemberWithAuditV
 
 // The `AddCircleMemberWithAudit` mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
 const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  memberId: ..., 
-  role: ..., 
-  createdAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  memberId: ...,
+  role: ...,
+  createdAt: ...,
 };
 
 // Call the `addCircleMemberWithAuditRef()` function to get a reference to the mutation.
@@ -3086,16 +3858,16 @@ import { connectorConfig, configureGiftCircle, ConfigureGiftCircleVariables } fr
 
 // The `ConfigureGiftCircle` mutation requires an argument of type `ConfigureGiftCircleVariables`:
 const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  giftTitle: ..., 
-  contributionMode: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  giftTitle: ...,
+  contributionMode: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureGiftCircle()` function to execute the mutation.
@@ -3127,16 +3899,16 @@ import { connectorConfig, configureGiftCircleRef, ConfigureGiftCircleVariables }
 
 // The `ConfigureGiftCircle` mutation requires an argument of type `ConfigureGiftCircleVariables`:
 const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  giftTitle: ..., 
-  contributionMode: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  giftTitle: ...,
+  contributionMode: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureGiftCircleRef()` function to get a reference to the mutation.
@@ -3220,10 +3992,10 @@ import { connectorConfig, setGiftMemberAllocation, SetGiftMemberAllocationVariab
 
 // The `SetGiftMemberAllocation` mutation requires an argument of type `SetGiftMemberAllocationVariables`:
 const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  expectedAmount: ..., 
-  contributionStatus: ..., 
+  circleId: ...,
+  memberId: ...,
+  expectedAmount: ...,
+  contributionStatus: ...,
 };
 
 // Call the `setGiftMemberAllocation()` function to execute the mutation.
@@ -3253,10 +4025,10 @@ import { connectorConfig, setGiftMemberAllocationRef, SetGiftMemberAllocationVar
 
 // The `SetGiftMemberAllocation` mutation requires an argument of type `SetGiftMemberAllocationVariables`:
 const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  expectedAmount: ..., 
-  contributionStatus: ..., 
+  circleId: ...,
+  memberId: ...,
+  expectedAmount: ...,
+  contributionStatus: ...,
 };
 
 // Call the `setGiftMemberAllocationRef()` function to get a reference to the mutation.
@@ -3345,16 +4117,16 @@ import { connectorConfig, configureAsoEbiCircle, ConfigureAsoEbiCircleVariables 
 
 // The `ConfigureAsoEbiCircle` mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
 const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  eventType: ..., 
-  organizerName: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  eventType: ...,
+  organizerName: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureAsoEbiCircle()` function to execute the mutation.
@@ -3386,16 +4158,16 @@ import { connectorConfig, configureAsoEbiCircleRef, ConfigureAsoEbiCircleVariabl
 
 // The `ConfigureAsoEbiCircle` mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
 const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  eventType: ..., 
-  organizerName: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  eventType: ...,
+  organizerName: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureAsoEbiCircleRef()` function to get a reference to the mutation.
@@ -3489,11 +4261,11 @@ import { connectorConfig, createAsoEbiTier, CreateAsoEbiTierVariables } from '@b
 
 // The `CreateAsoEbiTier` mutation requires an argument of type `CreateAsoEbiTierVariables`:
 const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-  tierId: ..., 
-  circleId: ..., 
-  name: ..., 
-  price: ..., 
-  fabricDescription: ..., 
+  tierId: ...,
+  circleId: ...,
+  name: ...,
+  price: ...,
+  fabricDescription: ...,
   fabricImageUrl: ..., // optional
   fabricImageStoragePath: ..., // optional
   appreciationGiftName: ..., // optional
@@ -3501,8 +4273,8 @@ const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
   appreciationGiftImageStoragePath: ..., // optional
   availabilityNote: ..., // optional
   deliveryDetails: ..., // optional
-  sortOrder: ..., 
-  createdAt: ..., 
+  sortOrder: ...,
+  createdAt: ...,
 };
 
 // Call the `createAsoEbiTier()` function to execute the mutation.
@@ -3532,11 +4304,11 @@ import { connectorConfig, createAsoEbiTierRef, CreateAsoEbiTierVariables } from 
 
 // The `CreateAsoEbiTier` mutation requires an argument of type `CreateAsoEbiTierVariables`:
 const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-  tierId: ..., 
-  circleId: ..., 
-  name: ..., 
-  price: ..., 
-  fabricDescription: ..., 
+  tierId: ...,
+  circleId: ...,
+  name: ...,
+  price: ...,
+  fabricDescription: ...,
   fabricImageUrl: ..., // optional
   fabricImageStoragePath: ..., // optional
   appreciationGiftName: ..., // optional
@@ -3544,8 +4316,8 @@ const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
   appreciationGiftImageStoragePath: ..., // optional
   availabilityNote: ..., // optional
   deliveryDetails: ..., // optional
-  sortOrder: ..., 
-  createdAt: ..., 
+  sortOrder: ...,
+  createdAt: ...,
 };
 
 // Call the `createAsoEbiTierRef()` function to get a reference to the mutation.
@@ -3630,11 +4402,11 @@ import { connectorConfig, selectAsoEbiTier, SelectAsoEbiTierVariables } from '@b
 
 // The `SelectAsoEbiTier` mutation requires an argument of type `SelectAsoEbiTierVariables`:
 const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  tierId: ..., 
-  expectedAmount: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  memberId: ...,
+  tierId: ...,
+  expectedAmount: ...,
+  updatedAt: ...,
 };
 
 // Call the `selectAsoEbiTier()` function to execute the mutation.
@@ -3668,11 +4440,11 @@ import { connectorConfig, selectAsoEbiTierRef, SelectAsoEbiTierVariables } from 
 
 // The `SelectAsoEbiTier` mutation requires an argument of type `SelectAsoEbiTierVariables`:
 const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  tierId: ..., 
-  expectedAmount: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  memberId: ...,
+  tierId: ...,
+  expectedAmount: ...,
+  updatedAt: ...,
 };
 
 // Call the `selectAsoEbiTierRef()` function to get a reference to the mutation.
@@ -3761,11 +4533,11 @@ import { connectorConfig, updateAsoEbiFulfilment, UpdateAsoEbiFulfilmentVariable
 
 // The `UpdateAsoEbiFulfilment` mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
 const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  memberId: ..., 
-  status: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  memberId: ...,
+  status: ...,
+  updatedAt: ...,
 };
 
 // Call the `updateAsoEbiFulfilment()` function to execute the mutation.
@@ -3799,11 +4571,11 @@ import { connectorConfig, updateAsoEbiFulfilmentRef, UpdateAsoEbiFulfilmentVaria
 
 // The `UpdateAsoEbiFulfilment` mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
 const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  memberId: ..., 
-  status: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  memberId: ...,
+  status: ...,
+  updatedAt: ...,
 };
 
 // Call the `updateAsoEbiFulfilmentRef()` function to get a reference to the mutation.
@@ -3903,23 +4675,23 @@ import { connectorConfig, configureSupportCircle, ConfigureSupportCircleVariable
 
 // The `ConfigureSupportCircle` mutation requires an argument of type `ConfigureSupportCircleVariables`:
 const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  supportType: ..., 
-  beneficiaryName: ..., 
+  circleId: ...,
+  actorId: ...,
+  supportType: ...,
+  beneficiaryName: ...,
   beneficiaryRelationship: ..., // optional
-  contributionMode: ..., 
-  showBeneficiaryName: ..., 
-  showTargetToMembers: ..., 
-  showConfirmedTotalToMembers: ..., 
-  hideIndividualAmounts: ..., 
-  requireCreatorApproval: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  contributionMode: ...,
+  showBeneficiaryName: ...,
+  showTargetToMembers: ...,
+  showConfirmedTotalToMembers: ...,
+  hideIndividualAmounts: ...,
+  requireCreatorApproval: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureSupportCircle()` function to execute the mutation.
@@ -3951,23 +4723,23 @@ import { connectorConfig, configureSupportCircleRef, ConfigureSupportCircleVaria
 
 // The `ConfigureSupportCircle` mutation requires an argument of type `ConfigureSupportCircleVariables`:
 const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  supportType: ..., 
-  beneficiaryName: ..., 
+  circleId: ...,
+  actorId: ...,
+  supportType: ...,
+  beneficiaryName: ...,
   beneficiaryRelationship: ..., // optional
-  contributionMode: ..., 
-  showBeneficiaryName: ..., 
-  showTargetToMembers: ..., 
-  showConfirmedTotalToMembers: ..., 
-  hideIndividualAmounts: ..., 
-  requireCreatorApproval: ..., 
-  paymentBankName: ..., 
-  paymentAccountName: ..., 
-  paymentAccountNumber: ..., 
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  updatedAt: ..., 
+  contributionMode: ...,
+  showBeneficiaryName: ...,
+  showTargetToMembers: ...,
+  showConfirmedTotalToMembers: ...,
+  hideIndividualAmounts: ...,
+  requireCreatorApproval: ...,
+  paymentBankName: ...,
+  paymentAccountName: ...,
+  paymentAccountNumber: ...,
+  imageUrl: ...,
+  imageStoragePath: ...,
+  updatedAt: ...,
 };
 
 // Call the `configureSupportCircleRef()` function to get a reference to the mutation.
@@ -4052,10 +4824,10 @@ import { connectorConfig, recordSupportPledge, RecordSupportPledgeVariables } fr
 
 // The `RecordSupportPledge` mutation requires an argument of type `RecordSupportPledgeVariables`:
 const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  amount: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  memberId: ...,
+  amount: ...,
+  updatedAt: ...,
 };
 
 // Call the `recordSupportPledge()` function to execute the mutation.
@@ -4087,10 +4859,10 @@ import { connectorConfig, recordSupportPledgeRef, RecordSupportPledgeVariables }
 
 // The `RecordSupportPledge` mutation requires an argument of type `RecordSupportPledgeVariables`:
 const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  amount: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  memberId: ...,
+  amount: ...,
+  updatedAt: ...,
 };
 
 // Call the `recordSupportPledgeRef()` function to get a reference to the mutation.
@@ -4174,10 +4946,10 @@ import { connectorConfig, setSupportMemberAllocation, SetSupportMemberAllocation
 
 // The `SetSupportMemberAllocation` mutation requires an argument of type `SetSupportMemberAllocationVariables`:
 const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  expectedAmount: ..., 
-  contributionStatus: ..., 
+  circleId: ...,
+  memberId: ...,
+  expectedAmount: ...,
+  contributionStatus: ...,
 };
 
 // Call the `setSupportMemberAllocation()` function to execute the mutation.
@@ -4207,10 +4979,10 @@ import { connectorConfig, setSupportMemberAllocationRef, SetSupportMemberAllocat
 
 // The `SetSupportMemberAllocation` mutation requires an argument of type `SetSupportMemberAllocationVariables`:
 const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-  circleId: ..., 
-  memberId: ..., 
-  expectedAmount: ..., 
-  contributionStatus: ..., 
+  circleId: ...,
+  memberId: ...,
+  expectedAmount: ...,
+  contributionStatus: ...,
 };
 
 // Call the `setSupportMemberAllocationRef()` function to get a reference to the mutation.
@@ -4293,10 +5065,10 @@ import { connectorConfig, createSupportUpdate, CreateSupportUpdateVariables } fr
 
 // The `CreateSupportUpdate` mutation requires an argument of type `CreateSupportUpdateVariables`:
 const createSupportUpdateVars: CreateSupportUpdateVariables = {
-  circleId: ..., 
-  authorId: ..., 
-  body: ..., 
-  createdAt: ..., 
+  circleId: ...,
+  authorId: ...,
+  body: ...,
+  createdAt: ...,
 };
 
 // Call the `createSupportUpdate()` function to execute the mutation.
@@ -4328,10 +5100,10 @@ import { connectorConfig, createSupportUpdateRef, CreateSupportUpdateVariables }
 
 // The `CreateSupportUpdate` mutation requires an argument of type `CreateSupportUpdateVariables`:
 const createSupportUpdateVars: CreateSupportUpdateVariables = {
-  circleId: ..., 
-  authorId: ..., 
-  body: ..., 
-  createdAt: ..., 
+  circleId: ...,
+  authorId: ...,
+  body: ...,
+  createdAt: ...,
 };
 
 // Call the `createSupportUpdateRef()` function to get a reference to the mutation.
@@ -4416,10 +5188,10 @@ import { connectorConfig, setSupportCompletionType, SetSupportCompletionTypeVari
 
 // The `SetSupportCompletionType` mutation requires an argument of type `SetSupportCompletionTypeVariables`:
 const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  completionType: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  completionType: ...,
+  updatedAt: ...,
 };
 
 // Call the `setSupportCompletionType()` function to execute the mutation.
@@ -4451,10 +5223,10 @@ import { connectorConfig, setSupportCompletionTypeRef, SetSupportCompletionTypeV
 
 // The `SetSupportCompletionType` mutation requires an argument of type `SetSupportCompletionTypeVariables`:
 const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  completionType: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  completionType: ...,
+  updatedAt: ...,
 };
 
 // Call the `setSupportCompletionTypeRef()` function to get a reference to the mutation.
@@ -4548,18 +5320,18 @@ import { connectorConfig, createInvitation, CreateInvitationVariables } from '@b
 
 // The `CreateInvitation` mutation requires an argument of type `CreateInvitationVariables`:
 const createInvitationVars: CreateInvitationVariables = {
-  circleId: ..., 
-  invitedById: ..., 
-  tokenHash: ..., 
-  mode: ..., 
+  circleId: ...,
+  invitedById: ...,
+  tokenHash: ...,
+  mode: ...,
   recipientName: ..., // optional
   recipientEmail: ..., // optional
   recipientPhone: ..., // optional
-  expectedAmount: ..., 
-  requireApproval: ..., 
-  maxUses: ..., 
-  expiresAt: ..., 
-  createdAt: ..., 
+  expectedAmount: ...,
+  requireApproval: ...,
+  maxUses: ...,
+  expiresAt: ...,
+  createdAt: ...,
 };
 
 // Call the `createInvitation()` function to execute the mutation.
@@ -4593,18 +5365,18 @@ import { connectorConfig, createInvitationRef, CreateInvitationVariables } from 
 
 // The `CreateInvitation` mutation requires an argument of type `CreateInvitationVariables`:
 const createInvitationVars: CreateInvitationVariables = {
-  circleId: ..., 
-  invitedById: ..., 
-  tokenHash: ..., 
-  mode: ..., 
+  circleId: ...,
+  invitedById: ...,
+  tokenHash: ...,
+  mode: ...,
   recipientName: ..., // optional
   recipientEmail: ..., // optional
   recipientPhone: ..., // optional
-  expectedAmount: ..., 
-  requireApproval: ..., 
-  maxUses: ..., 
-  expiresAt: ..., 
-  createdAt: ..., 
+  expectedAmount: ...,
+  requireApproval: ...,
+  maxUses: ...,
+  expiresAt: ...,
+  createdAt: ...,
 };
 
 // Call the `createInvitationRef()` function to get a reference to the mutation.
@@ -4694,13 +5466,13 @@ import { connectorConfig, updateInvitationState, UpdateInvitationStateVariables 
 
 // The `UpdateInvitationState` mutation requires an argument of type `UpdateInvitationStateVariables`:
 const updateInvitationStateVars: UpdateInvitationStateVariables = {
-  invitationId: ..., 
-  actorId: ..., 
-  circleId: ..., 
-  state: ..., 
+  invitationId: ...,
+  actorId: ...,
+  circleId: ...,
+  state: ...,
   openedAt: ..., // optional
   revokedAt: ..., // optional
-  updatedAt: ..., 
+  updatedAt: ...,
 };
 
 // Call the `updateInvitationState()` function to execute the mutation.
@@ -4732,13 +5504,13 @@ import { connectorConfig, updateInvitationStateRef, UpdateInvitationStateVariabl
 
 // The `UpdateInvitationState` mutation requires an argument of type `UpdateInvitationStateVariables`:
 const updateInvitationStateVars: UpdateInvitationStateVariables = {
-  invitationId: ..., 
-  actorId: ..., 
-  circleId: ..., 
-  state: ..., 
+  invitationId: ...,
+  actorId: ...,
+  circleId: ...,
+  state: ...,
   openedAt: ..., // optional
   revokedAt: ..., // optional
-  updatedAt: ..., 
+  updatedAt: ...,
 };
 
 // Call the `updateInvitationStateRef()` function to get a reference to the mutation.
@@ -4832,15 +5604,15 @@ import { connectorConfig, acceptInvitationWithMembership, AcceptInvitationWithMe
 
 // The `AcceptInvitationWithMembership` mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
 const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  role: ..., 
-  expectedAmount: ..., 
-  nextMemberCount: ..., 
-  nextInvitationState: ..., 
-  nextUseCount: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  role: ...,
+  expectedAmount: ...,
+  nextMemberCount: ...,
+  nextInvitationState: ...,
+  nextUseCount: ...,
+  respondedAt: ...,
 };
 
 // Call the `acceptInvitationWithMembership()` function to execute the mutation.
@@ -4880,15 +5652,15 @@ import { connectorConfig, acceptInvitationWithMembershipRef, AcceptInvitationWit
 
 // The `AcceptInvitationWithMembership` mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
 const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  role: ..., 
-  expectedAmount: ..., 
-  nextMemberCount: ..., 
-  nextInvitationState: ..., 
-  nextUseCount: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  role: ...,
+  expectedAmount: ...,
+  nextMemberCount: ...,
+  nextInvitationState: ...,
+  nextUseCount: ...,
+  respondedAt: ...,
 };
 
 // Call the `acceptInvitationWithMembershipRef()` function to get a reference to the mutation.
@@ -4982,10 +5754,10 @@ import { connectorConfig, requestInvitationApproval, RequestInvitationApprovalVa
 
 // The `RequestInvitationApproval` mutation requires an argument of type `RequestInvitationApprovalVariables`:
 const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  respondedAt: ...,
 };
 
 // Call the `requestInvitationApproval()` function to execute the mutation.
@@ -5019,10 +5791,10 @@ import { connectorConfig, requestInvitationApprovalRef, RequestInvitationApprova
 
 // The `RequestInvitationApproval` mutation requires an argument of type `RequestInvitationApprovalVariables`:
 const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  respondedAt: ...,
 };
 
 // Call the `requestInvitationApprovalRef()` function to get a reference to the mutation.
@@ -5118,17 +5890,17 @@ import { connectorConfig, submitReceiptWithAudit, SubmitReceiptWithAuditVariable
 
 // The `SubmitReceiptWithAudit` mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
 const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-  receiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  amount: ..., 
+  receiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  amount: ...,
   note: ..., // optional
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  contentType: ..., 
-  status: ..., 
-  overpaymentAmount: ..., 
-  submittedAt: ..., 
+  imageUrl: ...,
+  imageStoragePath: ...,
+  contentType: ...,
+  status: ...,
+  overpaymentAmount: ...,
+  submittedAt: ...,
 };
 
 // Call the `submitReceiptWithAudit()` function to execute the mutation.
@@ -5164,17 +5936,17 @@ import { connectorConfig, submitReceiptWithAuditRef, SubmitReceiptWithAuditVaria
 
 // The `SubmitReceiptWithAudit` mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
 const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-  receiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  amount: ..., 
+  receiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  amount: ...,
   note: ..., // optional
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  contentType: ..., 
-  status: ..., 
-  overpaymentAmount: ..., 
-  submittedAt: ..., 
+  imageUrl: ...,
+  imageStoragePath: ...,
+  contentType: ...,
+  status: ...,
+  overpaymentAmount: ...,
+  submittedAt: ...,
 };
 
 // Call the `submitReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -5274,18 +6046,18 @@ import { connectorConfig, replaceReceiptWithAudit, ReplaceReceiptWithAuditVariab
 
 // The `ReplaceReceiptWithAudit` mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
 const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-  receiptId: ..., 
-  replacedReceiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  amount: ..., 
+  receiptId: ...,
+  replacedReceiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  amount: ...,
   note: ..., // optional
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  contentType: ..., 
-  status: ..., 
-  overpaymentAmount: ..., 
-  submittedAt: ..., 
+  imageUrl: ...,
+  imageStoragePath: ...,
+  contentType: ...,
+  status: ...,
+  overpaymentAmount: ...,
+  submittedAt: ...,
 };
 
 // Call the `replaceReceiptWithAudit()` function to execute the mutation.
@@ -5323,18 +6095,18 @@ import { connectorConfig, replaceReceiptWithAuditRef, ReplaceReceiptWithAuditVar
 
 // The `ReplaceReceiptWithAudit` mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
 const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-  receiptId: ..., 
-  replacedReceiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  amount: ..., 
+  receiptId: ...,
+  replacedReceiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  amount: ...,
   note: ..., // optional
-  imageUrl: ..., 
-  imageStoragePath: ..., 
-  contentType: ..., 
-  status: ..., 
-  overpaymentAmount: ..., 
-  submittedAt: ..., 
+  imageUrl: ...,
+  imageStoragePath: ...,
+  contentType: ...,
+  status: ...,
+  overpaymentAmount: ...,
+  submittedAt: ...,
 };
 
 // Call the `replaceReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -5436,18 +6208,18 @@ import { connectorConfig, reviewReceiptWithAudit, ReviewReceiptWithAuditVariable
 
 // The `ReviewReceiptWithAudit` mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
 const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-  receiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  reviewerId: ..., 
-  receiptStatus: ..., 
+  receiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  reviewerId: ...,
+  receiptStatus: ...,
   rejectionReason: ..., // optional
-  reviewedAt: ..., 
-  membershipStatus: ..., 
-  nextConfirmedAmount: ..., 
-  nextCircleContributedAmount: ..., 
-  auditAction: ..., 
-  materialChanges: ..., 
+  reviewedAt: ...,
+  membershipStatus: ...,
+  nextConfirmedAmount: ...,
+  nextCircleContributedAmount: ...,
+  auditAction: ...,
+  materialChanges: ...,
 };
 
 // Call the `reviewReceiptWithAudit()` function to execute the mutation.
@@ -5485,18 +6257,18 @@ import { connectorConfig, reviewReceiptWithAuditRef, ReviewReceiptWithAuditVaria
 
 // The `ReviewReceiptWithAudit` mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
 const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-  receiptId: ..., 
-  circleId: ..., 
-  uploaderId: ..., 
-  reviewerId: ..., 
-  receiptStatus: ..., 
+  receiptId: ...,
+  circleId: ...,
+  uploaderId: ...,
+  reviewerId: ...,
+  receiptStatus: ...,
   rejectionReason: ..., // optional
-  reviewedAt: ..., 
-  membershipStatus: ..., 
-  nextConfirmedAmount: ..., 
-  nextCircleContributedAmount: ..., 
-  auditAction: ..., 
-  materialChanges: ..., 
+  reviewedAt: ...,
+  membershipStatus: ...,
+  nextConfirmedAmount: ...,
+  nextCircleContributedAmount: ...,
+  auditAction: ...,
+  materialChanges: ...,
 };
 
 // Call the `reviewReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -5597,16 +6369,16 @@ import { connectorConfig, approveInvitationMembership, ApproveInvitationMembersh
 
 // The `ApproveInvitationMembership` mutation requires an argument of type `ApproveInvitationMembershipVariables`:
 const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  userId: ..., 
-  role: ..., 
-  expectedAmount: ..., 
-  nextMemberCount: ..., 
-  nextInvitationState: ..., 
-  nextUseCount: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  actorId: ...,
+  userId: ...,
+  role: ...,
+  expectedAmount: ...,
+  nextMemberCount: ...,
+  nextInvitationState: ...,
+  nextUseCount: ...,
+  respondedAt: ...,
 };
 
 // Call the `approveInvitationMembership()` function to execute the mutation.
@@ -5646,16 +6418,16 @@ import { connectorConfig, approveInvitationMembershipRef, ApproveInvitationMembe
 
 // The `ApproveInvitationMembership` mutation requires an argument of type `ApproveInvitationMembershipVariables`:
 const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  userId: ..., 
-  role: ..., 
-  expectedAmount: ..., 
-  nextMemberCount: ..., 
-  nextInvitationState: ..., 
-  nextUseCount: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  actorId: ...,
+  userId: ...,
+  role: ...,
+  expectedAmount: ...,
+  nextMemberCount: ...,
+  nextInvitationState: ...,
+  nextUseCount: ...,
+  respondedAt: ...,
 };
 
 // Call the `approveInvitationMembershipRef()` function to get a reference to the mutation.
@@ -5750,11 +6522,11 @@ import { connectorConfig, declineInvitation, DeclineInvitationVariables } from '
 
 // The `DeclineInvitation` mutation requires an argument of type `DeclineInvitationVariables`:
 const declineInvitationVars: DeclineInvitationVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  state: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  state: ...,
+  respondedAt: ...,
 };
 
 // Call the `declineInvitation()` function to execute the mutation.
@@ -5788,11 +6560,11 @@ import { connectorConfig, declineInvitationRef, DeclineInvitationVariables } fro
 
 // The `DeclineInvitation` mutation requires an argument of type `DeclineInvitationVariables`:
 const declineInvitationVars: DeclineInvitationVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  userId: ..., 
-  state: ..., 
-  respondedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  userId: ...,
+  state: ...,
+  respondedAt: ...,
 };
 
 // Call the `declineInvitationRef()` function to get a reference to the mutation.
@@ -5878,10 +6650,10 @@ import { connectorConfig, requestReplacementInvitation, RequestReplacementInvita
 
 // The `RequestReplacementInvitation` mutation requires an argument of type `RequestReplacementInvitationVariables`:
 const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  requestedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  actorId: ...,
+  requestedAt: ...,
 };
 
 // Call the `requestReplacementInvitation()` function to execute the mutation.
@@ -5911,10 +6683,10 @@ import { connectorConfig, requestReplacementInvitationRef, RequestReplacementInv
 
 // The `RequestReplacementInvitation` mutation requires an argument of type `RequestReplacementInvitationVariables`:
 const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-  invitationId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  requestedAt: ..., 
+  invitationId: ...,
+  circleId: ...,
+  actorId: ...,
+  requestedAt: ...,
 };
 
 // Call the `requestReplacementInvitationRef()` function to get a reference to the mutation.
@@ -5981,6 +6753,7 @@ export interface CreateAnnouncementWithActivityVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   createdAt: TimestampString;
 }
@@ -6004,23 +6777,24 @@ import { connectorConfig, createAnnouncementWithActivity, CreateAnnouncementWith
 
 // The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
 const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-  announcementId: ..., 
-  announcementEntityId: ..., 
-  activityId: ..., 
-  circleId: ..., 
-  authorId: ..., 
-  title: ..., 
-  body: ..., 
-  pinned: ..., 
-  commentsEnabled: ..., 
-  createdAt: ..., 
+  announcementId: ...,
+  announcementEntityId: ...,
+  activityId: ...,
+  circleId: ...,
+  authorId: ...,
+  title: ...,
+  body: ...,
+  pinned: ...,
+  important: ..., // optional
+  commentsEnabled: ...,
+  createdAt: ...,
 };
 
 // Call the `createAnnouncementWithActivity()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createAnnouncementWithActivity(createAnnouncementWithActivityVars);
 // Variables can be defined inline as well.
-const { data } = await createAnnouncementWithActivity({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., createdAt: ..., });
+const { data } = await createAnnouncementWithActivity({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., createdAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -6047,22 +6821,23 @@ import { connectorConfig, createAnnouncementWithActivityRef, CreateAnnouncementW
 
 // The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
 const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-  announcementId: ..., 
-  announcementEntityId: ..., 
-  activityId: ..., 
-  circleId: ..., 
-  authorId: ..., 
-  title: ..., 
-  body: ..., 
-  pinned: ..., 
-  commentsEnabled: ..., 
-  createdAt: ..., 
+  announcementId: ...,
+  announcementEntityId: ...,
+  activityId: ...,
+  circleId: ...,
+  authorId: ...,
+  title: ...,
+  body: ...,
+  pinned: ...,
+  important: ..., // optional
+  commentsEnabled: ...,
+  createdAt: ...,
 };
 
 // Call the `createAnnouncementWithActivityRef()` function to get a reference to the mutation.
 const ref = createAnnouncementWithActivityRef(createAnnouncementWithActivityVars);
 // Variables can be defined inline as well.
-const ref = createAnnouncementWithActivityRef({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., createdAt: ..., });
+const ref = createAnnouncementWithActivityRef({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., createdAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -6125,6 +6900,7 @@ export interface UpdateAnnouncementWithAuditVariables {
   title: string;
   body: string;
   pinned: boolean;
+  important?: boolean;
   commentsEnabled: boolean;
   updatedAt: TimestampString;
   materialChanges: string;
@@ -6148,22 +6924,23 @@ import { connectorConfig, updateAnnouncementWithAudit, UpdateAnnouncementWithAud
 
 // The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
 const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-  announcementId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  title: ..., 
-  body: ..., 
-  pinned: ..., 
-  commentsEnabled: ..., 
-  updatedAt: ..., 
-  materialChanges: ..., 
+  announcementId: ...,
+  circleId: ...,
+  actorId: ...,
+  title: ...,
+  body: ...,
+  pinned: ...,
+  important: ..., // optional
+  commentsEnabled: ...,
+  updatedAt: ...,
+  materialChanges: ...,
 };
 
 // Call the `updateAnnouncementWithAudit()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateAnnouncementWithAudit(updateAnnouncementWithAuditVars);
 // Variables can be defined inline as well.
-const { data } = await updateAnnouncementWithAudit({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
+const { data } = await updateAnnouncementWithAudit({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -6188,21 +6965,22 @@ import { connectorConfig, updateAnnouncementWithAuditRef, UpdateAnnouncementWith
 
 // The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
 const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-  announcementId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  title: ..., 
-  body: ..., 
-  pinned: ..., 
-  commentsEnabled: ..., 
-  updatedAt: ..., 
-  materialChanges: ..., 
+  announcementId: ...,
+  circleId: ...,
+  actorId: ...,
+  title: ...,
+  body: ...,
+  pinned: ...,
+  important: ..., // optional
+  commentsEnabled: ...,
+  updatedAt: ...,
+  materialChanges: ...,
 };
 
 // Call the `updateAnnouncementWithAuditRef()` function to get a reference to the mutation.
 const ref = updateAnnouncementWithAuditRef(updateAnnouncementWithAuditVars);
 // Variables can be defined inline as well.
-const ref = updateAnnouncementWithAuditRef({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
+const ref = updateAnnouncementWithAuditRef({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., important: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -6282,11 +7060,11 @@ import { connectorConfig, deleteAnnouncementWithAudit, DeleteAnnouncementWithAud
 
 // The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
 const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-  announcementId: ..., 
-  announcementEntityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  deletedAt: ..., 
+  announcementId: ...,
+  announcementEntityId: ...,
+  circleId: ...,
+  actorId: ...,
+  deletedAt: ...,
 };
 
 // Call the `deleteAnnouncementWithAudit()` function to execute the mutation.
@@ -6318,11 +7096,11 @@ import { connectorConfig, deleteAnnouncementWithAuditRef, DeleteAnnouncementWith
 
 // The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
 const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-  announcementId: ..., 
-  announcementEntityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  deletedAt: ..., 
+  announcementId: ...,
+  announcementEntityId: ...,
+  circleId: ...,
+  actorId: ...,
+  deletedAt: ...,
 };
 
 // Call the `deleteAnnouncementWithAuditRef()` function to get a reference to the mutation.
@@ -6408,11 +7186,11 @@ import { connectorConfig, setCircleCommentsWithAudit, SetCircleCommentsWithAudit
 
 // The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
 const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  commentsEnabled: ..., 
-  materialChanges: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  commentsEnabled: ...,
+  materialChanges: ...,
+  updatedAt: ...,
 };
 
 // Call the `setCircleCommentsWithAudit()` function to execute the mutation.
@@ -6444,11 +7222,11 @@ import { connectorConfig, setCircleCommentsWithAuditRef, SetCircleCommentsWithAu
 
 // The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
 const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-  circleId: ..., 
-  actorId: ..., 
-  commentsEnabled: ..., 
-  materialChanges: ..., 
-  updatedAt: ..., 
+  circleId: ...,
+  actorId: ...,
+  commentsEnabled: ...,
+  materialChanges: ...,
+  updatedAt: ...,
 };
 
 // Call the `setCircleCommentsWithAuditRef()` function to get a reference to the mutation.
@@ -6538,15 +7316,15 @@ import { connectorConfig, createCommentWithActivity, CreateCommentWithActivityVa
 
 // The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
 const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-  commentId: ..., 
-  commentEntityId: ..., 
-  activityId: ..., 
-  circleId: ..., 
-  authorId: ..., 
+  commentId: ...,
+  commentEntityId: ...,
+  activityId: ...,
+  circleId: ...,
+  authorId: ...,
   announcementId: ..., // optional
   parentCommentId: ..., // optional
-  body: ..., 
-  createdAt: ..., 
+  body: ...,
+  createdAt: ...,
 };
 
 // Call the `createCommentWithActivity()` function to execute the mutation.
@@ -6578,15 +7356,15 @@ import { connectorConfig, createCommentWithActivityRef, CreateCommentWithActivit
 
 // The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
 const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-  commentId: ..., 
-  commentEntityId: ..., 
-  activityId: ..., 
-  circleId: ..., 
-  authorId: ..., 
+  commentId: ...,
+  commentEntityId: ...,
+  activityId: ...,
+  circleId: ...,
+  authorId: ...,
   announcementId: ..., // optional
   parentCommentId: ..., // optional
-  body: ..., 
-  createdAt: ..., 
+  body: ...,
+  createdAt: ...,
 };
 
 // Call the `createCommentWithActivityRef()` function to get a reference to the mutation.
@@ -6672,11 +7450,11 @@ import { connectorConfig, deleteOwnCommentWithAudit, DeleteOwnCommentWithAuditVa
 
 // The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
 const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-  commentId: ..., 
-  commentEntityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  deletedAt: ..., 
+  commentId: ...,
+  commentEntityId: ...,
+  circleId: ...,
+  actorId: ...,
+  deletedAt: ...,
 };
 
 // Call the `deleteOwnCommentWithAudit()` function to execute the mutation.
@@ -6708,11 +7486,11 @@ import { connectorConfig, deleteOwnCommentWithAuditRef, DeleteOwnCommentWithAudi
 
 // The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
 const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-  commentId: ..., 
-  commentEntityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  deletedAt: ..., 
+  commentId: ...,
+  commentEntityId: ...,
+  circleId: ...,
+  actorId: ...,
+  deletedAt: ...,
 };
 
 // Call the `deleteOwnCommentWithAuditRef()` function to get a reference to the mutation.
@@ -6799,11 +7577,11 @@ import { connectorConfig, moderateCommentWithAudit, ModerateCommentWithAuditVari
 
 // The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
 const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-  commentId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  reason: ..., 
-  moderatedAt: ..., 
+  commentId: ...,
+  circleId: ...,
+  actorId: ...,
+  reason: ...,
+  moderatedAt: ...,
 };
 
 // Call the `moderateCommentWithAudit()` function to execute the mutation.
@@ -6837,11 +7615,11 @@ import { connectorConfig, moderateCommentWithAuditRef, ModerateCommentWithAuditV
 
 // The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
 const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-  commentId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  reason: ..., 
-  moderatedAt: ..., 
+  commentId: ...,
+  circleId: ...,
+  actorId: ...,
+  reason: ...,
+  moderatedAt: ...,
 };
 
 // Call the `moderateCommentWithAuditRef()` function to get a reference to the mutation.
@@ -6931,13 +7709,13 @@ import { connectorConfig, reportCommentWithAudit, ReportCommentWithAuditVariable
 
 // The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
 const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-  reportId: ..., 
-  commentId: ..., 
-  commentEntityId: ..., 
-  circleId: ..., 
-  reporterId: ..., 
-  reason: ..., 
-  createdAt: ..., 
+  reportId: ...,
+  commentId: ...,
+  commentEntityId: ...,
+  circleId: ...,
+  reporterId: ...,
+  reason: ...,
+  createdAt: ...,
 };
 
 // Call the `reportCommentWithAudit()` function to execute the mutation.
@@ -6969,13 +7747,13 @@ import { connectorConfig, reportCommentWithAuditRef, ReportCommentWithAuditVaria
 
 // The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
 const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-  reportId: ..., 
-  commentId: ..., 
-  commentEntityId: ..., 
-  circleId: ..., 
-  reporterId: ..., 
-  reason: ..., 
-  createdAt: ..., 
+  reportId: ...,
+  commentId: ...,
+  commentEntityId: ...,
+  circleId: ...,
+  reporterId: ...,
+  reason: ...,
+  createdAt: ...,
 };
 
 // Call the `reportCommentWithAuditRef()` function to get a reference to the mutation.
@@ -7062,13 +7840,13 @@ import { connectorConfig, recordSystemActivity, RecordSystemActivityVariables } 
 
 // The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
 const recordSystemActivityVars: RecordSystemActivityVariables = {
-  activityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  eventType: ..., 
-  entityId: ..., 
-  metadata: ..., 
-  createdAt: ..., 
+  activityId: ...,
+  circleId: ...,
+  actorId: ...,
+  eventType: ...,
+  entityId: ...,
+  metadata: ...,
+  createdAt: ...,
 };
 
 // Call the `recordSystemActivity()` function to execute the mutation.
@@ -7098,13 +7876,13 @@ import { connectorConfig, recordSystemActivityRef, RecordSystemActivityVariables
 
 // The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
 const recordSystemActivityVars: RecordSystemActivityVariables = {
-  activityId: ..., 
-  circleId: ..., 
-  actorId: ..., 
-  eventType: ..., 
-  entityId: ..., 
-  metadata: ..., 
-  createdAt: ..., 
+  activityId: ...,
+  circleId: ...,
+  actorId: ...,
+  eventType: ...,
+  entityId: ...,
+  metadata: ...,
+  createdAt: ...,
 };
 
 // Call the `recordSystemActivityRef()` function to get a reference to the mutation.
@@ -7126,6 +7904,856 @@ console.log(data.activityLog_insert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.activityLog_insert);
+});
+```
+
+## CreateNotification
+You can execute the `CreateNotification` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createNotification(vars: CreateNotificationVariables): MutationPromise<CreateNotificationData, CreateNotificationVariables>;
+
+interface CreateNotificationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateNotificationVariables): MutationRef<CreateNotificationData, CreateNotificationVariables>;
+}
+export const createNotificationRef: CreateNotificationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createNotification(dc: DataConnect, vars: CreateNotificationVariables): MutationPromise<CreateNotificationData, CreateNotificationVariables>;
+
+interface CreateNotificationRef {
+  ...
+  (dc: DataConnect, vars: CreateNotificationVariables): MutationRef<CreateNotificationData, CreateNotificationVariables>;
+}
+export const createNotificationRef: CreateNotificationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createNotificationRef:
+```typescript
+const name = createNotificationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateNotification` mutation requires an argument of type `CreateNotificationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  circleId?: UUIDString | null;
+  type: string;
+  title: string;
+  body: string;
+  deepLink: string;
+  dedupeKey: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateNotification` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateNotificationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateNotificationData {
+  notification_insert: Notification_Key;
+}
+```
+### Using `CreateNotification`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createNotification, CreateNotificationVariables } from '@bondcircle/dataconnect';
+
+// The `CreateNotification` mutation requires an argument of type `CreateNotificationVariables`:
+const createNotificationVars: CreateNotificationVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  circleId: ..., // optional
+  type: ...,
+  title: ...,
+  body: ...,
+  deepLink: ...,
+  dedupeKey: ...,
+  createdAt: ...,
+};
+
+// Call the `createNotification()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createNotification(createNotificationVars);
+// Variables can be defined inline as well.
+const { data } = await createNotification({ notificationId: ..., recipientId: ..., circleId: ..., type: ..., title: ..., body: ..., deepLink: ..., dedupeKey: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createNotification(dataConnect, createNotificationVars);
+
+console.log(data.notification_insert);
+
+// Or, you can use the `Promise` API.
+createNotification(createNotificationVars).then((response) => {
+  const data = response.data;
+  console.log(data.notification_insert);
+});
+```
+
+### Using `CreateNotification`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createNotificationRef, CreateNotificationVariables } from '@bondcircle/dataconnect';
+
+// The `CreateNotification` mutation requires an argument of type `CreateNotificationVariables`:
+const createNotificationVars: CreateNotificationVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  circleId: ..., // optional
+  type: ...,
+  title: ...,
+  body: ...,
+  deepLink: ...,
+  dedupeKey: ...,
+  createdAt: ...,
+};
+
+// Call the `createNotificationRef()` function to get a reference to the mutation.
+const ref = createNotificationRef(createNotificationVars);
+// Variables can be defined inline as well.
+const ref = createNotificationRef({ notificationId: ..., recipientId: ..., circleId: ..., type: ..., title: ..., body: ..., deepLink: ..., dedupeKey: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createNotificationRef(dataConnect, createNotificationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.notification_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notification_insert);
+});
+```
+
+## MarkNotificationRead
+You can execute the `MarkNotificationRead` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+markNotificationRead(vars: MarkNotificationReadVariables): MutationPromise<MarkNotificationReadData, MarkNotificationReadVariables>;
+
+interface MarkNotificationReadRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkNotificationReadVariables): MutationRef<MarkNotificationReadData, MarkNotificationReadVariables>;
+}
+export const markNotificationReadRef: MarkNotificationReadRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+markNotificationRead(dc: DataConnect, vars: MarkNotificationReadVariables): MutationPromise<MarkNotificationReadData, MarkNotificationReadVariables>;
+
+interface MarkNotificationReadRef {
+  ...
+  (dc: DataConnect, vars: MarkNotificationReadVariables): MutationRef<MarkNotificationReadData, MarkNotificationReadVariables>;
+}
+export const markNotificationReadRef: MarkNotificationReadRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the markNotificationReadRef:
+```typescript
+const name = markNotificationReadRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `MarkNotificationRead` mutation requires an argument of type `MarkNotificationReadVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface MarkNotificationReadVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  readAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `MarkNotificationRead` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `MarkNotificationReadData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface MarkNotificationReadData {
+  notification_updateMany: number;
+}
+```
+### Using `MarkNotificationRead`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, markNotificationRead, MarkNotificationReadVariables } from '@bondcircle/dataconnect';
+
+// The `MarkNotificationRead` mutation requires an argument of type `MarkNotificationReadVariables`:
+const markNotificationReadVars: MarkNotificationReadVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  readAt: ...,
+};
+
+// Call the `markNotificationRead()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await markNotificationRead(markNotificationReadVars);
+// Variables can be defined inline as well.
+const { data } = await markNotificationRead({ notificationId: ..., recipientId: ..., readAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await markNotificationRead(dataConnect, markNotificationReadVars);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+markNotificationRead(markNotificationReadVars).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+### Using `MarkNotificationRead`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, markNotificationReadRef, MarkNotificationReadVariables } from '@bondcircle/dataconnect';
+
+// The `MarkNotificationRead` mutation requires an argument of type `MarkNotificationReadVariables`:
+const markNotificationReadVars: MarkNotificationReadVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  readAt: ...,
+};
+
+// Call the `markNotificationReadRef()` function to get a reference to the mutation.
+const ref = markNotificationReadRef(markNotificationReadVars);
+// Variables can be defined inline as well.
+const ref = markNotificationReadRef({ notificationId: ..., recipientId: ..., readAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = markNotificationReadRef(dataConnect, markNotificationReadVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+## DismissNotification
+You can execute the `DismissNotification` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+dismissNotification(vars: DismissNotificationVariables): MutationPromise<DismissNotificationData, DismissNotificationVariables>;
+
+interface DismissNotificationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DismissNotificationVariables): MutationRef<DismissNotificationData, DismissNotificationVariables>;
+}
+export const dismissNotificationRef: DismissNotificationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+dismissNotification(dc: DataConnect, vars: DismissNotificationVariables): MutationPromise<DismissNotificationData, DismissNotificationVariables>;
+
+interface DismissNotificationRef {
+  ...
+  (dc: DataConnect, vars: DismissNotificationVariables): MutationRef<DismissNotificationData, DismissNotificationVariables>;
+}
+export const dismissNotificationRef: DismissNotificationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the dismissNotificationRef:
+```typescript
+const name = dismissNotificationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DismissNotification` mutation requires an argument of type `DismissNotificationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DismissNotificationVariables {
+  notificationId: UUIDString;
+  recipientId: string;
+  dismissedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `DismissNotification` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DismissNotificationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DismissNotificationData {
+  notification_updateMany: number;
+}
+```
+### Using `DismissNotification`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, dismissNotification, DismissNotificationVariables } from '@bondcircle/dataconnect';
+
+// The `DismissNotification` mutation requires an argument of type `DismissNotificationVariables`:
+const dismissNotificationVars: DismissNotificationVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  dismissedAt: ...,
+};
+
+// Call the `dismissNotification()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await dismissNotification(dismissNotificationVars);
+// Variables can be defined inline as well.
+const { data } = await dismissNotification({ notificationId: ..., recipientId: ..., dismissedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await dismissNotification(dataConnect, dismissNotificationVars);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+dismissNotification(dismissNotificationVars).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+### Using `DismissNotification`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, dismissNotificationRef, DismissNotificationVariables } from '@bondcircle/dataconnect';
+
+// The `DismissNotification` mutation requires an argument of type `DismissNotificationVariables`:
+const dismissNotificationVars: DismissNotificationVariables = {
+  notificationId: ...,
+  recipientId: ...,
+  dismissedAt: ...,
+};
+
+// Call the `dismissNotificationRef()` function to get a reference to the mutation.
+const ref = dismissNotificationRef(dismissNotificationVars);
+// Variables can be defined inline as well.
+const ref = dismissNotificationRef({ notificationId: ..., recipientId: ..., dismissedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = dismissNotificationRef(dataConnect, dismissNotificationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+## MarkAllNotificationsRead
+You can execute the `MarkAllNotificationsRead` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+markAllNotificationsRead(vars: MarkAllNotificationsReadVariables): MutationPromise<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+
+interface MarkAllNotificationsReadRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkAllNotificationsReadVariables): MutationRef<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+}
+export const markAllNotificationsReadRef: MarkAllNotificationsReadRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+markAllNotificationsRead(dc: DataConnect, vars: MarkAllNotificationsReadVariables): MutationPromise<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+
+interface MarkAllNotificationsReadRef {
+  ...
+  (dc: DataConnect, vars: MarkAllNotificationsReadVariables): MutationRef<MarkAllNotificationsReadData, MarkAllNotificationsReadVariables>;
+}
+export const markAllNotificationsReadRef: MarkAllNotificationsReadRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the markAllNotificationsReadRef:
+```typescript
+const name = markAllNotificationsReadRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `MarkAllNotificationsRead` mutation requires an argument of type `MarkAllNotificationsReadVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface MarkAllNotificationsReadVariables {
+  recipientId: string;
+  readAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `MarkAllNotificationsRead` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `MarkAllNotificationsReadData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface MarkAllNotificationsReadData {
+  notification_updateMany: number;
+}
+```
+### Using `MarkAllNotificationsRead`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, markAllNotificationsRead, MarkAllNotificationsReadVariables } from '@bondcircle/dataconnect';
+
+// The `MarkAllNotificationsRead` mutation requires an argument of type `MarkAllNotificationsReadVariables`:
+const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
+  recipientId: ...,
+  readAt: ...,
+};
+
+// Call the `markAllNotificationsRead()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await markAllNotificationsRead(markAllNotificationsReadVars);
+// Variables can be defined inline as well.
+const { data } = await markAllNotificationsRead({ recipientId: ..., readAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await markAllNotificationsRead(dataConnect, markAllNotificationsReadVars);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+markAllNotificationsRead(markAllNotificationsReadVars).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+### Using `MarkAllNotificationsRead`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, markAllNotificationsReadRef, MarkAllNotificationsReadVariables } from '@bondcircle/dataconnect';
+
+// The `MarkAllNotificationsRead` mutation requires an argument of type `MarkAllNotificationsReadVariables`:
+const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
+  recipientId: ...,
+  readAt: ...,
+};
+
+// Call the `markAllNotificationsReadRef()` function to get a reference to the mutation.
+const ref = markAllNotificationsReadRef(markAllNotificationsReadVars);
+// Variables can be defined inline as well.
+const ref = markAllNotificationsReadRef({ recipientId: ..., readAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = markAllNotificationsReadRef(dataConnect, markAllNotificationsReadVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.notification_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.notification_updateMany);
+});
+```
+
+## UpdateNotificationPreferences
+You can execute the `UpdateNotificationPreferences` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateNotificationPreferences(vars: UpdateNotificationPreferencesVariables): MutationPromise<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+
+interface UpdateNotificationPreferencesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateNotificationPreferencesVariables): MutationRef<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+}
+export const updateNotificationPreferencesRef: UpdateNotificationPreferencesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateNotificationPreferences(dc: DataConnect, vars: UpdateNotificationPreferencesVariables): MutationPromise<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+
+interface UpdateNotificationPreferencesRef {
+  ...
+  (dc: DataConnect, vars: UpdateNotificationPreferencesVariables): MutationRef<UpdateNotificationPreferencesData, UpdateNotificationPreferencesVariables>;
+}
+export const updateNotificationPreferencesRef: UpdateNotificationPreferencesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateNotificationPreferencesRef:
+```typescript
+const name = updateNotificationPreferencesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateNotificationPreferences` mutation requires an argument of type `UpdateNotificationPreferencesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateNotificationPreferencesVariables {
+  userId: string;
+  emailNotifications: boolean;
+  browserPushNotifications: boolean;
+  commentNotifications: boolean;
+  contributionReminders: boolean;
+  circleUpdateNotifications: boolean;
+  marketingCommunication: boolean;
+}
+```
+### Return Type
+Recall that executing the `UpdateNotificationPreferences` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateNotificationPreferencesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateNotificationPreferencesData {
+  user_update?: User_Key | null;
+}
+```
+### Using `UpdateNotificationPreferences`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateNotificationPreferences, UpdateNotificationPreferencesVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateNotificationPreferences` mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
+const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
+  userId: ...,
+  emailNotifications: ...,
+  browserPushNotifications: ...,
+  commentNotifications: ...,
+  contributionReminders: ...,
+  circleUpdateNotifications: ...,
+  marketingCommunication: ...,
+};
+
+// Call the `updateNotificationPreferences()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateNotificationPreferences(updateNotificationPreferencesVars);
+// Variables can be defined inline as well.
+const { data } = await updateNotificationPreferences({ userId: ..., emailNotifications: ..., browserPushNotifications: ..., commentNotifications: ..., contributionReminders: ..., circleUpdateNotifications: ..., marketingCommunication: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateNotificationPreferences(dataConnect, updateNotificationPreferencesVars);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+updateNotificationPreferences(updateNotificationPreferencesVars).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+### Using `UpdateNotificationPreferences`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateNotificationPreferencesRef, UpdateNotificationPreferencesVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateNotificationPreferences` mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
+const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
+  userId: ...,
+  emailNotifications: ...,
+  browserPushNotifications: ...,
+  commentNotifications: ...,
+  contributionReminders: ...,
+  circleUpdateNotifications: ...,
+  marketingCommunication: ...,
+};
+
+// Call the `updateNotificationPreferencesRef()` function to get a reference to the mutation.
+const ref = updateNotificationPreferencesRef(updateNotificationPreferencesVars);
+// Variables can be defined inline as well.
+const ref = updateNotificationPreferencesRef({ userId: ..., emailNotifications: ..., browserPushNotifications: ..., commentNotifications: ..., contributionReminders: ..., circleUpdateNotifications: ..., marketingCommunication: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateNotificationPreferencesRef(dataConnect, updateNotificationPreferencesVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+## SetCircleNotificationMute
+You can execute the `SetCircleNotificationMute` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+setCircleNotificationMute(vars: SetCircleNotificationMuteVariables): MutationPromise<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+
+interface SetCircleNotificationMuteRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleNotificationMuteVariables): MutationRef<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+}
+export const setCircleNotificationMuteRef: SetCircleNotificationMuteRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+setCircleNotificationMute(dc: DataConnect, vars: SetCircleNotificationMuteVariables): MutationPromise<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+
+interface SetCircleNotificationMuteRef {
+  ...
+  (dc: DataConnect, vars: SetCircleNotificationMuteVariables): MutationRef<SetCircleNotificationMuteData, SetCircleNotificationMuteVariables>;
+}
+export const setCircleNotificationMuteRef: SetCircleNotificationMuteRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the setCircleNotificationMuteRef:
+```typescript
+const name = setCircleNotificationMuteRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SetCircleNotificationMute` mutation requires an argument of type `SetCircleNotificationMuteVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SetCircleNotificationMuteVariables {
+  circleId: UUIDString;
+  userId: string;
+  notificationsMuted: boolean;
+}
+```
+### Return Type
+Recall that executing the `SetCircleNotificationMute` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SetCircleNotificationMuteData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SetCircleNotificationMuteData {
+  circleMembership_update?: CircleMembership_Key | null;
+}
+```
+### Using `SetCircleNotificationMute`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, setCircleNotificationMute, SetCircleNotificationMuteVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleNotificationMute` mutation requires an argument of type `SetCircleNotificationMuteVariables`:
+const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
+  circleId: ...,
+  userId: ...,
+  notificationsMuted: ...,
+};
+
+// Call the `setCircleNotificationMute()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await setCircleNotificationMute(setCircleNotificationMuteVars);
+// Variables can be defined inline as well.
+const { data } = await setCircleNotificationMute({ circleId: ..., userId: ..., notificationsMuted: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await setCircleNotificationMute(dataConnect, setCircleNotificationMuteVars);
+
+console.log(data.circleMembership_update);
+
+// Or, you can use the `Promise` API.
+setCircleNotificationMute(setCircleNotificationMuteVars).then((response) => {
+  const data = response.data;
+  console.log(data.circleMembership_update);
+});
+```
+
+### Using `SetCircleNotificationMute`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, setCircleNotificationMuteRef, SetCircleNotificationMuteVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleNotificationMute` mutation requires an argument of type `SetCircleNotificationMuteVariables`:
+const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
+  circleId: ...,
+  userId: ...,
+  notificationsMuted: ...,
+};
+
+// Call the `setCircleNotificationMuteRef()` function to get a reference to the mutation.
+const ref = setCircleNotificationMuteRef(setCircleNotificationMuteVars);
+// Variables can be defined inline as well.
+const ref = setCircleNotificationMuteRef({ circleId: ..., userId: ..., notificationsMuted: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = setCircleNotificationMuteRef(dataConnect, setCircleNotificationMuteVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circleMembership_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circleMembership_update);
+});
+```
+
+## CreateEmailDelivery
+You can execute the `CreateEmailDelivery` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createEmailDelivery(vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+
+interface CreateEmailDeliveryRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateEmailDeliveryVariables): MutationRef<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+}
+export const createEmailDeliveryRef: CreateEmailDeliveryRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createEmailDelivery(dc: DataConnect, vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+
+interface CreateEmailDeliveryRef {
+  ...
+  (dc: DataConnect, vars: CreateEmailDeliveryVariables): MutationRef<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+}
+export const createEmailDeliveryRef: CreateEmailDeliveryRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createEmailDeliveryRef:
+```typescript
+const name = createEmailDeliveryRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateEmailDelivery` mutation requires an argument of type `CreateEmailDeliveryVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateEmailDeliveryVariables {
+  deliveryId: UUIDString;
+  notificationId?: UUIDString | null;
+  recipientId?: string | null;
+  eventType: string;
+  destinationMasked: string;
+  status: string;
+  providerMessageId?: string | null;
+  failureReason?: string | null;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateEmailDelivery` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateEmailDeliveryData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateEmailDeliveryData {
+  emailDelivery_insert: EmailDelivery_Key;
+}
+```
+### Using `CreateEmailDelivery`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createEmailDelivery, CreateEmailDeliveryVariables } from '@bondcircle/dataconnect';
+
+// The `CreateEmailDelivery` mutation requires an argument of type `CreateEmailDeliveryVariables`:
+const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
+  deliveryId: ...,
+  notificationId: ..., // optional
+  recipientId: ..., // optional
+  eventType: ...,
+  destinationMasked: ...,
+  status: ...,
+  providerMessageId: ..., // optional
+  failureReason: ..., // optional
+  createdAt: ...,
+};
+
+// Call the `createEmailDelivery()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createEmailDelivery(createEmailDeliveryVars);
+// Variables can be defined inline as well.
+const { data } = await createEmailDelivery({ deliveryId: ..., notificationId: ..., recipientId: ..., eventType: ..., destinationMasked: ..., status: ..., providerMessageId: ..., failureReason: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createEmailDelivery(dataConnect, createEmailDeliveryVars);
+
+console.log(data.emailDelivery_insert);
+
+// Or, you can use the `Promise` API.
+createEmailDelivery(createEmailDeliveryVars).then((response) => {
+  const data = response.data;
+  console.log(data.emailDelivery_insert);
+});
+```
+
+### Using `CreateEmailDelivery`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createEmailDeliveryRef, CreateEmailDeliveryVariables } from '@bondcircle/dataconnect';
+
+// The `CreateEmailDelivery` mutation requires an argument of type `CreateEmailDeliveryVariables`:
+const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
+  deliveryId: ...,
+  notificationId: ..., // optional
+  recipientId: ..., // optional
+  eventType: ...,
+  destinationMasked: ...,
+  status: ...,
+  providerMessageId: ..., // optional
+  failureReason: ..., // optional
+  createdAt: ...,
+};
+
+// Call the `createEmailDeliveryRef()` function to get a reference to the mutation.
+const ref = createEmailDeliveryRef(createEmailDeliveryVars);
+// Variables can be defined inline as well.
+const ref = createEmailDeliveryRef({ deliveryId: ..., notificationId: ..., recipientId: ..., eventType: ..., destinationMasked: ..., status: ..., providerMessageId: ..., failureReason: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createEmailDeliveryRef(dataConnect, createEmailDeliveryVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.emailDelivery_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.emailDelivery_insert);
 });
 ```
 

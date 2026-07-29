@@ -19,6 +19,7 @@ import {
 } from "@/server/communication/rules";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
+import { safelyEmitNotification } from "@/server/repositories/notifications";
 
 type CommunicationQuery = {
   circle?: {
@@ -32,6 +33,8 @@ type CommunicationQuery = {
   circleMemberships: Array<{
     role: string;
     membershipStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
     user: {
       id: string;
       displayName: string;
@@ -43,6 +46,7 @@ type CommunicationQuery = {
     title: string;
     body: string;
     pinned: boolean;
+    important: boolean;
     commentsEnabled: boolean;
     createdAt: string;
     updatedAt: string;
@@ -116,6 +120,12 @@ export type CircleCommunication = {
   comments: CircleComment[];
   reports: CommentReport[];
   activity: ActivityEvent[];
+  reminderCandidates: Array<{
+    id: string;
+    name: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+  }>;
 };
 
 function safeMetadata(value: string): Record<string, unknown> {
@@ -216,6 +226,7 @@ export async function loadCircleCommunication(
       title: announcement.title,
       body: announcement.body,
       pinned: announcement.pinned,
+      important: announcement.important,
       commentsEnabled: announcement.commentsEnabled,
       authorId: announcement.author.id,
       authorName: announcement.author.displayName,
@@ -244,6 +255,21 @@ export async function loadCircleCommunication(
           createdAt: report.createdAt,
         }))
       : [],
+    reminderCandidates: viewerCanManage
+      ? data.circleMemberships
+          .filter(
+            (membership) =>
+              membership.membershipStatus === "joined" &&
+              membership.user.id !== viewerId &&
+              membership.expectedAmount > membership.confirmedAmount,
+          )
+          .map((membership) => ({
+            id: membership.user.id,
+            name: membership.user.displayName,
+            expectedAmount: membership.expectedAmount,
+            confirmedAmount: membership.confirmedAmount,
+          }))
+      : [],
     activity: data.activityLogs
       .map((row) => mapActivity(row, circle))
       .filter((row): row is ActivityEvent => Boolean(row)),
@@ -262,6 +288,7 @@ export async function createAnnouncement(input: {
   title: string;
   body: string;
   pinned: boolean;
+  important: boolean;
   commentsEnabled: boolean;
 }) {
   const workspace = await requireCommunicationMember(
@@ -283,10 +310,18 @@ export async function createAnnouncement(input: {
       authorId: input.authorId,
       ...content,
       pinned: input.pinned,
+      important: input.important,
       commentsEnabled: input.commentsEnabled,
       createdAt,
     },
   );
+  await safelyEmitNotification({
+    circleId: input.circleId,
+    type: "announcement_posted",
+    entityId: announcementId,
+    actorId: input.authorId,
+    important: input.important,
+  });
   return { id: announcementId, createdAt };
 }
 
@@ -297,6 +332,7 @@ export async function updateAnnouncement(input: {
   title?: string;
   body?: string;
   pinned?: boolean;
+  important?: boolean;
   commentsEnabled?: boolean;
 }) {
   const workspace = await requireCommunicationMember(
@@ -314,6 +350,7 @@ export async function updateAnnouncement(input: {
     body: input.body ?? announcement.body,
   });
   const pinned = input.pinned ?? announcement.pinned;
+  const important = input.important ?? announcement.important;
   const commentsEnabled = input.commentsEnabled ?? announcement.commentsEnabled;
   const updatedAt = new Date().toISOString();
   await getBondCircleDataConnect().executeMutation(
@@ -324,12 +361,14 @@ export async function updateAnnouncement(input: {
       actorId: input.actorId,
       ...content,
       pinned,
+      important,
       commentsEnabled,
       updatedAt,
       materialChanges: JSON.stringify({
         titleChanged: content.title !== announcement.title,
         bodyChanged: content.body !== announcement.body,
         pinned,
+        important,
         commentsEnabled,
       }),
     },
@@ -459,6 +498,15 @@ export async function createComment(input: {
       createdAt,
     },
   );
+  if (parent && parent.authorId !== input.authorId) {
+    await safelyEmitNotification({
+      circleId: input.circleId,
+      type: "comment_reply",
+      entityId: commentId,
+      actorId: input.authorId,
+      recipientIds: [parent.authorId],
+    });
+  }
   return { id: commentId, createdAt };
 }
 

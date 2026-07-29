@@ -19,6 +19,7 @@ export async function POST(
       title?: string;
       body?: string;
       pinned?: boolean;
+      important?: boolean;
       commentsEnabled?: boolean;
     };
     const result = await createAnnouncement({
@@ -27,6 +28,7 @@ export async function POST(
       title: String(body.title ?? ""),
       body: String(body.body ?? ""),
       pinned: body.pinned === true,
+      important: body.important === true,
       commentsEnabled: body.commentsEnabled !== false,
     });
     return NextResponse.json(result, { status: 201 });

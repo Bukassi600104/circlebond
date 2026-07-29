@@ -56,9 +56,11 @@ function isCurrent(pathname: string, href: string) {
 export function DashboardShell({
   children,
   displayName,
+  unreadCount,
 }: {
   children: ReactNode;
   displayName: string;
+  unreadCount: number;
 }) {
   const pathname = usePathname();
   const initials = displayName
@@ -115,6 +117,14 @@ export function DashboardShell({
           <div className="bc-dashboard-topbar__actions">
             <Link href="/account/notifications" aria-label="Notifications">
               <Bell size={19} aria-hidden="true" />
+              {unreadCount > 0 && (
+                <span
+                  className="bc-notification-count"
+                  aria-label={`${unreadCount} unread`}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </Link>
             <Link href="/account/profile" aria-label="Profile">
               <span aria-hidden="true">{initials}</span>

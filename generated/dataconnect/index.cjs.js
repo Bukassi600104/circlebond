@@ -16,7 +16,7 @@ getCurrentUserRef.operationName = 'GetCurrentUser';
 exports.getCurrentUserRef = getCurrentUserRef;
 
 exports.getCurrentUser = function getCurrentUser(dcOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
   return executeQuery(getCurrentUserRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -45,7 +45,7 @@ getDashboardCirclesRef.operationName = 'GetDashboardCircles';
 exports.getDashboardCirclesRef = getDashboardCirclesRef;
 
 exports.getDashboardCircles = function getDashboardCircles(dcOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
   return executeQuery(getDashboardCirclesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -60,7 +60,7 @@ getCircleEngineRecordRef.operationName = 'GetCircleEngineRecord';
 exports.getCircleEngineRecordRef = getCircleEngineRecordRef;
 
 exports.getCircleEngineRecord = function getCircleEngineRecord(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCircleEngineRecordRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -75,7 +75,7 @@ findUserByEmailRef.operationName = 'FindUserByEmail';
 exports.findUserByEmailRef = findUserByEmailRef;
 
 exports.findUserByEmail = function findUserByEmail(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(findUserByEmailRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -90,7 +90,7 @@ getGiftCircleDetailRef.operationName = 'GetGiftCircleDetail';
 exports.getGiftCircleDetailRef = getGiftCircleDetailRef;
 
 exports.getGiftCircleDetail = function getGiftCircleDetail(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getGiftCircleDetailRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -105,7 +105,7 @@ getCircleAuditEntriesRef.operationName = 'GetCircleAuditEntries';
 exports.getCircleAuditEntriesRef = getCircleAuditEntriesRef;
 
 exports.getCircleAuditEntries = function getCircleAuditEntries(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCircleAuditEntriesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -204,7 +204,7 @@ getAsoEbiCircleDetailRef.operationName = 'GetAsoEbiCircleDetail';
 exports.getAsoEbiCircleDetailRef = getAsoEbiCircleDetailRef;
 
 exports.getAsoEbiCircleDetail = function getAsoEbiCircleDetail(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getAsoEbiCircleDetailRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -275,7 +275,7 @@ getSupportCircleDetailRef.operationName = 'GetSupportCircleDetail';
 exports.getSupportCircleDetailRef = getSupportCircleDetailRef;
 
 exports.getSupportCircleDetail = function getSupportCircleDetail(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getSupportCircleDetailRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -360,7 +360,7 @@ getInvitationByTokenHashRef.operationName = 'GetInvitationByTokenHash';
 exports.getInvitationByTokenHashRef = getInvitationByTokenHashRef;
 
 exports.getInvitationByTokenHash = function getInvitationByTokenHash(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getInvitationByTokenHashRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -375,7 +375,7 @@ getCircleInvitationsRef.operationName = 'GetCircleInvitations';
 exports.getCircleInvitationsRef = getCircleInvitationsRef;
 
 exports.getCircleInvitations = function getCircleInvitations(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCircleInvitationsRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -390,7 +390,7 @@ getInvitationAcceptancesRef.operationName = 'GetInvitationAcceptances';
 exports.getInvitationAcceptancesRef = getInvitationAcceptancesRef;
 
 exports.getInvitationAcceptances = function getInvitationAcceptances(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getInvitationAcceptancesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -461,7 +461,7 @@ getContributionWorkspaceRef.operationName = 'GetContributionWorkspace';
 exports.getContributionWorkspaceRef = getContributionWorkspaceRef;
 
 exports.getContributionWorkspace = function getContributionWorkspace(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getContributionWorkspaceRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -560,7 +560,7 @@ getCircleCommunicationRef.operationName = 'GetCircleCommunication';
 exports.getCircleCommunicationRef = getCircleCommunicationRef;
 
 exports.getCircleCommunication = function getCircleCommunication(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCircleCommunicationRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -575,7 +575,7 @@ getRecentCommentsByAuthorRef.operationName = 'GetRecentCommentsByAuthor';
 exports.getRecentCommentsByAuthorRef = getRecentCommentsByAuthorRef;
 
 exports.getRecentCommentsByAuthor = function getRecentCommentsByAuthor(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getRecentCommentsByAuthorRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -590,7 +590,7 @@ getOpenCommentReportsByReporterRef.operationName = 'GetOpenCommentReportsByRepor
 exports.getOpenCommentReportsByReporterRef = getOpenCommentReportsByReporterRef;
 
 exports.getOpenCommentReportsByReporter = function getOpenCommentReportsByReporter(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getOpenCommentReportsByReporterRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -605,7 +605,7 @@ getActivityLogsForCirclesRef.operationName = 'GetActivityLogsForCircles';
 exports.getActivityLogsForCirclesRef = getActivityLogsForCirclesRef;
 
 exports.getActivityLogsForCircles = function getActivityLogsForCircles(dcOrVars, varsOrOptions, options) {
-  
+
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getActivityLogsForCirclesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
 }
@@ -734,5 +734,193 @@ exports.recordSystemActivityRef = recordSystemActivityRef;
 exports.recordSystemActivity = function recordSystemActivity(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(recordSystemActivityRef(dcInstance, inputVars));
+}
+;
+
+const getUserNotificationsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserNotifications', inputVars);
+}
+getUserNotificationsRef.operationName = 'GetUserNotifications';
+exports.getUserNotificationsRef = getUserNotificationsRef;
+
+exports.getUserNotifications = function getUserNotifications(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getUserNotificationsRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getNotificationContextRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetNotificationContext', inputVars);
+}
+getNotificationContextRef.operationName = 'GetNotificationContext';
+exports.getNotificationContextRef = getNotificationContextRef;
+
+exports.getNotificationContext = function getNotificationContext(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getNotificationContextRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getNotificationDedupeRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetNotificationDedupe', inputVars);
+}
+getNotificationDedupeRef.operationName = 'GetNotificationDedupe';
+exports.getNotificationDedupeRef = getNotificationDedupeRef;
+
+exports.getNotificationDedupe = function getNotificationDedupe(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getNotificationDedupeRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getRecentReminderNotificationsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetRecentReminderNotifications', inputVars);
+}
+getRecentReminderNotificationsRef.operationName = 'GetRecentReminderNotifications';
+exports.getRecentReminderNotificationsRef = getRecentReminderNotificationsRef;
+
+exports.getRecentReminderNotifications = function getRecentReminderNotifications(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getRecentReminderNotificationsRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const findNotificationRecipientByEmailRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'FindNotificationRecipientByEmail', inputVars);
+}
+findNotificationRecipientByEmailRef.operationName = 'FindNotificationRecipientByEmail';
+exports.findNotificationRecipientByEmailRef = findNotificationRecipientByEmailRef;
+
+exports.findNotificationRecipientByEmail = function findNotificationRecipientByEmail(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(findNotificationRecipientByEmailRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getDeadlineNotificationCandidatesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDeadlineNotificationCandidates', inputVars);
+}
+getDeadlineNotificationCandidatesRef.operationName = 'GetDeadlineNotificationCandidates';
+exports.getDeadlineNotificationCandidatesRef = getDeadlineNotificationCandidatesRef;
+
+exports.getDeadlineNotificationCandidates = function getDeadlineNotificationCandidates(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getDeadlineNotificationCandidatesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const createNotificationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateNotification', inputVars);
+}
+createNotificationRef.operationName = 'CreateNotification';
+exports.createNotificationRef = createNotificationRef;
+
+exports.createNotification = function createNotification(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createNotificationRef(dcInstance, inputVars));
+}
+;
+
+const markNotificationReadRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'MarkNotificationRead', inputVars);
+}
+markNotificationReadRef.operationName = 'MarkNotificationRead';
+exports.markNotificationReadRef = markNotificationReadRef;
+
+exports.markNotificationRead = function markNotificationRead(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(markNotificationReadRef(dcInstance, inputVars));
+}
+;
+
+const dismissNotificationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DismissNotification', inputVars);
+}
+dismissNotificationRef.operationName = 'DismissNotification';
+exports.dismissNotificationRef = dismissNotificationRef;
+
+exports.dismissNotification = function dismissNotification(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(dismissNotificationRef(dcInstance, inputVars));
+}
+;
+
+const markAllNotificationsReadRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'MarkAllNotificationsRead', inputVars);
+}
+markAllNotificationsReadRef.operationName = 'MarkAllNotificationsRead';
+exports.markAllNotificationsReadRef = markAllNotificationsReadRef;
+
+exports.markAllNotificationsRead = function markAllNotificationsRead(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(markAllNotificationsReadRef(dcInstance, inputVars));
+}
+;
+
+const updateNotificationPreferencesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateNotificationPreferences', inputVars);
+}
+updateNotificationPreferencesRef.operationName = 'UpdateNotificationPreferences';
+exports.updateNotificationPreferencesRef = updateNotificationPreferencesRef;
+
+exports.updateNotificationPreferences = function updateNotificationPreferences(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateNotificationPreferencesRef(dcInstance, inputVars));
+}
+;
+
+const setCircleNotificationMuteRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SetCircleNotificationMute', inputVars);
+}
+setCircleNotificationMuteRef.operationName = 'SetCircleNotificationMute';
+exports.setCircleNotificationMuteRef = setCircleNotificationMuteRef;
+
+exports.setCircleNotificationMute = function setCircleNotificationMute(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(setCircleNotificationMuteRef(dcInstance, inputVars));
+}
+;
+
+const createEmailDeliveryRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateEmailDelivery', inputVars);
+}
+createEmailDeliveryRef.operationName = 'CreateEmailDelivery';
+exports.createEmailDeliveryRef = createEmailDeliveryRef;
+
+exports.createEmailDelivery = function createEmailDelivery(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createEmailDeliveryRef(dcInstance, inputVars));
 }
 ;
