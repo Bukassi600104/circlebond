@@ -247,6 +247,7 @@ export function AsoEbiCircleForm() {
                     Number.isInteger(requested) &&
                     requested > selectedPlan.memberLimit
                   ) {
+                    event.currentTarget.blur();
                     setCapacityIssue(requested);
                     return;
                   }
@@ -465,7 +466,12 @@ export function AsoEbiCircleForm() {
           <header>
             <div>
               <h2>Invite members</h2>
-              <p>Members choose their tier after joining.</p>
+              <p>
+                Add existing members or email a secure registration invite.
+                Members choose their tier after joining.
+                After creation, you can also share a detailed WhatsApp or open
+                link.
+              </p>
             </div>
             <button
               type="button"

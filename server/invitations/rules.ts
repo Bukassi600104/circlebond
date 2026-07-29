@@ -14,6 +14,28 @@ export const INVITATION_STATES = [
 export type InvitationState = (typeof INVITATION_STATES)[number];
 export type InvitationMode = "named" | "open";
 
+export function buildInvitationShareMessage(input: {
+  inviterName: string;
+  circleName: string;
+  circleType: string;
+  reason: string;
+  link: string;
+}) {
+  const type =
+    input.circleType === "aso-ebi"
+      ? "Aso-Ebi Circle"
+      : input.circleType === "support"
+        ? "Support Circle"
+        : "Gift Circle";
+  const reason = input.reason.trim().replace(/\s+/g, " ").slice(0, 300);
+  return [
+    `${input.inviterName} invited you to join “${input.circleName}” on BondCircle.`,
+    `${type}${reason ? ` — ${reason}` : ""}`,
+    "Open the secure link to register or sign in, install BondCircle, and respond to the invitation:",
+    input.link,
+  ].join("\n\n");
+}
+
 const transitions: Record<InvitationState, readonly InvitationState[]> = {
   created: ["sent", "opened", "declined", "revoked", "expired"],
   sent: [

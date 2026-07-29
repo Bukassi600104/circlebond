@@ -202,6 +202,7 @@ export function GiftCircleForm() {
                   Number.isInteger(requested) &&
                   requested > selectedTier.memberLimit
                 ) {
+                  event.currentTarget.blur();
                   setCapacityIssue(requested);
                   return;
                 }
@@ -322,7 +323,11 @@ export function GiftCircleForm() {
           <header>
             <div>
               <h2>Invite members</h2>
-              <p>Add people who already have a BondCircle account.</p>
+              <p>
+                Add existing members or email a secure registration invite.
+                After creation, you can also share a detailed WhatsApp or open
+                link.
+              </p>
             </div>
             <button
               type="button"

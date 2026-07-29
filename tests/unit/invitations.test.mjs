@@ -132,7 +132,7 @@ test("Milestone 9 secure invitation and multi-circle membership surfaces are wir
   assert.match(manager, /navigator\.share/);
   assert.match(manager, /navigator\.contacts/);
   assert.match(manager, /wa\.me/);
-  assert.match(manager, /sms:/);
+  assert.doesNotMatch(manager, /href=\{`sms:/);
   assert.match(manager, /mailto:/);
   assert.match(auth, /params\.get\("next"\)/);
 });

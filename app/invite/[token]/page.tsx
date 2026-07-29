@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import {
   ExpiredInvitation,
   InvalidInvitation,
   InvitationDetails,
 } from "@/components/invitations/InvitationDetails";
 import { invitationMatchesUser } from "@/server/invitations/rules";
-import { requireSession } from "@/server/auth";
+import { readSession } from "@/server/auth";
 import { loadInvitationByToken } from "@/server/repositories/invitations";
 
 export const metadata: Metadata = {
@@ -19,7 +20,11 @@ export default async function InvitationPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const session = await requireSession(`/invite/${encodeURIComponent(token)}`);
+  const nextPath = `/invite/${encodeURIComponent(token)}`;
+  const session = await readSession();
+  if (!session) {
+    redirect(`/register?next=${encodeURIComponent(nextPath)}`);
+  }
   const invitation = await loadInvitationByToken(token);
   if (!invitation) return <InvalidInvitation />;
 

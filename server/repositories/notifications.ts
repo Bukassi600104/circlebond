@@ -260,6 +260,7 @@ export async function emitNewInvitation(input: {
   recipientEmail: string;
   invitationId: string;
   deepLink: string;
+  message?: string;
 }) {
   const email = input.recipientEmail.trim().toLowerCase();
   const { circle } = await contextFor(input.circleId);
@@ -287,7 +288,7 @@ export async function emitNewInvitation(input: {
     email,
     type: "invitation_received",
     title: copy.title,
-    body: copy.body,
+    body: input.message ?? copy.body,
     deepLink: safeDeepLink(input.deepLink),
     dedupeKey,
   });

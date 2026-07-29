@@ -54,6 +54,7 @@ type InvitationSummary = {
 type GeneratedInvitation = {
   id: string;
   link: string;
+  shareMessage: string;
   recipientEmail: string;
   recipientPhone: string;
 };
@@ -140,14 +141,16 @@ export function InvitationManager({
       const data = (await response.json()) as {
         id?: string;
         link?: string;
+        shareMessage?: string;
         error?: string;
       };
-      if (!response.ok || !data.id || !data.link) {
+      if (!response.ok || !data.id || !data.link || !data.shareMessage) {
         throw new Error(data.error ?? "Unable to create invitation.");
       }
       setGenerated({
         id: data.id,
         link: data.link,
+        shareMessage: data.shareMessage,
         recipientEmail: channel === "email" ? recipient : "",
         recipientPhone: channel === "phone" ? recipient : "",
       });
@@ -177,7 +180,7 @@ export function InvitationManager({
 
   async function copyLink() {
     if (!generated) return;
-    await navigator.clipboard.writeText(generated.link);
+    await navigator.clipboard.writeText(generated.shareMessage);
     setBusy("copied");
     await markSent(generated.id);
     window.setTimeout(() => setBusy(""), 1500);
@@ -187,8 +190,7 @@ export function InvitationManager({
     if (!generated || !navigator.share) return;
     await navigator.share({
       title: "BondCircle invitation",
-      text: "You’re invited to join my BondCircle.",
-      url: generated.link,
+      text: generated.shareMessage,
     });
     await markSent(generated.id);
   }
@@ -453,7 +455,7 @@ export function InvitationManager({
                 <div>
                   <button type="button" onClick={copyLink}>
                     <Clipboard size={13} aria-hidden="true" />
-                    {busy === "copied" ? "Copied" : "Copy"}
+                    {busy === "copied" ? "Copied" : "Copy message"}
                   </button>
                   {typeof (navigator as Partial<Navigator>).share ===
                   "function" ? (
@@ -462,7 +464,7 @@ export function InvitationManager({
                     </button>
                   ) : null}
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`Join my BondCircle: ${generated.link}`)}`}
+                    href={`https://wa.me/?text=${encodeURIComponent(generated.shareMessage)}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => void markSent(generated.id)}
@@ -470,13 +472,7 @@ export function InvitationManager({
                     <MessageCircle size={13} aria-hidden="true" /> WhatsApp
                   </a>
                   <a
-                    href={`sms:${generated.recipientPhone}?body=${encodeURIComponent(`Join my BondCircle: ${generated.link}`)}`}
-                    onClick={() => void markSent(generated.id)}
-                  >
-                    <Smartphone size={13} aria-hidden="true" /> SMS
-                  </a>
-                  <a
-                    href={`mailto:${generated.recipientEmail}?subject=${encodeURIComponent("Your BondCircle invitation")}&body=${encodeURIComponent(`Join my BondCircle: ${generated.link}`)}`}
+                    href={`mailto:${generated.recipientEmail}?subject=${encodeURIComponent("Your BondCircle invitation")}&body=${encodeURIComponent(generated.shareMessage)}`}
                     onClick={() => void markSent(generated.id)}
                   >
                     <Mail size={13} aria-hidden="true" /> Email

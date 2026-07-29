@@ -1108,7 +1108,7 @@
   background: white;
   color: #183a34;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .bc-invite-manager label small {
@@ -2312,14 +2312,19 @@
 }
 
 .bc-gift-create input,
-.bc-gift-create textarea {
+.bc-gift-create textarea,
+.bc-gift-create select {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 2.75rem;
   padding: var(--space-2) var(--space-3);
   border: var(--border);
   border-radius: var(--radius-small);
   background: var(--color-white);
   color: var(--color-text-primary);
+  /* iOS zooms focused controls below 16px and breaks the app-like frame. */
+  font-size: 1rem;
   font-weight: 400;
 }
 
@@ -2567,8 +2572,13 @@
 }
 
 .bc-tier-modal > section {
-  width: min(100%, 26rem);
-  padding: var(--space-5);
+  width: 100%;
+  max-width: 24rem;
+  min-width: 0;
+  max-height: min(22rem, calc(100dvh - 1.5rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1.1rem;
   border-radius: var(--radius-large);
   position: relative;
   background: var(--color-white);
@@ -2598,9 +2608,11 @@
 }
 
 .bc-tier-modal h2 {
-  max-width: 20rem;
-  margin: var(--space-2) 0;
-  font-size: var(--text-h3);
+  max-width: calc(100% - 2.5rem);
+  margin: 0.4rem 0;
+  overflow-wrap: anywhere;
+  font-size: 1.05rem;
+  line-height: 1.3;
 }
 
 .bc-tier-modal p {
@@ -2618,6 +2630,7 @@
 }
 
 .bc-tier-modal footer button {
+  min-width: 0;
   min-height: 2.35rem;
   padding: 0.45rem 0.75rem;
   border: 1px solid var(--color-green);
@@ -2630,12 +2643,41 @@
   cursor: pointer;
   font-size: var(--text-caption);
   font-weight: 700;
+  text-align: center;
+  white-space: normal;
 }
 
 .bc-tier-modal footer button:last-child {
   border-color: var(--color-teal);
   background: var(--color-teal);
   color: var(--color-white);
+}
+
+@media (max-width: 30rem) {
+  .bc-tier-modal {
+    align-items: center;
+    padding: max(0.75rem, env(safe-area-inset-top))
+      max(0.75rem, env(safe-area-inset-right))
+      max(0.75rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .bc-tier-modal > section {
+    max-width: 21rem;
+    border-radius: 1.15rem;
+  }
+
+  .bc-tier-modal footer {
+    grid-template-columns: 1fr;
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+  }
+
+  .bc-tier-modal footer button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .bc-gift-view {

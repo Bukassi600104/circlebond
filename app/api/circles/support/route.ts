@@ -14,7 +14,10 @@ import {
 } from "@/server/circles/gift";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
 import { firebaseCircleStore } from "@/server/repositories/circles";
-import { findUserByEmail } from "@/server/repositories/gift-circles";
+import {
+  resolveInitialInvitees,
+  sendInitialInvitations,
+} from "@/server/circles/initial-invitations";
 import {
   configureSupportCircle,
   setSupportMemberAllocation,
@@ -128,34 +131,21 @@ export async function POST(request: Request) {
       "Add a valid JPG, PNG or WebP support image up to 5 MB.",
     );
 
-    const uniqueInvites = [
-      ...new Map(
-        invites
-          .filter((invite) => invite.email.trim())
-          .map((invite) => [
-            invite.email.trim().toLowerCase(),
-            { ...invite, email: invite.email.trim().toLowerCase() },
-          ]),
-      ).values(),
-    ];
-    const resolved = [];
-    for (const invite of uniqueInvites) {
-      const user = await findUserByEmail(invite.email);
-      if (!user) {
-        throw new Error(
-          `${invite.email} does not have a BondCircle account yet.`,
-        );
-      }
-      if (user.id !== session.uid) resolved.push({ ...invite, user });
-    }
-    if (resolved.length > memberCapacity - 1) {
+    const invitees = await resolveInitialInvitees(invites, session.uid);
+    const resolved = invitees.filter(
+      (
+        invite,
+      ): invite is typeof invite & { user: NonNullable<typeof invite.user> } =>
+        Boolean(invite.user),
+    );
+    if (invitees.length > memberCapacity - 1) {
       throw new Error(
         `This circle has ${memberCapacity - 1} supporter places besides yours.`,
       );
     }
     if (
       contributionMode === "custom" &&
-      resolved.length !== memberCapacity - 1
+      invitees.length !== memberCapacity - 1
     ) {
       throw new Error(
         "Custom amounts require every planned supporter before creation.",
@@ -218,24 +208,41 @@ export async function POST(request: Request) {
       imageStoragePath,
     });
 
-    const memberIds = [session.uid, ...resolved.map(({ user }) => user.id)];
     const equalSlotAmounts =
       contributionMode === "equal"
         ? calculateEqualSlotAllocations(targetAmount, memberCapacity)
         : [];
+    if (contributionMode === "custom") {
+      validateCustomAllocations(targetAmount, [
+        { memberId: session.uid, expectedAmount: creatorAmount },
+        ...invitees.map((invite, index) => ({
+          memberId: invite.user?.id ?? `pending:${index}`,
+          expectedAmount: Number(invite.amount ?? 0),
+        })),
+      ]);
+    }
     const allocations =
       contributionMode === "equal"
-        ? memberIds.map((memberId, index) => ({
-            memberId,
-            expectedAmount: equalSlotAmounts[index],
-          }))
-        : validateCustomAllocations(targetAmount, [
+        ? [
+            { memberId: session.uid, expectedAmount: equalSlotAmounts[0] },
+            ...invitees.flatMap((invite, index) =>
+              invite.user
+                ? [
+                    {
+                      memberId: invite.user.id,
+                      expectedAmount: equalSlotAmounts[index + 1],
+                    },
+                  ]
+                : [],
+            ),
+          ]
+        : [
             { memberId: session.uid, expectedAmount: creatorAmount },
             ...resolved.map(({ amount, user }) => ({
               memberId: user.id,
               expectedAmount: Number(amount ?? 0),
             })),
-          ]);
+          ];
     for (const allocation of allocations) {
       await setSupportMemberAllocation({
         circleId: circle.id,
@@ -258,6 +265,15 @@ export async function POST(request: Request) {
       "active",
       firebaseCircleStore,
     );
+    await sendInitialInvitations({
+      circleId: circle.id,
+      creatorId: session.uid,
+      invitees,
+      expectedAmountFor: (invitee, index) =>
+        contributionMode === "equal"
+          ? equalSlotAmounts[index + 1]
+          : Number(invitee.amount ?? 0),
+    });
 
     await recordUploadOutcome({
       kind: "support_image",

@@ -238,6 +238,7 @@ export function SupportCircleForm() {
                     Number.isInteger(requested) &&
                     requested > selectedPlan.memberLimit
                   ) {
+                    event.currentTarget.blur();
                     setCapacityIssue(requested);
                     return;
                   }
@@ -405,7 +406,11 @@ export function SupportCircleForm() {
           <header>
             <div>
               <h2>Invite supporters</h2>
-              <p>Add people who already have a BondCircle account.</p>
+              <p>
+                Add existing members or email a secure registration invite.
+                After creation, you can also share a detailed WhatsApp or open
+                link.
+              </p>
             </div>
             <button
               type="button"

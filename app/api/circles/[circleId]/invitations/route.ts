@@ -5,9 +5,11 @@ import {
   assertCanManageInvitations,
   createCircleInvitation,
   listCircleInvitations,
+  loadInvitationByToken,
 } from "@/server/repositories/invitations";
 import { emitNewInvitation } from "@/server/repositories/notifications";
 import { enforceRateLimit } from "@/server/auth/security";
+import { buildInvitationShareMessage } from "@/server/invitations/rules";
 
 export const runtime = "nodejs";
 
@@ -76,18 +78,30 @@ export async function POST(
     });
     const origin = new URL(request.url).origin;
     const deepLink = `/invite/${encodeURIComponent(invitation.token)}`;
+    const link = `${origin}${deepLink}`;
+    const details = await loadInvitationByToken(invitation.token);
+    if (!details) throw new Error("Unable to prepare the invitation.");
+    const shareMessage = buildInvitationShareMessage({
+      inviterName: details.invitedBy.displayName,
+      circleName: details.circle.name,
+      circleType: details.circle.type,
+      reason: details.circle.description,
+      link,
+    });
     if (input.mode !== "open" && input.recipientEmail) {
       await emitNewInvitation({
         circleId,
         recipientEmail: input.recipientEmail,
         invitationId: invitation.id,
         deepLink,
+        message: shareMessage,
       });
     }
     return NextResponse.json(
       {
         id: invitation.id,
-        link: `${origin}${deepLink}`,
+        link,
+        shareMessage,
       },
       { status: 201 },
     );

@@ -15,7 +15,10 @@ import {
 } from "@/server/circles/service";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
 import { firebaseCircleStore } from "@/server/repositories/circles";
-import { findUserByEmail } from "@/server/repositories/gift-circles";
+import {
+  resolveInitialInvitees,
+  sendInitialInvitations,
+} from "@/server/circles/initial-invitations";
 import {
   configureAsoEbiCircle,
   createAsoEbiTier,
@@ -152,24 +155,15 @@ export async function POST(request: Request) {
       }
     }
 
-    const uniqueInvites = [
-      ...new Set(
-        invites.map(({ email }) => email.trim().toLowerCase()).filter(Boolean),
-      ),
-    ];
-    if (uniqueInvites.length > memberCapacity - 1) {
+    const invitees = await resolveInitialInvitees(invites, session.uid);
+    if (invitees.length > memberCapacity - 1) {
       throw new Error(
         `This circle has ${memberCapacity - 1} member places besides yours.`,
       );
     }
-    const resolvedMembers = [];
-    for (const email of uniqueInvites) {
-      const user = await findUserByEmail(email);
-      if (!user) {
-        throw new Error(`${email} does not have a BondCircle account yet.`);
-      }
-      if (user.id !== session.uid) resolvedMembers.push(user);
-    }
+    const resolvedMembers = invitees.flatMap((invite) =>
+      invite.user ? [invite.user] : [],
+    );
 
     const circle = await createCircleDraft(
       session.uid,
@@ -267,6 +261,11 @@ export async function POST(request: Request) {
       "active",
       firebaseCircleStore,
     );
+    await sendInitialInvitations({
+      circleId: circle.id,
+      creatorId: session.uid,
+      invitees,
+    });
 
     await recordUploadOutcome({
       kind: "aso_ebi_image",
