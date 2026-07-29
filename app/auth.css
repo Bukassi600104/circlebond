@@ -331,6 +331,22 @@
   margin-top: var(--space-6);
 }
 
+@media (min-width: 48rem) and (max-height: 50rem) {
+  .bc-onboarding {
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .bc-onboarding__art {
+    width: min(68vh, 30rem);
+    margin-bottom: var(--space-3);
+  }
+
+  .bc-onboarding__dots,
+  .bc-onboarding footer {
+    margin-top: var(--space-4);
+  }
+}
+
 .bc-auth-page {
   min-height: 100svh;
   display: grid;

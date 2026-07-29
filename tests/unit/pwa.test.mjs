@@ -53,7 +53,7 @@ test("onboarding artwork sits on a subtle multi-brand gradient canvas", async ()
   );
   assert.doesNotMatch(
     styles,
-    /\.bc-onboarding\s*\{[\s\S]{0,500}background:\s*var\(--color-cream\)/,
+    /\.bc-onboarding\s*\{[^}]*background:\s*var\(--color-cream\)/,
   );
 });
 
@@ -63,6 +63,10 @@ test("onboarding navigation stays separated from the slide indicators", async ()
   assert.match(
     styles,
     /\.bc-onboarding footer\s*\{[\s\S]*margin-top:\s*var\(--space-6\)/,
+  );
+  assert.match(
+    styles,
+    /@media \(min-width: 48rem\) and \(max-height: 50rem\)[\s\S]*\.bc-onboarding__art[\s\S]*width:\s*min\(68vh, 30rem\)/,
   );
 });
 
