@@ -57,6 +57,15 @@ test("onboarding artwork sits on a subtle multi-brand gradient canvas", async ()
   );
 });
 
+test("onboarding navigation stays separated from the slide indicators", async () => {
+  const styles = await source("app/auth.css");
+
+  assert.match(
+    styles,
+    /\.bc-onboarding footer\s*\{[\s\S]*margin-top:\s*var\(--space-6\)/,
+  );
+});
+
 test("mobile app chrome accounts for device safe areas", async () => {
   const globals = await source("app/globals.css");
   const dashboard = await source("app/dashboard.css");

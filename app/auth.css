@@ -328,6 +328,7 @@
 
 .bc-onboarding footer {
   justify-content: center;
+  margin-top: var(--space-6);
 }
 
 .bc-auth-page {
