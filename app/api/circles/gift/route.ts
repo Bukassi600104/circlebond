@@ -18,6 +18,7 @@ import {
   setGiftMemberAllocation,
 } from "@/server/repositories/gift-circles";
 import {
+  createInitialShareInvitation,
   resolveInitialInvitees,
   sendInitialInvitations,
 } from "@/server/circles/initial-invitations";
@@ -251,13 +252,22 @@ export async function POST(request: Request) {
           ? equalSlotAmounts[index + 1]
           : Number(invitee.amount ?? 0),
     });
+    const { share, shareStatus } = await createInitialShareInvitation({
+      circleId: circle.id,
+      creatorId: session.uid,
+      maxUses: memberCapacity - 1 - invitees.length,
+      origin: new URL(request.url).origin,
+    });
 
     await recordUploadOutcome({
       kind: "gift_image",
       outcome: "succeeded",
       circleId: circle.id,
     });
-    return NextResponse.json({ circleId: circle.id }, { status: 201 });
+    return NextResponse.json(
+      { circleId: circle.id, share, shareStatus },
+      { status: 201 },
+    );
   } catch (error) {
     if (uploadAttempted) {
       await recordUploadOutcome({

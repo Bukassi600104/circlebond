@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -18,6 +17,11 @@ import {
   planForMemberCount,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
+import {
+  CircleCreationSuccess,
+  type CircleCreationShareStatus,
+  type CircleCreationShareView,
+} from "@/components/invitations/CircleCreationSuccess";
 
 type Invite = { email: string };
 type TierDraft = {
@@ -70,7 +74,6 @@ async function csrfToken() {
 }
 
 export function AsoEbiCircleForm() {
-  const router = useRouter();
   const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
@@ -79,6 +82,11 @@ export function AsoEbiCircleForm() {
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [created, setCreated] = useState<{
+    circleId: string;
+    share: CircleCreationShareView | null;
+    shareStatus: CircleCreationShareStatus;
+  } | null>(null);
   const selectedPlan = CIRCLE_PRICING_PLANS[pricingPlan];
   const capacityNumber = Number(memberCapacity);
   const validCapacity =
@@ -126,13 +134,18 @@ export function AsoEbiCircleForm() {
       });
       const data = (await response.json()) as {
         circleId?: string;
+        share?: CircleCreationShareView | null;
+        shareStatus?: CircleCreationShareStatus;
         error?: string;
       };
       if (!response.ok || !data.circleId) {
         throw new Error(data.error ?? "Unable to create the Aso-Ebi Circle.");
       }
-      router.push(`/account/circles/${data.circleId}`);
-      router.refresh();
+      setCreated({
+        circleId: data.circleId,
+        share: data.share ?? null,
+        shareStatus: data.shareStatus ?? "unavailable",
+      });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Please try again.");
       setBusy(false);
@@ -140,7 +153,7 @@ export function AsoEbiCircleForm() {
   }
 
   return (
-    <section className="bc-gift-create bc-aso-create">
+    <section className="bc-gift-create bc-aso-create bc-circle-create-mobile-controls">
       <header>
         <Link href="/account/create">
           <ArrowLeft size={15} aria-hidden="true" />
@@ -468,9 +481,8 @@ export function AsoEbiCircleForm() {
               <h2>Invite members</h2>
               <p>
                 Add existing members or email a secure registration invite.
-                Members choose their tier after joining.
-                After creation, you can also share a detailed WhatsApp or open
-                link.
+                Members choose their tier after joining. After creation, you can
+                also share a detailed WhatsApp or open link.
               </p>
             </div>
             <button
@@ -597,6 +609,13 @@ export function AsoEbiCircleForm() {
             </footer>
           </section>
         </div>
+      ) : null}
+      {created ? (
+        <CircleCreationSuccess
+          circleId={created.circleId}
+          share={created.share}
+          shareStatus={created.shareStatus}
+        />
       ) : null}
     </section>
   );

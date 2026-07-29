@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -17,6 +16,11 @@ import {
   planForMemberCount,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
+import {
+  CircleCreationSuccess,
+  type CircleCreationShareStatus,
+  type CircleCreationShareView,
+} from "@/components/invitations/CircleCreationSuccess";
 
 type Invite = { email: string; amount: string };
 
@@ -37,7 +41,6 @@ async function csrfToken() {
 }
 
 export function GiftCircleForm() {
-  const router = useRouter();
   const [mode, setMode] = useState<"equal" | "custom">("equal");
   const [invites, setInvites] = useState<Invite[]>([]);
   const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
@@ -46,6 +49,11 @@ export function GiftCircleForm() {
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [created, setCreated] = useState<{
+    circleId: string;
+    share: CircleCreationShareView | null;
+    shareStatus: CircleCreationShareStatus;
+  } | null>(null);
   const selectedTier = CIRCLE_PRICING_PLANS[pricingPlan];
   const capacityNumber = Number(memberCapacity);
   const validCapacity =
@@ -91,13 +99,18 @@ export function GiftCircleForm() {
       });
       const data = (await response.json()) as {
         circleId?: string;
+        share?: CircleCreationShareView | null;
+        shareStatus?: CircleCreationShareStatus;
         error?: string;
       };
       if (!response.ok || !data.circleId) {
         throw new Error(data.error ?? "Unable to create the Gift Circle.");
       }
-      router.push(`/account/circles/${data.circleId}`);
-      router.refresh();
+      setCreated({
+        circleId: data.circleId,
+        share: data.share ?? null,
+        shareStatus: data.shareStatus ?? "unavailable",
+      });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Please try again.");
       setBusy(false);
@@ -105,7 +118,7 @@ export function GiftCircleForm() {
   }
 
   return (
-    <section className="bc-gift-create">
+    <section className="bc-gift-create bc-circle-create-mobile-controls">
       <header>
         <Link href="/account/create">
           <ArrowLeft size={15} aria-hidden="true" />
@@ -495,6 +508,13 @@ export function GiftCircleForm() {
           </section>
         </div>
       )}
+      {created ? (
+        <CircleCreationSuccess
+          circleId={created.circleId}
+          share={created.share}
+          shareStatus={created.shareStatus}
+        />
+      ) : null}
     </section>
   );
 }

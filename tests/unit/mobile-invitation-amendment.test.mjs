@@ -19,6 +19,13 @@ test("all circle creation forms retain an iOS-safe mobile frame", async () => {
     css,
     /@media \(max-width: 30rem\)[\s\S]*\.bc-tier-modal footer[\s\S]*grid-template-columns:\s*1fr/,
   );
+  const asoOverride = css.lastIndexOf(".bc-aso-create input");
+  const finalMobileGuard = css.lastIndexOf(".bc-circle-create-mobile-controls");
+  assert.ok(
+    finalMobileGuard > asoOverride,
+    "the final iOS font-size guard must follow every circle-specific override",
+  );
+  assert.match(css.slice(finalMobileGuard), /font-size:\s*16px\s*!important/);
 });
 
 test("gift, Aso-Ebi and support creation accept secure invitations for non-members", async () => {
@@ -52,4 +59,43 @@ test("invitation sharing carries context and new users register before joining",
   assert.match(manager, /Copy message/);
   assert.doesNotMatch(manager, /href=\{`sms:/);
   assert.match(invitePage, /redirect\(`\/register\?next=/);
+});
+
+test("every circle creation flow pauses on a secure copy and native-share step", async () => {
+  const helper = await source("server/circles/initial-invitations.ts");
+  const success = await source(
+    "components/invitations/CircleCreationSuccess.tsx",
+  );
+
+  assert.match(helper, /createInitialShareInvitation/);
+  assert.match(helper, /mode:\s*"open"/);
+  assert.match(helper, /maxUses/);
+  assert.match(helper, /shareStatus:\s*"unavailable"/);
+  assert.match(success, /navigator\.clipboard\.writeText\(share\.link\)/);
+  assert.match(
+    success,
+    /navigator\.clipboard\.writeText\(share\.shareMessage\)/,
+  );
+  assert.match(success, /navigator\.share/);
+  assert.match(success, /Open circle/);
+
+  for (const route of [
+    "app/api/circles/gift/route.ts",
+    "app/api/circles/aso-ebi/route.ts",
+    "app/api/circles/support/route.ts",
+  ]) {
+    const contents = await source(route);
+    assert.match(contents, /createInitialShareInvitation/);
+    assert.match(contents, /share/);
+  }
+
+  for (const form of [
+    "components/gift-circles/GiftCircleForm.tsx",
+    "components/aso-ebi/AsoEbiCircleForm.tsx",
+    "components/support-circles/SupportCircleForm.tsx",
+  ]) {
+    const contents = await source(form);
+    assert.match(contents, /CircleCreationSuccess/);
+    assert.match(contents, /data\.share/);
+  }
 });
