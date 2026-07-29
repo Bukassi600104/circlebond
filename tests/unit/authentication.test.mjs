@@ -216,3 +216,28 @@ test("email OTP verification resends in place, counts down, and submits on digit
   assert.match(otpComponent, /window\.location\.replace/);
   assert.match(styles, /\.bc-auth-story__copy\s*\{[\s\S]*text-align:\s*center/);
 });
+
+test("Firebase Admin stays on the Vercel-compatible dependency line", async () => {
+  const packageJson = JSON.parse(await source("package.json"));
+
+  assert.equal(packageJson.dependencies["firebase-admin"], "13.6.0");
+});
+
+test("onboarding uses the supplied artwork and keeps its composition centered", async () => {
+  const onboarding = await source("app/onboarding/page.tsx");
+  const styles = await source("app/auth.css");
+
+  assert.match(onboarding, /\/images\/onboarding\/group-gifts\.jpg/);
+  assert.match(onboarding, /\/images\/onboarding\/aso-ebi\.jpg/);
+  assert.match(onboarding, /\/images\/onboarding\/support\.jpg/);
+  assert.match(styles, /\.bc-onboarding header[\s\S]*position:\s*relative/);
+  assert.match(
+    styles,
+    /\.bc-onboarding header > button[\s\S]*position:\s*absolute[\s\S]*right:\s*0/,
+  );
+  assert.match(
+    styles,
+    /\.bc-onboarding section[\s\S]*text-align:\s*center[\s\S]*justify-items:\s*center/,
+  );
+  assert.match(styles, /\.bc-onboarding footer[\s\S]*justify-content:\s*center/);
+});

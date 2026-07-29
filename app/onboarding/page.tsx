@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Gift, HandHeart, PartyPopper, UsersRound } from "lucide-react";
 import { BrandLockup } from "@/components/layout";
 import { Button } from "@/components/ui";
 
@@ -10,17 +10,20 @@ const pages = [
   {
     title: "Group gifts, made simple",
     text: "Bring people together around one meaningful gift.",
-    icon: Gift,
+    image: "/images/onboarding/group-gifts.jpg",
+    imageAlt: "Friends celebrating together around a group gift",
   },
   {
     title: "Organize Aso-Ebi",
     text: "Coordinate tiers, contributions and delivery in one circle.",
-    icon: PartyPopper,
+    image: "/images/onboarding/aso-ebi.jpg",
+    imageAlt: "A couple celebrating together in matching Aso-Ebi",
   },
   {
     title: "Support that feels human",
     text: "Gather a trusted community around life’s important moments.",
-    icon: HandHeart,
+    image: "/images/onboarding/support.jpg",
+    imageAlt: "A community surrounding and comforting someone in need",
   },
 ];
 
@@ -28,7 +31,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const [page, setPage] = useState(0);
   const item = pages[page];
-  const Icon = item.icon;
 
   function finish() {
     localStorage.setItem("bc-onboarding-complete", "true");
@@ -44,9 +46,14 @@ export default function OnboardingPage() {
         </button>
       </header>
       <section>
-        <div className="bc-onboarding__art" aria-hidden="true">
-          <UsersRound />
-          <Icon />
+        <div className="bc-onboarding__art">
+          <Image
+            src={item.image}
+            alt={item.imageAlt}
+            width={1280}
+            height={853}
+            priority={page === 0}
+          />
         </div>
         <p className="bc-auth-eyebrow">Together, every step</p>
         <h1>{item.title}</h1>
