@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/lora/600.css";
 import "./globals.css";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 export const metadata: Metadata = {
   title: {
@@ -13,11 +14,26 @@ export const metadata: Metadata = {
   },
   description:
     "Create, join and manage trusted circles for gifts, Aso-Ebi and support.",
+  applicationName: "BondCircle",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BondCircle",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: "/brand/favicon.png",
     shortcut: "/brand/favicon.png",
     apple: "/brand/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f5a50",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -27,7 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        {children}
+        <InstallPrompt />
+      </body>
     </html>
   );
 }

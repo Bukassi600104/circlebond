@@ -14,12 +14,96 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
+  padding-top: env(safe-area-inset-top);
   background: var(--color-cream);
   color: var(--color-text-primary);
   font-family: var(--font-product);
   font-size: var(--text-body);
   line-height: 1.5;
+}
+
+.bc-install-prompt {
+  position: fixed;
+  right: max(0.85rem, env(safe-area-inset-right));
+  bottom: max(5.25rem, calc(env(safe-area-inset-bottom) + 4.75rem));
+  left: max(0.85rem, env(safe-area-inset-left));
+  z-index: 100;
+  max-width: 26rem;
+  margin-inline: auto;
+  padding: 0.75rem 2.3rem 0.75rem 0.75rem;
+  border: 1px solid rgb(15 90 80 / 18%);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 0.75rem 2.5rem rgb(15 77 70 / 18%);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--color-text-primary);
+}
+
+.bc-install-prompt > img {
+  border-radius: 0.65rem;
+}
+
+.bc-install-prompt strong {
+  display: block;
+  color: var(--color-teal);
+  font-size: 0.875rem;
+}
+
+.bc-install-prompt p {
+  margin: 0.08rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.bc-install-prompt p svg {
+  margin-inline: 0.08rem;
+  vertical-align: -0.15rem;
+}
+
+.bc-install-prompt__close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.bc-install-prompt__action {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.7rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--color-teal);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (min-width: 56rem) {
+  .bc-install-prompt {
+    right: 1.25rem;
+    bottom: 1.25rem;
+    left: auto;
+    margin: 0;
+  }
 }
 
 button,
