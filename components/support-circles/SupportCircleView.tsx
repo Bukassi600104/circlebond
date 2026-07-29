@@ -15,7 +15,6 @@ import {
   Send,
   ShieldCheck,
   Users,
-  X,
 } from "lucide-react";
 import type {
   SupportCircleDetail,
@@ -68,9 +67,10 @@ export function SupportCircleView({
   const router = useRouter();
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
-  const [confirmCompletion, setConfirmCompletion] = useState(false);
   const viewer = circle.members.find((member) => member.id === viewerId);
-  const completed = circle.status === "completed";
+  const completed = ["completed", "cancelled", "archived", "purged"].includes(
+    circle.status,
+  );
   const progress =
     circle.targetAmount && circle.contributedAmount !== null
       ? Math.min(
@@ -124,15 +124,6 @@ export function SupportCircleView({
       "update",
     );
     if (ok) event.currentTarget.reset();
-  }
-
-  async function completeCircle() {
-    const ok = await submitJson(
-      `/api/circles/${circle.id}/support/complete`,
-      {},
-      "complete",
-    );
-    if (ok) setConfirmCompletion(false);
   }
 
   return (
@@ -286,6 +277,7 @@ export function SupportCircleView({
           <ContributionWorkspace
             circleId={circle.id}
             heading="Your support contribution"
+            readOnly={completed}
           />
 
           <section className="bc-support-members">
@@ -298,7 +290,7 @@ export function SupportCircleView({
                 <small>
                   {circle.members.length}/{circle.memberLimit}
                 </small>
-                {circle.viewerCanManage ? (
+                {circle.viewerCanManage && !completed ? (
                   <InvitationManager
                     circleId={circle.id}
                     contributionMode={circle.contributionMode}
@@ -424,62 +416,8 @@ export function SupportCircleView({
               </li>
             </ul>
           </section>
-
-          {circle.creatorId === viewerId && !completed ? (
-            <button
-              className="bc-support-complete-button"
-              type="button"
-              onClick={() => setConfirmCompletion(true)}
-            >
-              <CheckCircle2 size={16} aria-hidden="true" />
-              Record support delivered
-            </button>
-          ) : null}
         </aside>
       </div>
-
-      {confirmCompletion ? (
-        <div
-          className="bc-support-confirm"
-          role="presentation"
-          onMouseDown={() => setConfirmCompletion(false)}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="support-completion-title"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              aria-label="Close completion confirmation"
-              onClick={() => setConfirmCompletion(false)}
-            >
-              <X size={16} aria-hidden="true" />
-            </button>
-            <CheckCircle2 size={24} aria-hidden="true" />
-            <h2 id="support-completion-title">Confirm support delivered</h2>
-            <p>
-              This completes and locks the Support Circle. Existing records
-              remain available according to the retention policy.
-            </p>
-            <footer>
-              <button type="button" onClick={() => setConfirmCompletion(false)}>
-                Not yet
-              </button>
-              <button
-                type="button"
-                disabled={Boolean(busy)}
-                onClick={() => void completeCircle()}
-              >
-                {busy === "complete"
-                  ? "Completing…"
-                  : "Confirm support delivered"}
-              </button>
-            </footer>
-          </section>
-        </div>
-      ) : null}
     </section>
   );
 }

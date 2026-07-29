@@ -5,6 +5,7 @@ import { loadNotificationWorkspace } from "@/server/repositories/notifications";
 import "../dashboard.css";
 import "../communication.css";
 import "../notifications.css";
+import "../lifecycle.css";
 
 export default async function AccountLayout({
   children,

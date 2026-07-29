@@ -13,6 +13,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetCurrentUser*](#getcurrentuser)
   - [*GetDashboardCircles*](#getdashboardcircles)
   - [*GetCircleEngineRecord*](#getcircleenginerecord)
+  - [*GetCircleLifecycleSummary*](#getcirclelifecyclesummary)
   - [*FindUserByEmail*](#finduserbyemail)
   - [*GetGiftCircleDetail*](#getgiftcircledetail)
   - [*GetCircleAuditEntries*](#getcircleauditentries)
@@ -33,11 +34,15 @@ This README will guide you through the process of using the generated JavaScript
   - [*FindNotificationRecipientByEmail*](#findnotificationrecipientbyemail)
   - [*GetDeadlineNotificationCandidates*](#getdeadlinenotificationcandidates)
   - [*GetUserDeadlineNotificationCandidates*](#getuserdeadlinenotificationcandidates)
+  - [*GetRetentionCandidates*](#getretentioncandidates)
+  - [*GetCircleRetentionPayload*](#getcircleretentionpayload)
+  - [*GetStoragePathReferences*](#getstoragepathreferences)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
   - [*UpdateCircleConfigurationWithAudit*](#updatecircleconfigurationwithaudit)
   - [*TransitionCircleWithAudit*](#transitioncirclewithaudit)
+  - [*SetCircleCompletionTypeWithAudit*](#setcirclecompletiontypewithaudit)
   - [*AddCircleMemberWithAudit*](#addcirclememberwithaudit)
   - [*ConfigureGiftCircle*](#configuregiftcircle)
   - [*SetGiftMemberAllocation*](#setgiftmemberallocation)
@@ -76,6 +81,10 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateNotificationPreferences*](#updatenotificationpreferences)
   - [*SetCircleNotificationMute*](#setcirclenotificationmute)
   - [*CreateEmailDelivery*](#createemaildelivery)
+  - [*CreateRetentionPurgeAttempt*](#createretentionpurgeattempt)
+  - [*CompleteRetentionPurgeAttempt*](#completeretentionpurgeattempt)
+  - [*PurgeInvitationAcceptances*](#purgeinvitationacceptances)
+  - [*PurgeCircleSensitiveData*](#purgecirclesensitivedata)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bondcircle`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -398,6 +407,7 @@ export interface GetCircleEngineRecordData {
     createdAt: TimestampString;
     updatedAt: TimestampString;
     completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
     archiveAt?: TimestampString | null;
     purgeAt?: TimestampString | null;
     creator: {
@@ -421,7 +431,7 @@ import { connectorConfig, getCircleEngineRecord, GetCircleEngineRecordVariables 
 
 // The `GetCircleEngineRecord` query requires an argument of type `GetCircleEngineRecordVariables`:
 const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleEngineRecord()` function to execute the query.
@@ -453,7 +463,7 @@ import { connectorConfig, getCircleEngineRecordRef, GetCircleEngineRecordVariabl
 
 // The `GetCircleEngineRecord` query requires an argument of type `GetCircleEngineRecordVariables`:
 const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleEngineRecordRef()` function to get a reference to the query.
@@ -477,6 +487,153 @@ executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.circle);
   console.log(data.circleMemberships);
+});
+```
+
+## GetCircleLifecycleSummary
+You can execute the `GetCircleLifecycleSummary` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleLifecycleSummary(vars: GetCircleLifecycleSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+
+interface GetCircleLifecycleSummaryRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleLifecycleSummaryVariables): QueryRef<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+}
+export const getCircleLifecycleSummaryRef: GetCircleLifecycleSummaryRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleLifecycleSummary(dc: DataConnect, vars: GetCircleLifecycleSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+
+interface GetCircleLifecycleSummaryRef {
+  ...
+  (dc: DataConnect, vars: GetCircleLifecycleSummaryVariables): QueryRef<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+}
+export const getCircleLifecycleSummaryRef: GetCircleLifecycleSummaryRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleLifecycleSummaryRef:
+```typescript
+const name = getCircleLifecycleSummaryRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleLifecycleSummary` query requires an argument of type `GetCircleLifecycleSummaryVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleLifecycleSummaryVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleLifecycleSummary` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleLifecycleSummaryData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleLifecycleSummaryData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    completionType?: string | null;
+    memberCount: number;
+    pricingPlan: string;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      user: {
+        id: string;
+      } & User_Key;
+    })[];
+      activityLogs: ({
+        id: UUIDString;
+        eventType: string;
+        createdAt: TimestampString;
+        actor?: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & ActivityLog_Key)[];
+}
+```
+### Using `GetCircleLifecycleSummary`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleLifecycleSummary, GetCircleLifecycleSummaryVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleLifecycleSummary` query requires an argument of type `GetCircleLifecycleSummaryVariables`:
+const getCircleLifecycleSummaryVars: GetCircleLifecycleSummaryVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleLifecycleSummary()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleLifecycleSummary(getCircleLifecycleSummaryVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleLifecycleSummary({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleLifecycleSummary(dataConnect, getCircleLifecycleSummaryVars);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+getCircleLifecycleSummary(getCircleLifecycleSummaryVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.activityLogs);
+});
+```
+
+### Using `GetCircleLifecycleSummary`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleLifecycleSummaryRef, GetCircleLifecycleSummaryVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleLifecycleSummary` query requires an argument of type `GetCircleLifecycleSummaryVariables`:
+const getCircleLifecycleSummaryVars: GetCircleLifecycleSummaryVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleLifecycleSummaryRef()` function to get a reference to the query.
+const ref = getCircleLifecycleSummaryRef(getCircleLifecycleSummaryVars);
+// Variables can be defined inline as well.
+const ref = getCircleLifecycleSummaryRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleLifecycleSummaryRef(dataConnect, getCircleLifecycleSummaryVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.activityLogs);
 });
 ```
 
@@ -541,7 +698,7 @@ import { connectorConfig, findUserByEmail, FindUserByEmailVariables } from '@bon
 
 // The `FindUserByEmail` query requires an argument of type `FindUserByEmailVariables`:
 const findUserByEmailVars: FindUserByEmailVariables = {
-  email: ...,
+  email: ..., 
 };
 
 // Call the `findUserByEmail()` function to execute the query.
@@ -571,7 +728,7 @@ import { connectorConfig, findUserByEmailRef, FindUserByEmailVariables } from '@
 
 // The `FindUserByEmail` query requires an argument of type `FindUserByEmailVariables`:
 const findUserByEmailVars: FindUserByEmailVariables = {
-  email: ...,
+  email: ..., 
 };
 
 // Call the `findUserByEmailRef()` function to get a reference to the query.
@@ -653,9 +810,16 @@ export interface GetGiftCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -685,7 +849,7 @@ import { connectorConfig, getGiftCircleDetail, GetGiftCircleDetailVariables } fr
 
 // The `GetGiftCircleDetail` query requires an argument of type `GetGiftCircleDetailVariables`:
 const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getGiftCircleDetail()` function to execute the query.
@@ -717,7 +881,7 @@ import { connectorConfig, getGiftCircleDetailRef, GetGiftCircleDetailVariables }
 
 // The `GetGiftCircleDetail` query requires an argument of type `GetGiftCircleDetailVariables`:
 const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getGiftCircleDetailRef()` function to get a reference to the query.
@@ -808,7 +972,7 @@ import { connectorConfig, getCircleAuditEntries, GetCircleAuditEntriesVariables 
 
 // The `GetCircleAuditEntries` query requires an argument of type `GetCircleAuditEntriesVariables`:
 const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleAuditEntries()` function to execute the query.
@@ -838,7 +1002,7 @@ import { connectorConfig, getCircleAuditEntriesRef, GetCircleAuditEntriesVariabl
 
 // The `GetCircleAuditEntries` query requires an argument of type `GetCircleAuditEntriesVariables`:
 const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleAuditEntriesRef()` function to get a reference to the query.
@@ -919,9 +1083,16 @@ export interface GetAsoEbiCircleDetailData {
     paymentAccountName?: string | null;
     paymentAccountNumber?: string | null;
     memberLimit: number;
+    memberCount: number;
+    pricingPlan: string;
     contributedAmount: number;
     eventDate?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -969,7 +1140,7 @@ import { connectorConfig, getAsoEbiCircleDetail, GetAsoEbiCircleDetailVariables 
 
 // The `GetAsoEbiCircleDetail` query requires an argument of type `GetAsoEbiCircleDetailVariables`:
 const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getAsoEbiCircleDetail()` function to execute the query.
@@ -1003,7 +1174,7 @@ import { connectorConfig, getAsoEbiCircleDetailRef, GetAsoEbiCircleDetailVariabl
 
 // The `GetAsoEbiCircleDetail` query requires an argument of type `GetAsoEbiCircleDetailVariables`:
 const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getAsoEbiCircleDetailRef()` function to get a reference to the query.
@@ -1097,9 +1268,15 @@ export interface GetSupportCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -1137,7 +1314,7 @@ import { connectorConfig, getSupportCircleDetail, GetSupportCircleDetailVariable
 
 // The `GetSupportCircleDetail` query requires an argument of type `GetSupportCircleDetailVariables`:
 const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getSupportCircleDetail()` function to execute the query.
@@ -1171,7 +1348,7 @@ import { connectorConfig, getSupportCircleDetailRef, GetSupportCircleDetailVaria
 
 // The `GetSupportCircleDetail` query requires an argument of type `GetSupportCircleDetailVariables`:
 const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getSupportCircleDetailRef()` function to get a reference to the query.
@@ -1296,7 +1473,7 @@ import { connectorConfig, getInvitationByTokenHash, GetInvitationByTokenHashVari
 
 // The `GetInvitationByTokenHash` query requires an argument of type `GetInvitationByTokenHashVariables`:
 const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-  tokenHash: ...,
+  tokenHash: ..., 
 };
 
 // Call the `getInvitationByTokenHash()` function to execute the query.
@@ -1326,7 +1503,7 @@ import { connectorConfig, getInvitationByTokenHashRef, GetInvitationByTokenHashV
 
 // The `GetInvitationByTokenHash` query requires an argument of type `GetInvitationByTokenHashVariables`:
 const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-  tokenHash: ...,
+  tokenHash: ..., 
 };
 
 // Call the `getInvitationByTokenHashRef()` function to get a reference to the query.
@@ -1419,7 +1596,7 @@ import { connectorConfig, getCircleInvitations, GetCircleInvitationsVariables } 
 
 // The `GetCircleInvitations` query requires an argument of type `GetCircleInvitationsVariables`:
 const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleInvitations()` function to execute the query.
@@ -1449,7 +1626,7 @@ import { connectorConfig, getCircleInvitationsRef, GetCircleInvitationsVariables
 
 // The `GetCircleInvitations` query requires an argument of type `GetCircleInvitationsVariables`:
 const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleInvitationsRef()` function to get a reference to the query.
@@ -1539,7 +1716,7 @@ import { connectorConfig, getInvitationAcceptances, GetInvitationAcceptancesVari
 
 // The `GetInvitationAcceptances` query requires an argument of type `GetInvitationAcceptancesVariables`:
 const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-  invitationId: ...,
+  invitationId: ..., 
 };
 
 // Call the `getInvitationAcceptances()` function to execute the query.
@@ -1569,7 +1746,7 @@ import { connectorConfig, getInvitationAcceptancesRef, GetInvitationAcceptancesV
 
 // The `GetInvitationAcceptances` query requires an argument of type `GetInvitationAcceptancesVariables`:
 const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-  invitationId: ...,
+  invitationId: ..., 
 };
 
 // Call the `getInvitationAcceptancesRef()` function to get a reference to the query.
@@ -1692,7 +1869,7 @@ import { connectorConfig, getContributionWorkspace, GetContributionWorkspaceVari
 
 // The `GetContributionWorkspace` query requires an argument of type `GetContributionWorkspaceVariables`:
 const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getContributionWorkspace()` function to execute the query.
@@ -1726,7 +1903,7 @@ import { connectorConfig, getContributionWorkspaceRef, GetContributionWorkspaceV
 
 // The `GetContributionWorkspace` query requires an argument of type `GetContributionWorkspaceVariables`:
 const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getContributionWorkspaceRef()` function to get a reference to the query.
@@ -1883,7 +2060,7 @@ import { connectorConfig, getCircleCommunication, GetCircleCommunicationVariable
 
 // The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
 const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleCommunication()` function to execute the query.
@@ -1923,7 +2100,7 @@ import { connectorConfig, getCircleCommunicationRef, GetCircleCommunicationVaria
 
 // The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
 const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getCircleCommunicationRef()` function to get a reference to the query.
@@ -2016,9 +2193,9 @@ import { connectorConfig, getRecentCommentsByAuthor, GetRecentCommentsByAuthorVa
 
 // The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
 const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-  circleId: ...,
-  authorId: ...,
-  since: ...,
+  circleId: ..., 
+  authorId: ..., 
+  since: ..., 
 };
 
 // Call the `getRecentCommentsByAuthor()` function to execute the query.
@@ -2048,9 +2225,9 @@ import { connectorConfig, getRecentCommentsByAuthorRef, GetRecentCommentsByAutho
 
 // The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
 const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-  circleId: ...,
-  authorId: ...,
-  since: ...,
+  circleId: ..., 
+  authorId: ..., 
+  since: ..., 
 };
 
 // Call the `getRecentCommentsByAuthorRef()` function to get a reference to the query.
@@ -2132,8 +2309,8 @@ import { connectorConfig, getOpenCommentReportsByReporter, GetOpenCommentReports
 
 // The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
 const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-  commentId: ...,
-  reporterId: ...,
+  commentId: ..., 
+  reporterId: ..., 
 };
 
 // Call the `getOpenCommentReportsByReporter()` function to execute the query.
@@ -2163,8 +2340,8 @@ import { connectorConfig, getOpenCommentReportsByReporterRef, GetOpenCommentRepo
 
 // The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
 const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-  commentId: ...,
-  reporterId: ...,
+  commentId: ..., 
+  reporterId: ..., 
 };
 
 // Call the `getOpenCommentReportsByReporterRef()` function to get a reference to the query.
@@ -2258,7 +2435,7 @@ import { connectorConfig, getActivityLogsForCircles, GetActivityLogsForCirclesVa
 
 // The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
 const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-  circleIds: ...,
+  circleIds: ..., 
 };
 
 // Call the `getActivityLogsForCircles()` function to execute the query.
@@ -2288,7 +2465,7 @@ import { connectorConfig, getActivityLogsForCirclesRef, GetActivityLogsForCircle
 
 // The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
 const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-  circleIds: ...,
+  circleIds: ..., 
 };
 
 // Call the `getActivityLogsForCirclesRef()` function to get a reference to the query.
@@ -2398,7 +2575,7 @@ import { connectorConfig, getUserNotifications, GetUserNotificationsVariables } 
 
 // The `GetUserNotifications` query requires an argument of type `GetUserNotificationsVariables`:
 const getUserNotificationsVars: GetUserNotificationsVariables = {
-  userId: ...,
+  userId: ..., 
 };
 
 // Call the `getUserNotifications()` function to execute the query.
@@ -2432,7 +2609,7 @@ import { connectorConfig, getUserNotificationsRef, GetUserNotificationsVariables
 
 // The `GetUserNotifications` query requires an argument of type `GetUserNotificationsVariables`:
 const getUserNotificationsVars: GetUserNotificationsVariables = {
-  userId: ...,
+  userId: ..., 
 };
 
 // Call the `getUserNotificationsRef()` function to get a reference to the query.
@@ -2545,7 +2722,7 @@ import { connectorConfig, getNotificationContext, GetNotificationContextVariable
 
 // The `GetNotificationContext` query requires an argument of type `GetNotificationContextVariables`:
 const getNotificationContextVars: GetNotificationContextVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getNotificationContext()` function to execute the query.
@@ -2577,7 +2754,7 @@ import { connectorConfig, getNotificationContextRef, GetNotificationContextVaria
 
 // The `GetNotificationContext` query requires an argument of type `GetNotificationContextVariables`:
 const getNotificationContextVars: GetNotificationContextVariables = {
-  circleId: ...,
+  circleId: ..., 
 };
 
 // Call the `getNotificationContextRef()` function to get a reference to the query.
@@ -2661,8 +2838,8 @@ import { connectorConfig, getNotificationDedupe, GetNotificationDedupeVariables 
 
 // The `GetNotificationDedupe` query requires an argument of type `GetNotificationDedupeVariables`:
 const getNotificationDedupeVars: GetNotificationDedupeVariables = {
-  recipientId: ...,
-  dedupeKey: ...,
+  recipientId: ..., 
+  dedupeKey: ..., 
 };
 
 // Call the `getNotificationDedupe()` function to execute the query.
@@ -2692,8 +2869,8 @@ import { connectorConfig, getNotificationDedupeRef, GetNotificationDedupeVariabl
 
 // The `GetNotificationDedupe` query requires an argument of type `GetNotificationDedupeVariables`:
 const getNotificationDedupeVars: GetNotificationDedupeVariables = {
-  recipientId: ...,
-  dedupeKey: ...,
+  recipientId: ..., 
+  dedupeKey: ..., 
 };
 
 // Call the `getNotificationDedupeRef()` function to get a reference to the query.
@@ -2776,9 +2953,9 @@ import { connectorConfig, getRecentReminderNotifications, GetRecentReminderNotif
 
 // The `GetRecentReminderNotifications` query requires an argument of type `GetRecentReminderNotificationsVariables`:
 const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
-  circleId: ...,
-  recipientId: ...,
-  since: ...,
+  circleId: ..., 
+  recipientId: ..., 
+  since: ..., 
 };
 
 // Call the `getRecentReminderNotifications()` function to execute the query.
@@ -2808,9 +2985,9 @@ import { connectorConfig, getRecentReminderNotificationsRef, GetRecentReminderNo
 
 // The `GetRecentReminderNotifications` query requires an argument of type `GetRecentReminderNotificationsVariables`:
 const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
-  circleId: ...,
-  recipientId: ...,
-  since: ...,
+  circleId: ..., 
+  recipientId: ..., 
+  since: ..., 
 };
 
 // Call the `getRecentReminderNotificationsRef()` function to get a reference to the query.
@@ -2897,7 +3074,7 @@ import { connectorConfig, findNotificationRecipientByEmail, FindNotificationReci
 
 // The `FindNotificationRecipientByEmail` query requires an argument of type `FindNotificationRecipientByEmailVariables`:
 const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
-  email: ...,
+  email: ..., 
 };
 
 // Call the `findNotificationRecipientByEmail()` function to execute the query.
@@ -2927,7 +3104,7 @@ import { connectorConfig, findNotificationRecipientByEmailRef, FindNotificationR
 
 // The `FindNotificationRecipientByEmail` query requires an argument of type `FindNotificationRecipientByEmailVariables`:
 const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
-  email: ...,
+  email: ..., 
 };
 
 // Call the `findNotificationRecipientByEmailRef()` function to get a reference to the query.
@@ -3012,8 +3189,8 @@ import { connectorConfig, getDeadlineNotificationCandidates, GetDeadlineNotifica
 
 // The `GetDeadlineNotificationCandidates` query requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
 const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
-  from: ...,
-  to: ...,
+  from: ..., 
+  to: ..., 
 };
 
 // Call the `getDeadlineNotificationCandidates()` function to execute the query.
@@ -3043,8 +3220,8 @@ import { connectorConfig, getDeadlineNotificationCandidatesRef, GetDeadlineNotif
 
 // The `GetDeadlineNotificationCandidates` query requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
 const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
-  from: ...,
-  to: ...,
+  from: ..., 
+  to: ..., 
 };
 
 // Call the `getDeadlineNotificationCandidatesRef()` function to get a reference to the query.
@@ -3130,7 +3307,7 @@ import { connectorConfig, getUserDeadlineNotificationCandidates, GetUserDeadline
 
 // The `GetUserDeadlineNotificationCandidates` query requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`:
 const getUserDeadlineNotificationCandidatesVars: GetUserDeadlineNotificationCandidatesVariables = {
-  userId: ...,
+  userId: ..., 
 };
 
 // Call the `getUserDeadlineNotificationCandidates()` function to execute the query.
@@ -3160,7 +3337,7 @@ import { connectorConfig, getUserDeadlineNotificationCandidatesRef, GetUserDeadl
 
 // The `GetUserDeadlineNotificationCandidates` query requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`:
 const getUserDeadlineNotificationCandidatesVars: GetUserDeadlineNotificationCandidatesVariables = {
-  userId: ...,
+  userId: ..., 
 };
 
 // Call the `getUserDeadlineNotificationCandidatesRef()` function to get a reference to the query.
@@ -3182,6 +3359,424 @@ console.log(data.circleMemberships);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.circleMemberships);
+});
+```
+
+## GetRetentionCandidates
+You can execute the `GetRetentionCandidates` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getRetentionCandidates(vars: GetRetentionCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+
+interface GetRetentionCandidatesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRetentionCandidatesVariables): QueryRef<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+}
+export const getRetentionCandidatesRef: GetRetentionCandidatesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRetentionCandidates(dc: DataConnect, vars: GetRetentionCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+
+interface GetRetentionCandidatesRef {
+  ...
+  (dc: DataConnect, vars: GetRetentionCandidatesVariables): QueryRef<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+}
+export const getRetentionCandidatesRef: GetRetentionCandidatesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRetentionCandidatesRef:
+```typescript
+const name = getRetentionCandidatesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRetentionCandidates` query requires an argument of type `GetRetentionCandidatesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRetentionCandidatesVariables {
+  now: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `GetRetentionCandidates` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRetentionCandidatesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRetentionCandidatesData {
+  circles: ({
+    id: UUIDString;
+    retentionDueAt?: TimestampString | null;
+  } & Circle_Key)[];
+}
+```
+### Using `GetRetentionCandidates`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRetentionCandidates, GetRetentionCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetRetentionCandidates` query requires an argument of type `GetRetentionCandidatesVariables`:
+const getRetentionCandidatesVars: GetRetentionCandidatesVariables = {
+  now: ..., 
+};
+
+// Call the `getRetentionCandidates()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRetentionCandidates(getRetentionCandidatesVars);
+// Variables can be defined inline as well.
+const { data } = await getRetentionCandidates({ now: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRetentionCandidates(dataConnect, getRetentionCandidatesVars);
+
+console.log(data.circles);
+
+// Or, you can use the `Promise` API.
+getRetentionCandidates(getRetentionCandidatesVars).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+});
+```
+
+### Using `GetRetentionCandidates`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRetentionCandidatesRef, GetRetentionCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetRetentionCandidates` query requires an argument of type `GetRetentionCandidatesVariables`:
+const getRetentionCandidatesVars: GetRetentionCandidatesVariables = {
+  now: ..., 
+};
+
+// Call the `getRetentionCandidatesRef()` function to get a reference to the query.
+const ref = getRetentionCandidatesRef(getRetentionCandidatesVars);
+// Variables can be defined inline as well.
+const ref = getRetentionCandidatesRef({ now: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRetentionCandidatesRef(dataConnect, getRetentionCandidatesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circles);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+});
+```
+
+## GetCircleRetentionPayload
+You can execute the `GetCircleRetentionPayload` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleRetentionPayload(vars: GetCircleRetentionPayloadVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+
+interface GetCircleRetentionPayloadRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleRetentionPayloadVariables): QueryRef<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+}
+export const getCircleRetentionPayloadRef: GetCircleRetentionPayloadRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleRetentionPayload(dc: DataConnect, vars: GetCircleRetentionPayloadVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+
+interface GetCircleRetentionPayloadRef {
+  ...
+  (dc: DataConnect, vars: GetCircleRetentionPayloadVariables): QueryRef<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+}
+export const getCircleRetentionPayloadRef: GetCircleRetentionPayloadRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleRetentionPayloadRef:
+```typescript
+const name = getCircleRetentionPayloadRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleRetentionPayload` query requires an argument of type `GetCircleRetentionPayloadVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleRetentionPayloadVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleRetentionPayload` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleRetentionPayloadData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleRetentionPayloadData {
+  circle?: {
+    id: UUIDString;
+    type: string;
+    status: string;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    imageStoragePath?: string | null;
+  } & Circle_Key;
+    receipts: ({
+      id: UUIDString;
+      imageStoragePath: string;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        receiptStoragePath?: string | null;
+      })[];
+        asoEbiTiers: ({
+          fabricImageStoragePath?: string | null;
+          appreciationGiftImageStoragePath?: string | null;
+        })[];
+          retentionPurgeAttempts: ({
+            attemptNumber: number;
+            status: string;
+            startedAt: TimestampString;
+            nextRetryAt?: TimestampString | null;
+          })[];
+            invitations: ({
+              id: UUIDString;
+            } & Invitation_Key)[];
+}
+```
+### Using `GetCircleRetentionPayload`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionPayload, GetCircleRetentionPayloadVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionPayload` query requires an argument of type `GetCircleRetentionPayloadVariables`:
+const getCircleRetentionPayloadVars: GetCircleRetentionPayloadVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleRetentionPayload()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleRetentionPayload(getCircleRetentionPayloadVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleRetentionPayload({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleRetentionPayload(dataConnect, getCircleRetentionPayloadVars);
+
+console.log(data.circle);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.asoEbiTiers);
+console.log(data.retentionPurgeAttempts);
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+getCircleRetentionPayload(getCircleRetentionPayloadVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.asoEbiTiers);
+  console.log(data.retentionPurgeAttempts);
+  console.log(data.invitations);
+});
+```
+
+### Using `GetCircleRetentionPayload`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionPayloadRef, GetCircleRetentionPayloadVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionPayload` query requires an argument of type `GetCircleRetentionPayloadVariables`:
+const getCircleRetentionPayloadVars: GetCircleRetentionPayloadVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleRetentionPayloadRef()` function to get a reference to the query.
+const ref = getCircleRetentionPayloadRef(getCircleRetentionPayloadVars);
+// Variables can be defined inline as well.
+const ref = getCircleRetentionPayloadRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleRetentionPayloadRef(dataConnect, getCircleRetentionPayloadVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.asoEbiTiers);
+console.log(data.retentionPurgeAttempts);
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.asoEbiTiers);
+  console.log(data.retentionPurgeAttempts);
+  console.log(data.invitations);
+});
+```
+
+## GetStoragePathReferences
+You can execute the `GetStoragePathReferences` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getStoragePathReferences(vars: GetStoragePathReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+
+interface GetStoragePathReferencesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetStoragePathReferencesVariables): QueryRef<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+}
+export const getStoragePathReferencesRef: GetStoragePathReferencesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getStoragePathReferences(dc: DataConnect, vars: GetStoragePathReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+
+interface GetStoragePathReferencesRef {
+  ...
+  (dc: DataConnect, vars: GetStoragePathReferencesVariables): QueryRef<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+}
+export const getStoragePathReferencesRef: GetStoragePathReferencesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getStoragePathReferencesRef:
+```typescript
+const name = getStoragePathReferencesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetStoragePathReferences` query requires an argument of type `GetStoragePathReferencesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetStoragePathReferencesVariables {
+  path: string;
+}
+```
+### Return Type
+Recall that executing the `GetStoragePathReferences` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetStoragePathReferencesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetStoragePathReferencesData {
+  circles: ({
+    id: UUIDString;
+  } & Circle_Key)[];
+    receipts: ({
+      id: UUIDString;
+      circle: {
+        id: UUIDString;
+      } & Circle_Key;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        circle: {
+          id: UUIDString;
+        } & Circle_Key;
+      })[];
+        fabricReferences: ({
+          id: UUIDString;
+          circle: {
+            id: UUIDString;
+          } & Circle_Key;
+        } & AsoEbiTier_Key)[];
+          giftReferences: ({
+            id: UUIDString;
+            circle: {
+              id: UUIDString;
+            } & Circle_Key;
+          } & AsoEbiTier_Key)[];
+}
+```
+### Using `GetStoragePathReferences`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getStoragePathReferences, GetStoragePathReferencesVariables } from '@bondcircle/dataconnect';
+
+// The `GetStoragePathReferences` query requires an argument of type `GetStoragePathReferencesVariables`:
+const getStoragePathReferencesVars: GetStoragePathReferencesVariables = {
+  path: ..., 
+};
+
+// Call the `getStoragePathReferences()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getStoragePathReferences(getStoragePathReferencesVars);
+// Variables can be defined inline as well.
+const { data } = await getStoragePathReferences({ path: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getStoragePathReferences(dataConnect, getStoragePathReferencesVars);
+
+console.log(data.circles);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.fabricReferences);
+console.log(data.giftReferences);
+
+// Or, you can use the `Promise` API.
+getStoragePathReferences(getStoragePathReferencesVars).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.fabricReferences);
+  console.log(data.giftReferences);
+});
+```
+
+### Using `GetStoragePathReferences`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getStoragePathReferencesRef, GetStoragePathReferencesVariables } from '@bondcircle/dataconnect';
+
+// The `GetStoragePathReferences` query requires an argument of type `GetStoragePathReferencesVariables`:
+const getStoragePathReferencesVars: GetStoragePathReferencesVariables = {
+  path: ..., 
+};
+
+// Call the `getStoragePathReferencesRef()` function to get a reference to the query.
+const ref = getStoragePathReferencesRef(getStoragePathReferencesVars);
+// Variables can be defined inline as well.
+const ref = getStoragePathReferencesRef({ path: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getStoragePathReferencesRef(dataConnect, getStoragePathReferencesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circles);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.fabricReferences);
+console.log(data.giftReferences);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.fabricReferences);
+  console.log(data.giftReferences);
 });
 ```
 
@@ -3259,7 +3854,7 @@ import { connectorConfig, upsertCurrentUser, UpsertCurrentUserVariables } from '
 
 // The `UpsertCurrentUser` mutation requires an argument of type `UpsertCurrentUserVariables`:
 const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-  displayName: ...,
+  displayName: ..., 
   phone: ..., // optional
   email: ..., // optional
   profileImage: ..., // optional
@@ -3294,7 +3889,7 @@ import { connectorConfig, upsertCurrentUserRef, UpsertCurrentUserVariables } fro
 
 // The `UpsertCurrentUser` mutation requires an argument of type `UpsertCurrentUserVariables`:
 const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-  displayName: ...,
+  displayName: ..., 
   phone: ..., // optional
   email: ..., // optional
   profileImage: ..., // optional
@@ -3393,19 +3988,19 @@ import { connectorConfig, createCircleDraft, CreateCircleDraftVariables } from '
 
 // The `CreateCircleDraft` mutation requires an argument of type `CreateCircleDraftVariables`:
 const createCircleDraftVars: CreateCircleDraftVariables = {
-  creatorId: ...,
-  name: ...,
-  type: ...,
-  description: ...,
-  targetAmount: ...,
-  pricingPlan: ...,
-  memberLimit: ...,
-  activationPrice: ...,
+  creatorId: ..., 
+  name: ..., 
+  type: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ...,
-  createdAt: ...,
-  updatedAt: ...,
+  visibility: ..., 
+  createdAt: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `createCircleDraft()` function to execute the mutation.
@@ -3441,19 +4036,19 @@ import { connectorConfig, createCircleDraftRef, CreateCircleDraftVariables } fro
 
 // The `CreateCircleDraft` mutation requires an argument of type `CreateCircleDraftVariables`:
 const createCircleDraftVars: CreateCircleDraftVariables = {
-  creatorId: ...,
-  name: ...,
-  type: ...,
-  description: ...,
-  targetAmount: ...,
-  pricingPlan: ...,
-  memberLimit: ...,
-  activationPrice: ...,
+  creatorId: ..., 
+  name: ..., 
+  type: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ...,
-  createdAt: ...,
-  updatedAt: ...,
+  visibility: ..., 
+  createdAt: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `createCircleDraftRef()` function to get a reference to the mutation.
@@ -3553,21 +4148,21 @@ import { connectorConfig, updateCircleConfigurationWithAudit, UpdateCircleConfig
 
 // The `UpdateCircleConfigurationWithAudit` mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
 const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  action: ...,
-  status: ...,
-  name: ...,
-  description: ...,
-  targetAmount: ...,
-  pricingPlan: ...,
-  memberLimit: ...,
-  activationPrice: ...,
+  circleId: ..., 
+  actorId: ..., 
+  action: ..., 
+  status: ..., 
+  name: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ...,
-  updatedAt: ...,
-  materialChanges: ...,
+  visibility: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `updateCircleConfigurationWithAudit()` function to execute the mutation.
@@ -3599,21 +4194,21 @@ import { connectorConfig, updateCircleConfigurationWithAuditRef, UpdateCircleCon
 
 // The `UpdateCircleConfigurationWithAudit` mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
 const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  action: ...,
-  status: ...,
-  name: ...,
-  description: ...,
-  targetAmount: ...,
-  pricingPlan: ...,
-  memberLimit: ...,
-  activationPrice: ...,
+  circleId: ..., 
+  actorId: ..., 
+  action: ..., 
+  status: ..., 
+  name: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
-  visibility: ...,
-  updatedAt: ...,
-  materialChanges: ...,
+  visibility: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `updateCircleConfigurationWithAuditRef()` function to get a reference to the mutation.
@@ -3680,6 +4275,7 @@ export interface TransitionCircleWithAuditVariables {
   toStatus: string;
   updatedAt: TimestampString;
   completedAt?: TimestampString | null;
+  retentionDueAt?: TimestampString | null;
   archiveAt?: TimestampString | null;
   purgeAt?: TimestampString | null;
 }
@@ -3703,12 +4299,13 @@ import { connectorConfig, transitionCircleWithAudit, TransitionCircleWithAuditVa
 
 // The `TransitionCircleWithAudit` mutation requires an argument of type `TransitionCircleWithAuditVariables`:
 const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  fromStatus: ...,
-  toStatus: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  fromStatus: ..., 
+  toStatus: ..., 
+  updatedAt: ..., 
   completedAt: ..., // optional
+  retentionDueAt: ..., // optional
   archiveAt: ..., // optional
   purgeAt: ..., // optional
 };
@@ -3717,7 +4314,7 @@ const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await transitionCircleWithAudit(transitionCircleWithAuditVars);
 // Variables can be defined inline as well.
-const { data } = await transitionCircleWithAudit({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., archiveAt: ..., purgeAt: ..., });
+const { data } = await transitionCircleWithAudit({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., retentionDueAt: ..., archiveAt: ..., purgeAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -3744,12 +4341,13 @@ import { connectorConfig, transitionCircleWithAuditRef, TransitionCircleWithAudi
 
 // The `TransitionCircleWithAudit` mutation requires an argument of type `TransitionCircleWithAuditVariables`:
 const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  fromStatus: ...,
-  toStatus: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  fromStatus: ..., 
+  toStatus: ..., 
+  updatedAt: ..., 
   completedAt: ..., // optional
+  retentionDueAt: ..., // optional
   archiveAt: ..., // optional
   purgeAt: ..., // optional
 };
@@ -3757,7 +4355,7 @@ const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
 // Call the `transitionCircleWithAuditRef()` function to get a reference to the mutation.
 const ref = transitionCircleWithAuditRef(transitionCircleWithAuditVars);
 // Variables can be defined inline as well.
-const ref = transitionCircleWithAuditRef({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., archiveAt: ..., purgeAt: ..., });
+const ref = transitionCircleWithAuditRef({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., retentionDueAt: ..., archiveAt: ..., purgeAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -3777,6 +4375,129 @@ executeMutation(ref).then((response) => {
   console.log(data.circle_update);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
+});
+```
+
+## SetCircleCompletionTypeWithAudit
+You can execute the `SetCircleCompletionTypeWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+setCircleCompletionTypeWithAudit(vars: SetCircleCompletionTypeWithAuditVariables): MutationPromise<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+
+interface SetCircleCompletionTypeWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleCompletionTypeWithAuditVariables): MutationRef<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+}
+export const setCircleCompletionTypeWithAuditRef: SetCircleCompletionTypeWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+setCircleCompletionTypeWithAudit(dc: DataConnect, vars: SetCircleCompletionTypeWithAuditVariables): MutationPromise<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+
+interface SetCircleCompletionTypeWithAuditRef {
+  ...
+  (dc: DataConnect, vars: SetCircleCompletionTypeWithAuditVariables): MutationRef<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+}
+export const setCircleCompletionTypeWithAuditRef: SetCircleCompletionTypeWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the setCircleCompletionTypeWithAuditRef:
+```typescript
+const name = setCircleCompletionTypeWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SetCircleCompletionTypeWithAudit` mutation requires an argument of type `SetCircleCompletionTypeWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SetCircleCompletionTypeWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  completionType: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `SetCircleCompletionTypeWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SetCircleCompletionTypeWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SetCircleCompletionTypeWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `SetCircleCompletionTypeWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, setCircleCompletionTypeWithAudit, SetCircleCompletionTypeWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleCompletionTypeWithAudit` mutation requires an argument of type `SetCircleCompletionTypeWithAuditVariables`:
+const setCircleCompletionTypeWithAuditVars: SetCircleCompletionTypeWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  completionType: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `setCircleCompletionTypeWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await setCircleCompletionTypeWithAudit(setCircleCompletionTypeWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await setCircleCompletionTypeWithAudit({ circleId: ..., actorId: ..., completionType: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await setCircleCompletionTypeWithAudit(dataConnect, setCircleCompletionTypeWithAuditVars);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+setCircleCompletionTypeWithAudit(setCircleCompletionTypeWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `SetCircleCompletionTypeWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, setCircleCompletionTypeWithAuditRef, SetCircleCompletionTypeWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleCompletionTypeWithAudit` mutation requires an argument of type `SetCircleCompletionTypeWithAuditVariables`:
+const setCircleCompletionTypeWithAuditVars: SetCircleCompletionTypeWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  completionType: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `setCircleCompletionTypeWithAuditRef()` function to get a reference to the mutation.
+const ref = setCircleCompletionTypeWithAuditRef(setCircleCompletionTypeWithAuditVars);
+// Variables can be defined inline as well.
+const ref = setCircleCompletionTypeWithAuditRef({ circleId: ..., actorId: ..., completionType: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = setCircleCompletionTypeWithAuditRef(dataConnect, setCircleCompletionTypeWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
 });
 ```
 
@@ -3840,11 +4561,11 @@ import { connectorConfig, addCircleMemberWithAudit, AddCircleMemberWithAuditVari
 
 // The `AddCircleMemberWithAudit` mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
 const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  memberId: ...,
-  role: ...,
-  createdAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  memberId: ..., 
+  role: ..., 
+  createdAt: ..., 
 };
 
 // Call the `addCircleMemberWithAudit()` function to execute the mutation.
@@ -3878,11 +4599,11 @@ import { connectorConfig, addCircleMemberWithAuditRef, AddCircleMemberWithAuditV
 
 // The `AddCircleMemberWithAudit` mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
 const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  memberId: ...,
-  role: ...,
-  createdAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  memberId: ..., 
+  role: ..., 
+  createdAt: ..., 
 };
 
 // Call the `addCircleMemberWithAuditRef()` function to get a reference to the mutation.
@@ -3975,16 +4696,16 @@ import { connectorConfig, configureGiftCircle, ConfigureGiftCircleVariables } fr
 
 // The `ConfigureGiftCircle` mutation requires an argument of type `ConfigureGiftCircleVariables`:
 const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  giftTitle: ...,
-  contributionMode: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  giftTitle: ..., 
+  contributionMode: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureGiftCircle()` function to execute the mutation.
@@ -4016,16 +4737,16 @@ import { connectorConfig, configureGiftCircleRef, ConfigureGiftCircleVariables }
 
 // The `ConfigureGiftCircle` mutation requires an argument of type `ConfigureGiftCircleVariables`:
 const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  giftTitle: ...,
-  contributionMode: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  giftTitle: ..., 
+  contributionMode: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureGiftCircleRef()` function to get a reference to the mutation.
@@ -4109,10 +4830,10 @@ import { connectorConfig, setGiftMemberAllocation, SetGiftMemberAllocationVariab
 
 // The `SetGiftMemberAllocation` mutation requires an argument of type `SetGiftMemberAllocationVariables`:
 const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-  circleId: ...,
-  memberId: ...,
-  expectedAmount: ...,
-  contributionStatus: ...,
+  circleId: ..., 
+  memberId: ..., 
+  expectedAmount: ..., 
+  contributionStatus: ..., 
 };
 
 // Call the `setGiftMemberAllocation()` function to execute the mutation.
@@ -4142,10 +4863,10 @@ import { connectorConfig, setGiftMemberAllocationRef, SetGiftMemberAllocationVar
 
 // The `SetGiftMemberAllocation` mutation requires an argument of type `SetGiftMemberAllocationVariables`:
 const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-  circleId: ...,
-  memberId: ...,
-  expectedAmount: ...,
-  contributionStatus: ...,
+  circleId: ..., 
+  memberId: ..., 
+  expectedAmount: ..., 
+  contributionStatus: ..., 
 };
 
 // Call the `setGiftMemberAllocationRef()` function to get a reference to the mutation.
@@ -4234,16 +4955,16 @@ import { connectorConfig, configureAsoEbiCircle, ConfigureAsoEbiCircleVariables 
 
 // The `ConfigureAsoEbiCircle` mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
 const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  eventType: ...,
-  organizerName: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  organizerName: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureAsoEbiCircle()` function to execute the mutation.
@@ -4275,16 +4996,16 @@ import { connectorConfig, configureAsoEbiCircleRef, ConfigureAsoEbiCircleVariabl
 
 // The `ConfigureAsoEbiCircle` mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
 const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  eventType: ...,
-  organizerName: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  organizerName: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureAsoEbiCircleRef()` function to get a reference to the mutation.
@@ -4378,11 +5099,11 @@ import { connectorConfig, createAsoEbiTier, CreateAsoEbiTierVariables } from '@b
 
 // The `CreateAsoEbiTier` mutation requires an argument of type `CreateAsoEbiTierVariables`:
 const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-  tierId: ...,
-  circleId: ...,
-  name: ...,
-  price: ...,
-  fabricDescription: ...,
+  tierId: ..., 
+  circleId: ..., 
+  name: ..., 
+  price: ..., 
+  fabricDescription: ..., 
   fabricImageUrl: ..., // optional
   fabricImageStoragePath: ..., // optional
   appreciationGiftName: ..., // optional
@@ -4390,8 +5111,8 @@ const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
   appreciationGiftImageStoragePath: ..., // optional
   availabilityNote: ..., // optional
   deliveryDetails: ..., // optional
-  sortOrder: ...,
-  createdAt: ...,
+  sortOrder: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createAsoEbiTier()` function to execute the mutation.
@@ -4421,11 +5142,11 @@ import { connectorConfig, createAsoEbiTierRef, CreateAsoEbiTierVariables } from 
 
 // The `CreateAsoEbiTier` mutation requires an argument of type `CreateAsoEbiTierVariables`:
 const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-  tierId: ...,
-  circleId: ...,
-  name: ...,
-  price: ...,
-  fabricDescription: ...,
+  tierId: ..., 
+  circleId: ..., 
+  name: ..., 
+  price: ..., 
+  fabricDescription: ..., 
   fabricImageUrl: ..., // optional
   fabricImageStoragePath: ..., // optional
   appreciationGiftName: ..., // optional
@@ -4433,8 +5154,8 @@ const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
   appreciationGiftImageStoragePath: ..., // optional
   availabilityNote: ..., // optional
   deliveryDetails: ..., // optional
-  sortOrder: ...,
-  createdAt: ...,
+  sortOrder: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createAsoEbiTierRef()` function to get a reference to the mutation.
@@ -4519,11 +5240,11 @@ import { connectorConfig, selectAsoEbiTier, SelectAsoEbiTierVariables } from '@b
 
 // The `SelectAsoEbiTier` mutation requires an argument of type `SelectAsoEbiTierVariables`:
 const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-  circleId: ...,
-  memberId: ...,
-  tierId: ...,
-  expectedAmount: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  memberId: ..., 
+  tierId: ..., 
+  expectedAmount: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `selectAsoEbiTier()` function to execute the mutation.
@@ -4557,11 +5278,11 @@ import { connectorConfig, selectAsoEbiTierRef, SelectAsoEbiTierVariables } from 
 
 // The `SelectAsoEbiTier` mutation requires an argument of type `SelectAsoEbiTierVariables`:
 const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-  circleId: ...,
-  memberId: ...,
-  tierId: ...,
-  expectedAmount: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  memberId: ..., 
+  tierId: ..., 
+  expectedAmount: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `selectAsoEbiTierRef()` function to get a reference to the mutation.
@@ -4650,11 +5371,11 @@ import { connectorConfig, updateAsoEbiFulfilment, UpdateAsoEbiFulfilmentVariable
 
 // The `UpdateAsoEbiFulfilment` mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
 const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-  circleId: ...,
-  actorId: ...,
-  memberId: ...,
-  status: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  memberId: ..., 
+  status: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `updateAsoEbiFulfilment()` function to execute the mutation.
@@ -4688,11 +5409,11 @@ import { connectorConfig, updateAsoEbiFulfilmentRef, UpdateAsoEbiFulfilmentVaria
 
 // The `UpdateAsoEbiFulfilment` mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
 const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-  circleId: ...,
-  actorId: ...,
-  memberId: ...,
-  status: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  memberId: ..., 
+  status: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `updateAsoEbiFulfilmentRef()` function to get a reference to the mutation.
@@ -4792,23 +5513,23 @@ import { connectorConfig, configureSupportCircle, ConfigureSupportCircleVariable
 
 // The `ConfigureSupportCircle` mutation requires an argument of type `ConfigureSupportCircleVariables`:
 const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  supportType: ...,
-  beneficiaryName: ...,
+  circleId: ..., 
+  actorId: ..., 
+  supportType: ..., 
+  beneficiaryName: ..., 
   beneficiaryRelationship: ..., // optional
-  contributionMode: ...,
-  showBeneficiaryName: ...,
-  showTargetToMembers: ...,
-  showConfirmedTotalToMembers: ...,
-  hideIndividualAmounts: ...,
-  requireCreatorApproval: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  contributionMode: ..., 
+  showBeneficiaryName: ..., 
+  showTargetToMembers: ..., 
+  showConfirmedTotalToMembers: ..., 
+  hideIndividualAmounts: ..., 
+  requireCreatorApproval: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureSupportCircle()` function to execute the mutation.
@@ -4840,23 +5561,23 @@ import { connectorConfig, configureSupportCircleRef, ConfigureSupportCircleVaria
 
 // The `ConfigureSupportCircle` mutation requires an argument of type `ConfigureSupportCircleVariables`:
 const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-  circleId: ...,
-  actorId: ...,
-  supportType: ...,
-  beneficiaryName: ...,
+  circleId: ..., 
+  actorId: ..., 
+  supportType: ..., 
+  beneficiaryName: ..., 
   beneficiaryRelationship: ..., // optional
-  contributionMode: ...,
-  showBeneficiaryName: ...,
-  showTargetToMembers: ...,
-  showConfirmedTotalToMembers: ...,
-  hideIndividualAmounts: ...,
-  requireCreatorApproval: ...,
-  paymentBankName: ...,
-  paymentAccountName: ...,
-  paymentAccountNumber: ...,
-  imageUrl: ...,
-  imageStoragePath: ...,
-  updatedAt: ...,
+  contributionMode: ..., 
+  showBeneficiaryName: ..., 
+  showTargetToMembers: ..., 
+  showConfirmedTotalToMembers: ..., 
+  hideIndividualAmounts: ..., 
+  requireCreatorApproval: ..., 
+  paymentBankName: ..., 
+  paymentAccountName: ..., 
+  paymentAccountNumber: ..., 
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `configureSupportCircleRef()` function to get a reference to the mutation.
@@ -4941,10 +5662,10 @@ import { connectorConfig, recordSupportPledge, RecordSupportPledgeVariables } fr
 
 // The `RecordSupportPledge` mutation requires an argument of type `RecordSupportPledgeVariables`:
 const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-  circleId: ...,
-  memberId: ...,
-  amount: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  memberId: ..., 
+  amount: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `recordSupportPledge()` function to execute the mutation.
@@ -4976,10 +5697,10 @@ import { connectorConfig, recordSupportPledgeRef, RecordSupportPledgeVariables }
 
 // The `RecordSupportPledge` mutation requires an argument of type `RecordSupportPledgeVariables`:
 const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-  circleId: ...,
-  memberId: ...,
-  amount: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  memberId: ..., 
+  amount: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `recordSupportPledgeRef()` function to get a reference to the mutation.
@@ -5063,10 +5784,10 @@ import { connectorConfig, setSupportMemberAllocation, SetSupportMemberAllocation
 
 // The `SetSupportMemberAllocation` mutation requires an argument of type `SetSupportMemberAllocationVariables`:
 const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-  circleId: ...,
-  memberId: ...,
-  expectedAmount: ...,
-  contributionStatus: ...,
+  circleId: ..., 
+  memberId: ..., 
+  expectedAmount: ..., 
+  contributionStatus: ..., 
 };
 
 // Call the `setSupportMemberAllocation()` function to execute the mutation.
@@ -5096,10 +5817,10 @@ import { connectorConfig, setSupportMemberAllocationRef, SetSupportMemberAllocat
 
 // The `SetSupportMemberAllocation` mutation requires an argument of type `SetSupportMemberAllocationVariables`:
 const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-  circleId: ...,
-  memberId: ...,
-  expectedAmount: ...,
-  contributionStatus: ...,
+  circleId: ..., 
+  memberId: ..., 
+  expectedAmount: ..., 
+  contributionStatus: ..., 
 };
 
 // Call the `setSupportMemberAllocationRef()` function to get a reference to the mutation.
@@ -5182,10 +5903,10 @@ import { connectorConfig, createSupportUpdate, CreateSupportUpdateVariables } fr
 
 // The `CreateSupportUpdate` mutation requires an argument of type `CreateSupportUpdateVariables`:
 const createSupportUpdateVars: CreateSupportUpdateVariables = {
-  circleId: ...,
-  authorId: ...,
-  body: ...,
-  createdAt: ...,
+  circleId: ..., 
+  authorId: ..., 
+  body: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createSupportUpdate()` function to execute the mutation.
@@ -5217,10 +5938,10 @@ import { connectorConfig, createSupportUpdateRef, CreateSupportUpdateVariables }
 
 // The `CreateSupportUpdate` mutation requires an argument of type `CreateSupportUpdateVariables`:
 const createSupportUpdateVars: CreateSupportUpdateVariables = {
-  circleId: ...,
-  authorId: ...,
-  body: ...,
-  createdAt: ...,
+  circleId: ..., 
+  authorId: ..., 
+  body: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createSupportUpdateRef()` function to get a reference to the mutation.
@@ -5305,10 +6026,10 @@ import { connectorConfig, setSupportCompletionType, SetSupportCompletionTypeVari
 
 // The `SetSupportCompletionType` mutation requires an argument of type `SetSupportCompletionTypeVariables`:
 const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-  circleId: ...,
-  actorId: ...,
-  completionType: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  completionType: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `setSupportCompletionType()` function to execute the mutation.
@@ -5340,10 +6061,10 @@ import { connectorConfig, setSupportCompletionTypeRef, SetSupportCompletionTypeV
 
 // The `SetSupportCompletionType` mutation requires an argument of type `SetSupportCompletionTypeVariables`:
 const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-  circleId: ...,
-  actorId: ...,
-  completionType: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  completionType: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `setSupportCompletionTypeRef()` function to get a reference to the mutation.
@@ -5437,18 +6158,18 @@ import { connectorConfig, createInvitation, CreateInvitationVariables } from '@b
 
 // The `CreateInvitation` mutation requires an argument of type `CreateInvitationVariables`:
 const createInvitationVars: CreateInvitationVariables = {
-  circleId: ...,
-  invitedById: ...,
-  tokenHash: ...,
-  mode: ...,
+  circleId: ..., 
+  invitedById: ..., 
+  tokenHash: ..., 
+  mode: ..., 
   recipientName: ..., // optional
   recipientEmail: ..., // optional
   recipientPhone: ..., // optional
-  expectedAmount: ...,
-  requireApproval: ...,
-  maxUses: ...,
-  expiresAt: ...,
-  createdAt: ...,
+  expectedAmount: ..., 
+  requireApproval: ..., 
+  maxUses: ..., 
+  expiresAt: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createInvitation()` function to execute the mutation.
@@ -5482,18 +6203,18 @@ import { connectorConfig, createInvitationRef, CreateInvitationVariables } from 
 
 // The `CreateInvitation` mutation requires an argument of type `CreateInvitationVariables`:
 const createInvitationVars: CreateInvitationVariables = {
-  circleId: ...,
-  invitedById: ...,
-  tokenHash: ...,
-  mode: ...,
+  circleId: ..., 
+  invitedById: ..., 
+  tokenHash: ..., 
+  mode: ..., 
   recipientName: ..., // optional
   recipientEmail: ..., // optional
   recipientPhone: ..., // optional
-  expectedAmount: ...,
-  requireApproval: ...,
-  maxUses: ...,
-  expiresAt: ...,
-  createdAt: ...,
+  expectedAmount: ..., 
+  requireApproval: ..., 
+  maxUses: ..., 
+  expiresAt: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createInvitationRef()` function to get a reference to the mutation.
@@ -5583,13 +6304,13 @@ import { connectorConfig, updateInvitationState, UpdateInvitationStateVariables 
 
 // The `UpdateInvitationState` mutation requires an argument of type `UpdateInvitationStateVariables`:
 const updateInvitationStateVars: UpdateInvitationStateVariables = {
-  invitationId: ...,
-  actorId: ...,
-  circleId: ...,
-  state: ...,
+  invitationId: ..., 
+  actorId: ..., 
+  circleId: ..., 
+  state: ..., 
   openedAt: ..., // optional
   revokedAt: ..., // optional
-  updatedAt: ...,
+  updatedAt: ..., 
 };
 
 // Call the `updateInvitationState()` function to execute the mutation.
@@ -5621,13 +6342,13 @@ import { connectorConfig, updateInvitationStateRef, UpdateInvitationStateVariabl
 
 // The `UpdateInvitationState` mutation requires an argument of type `UpdateInvitationStateVariables`:
 const updateInvitationStateVars: UpdateInvitationStateVariables = {
-  invitationId: ...,
-  actorId: ...,
-  circleId: ...,
-  state: ...,
+  invitationId: ..., 
+  actorId: ..., 
+  circleId: ..., 
+  state: ..., 
   openedAt: ..., // optional
   revokedAt: ..., // optional
-  updatedAt: ...,
+  updatedAt: ..., 
 };
 
 // Call the `updateInvitationStateRef()` function to get a reference to the mutation.
@@ -5721,15 +6442,15 @@ import { connectorConfig, acceptInvitationWithMembership, AcceptInvitationWithMe
 
 // The `AcceptInvitationWithMembership` mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
 const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  role: ...,
-  expectedAmount: ...,
-  nextMemberCount: ...,
-  nextInvitationState: ...,
-  nextUseCount: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  role: ..., 
+  expectedAmount: ..., 
+  nextMemberCount: ..., 
+  nextInvitationState: ..., 
+  nextUseCount: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `acceptInvitationWithMembership()` function to execute the mutation.
@@ -5769,15 +6490,15 @@ import { connectorConfig, acceptInvitationWithMembershipRef, AcceptInvitationWit
 
 // The `AcceptInvitationWithMembership` mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
 const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  role: ...,
-  expectedAmount: ...,
-  nextMemberCount: ...,
-  nextInvitationState: ...,
-  nextUseCount: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  role: ..., 
+  expectedAmount: ..., 
+  nextMemberCount: ..., 
+  nextInvitationState: ..., 
+  nextUseCount: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `acceptInvitationWithMembershipRef()` function to get a reference to the mutation.
@@ -5871,10 +6592,10 @@ import { connectorConfig, requestInvitationApproval, RequestInvitationApprovalVa
 
 // The `RequestInvitationApproval` mutation requires an argument of type `RequestInvitationApprovalVariables`:
 const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `requestInvitationApproval()` function to execute the mutation.
@@ -5908,10 +6629,10 @@ import { connectorConfig, requestInvitationApprovalRef, RequestInvitationApprova
 
 // The `RequestInvitationApproval` mutation requires an argument of type `RequestInvitationApprovalVariables`:
 const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `requestInvitationApprovalRef()` function to get a reference to the mutation.
@@ -6007,17 +6728,17 @@ import { connectorConfig, submitReceiptWithAudit, SubmitReceiptWithAuditVariable
 
 // The `SubmitReceiptWithAudit` mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
 const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-  receiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  amount: ...,
+  receiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  amount: ..., 
   note: ..., // optional
-  imageUrl: ...,
-  imageStoragePath: ...,
-  contentType: ...,
-  status: ...,
-  overpaymentAmount: ...,
-  submittedAt: ...,
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  contentType: ..., 
+  status: ..., 
+  overpaymentAmount: ..., 
+  submittedAt: ..., 
 };
 
 // Call the `submitReceiptWithAudit()` function to execute the mutation.
@@ -6053,17 +6774,17 @@ import { connectorConfig, submitReceiptWithAuditRef, SubmitReceiptWithAuditVaria
 
 // The `SubmitReceiptWithAudit` mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
 const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-  receiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  amount: ...,
+  receiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  amount: ..., 
   note: ..., // optional
-  imageUrl: ...,
-  imageStoragePath: ...,
-  contentType: ...,
-  status: ...,
-  overpaymentAmount: ...,
-  submittedAt: ...,
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  contentType: ..., 
+  status: ..., 
+  overpaymentAmount: ..., 
+  submittedAt: ..., 
 };
 
 // Call the `submitReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -6163,18 +6884,18 @@ import { connectorConfig, replaceReceiptWithAudit, ReplaceReceiptWithAuditVariab
 
 // The `ReplaceReceiptWithAudit` mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
 const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-  receiptId: ...,
-  replacedReceiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  amount: ...,
+  receiptId: ..., 
+  replacedReceiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  amount: ..., 
   note: ..., // optional
-  imageUrl: ...,
-  imageStoragePath: ...,
-  contentType: ...,
-  status: ...,
-  overpaymentAmount: ...,
-  submittedAt: ...,
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  contentType: ..., 
+  status: ..., 
+  overpaymentAmount: ..., 
+  submittedAt: ..., 
 };
 
 // Call the `replaceReceiptWithAudit()` function to execute the mutation.
@@ -6212,18 +6933,18 @@ import { connectorConfig, replaceReceiptWithAuditRef, ReplaceReceiptWithAuditVar
 
 // The `ReplaceReceiptWithAudit` mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
 const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-  receiptId: ...,
-  replacedReceiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  amount: ...,
+  receiptId: ..., 
+  replacedReceiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  amount: ..., 
   note: ..., // optional
-  imageUrl: ...,
-  imageStoragePath: ...,
-  contentType: ...,
-  status: ...,
-  overpaymentAmount: ...,
-  submittedAt: ...,
+  imageUrl: ..., 
+  imageStoragePath: ..., 
+  contentType: ..., 
+  status: ..., 
+  overpaymentAmount: ..., 
+  submittedAt: ..., 
 };
 
 // Call the `replaceReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -6325,18 +7046,18 @@ import { connectorConfig, reviewReceiptWithAudit, ReviewReceiptWithAuditVariable
 
 // The `ReviewReceiptWithAudit` mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
 const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-  receiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  reviewerId: ...,
-  receiptStatus: ...,
+  receiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  reviewerId: ..., 
+  receiptStatus: ..., 
   rejectionReason: ..., // optional
-  reviewedAt: ...,
-  membershipStatus: ...,
-  nextConfirmedAmount: ...,
-  nextCircleContributedAmount: ...,
-  auditAction: ...,
-  materialChanges: ...,
+  reviewedAt: ..., 
+  membershipStatus: ..., 
+  nextConfirmedAmount: ..., 
+  nextCircleContributedAmount: ..., 
+  auditAction: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `reviewReceiptWithAudit()` function to execute the mutation.
@@ -6374,18 +7095,18 @@ import { connectorConfig, reviewReceiptWithAuditRef, ReviewReceiptWithAuditVaria
 
 // The `ReviewReceiptWithAudit` mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
 const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-  receiptId: ...,
-  circleId: ...,
-  uploaderId: ...,
-  reviewerId: ...,
-  receiptStatus: ...,
+  receiptId: ..., 
+  circleId: ..., 
+  uploaderId: ..., 
+  reviewerId: ..., 
+  receiptStatus: ..., 
   rejectionReason: ..., // optional
-  reviewedAt: ...,
-  membershipStatus: ...,
-  nextConfirmedAmount: ...,
-  nextCircleContributedAmount: ...,
-  auditAction: ...,
-  materialChanges: ...,
+  reviewedAt: ..., 
+  membershipStatus: ..., 
+  nextConfirmedAmount: ..., 
+  nextCircleContributedAmount: ..., 
+  auditAction: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `reviewReceiptWithAuditRef()` function to get a reference to the mutation.
@@ -6486,16 +7207,16 @@ import { connectorConfig, approveInvitationMembership, ApproveInvitationMembersh
 
 // The `ApproveInvitationMembership` mutation requires an argument of type `ApproveInvitationMembershipVariables`:
 const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-  invitationId: ...,
-  circleId: ...,
-  actorId: ...,
-  userId: ...,
-  role: ...,
-  expectedAmount: ...,
-  nextMemberCount: ...,
-  nextInvitationState: ...,
-  nextUseCount: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  userId: ..., 
+  role: ..., 
+  expectedAmount: ..., 
+  nextMemberCount: ..., 
+  nextInvitationState: ..., 
+  nextUseCount: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `approveInvitationMembership()` function to execute the mutation.
@@ -6535,16 +7256,16 @@ import { connectorConfig, approveInvitationMembershipRef, ApproveInvitationMembe
 
 // The `ApproveInvitationMembership` mutation requires an argument of type `ApproveInvitationMembershipVariables`:
 const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-  invitationId: ...,
-  circleId: ...,
-  actorId: ...,
-  userId: ...,
-  role: ...,
-  expectedAmount: ...,
-  nextMemberCount: ...,
-  nextInvitationState: ...,
-  nextUseCount: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  userId: ..., 
+  role: ..., 
+  expectedAmount: ..., 
+  nextMemberCount: ..., 
+  nextInvitationState: ..., 
+  nextUseCount: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `approveInvitationMembershipRef()` function to get a reference to the mutation.
@@ -6639,11 +7360,11 @@ import { connectorConfig, declineInvitation, DeclineInvitationVariables } from '
 
 // The `DeclineInvitation` mutation requires an argument of type `DeclineInvitationVariables`:
 const declineInvitationVars: DeclineInvitationVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  state: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  state: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `declineInvitation()` function to execute the mutation.
@@ -6677,11 +7398,11 @@ import { connectorConfig, declineInvitationRef, DeclineInvitationVariables } fro
 
 // The `DeclineInvitation` mutation requires an argument of type `DeclineInvitationVariables`:
 const declineInvitationVars: DeclineInvitationVariables = {
-  invitationId: ...,
-  circleId: ...,
-  userId: ...,
-  state: ...,
-  respondedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  userId: ..., 
+  state: ..., 
+  respondedAt: ..., 
 };
 
 // Call the `declineInvitationRef()` function to get a reference to the mutation.
@@ -6767,10 +7488,10 @@ import { connectorConfig, requestReplacementInvitation, RequestReplacementInvita
 
 // The `RequestReplacementInvitation` mutation requires an argument of type `RequestReplacementInvitationVariables`:
 const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-  invitationId: ...,
-  circleId: ...,
-  actorId: ...,
-  requestedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  requestedAt: ..., 
 };
 
 // Call the `requestReplacementInvitation()` function to execute the mutation.
@@ -6800,10 +7521,10 @@ import { connectorConfig, requestReplacementInvitationRef, RequestReplacementInv
 
 // The `RequestReplacementInvitation` mutation requires an argument of type `RequestReplacementInvitationVariables`:
 const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-  invitationId: ...,
-  circleId: ...,
-  actorId: ...,
-  requestedAt: ...,
+  invitationId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  requestedAt: ..., 
 };
 
 // Call the `requestReplacementInvitationRef()` function to get a reference to the mutation.
@@ -6894,17 +7615,17 @@ import { connectorConfig, createAnnouncementWithActivity, CreateAnnouncementWith
 
 // The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
 const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-  announcementId: ...,
-  announcementEntityId: ...,
-  activityId: ...,
-  circleId: ...,
-  authorId: ...,
-  title: ...,
-  body: ...,
-  pinned: ...,
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
   important: ..., // optional
-  commentsEnabled: ...,
-  createdAt: ...,
+  commentsEnabled: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createAnnouncementWithActivity()` function to execute the mutation.
@@ -6938,17 +7659,17 @@ import { connectorConfig, createAnnouncementWithActivityRef, CreateAnnouncementW
 
 // The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
 const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-  announcementId: ...,
-  announcementEntityId: ...,
-  activityId: ...,
-  circleId: ...,
-  authorId: ...,
-  title: ...,
-  body: ...,
-  pinned: ...,
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
   important: ..., // optional
-  commentsEnabled: ...,
-  createdAt: ...,
+  commentsEnabled: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createAnnouncementWithActivityRef()` function to get a reference to the mutation.
@@ -7041,16 +7762,16 @@ import { connectorConfig, updateAnnouncementWithAudit, UpdateAnnouncementWithAud
 
 // The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
 const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-  announcementId: ...,
-  circleId: ...,
-  actorId: ...,
-  title: ...,
-  body: ...,
-  pinned: ...,
+  announcementId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
   important: ..., // optional
-  commentsEnabled: ...,
-  updatedAt: ...,
-  materialChanges: ...,
+  commentsEnabled: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `updateAnnouncementWithAudit()` function to execute the mutation.
@@ -7082,16 +7803,16 @@ import { connectorConfig, updateAnnouncementWithAuditRef, UpdateAnnouncementWith
 
 // The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
 const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-  announcementId: ...,
-  circleId: ...,
-  actorId: ...,
-  title: ...,
-  body: ...,
-  pinned: ...,
+  announcementId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
   important: ..., // optional
-  commentsEnabled: ...,
-  updatedAt: ...,
-  materialChanges: ...,
+  commentsEnabled: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
 };
 
 // Call the `updateAnnouncementWithAuditRef()` function to get a reference to the mutation.
@@ -7177,11 +7898,11 @@ import { connectorConfig, deleteAnnouncementWithAudit, DeleteAnnouncementWithAud
 
 // The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
 const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-  announcementId: ...,
-  announcementEntityId: ...,
-  circleId: ...,
-  actorId: ...,
-  deletedAt: ...,
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
 };
 
 // Call the `deleteAnnouncementWithAudit()` function to execute the mutation.
@@ -7213,11 +7934,11 @@ import { connectorConfig, deleteAnnouncementWithAuditRef, DeleteAnnouncementWith
 
 // The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
 const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-  announcementId: ...,
-  announcementEntityId: ...,
-  circleId: ...,
-  actorId: ...,
-  deletedAt: ...,
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
 };
 
 // Call the `deleteAnnouncementWithAuditRef()` function to get a reference to the mutation.
@@ -7303,11 +8024,11 @@ import { connectorConfig, setCircleCommentsWithAudit, SetCircleCommentsWithAudit
 
 // The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
 const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  commentsEnabled: ...,
-  materialChanges: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  commentsEnabled: ..., 
+  materialChanges: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `setCircleCommentsWithAudit()` function to execute the mutation.
@@ -7339,11 +8060,11 @@ import { connectorConfig, setCircleCommentsWithAuditRef, SetCircleCommentsWithAu
 
 // The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
 const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-  circleId: ...,
-  actorId: ...,
-  commentsEnabled: ...,
-  materialChanges: ...,
-  updatedAt: ...,
+  circleId: ..., 
+  actorId: ..., 
+  commentsEnabled: ..., 
+  materialChanges: ..., 
+  updatedAt: ..., 
 };
 
 // Call the `setCircleCommentsWithAuditRef()` function to get a reference to the mutation.
@@ -7433,15 +8154,15 @@ import { connectorConfig, createCommentWithActivity, CreateCommentWithActivityVa
 
 // The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
 const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-  commentId: ...,
-  commentEntityId: ...,
-  activityId: ...,
-  circleId: ...,
-  authorId: ...,
+  commentId: ..., 
+  commentEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
   announcementId: ..., // optional
   parentCommentId: ..., // optional
-  body: ...,
-  createdAt: ...,
+  body: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createCommentWithActivity()` function to execute the mutation.
@@ -7473,15 +8194,15 @@ import { connectorConfig, createCommentWithActivityRef, CreateCommentWithActivit
 
 // The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
 const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-  commentId: ...,
-  commentEntityId: ...,
-  activityId: ...,
-  circleId: ...,
-  authorId: ...,
+  commentId: ..., 
+  commentEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
   announcementId: ..., // optional
   parentCommentId: ..., // optional
-  body: ...,
-  createdAt: ...,
+  body: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createCommentWithActivityRef()` function to get a reference to the mutation.
@@ -7567,11 +8288,11 @@ import { connectorConfig, deleteOwnCommentWithAudit, DeleteOwnCommentWithAuditVa
 
 // The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
 const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-  commentId: ...,
-  commentEntityId: ...,
-  circleId: ...,
-  actorId: ...,
-  deletedAt: ...,
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
 };
 
 // Call the `deleteOwnCommentWithAudit()` function to execute the mutation.
@@ -7603,11 +8324,11 @@ import { connectorConfig, deleteOwnCommentWithAuditRef, DeleteOwnCommentWithAudi
 
 // The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
 const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-  commentId: ...,
-  commentEntityId: ...,
-  circleId: ...,
-  actorId: ...,
-  deletedAt: ...,
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
 };
 
 // Call the `deleteOwnCommentWithAuditRef()` function to get a reference to the mutation.
@@ -7694,11 +8415,11 @@ import { connectorConfig, moderateCommentWithAudit, ModerateCommentWithAuditVari
 
 // The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
 const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-  commentId: ...,
-  circleId: ...,
-  actorId: ...,
-  reason: ...,
-  moderatedAt: ...,
+  commentId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  reason: ..., 
+  moderatedAt: ..., 
 };
 
 // Call the `moderateCommentWithAudit()` function to execute the mutation.
@@ -7732,11 +8453,11 @@ import { connectorConfig, moderateCommentWithAuditRef, ModerateCommentWithAuditV
 
 // The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
 const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-  commentId: ...,
-  circleId: ...,
-  actorId: ...,
-  reason: ...,
-  moderatedAt: ...,
+  commentId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  reason: ..., 
+  moderatedAt: ..., 
 };
 
 // Call the `moderateCommentWithAuditRef()` function to get a reference to the mutation.
@@ -7826,13 +8547,13 @@ import { connectorConfig, reportCommentWithAudit, ReportCommentWithAuditVariable
 
 // The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
 const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-  reportId: ...,
-  commentId: ...,
-  commentEntityId: ...,
-  circleId: ...,
-  reporterId: ...,
-  reason: ...,
-  createdAt: ...,
+  reportId: ..., 
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  reporterId: ..., 
+  reason: ..., 
+  createdAt: ..., 
 };
 
 // Call the `reportCommentWithAudit()` function to execute the mutation.
@@ -7864,13 +8585,13 @@ import { connectorConfig, reportCommentWithAuditRef, ReportCommentWithAuditVaria
 
 // The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
 const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-  reportId: ...,
-  commentId: ...,
-  commentEntityId: ...,
-  circleId: ...,
-  reporterId: ...,
-  reason: ...,
-  createdAt: ...,
+  reportId: ..., 
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  reporterId: ..., 
+  reason: ..., 
+  createdAt: ..., 
 };
 
 // Call the `reportCommentWithAuditRef()` function to get a reference to the mutation.
@@ -7957,13 +8678,13 @@ import { connectorConfig, recordSystemActivity, RecordSystemActivityVariables } 
 
 // The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
 const recordSystemActivityVars: RecordSystemActivityVariables = {
-  activityId: ...,
-  circleId: ...,
-  actorId: ...,
-  eventType: ...,
-  entityId: ...,
-  metadata: ...,
-  createdAt: ...,
+  activityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  entityId: ..., 
+  metadata: ..., 
+  createdAt: ..., 
 };
 
 // Call the `recordSystemActivity()` function to execute the mutation.
@@ -7993,13 +8714,13 @@ import { connectorConfig, recordSystemActivityRef, RecordSystemActivityVariables
 
 // The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
 const recordSystemActivityVars: RecordSystemActivityVariables = {
-  activityId: ...,
-  circleId: ...,
-  actorId: ...,
-  eventType: ...,
-  entityId: ...,
-  metadata: ...,
-  createdAt: ...,
+  activityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  entityId: ..., 
+  metadata: ..., 
+  createdAt: ..., 
 };
 
 // Call the `recordSystemActivityRef()` function to get a reference to the mutation.
@@ -8086,15 +8807,15 @@ import { connectorConfig, createNotification, CreateNotificationVariables } from
 
 // The `CreateNotification` mutation requires an argument of type `CreateNotificationVariables`:
 const createNotificationVars: CreateNotificationVariables = {
-  notificationId: ...,
-  recipientId: ...,
+  notificationId: ..., 
+  recipientId: ..., 
   circleId: ..., // optional
-  type: ...,
-  title: ...,
-  body: ...,
-  deepLink: ...,
-  dedupeKey: ...,
-  createdAt: ...,
+  type: ..., 
+  title: ..., 
+  body: ..., 
+  deepLink: ..., 
+  dedupeKey: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createNotification()` function to execute the mutation.
@@ -8124,15 +8845,15 @@ import { connectorConfig, createNotificationRef, CreateNotificationVariables } f
 
 // The `CreateNotification` mutation requires an argument of type `CreateNotificationVariables`:
 const createNotificationVars: CreateNotificationVariables = {
-  notificationId: ...,
-  recipientId: ...,
+  notificationId: ..., 
+  recipientId: ..., 
   circleId: ..., // optional
-  type: ...,
-  title: ...,
-  body: ...,
-  deepLink: ...,
-  dedupeKey: ...,
-  createdAt: ...,
+  type: ..., 
+  title: ..., 
+  body: ..., 
+  deepLink: ..., 
+  dedupeKey: ..., 
+  createdAt: ..., 
 };
 
 // Call the `createNotificationRef()` function to get a reference to the mutation.
@@ -8213,9 +8934,9 @@ import { connectorConfig, markNotificationRead, MarkNotificationReadVariables } 
 
 // The `MarkNotificationRead` mutation requires an argument of type `MarkNotificationReadVariables`:
 const markNotificationReadVars: MarkNotificationReadVariables = {
-  notificationId: ...,
-  recipientId: ...,
-  readAt: ...,
+  notificationId: ..., 
+  recipientId: ..., 
+  readAt: ..., 
 };
 
 // Call the `markNotificationRead()` function to execute the mutation.
@@ -8245,9 +8966,9 @@ import { connectorConfig, markNotificationReadRef, MarkNotificationReadVariables
 
 // The `MarkNotificationRead` mutation requires an argument of type `MarkNotificationReadVariables`:
 const markNotificationReadVars: MarkNotificationReadVariables = {
-  notificationId: ...,
-  recipientId: ...,
-  readAt: ...,
+  notificationId: ..., 
+  recipientId: ..., 
+  readAt: ..., 
 };
 
 // Call the `markNotificationReadRef()` function to get a reference to the mutation.
@@ -8328,9 +9049,9 @@ import { connectorConfig, dismissNotification, DismissNotificationVariables } fr
 
 // The `DismissNotification` mutation requires an argument of type `DismissNotificationVariables`:
 const dismissNotificationVars: DismissNotificationVariables = {
-  notificationId: ...,
-  recipientId: ...,
-  dismissedAt: ...,
+  notificationId: ..., 
+  recipientId: ..., 
+  dismissedAt: ..., 
 };
 
 // Call the `dismissNotification()` function to execute the mutation.
@@ -8360,9 +9081,9 @@ import { connectorConfig, dismissNotificationRef, DismissNotificationVariables }
 
 // The `DismissNotification` mutation requires an argument of type `DismissNotificationVariables`:
 const dismissNotificationVars: DismissNotificationVariables = {
-  notificationId: ...,
-  recipientId: ...,
-  dismissedAt: ...,
+  notificationId: ..., 
+  recipientId: ..., 
+  dismissedAt: ..., 
 };
 
 // Call the `dismissNotificationRef()` function to get a reference to the mutation.
@@ -8442,8 +9163,8 @@ import { connectorConfig, markAllNotificationsRead, MarkAllNotificationsReadVari
 
 // The `MarkAllNotificationsRead` mutation requires an argument of type `MarkAllNotificationsReadVariables`:
 const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
-  recipientId: ...,
-  readAt: ...,
+  recipientId: ..., 
+  readAt: ..., 
 };
 
 // Call the `markAllNotificationsRead()` function to execute the mutation.
@@ -8473,8 +9194,8 @@ import { connectorConfig, markAllNotificationsReadRef, MarkAllNotificationsReadV
 
 // The `MarkAllNotificationsRead` mutation requires an argument of type `MarkAllNotificationsReadVariables`:
 const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
-  recipientId: ...,
-  readAt: ...,
+  recipientId: ..., 
+  readAt: ..., 
 };
 
 // Call the `markAllNotificationsReadRef()` function to get a reference to the mutation.
@@ -8559,13 +9280,13 @@ import { connectorConfig, updateNotificationPreferences, UpdateNotificationPrefe
 
 // The `UpdateNotificationPreferences` mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
 const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
-  userId: ...,
-  emailNotifications: ...,
-  browserPushNotifications: ...,
-  commentNotifications: ...,
-  contributionReminders: ...,
-  circleUpdateNotifications: ...,
-  marketingCommunication: ...,
+  userId: ..., 
+  emailNotifications: ..., 
+  browserPushNotifications: ..., 
+  commentNotifications: ..., 
+  contributionReminders: ..., 
+  circleUpdateNotifications: ..., 
+  marketingCommunication: ..., 
 };
 
 // Call the `updateNotificationPreferences()` function to execute the mutation.
@@ -8595,13 +9316,13 @@ import { connectorConfig, updateNotificationPreferencesRef, UpdateNotificationPr
 
 // The `UpdateNotificationPreferences` mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
 const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
-  userId: ...,
-  emailNotifications: ...,
-  browserPushNotifications: ...,
-  commentNotifications: ...,
-  contributionReminders: ...,
-  circleUpdateNotifications: ...,
-  marketingCommunication: ...,
+  userId: ..., 
+  emailNotifications: ..., 
+  browserPushNotifications: ..., 
+  commentNotifications: ..., 
+  contributionReminders: ..., 
+  circleUpdateNotifications: ..., 
+  marketingCommunication: ..., 
 };
 
 // Call the `updateNotificationPreferencesRef()` function to get a reference to the mutation.
@@ -8682,9 +9403,9 @@ import { connectorConfig, setCircleNotificationMute, SetCircleNotificationMuteVa
 
 // The `SetCircleNotificationMute` mutation requires an argument of type `SetCircleNotificationMuteVariables`:
 const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
-  circleId: ...,
-  userId: ...,
-  notificationsMuted: ...,
+  circleId: ..., 
+  userId: ..., 
+  notificationsMuted: ..., 
 };
 
 // Call the `setCircleNotificationMute()` function to execute the mutation.
@@ -8714,9 +9435,9 @@ import { connectorConfig, setCircleNotificationMuteRef, SetCircleNotificationMut
 
 // The `SetCircleNotificationMute` mutation requires an argument of type `SetCircleNotificationMuteVariables`:
 const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
-  circleId: ...,
-  userId: ...,
-  notificationsMuted: ...,
+  circleId: ..., 
+  userId: ..., 
+  notificationsMuted: ..., 
 };
 
 // Call the `setCircleNotificationMuteRef()` function to get a reference to the mutation.
@@ -8803,15 +9524,15 @@ import { connectorConfig, createEmailDelivery, CreateEmailDeliveryVariables } fr
 
 // The `CreateEmailDelivery` mutation requires an argument of type `CreateEmailDeliveryVariables`:
 const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
-  deliveryId: ...,
+  deliveryId: ..., 
   notificationId: ..., // optional
   recipientId: ..., // optional
-  eventType: ...,
-  destinationMasked: ...,
-  status: ...,
+  eventType: ..., 
+  destinationMasked: ..., 
+  status: ..., 
   providerMessageId: ..., // optional
   failureReason: ..., // optional
-  createdAt: ...,
+  createdAt: ..., 
 };
 
 // Call the `createEmailDelivery()` function to execute the mutation.
@@ -8841,15 +9562,15 @@ import { connectorConfig, createEmailDeliveryRef, CreateEmailDeliveryVariables }
 
 // The `CreateEmailDelivery` mutation requires an argument of type `CreateEmailDeliveryVariables`:
 const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
-  deliveryId: ...,
+  deliveryId: ..., 
   notificationId: ..., // optional
   recipientId: ..., // optional
-  eventType: ...,
-  destinationMasked: ...,
-  status: ...,
+  eventType: ..., 
+  destinationMasked: ..., 
+  status: ..., 
   providerMessageId: ..., // optional
   failureReason: ..., // optional
-  createdAt: ...,
+  createdAt: ..., 
 };
 
 // Call the `createEmailDeliveryRef()` function to get a reference to the mutation.
@@ -8871,6 +9592,517 @@ console.log(data.emailDelivery_insert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.emailDelivery_insert);
+});
+```
+
+## CreateRetentionPurgeAttempt
+You can execute the `CreateRetentionPurgeAttempt` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createRetentionPurgeAttempt(vars: CreateRetentionPurgeAttemptVariables): MutationPromise<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+
+interface CreateRetentionPurgeAttemptRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateRetentionPurgeAttemptVariables): MutationRef<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+}
+export const createRetentionPurgeAttemptRef: CreateRetentionPurgeAttemptRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createRetentionPurgeAttempt(dc: DataConnect, vars: CreateRetentionPurgeAttemptVariables): MutationPromise<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+
+interface CreateRetentionPurgeAttemptRef {
+  ...
+  (dc: DataConnect, vars: CreateRetentionPurgeAttemptVariables): MutationRef<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+}
+export const createRetentionPurgeAttemptRef: CreateRetentionPurgeAttemptRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createRetentionPurgeAttemptRef:
+```typescript
+const name = createRetentionPurgeAttemptRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateRetentionPurgeAttempt` mutation requires an argument of type `CreateRetentionPurgeAttemptVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  circleId: UUIDString;
+  attemptNumber: number;
+  startedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateRetentionPurgeAttempt` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateRetentionPurgeAttemptData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateRetentionPurgeAttemptData {
+  retentionPurgeAttempt_insert: RetentionPurgeAttempt_Key;
+}
+```
+### Using `CreateRetentionPurgeAttempt`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createRetentionPurgeAttempt, CreateRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `CreateRetentionPurgeAttempt` mutation requires an argument of type `CreateRetentionPurgeAttemptVariables`:
+const createRetentionPurgeAttemptVars: CreateRetentionPurgeAttemptVariables = {
+  attemptId: ..., 
+  circleId: ..., 
+  attemptNumber: ..., 
+  startedAt: ..., 
+};
+
+// Call the `createRetentionPurgeAttempt()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createRetentionPurgeAttempt(createRetentionPurgeAttemptVars);
+// Variables can be defined inline as well.
+const { data } = await createRetentionPurgeAttempt({ attemptId: ..., circleId: ..., attemptNumber: ..., startedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createRetentionPurgeAttempt(dataConnect, createRetentionPurgeAttemptVars);
+
+console.log(data.retentionPurgeAttempt_insert);
+
+// Or, you can use the `Promise` API.
+createRetentionPurgeAttempt(createRetentionPurgeAttemptVars).then((response) => {
+  const data = response.data;
+  console.log(data.retentionPurgeAttempt_insert);
+});
+```
+
+### Using `CreateRetentionPurgeAttempt`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createRetentionPurgeAttemptRef, CreateRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `CreateRetentionPurgeAttempt` mutation requires an argument of type `CreateRetentionPurgeAttemptVariables`:
+const createRetentionPurgeAttemptVars: CreateRetentionPurgeAttemptVariables = {
+  attemptId: ..., 
+  circleId: ..., 
+  attemptNumber: ..., 
+  startedAt: ..., 
+};
+
+// Call the `createRetentionPurgeAttemptRef()` function to get a reference to the mutation.
+const ref = createRetentionPurgeAttemptRef(createRetentionPurgeAttemptVars);
+// Variables can be defined inline as well.
+const ref = createRetentionPurgeAttemptRef({ attemptId: ..., circleId: ..., attemptNumber: ..., startedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createRetentionPurgeAttemptRef(dataConnect, createRetentionPurgeAttemptVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.retentionPurgeAttempt_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.retentionPurgeAttempt_insert);
+});
+```
+
+## CompleteRetentionPurgeAttempt
+You can execute the `CompleteRetentionPurgeAttempt` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+completeRetentionPurgeAttempt(vars: CompleteRetentionPurgeAttemptVariables): MutationPromise<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+
+interface CompleteRetentionPurgeAttemptRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CompleteRetentionPurgeAttemptVariables): MutationRef<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+}
+export const completeRetentionPurgeAttemptRef: CompleteRetentionPurgeAttemptRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+completeRetentionPurgeAttempt(dc: DataConnect, vars: CompleteRetentionPurgeAttemptVariables): MutationPromise<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+
+interface CompleteRetentionPurgeAttemptRef {
+  ...
+  (dc: DataConnect, vars: CompleteRetentionPurgeAttemptVariables): MutationRef<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+}
+export const completeRetentionPurgeAttemptRef: CompleteRetentionPurgeAttemptRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the completeRetentionPurgeAttemptRef:
+```typescript
+const name = completeRetentionPurgeAttemptRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CompleteRetentionPurgeAttempt` mutation requires an argument of type `CompleteRetentionPurgeAttemptVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CompleteRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  status: string;
+  deletedFileCount: number;
+  skippedSharedFileCount: number;
+  failureReason?: string | null;
+  nextRetryAt?: TimestampString | null;
+  completedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CompleteRetentionPurgeAttempt` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CompleteRetentionPurgeAttemptData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CompleteRetentionPurgeAttemptData {
+  retentionPurgeAttempt_update?: RetentionPurgeAttempt_Key | null;
+}
+```
+### Using `CompleteRetentionPurgeAttempt`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, completeRetentionPurgeAttempt, CompleteRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `CompleteRetentionPurgeAttempt` mutation requires an argument of type `CompleteRetentionPurgeAttemptVariables`:
+const completeRetentionPurgeAttemptVars: CompleteRetentionPurgeAttemptVariables = {
+  attemptId: ..., 
+  status: ..., 
+  deletedFileCount: ..., 
+  skippedSharedFileCount: ..., 
+  failureReason: ..., // optional
+  nextRetryAt: ..., // optional
+  completedAt: ..., 
+};
+
+// Call the `completeRetentionPurgeAttempt()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await completeRetentionPurgeAttempt(completeRetentionPurgeAttemptVars);
+// Variables can be defined inline as well.
+const { data } = await completeRetentionPurgeAttempt({ attemptId: ..., status: ..., deletedFileCount: ..., skippedSharedFileCount: ..., failureReason: ..., nextRetryAt: ..., completedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await completeRetentionPurgeAttempt(dataConnect, completeRetentionPurgeAttemptVars);
+
+console.log(data.retentionPurgeAttempt_update);
+
+// Or, you can use the `Promise` API.
+completeRetentionPurgeAttempt(completeRetentionPurgeAttemptVars).then((response) => {
+  const data = response.data;
+  console.log(data.retentionPurgeAttempt_update);
+});
+```
+
+### Using `CompleteRetentionPurgeAttempt`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, completeRetentionPurgeAttemptRef, CompleteRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `CompleteRetentionPurgeAttempt` mutation requires an argument of type `CompleteRetentionPurgeAttemptVariables`:
+const completeRetentionPurgeAttemptVars: CompleteRetentionPurgeAttemptVariables = {
+  attemptId: ..., 
+  status: ..., 
+  deletedFileCount: ..., 
+  skippedSharedFileCount: ..., 
+  failureReason: ..., // optional
+  nextRetryAt: ..., // optional
+  completedAt: ..., 
+};
+
+// Call the `completeRetentionPurgeAttemptRef()` function to get a reference to the mutation.
+const ref = completeRetentionPurgeAttemptRef(completeRetentionPurgeAttemptVars);
+// Variables can be defined inline as well.
+const ref = completeRetentionPurgeAttemptRef({ attemptId: ..., status: ..., deletedFileCount: ..., skippedSharedFileCount: ..., failureReason: ..., nextRetryAt: ..., completedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = completeRetentionPurgeAttemptRef(dataConnect, completeRetentionPurgeAttemptVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.retentionPurgeAttempt_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.retentionPurgeAttempt_update);
+});
+```
+
+## PurgeInvitationAcceptances
+You can execute the `PurgeInvitationAcceptances` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+purgeInvitationAcceptances(vars: PurgeInvitationAcceptancesVariables): MutationPromise<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+
+interface PurgeInvitationAcceptancesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: PurgeInvitationAcceptancesVariables): MutationRef<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+}
+export const purgeInvitationAcceptancesRef: PurgeInvitationAcceptancesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+purgeInvitationAcceptances(dc: DataConnect, vars: PurgeInvitationAcceptancesVariables): MutationPromise<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+
+interface PurgeInvitationAcceptancesRef {
+  ...
+  (dc: DataConnect, vars: PurgeInvitationAcceptancesVariables): MutationRef<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+}
+export const purgeInvitationAcceptancesRef: PurgeInvitationAcceptancesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the purgeInvitationAcceptancesRef:
+```typescript
+const name = purgeInvitationAcceptancesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `PurgeInvitationAcceptances` mutation requires an argument of type `PurgeInvitationAcceptancesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface PurgeInvitationAcceptancesVariables {
+  invitationId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `PurgeInvitationAcceptances` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `PurgeInvitationAcceptancesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface PurgeInvitationAcceptancesData {
+  invitationAcceptance_deleteMany: number;
+}
+```
+### Using `PurgeInvitationAcceptances`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, purgeInvitationAcceptances, PurgeInvitationAcceptancesVariables } from '@bondcircle/dataconnect';
+
+// The `PurgeInvitationAcceptances` mutation requires an argument of type `PurgeInvitationAcceptancesVariables`:
+const purgeInvitationAcceptancesVars: PurgeInvitationAcceptancesVariables = {
+  invitationId: ..., 
+};
+
+// Call the `purgeInvitationAcceptances()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await purgeInvitationAcceptances(purgeInvitationAcceptancesVars);
+// Variables can be defined inline as well.
+const { data } = await purgeInvitationAcceptances({ invitationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await purgeInvitationAcceptances(dataConnect, purgeInvitationAcceptancesVars);
+
+console.log(data.invitationAcceptance_deleteMany);
+
+// Or, you can use the `Promise` API.
+purgeInvitationAcceptances(purgeInvitationAcceptancesVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptance_deleteMany);
+});
+```
+
+### Using `PurgeInvitationAcceptances`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, purgeInvitationAcceptancesRef, PurgeInvitationAcceptancesVariables } from '@bondcircle/dataconnect';
+
+// The `PurgeInvitationAcceptances` mutation requires an argument of type `PurgeInvitationAcceptancesVariables`:
+const purgeInvitationAcceptancesVars: PurgeInvitationAcceptancesVariables = {
+  invitationId: ..., 
+};
+
+// Call the `purgeInvitationAcceptancesRef()` function to get a reference to the mutation.
+const ref = purgeInvitationAcceptancesRef(purgeInvitationAcceptancesVars);
+// Variables can be defined inline as well.
+const ref = purgeInvitationAcceptancesRef({ invitationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = purgeInvitationAcceptancesRef(dataConnect, purgeInvitationAcceptancesVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.invitationAcceptance_deleteMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptance_deleteMany);
+});
+```
+
+## PurgeCircleSensitiveData
+You can execute the `PurgeCircleSensitiveData` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+purgeCircleSensitiveData(vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+
+interface PurgeCircleSensitiveDataRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: PurgeCircleSensitiveDataVariables): MutationRef<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+}
+export const purgeCircleSensitiveDataRef: PurgeCircleSensitiveDataRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+purgeCircleSensitiveData(dc: DataConnect, vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+
+interface PurgeCircleSensitiveDataRef {
+  ...
+  (dc: DataConnect, vars: PurgeCircleSensitiveDataVariables): MutationRef<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+}
+export const purgeCircleSensitiveDataRef: PurgeCircleSensitiveDataRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the purgeCircleSensitiveDataRef:
+```typescript
+const name = purgeCircleSensitiveDataRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `PurgeCircleSensitiveData` mutation requires an argument of type `PurgeCircleSensitiveDataVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface PurgeCircleSensitiveDataVariables {
+  circleId: UUIDString;
+  purgeAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `PurgeCircleSensitiveData` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `PurgeCircleSensitiveDataData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface PurgeCircleSensitiveDataData {
+  commentReport_deleteMany: number;
+  comment_deleteMany: number;
+  announcement_deleteMany: number;
+  supportUpdate_deleteMany: number;
+  receipt_deleteMany: number;
+  invitation_deleteMany: number;
+  notification_deleteMany: number;
+  circleMembership_deleteMany: number;
+  asoEbiTier_deleteMany: number;
+  circle_update?: Circle_Key | null;
+}
+```
+### Using `PurgeCircleSensitiveData`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, purgeCircleSensitiveData, PurgeCircleSensitiveDataVariables } from '@bondcircle/dataconnect';
+
+// The `PurgeCircleSensitiveData` mutation requires an argument of type `PurgeCircleSensitiveDataVariables`:
+const purgeCircleSensitiveDataVars: PurgeCircleSensitiveDataVariables = {
+  circleId: ..., 
+  purgeAt: ..., 
+};
+
+// Call the `purgeCircleSensitiveData()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await purgeCircleSensitiveData(purgeCircleSensitiveDataVars);
+// Variables can be defined inline as well.
+const { data } = await purgeCircleSensitiveData({ circleId: ..., purgeAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await purgeCircleSensitiveData(dataConnect, purgeCircleSensitiveDataVars);
+
+console.log(data.commentReport_deleteMany);
+console.log(data.comment_deleteMany);
+console.log(data.announcement_deleteMany);
+console.log(data.supportUpdate_deleteMany);
+console.log(data.receipt_deleteMany);
+console.log(data.invitation_deleteMany);
+console.log(data.notification_deleteMany);
+console.log(data.circleMembership_deleteMany);
+console.log(data.asoEbiTier_deleteMany);
+console.log(data.circle_update);
+
+// Or, you can use the `Promise` API.
+purgeCircleSensitiveData(purgeCircleSensitiveDataVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_deleteMany);
+  console.log(data.comment_deleteMany);
+  console.log(data.announcement_deleteMany);
+  console.log(data.supportUpdate_deleteMany);
+  console.log(data.receipt_deleteMany);
+  console.log(data.invitation_deleteMany);
+  console.log(data.notification_deleteMany);
+  console.log(data.circleMembership_deleteMany);
+  console.log(data.asoEbiTier_deleteMany);
+  console.log(data.circle_update);
+});
+```
+
+### Using `PurgeCircleSensitiveData`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, purgeCircleSensitiveDataRef, PurgeCircleSensitiveDataVariables } from '@bondcircle/dataconnect';
+
+// The `PurgeCircleSensitiveData` mutation requires an argument of type `PurgeCircleSensitiveDataVariables`:
+const purgeCircleSensitiveDataVars: PurgeCircleSensitiveDataVariables = {
+  circleId: ..., 
+  purgeAt: ..., 
+};
+
+// Call the `purgeCircleSensitiveDataRef()` function to get a reference to the mutation.
+const ref = purgeCircleSensitiveDataRef(purgeCircleSensitiveDataVars);
+// Variables can be defined inline as well.
+const ref = purgeCircleSensitiveDataRef({ circleId: ..., purgeAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = purgeCircleSensitiveDataRef(dataConnect, purgeCircleSensitiveDataVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.commentReport_deleteMany);
+console.log(data.comment_deleteMany);
+console.log(data.announcement_deleteMany);
+console.log(data.supportUpdate_deleteMany);
+console.log(data.receipt_deleteMany);
+console.log(data.invitation_deleteMany);
+console.log(data.notification_deleteMany);
+console.log(data.circleMembership_deleteMany);
+console.log(data.asoEbiTier_deleteMany);
+console.log(data.circle_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_deleteMany);
+  console.log(data.comment_deleteMany);
+  console.log(data.announcement_deleteMany);
+  console.log(data.supportUpdate_deleteMany);
+  console.log(data.receipt_deleteMany);
+  console.log(data.invitation_deleteMany);
+  console.log(data.notification_deleteMany);
+  console.log(data.circleMembership_deleteMany);
+  console.log(data.asoEbiTier_deleteMany);
+  console.log(data.circle_update);
 });
 ```
 

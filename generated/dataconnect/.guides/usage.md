@@ -12,7 +12,7 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetCurrentUser, useUpsertCurrentUser, useGetDashboardCircles, useGetCircleEngineRecord, useFindUserByEmail, useGetGiftCircleDetail, useGetCircleAuditEntries, useCreateCircleDraft, useUpdateCircleConfigurationWithAudit, useTransitionCircleWithAudit } from '@bondcircle/dataconnect/react';
+import { useGetCurrentUser, useUpsertCurrentUser, useGetDashboardCircles, useGetCircleEngineRecord, useGetCircleLifecycleSummary, useFindUserByEmail, useGetGiftCircleDetail, useGetCircleAuditEntries, useCreateCircleDraft, useUpdateCircleConfigurationWithAudit } from '@bondcircle/dataconnect/react';
 // The types of these hooks are available in react/index.d.ts
 
 const { data, isPending, isSuccess, isError, error } = useGetCurrentUser();
@@ -23,6 +23,8 @@ const { data, isPending, isSuccess, isError, error } = useGetDashboardCircles();
 
 const { data, isPending, isSuccess, isError, error } = useGetCircleEngineRecord(getCircleEngineRecordVars);
 
+const { data, isPending, isSuccess, isError, error } = useGetCircleLifecycleSummary(getCircleLifecycleSummaryVars);
+
 const { data, isPending, isSuccess, isError, error } = useFindUserByEmail(findUserByEmailVars);
 
 const { data, isPending, isSuccess, isError, error } = useGetGiftCircleDetail(getGiftCircleDetailVars);
@@ -32,8 +34,6 @@ const { data, isPending, isSuccess, isError, error } = useGetCircleAuditEntries(
 const { data, isPending, isSuccess, isError, error } = useCreateCircleDraft(createCircleDraftVars);
 
 const { data, isPending, isSuccess, isError, error } = useUpdateCircleConfigurationWithAudit(updateCircleConfigurationWithAuditVars);
-
-const { data, isPending, isSuccess, isError, error } = useTransitionCircleWithAudit(transitionCircleWithAuditVars);
 
 ```
 
@@ -72,7 +72,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getCurrentUser, upsertCurrentUser, getDashboardCircles, getCircleEngineRecord, findUserByEmail, getGiftCircleDetail, getCircleAuditEntries, createCircleDraft, updateCircleConfigurationWithAudit, transitionCircleWithAudit } from '@bondcircle/dataconnect';
+import { getCurrentUser, upsertCurrentUser, getDashboardCircles, getCircleEngineRecord, getCircleLifecycleSummary, findUserByEmail, getGiftCircleDetail, getCircleAuditEntries, createCircleDraft, updateCircleConfigurationWithAudit } from '@bondcircle/dataconnect';
 
 
 // Operation GetCurrentUser: 
@@ -86,6 +86,9 @@ const { data } = await GetDashboardCircles(dataConnect);
 
 // Operation GetCircleEngineRecord:  For variables, look at type GetCircleEngineRecordVars in ../index.d.ts
 const { data } = await GetCircleEngineRecord(dataConnect, getCircleEngineRecordVars);
+
+// Operation GetCircleLifecycleSummary:  For variables, look at type GetCircleLifecycleSummaryVars in ../index.d.ts
+const { data } = await GetCircleLifecycleSummary(dataConnect, getCircleLifecycleSummaryVars);
 
 // Operation FindUserByEmail:  For variables, look at type FindUserByEmailVars in ../index.d.ts
 const { data } = await FindUserByEmail(dataConnect, findUserByEmailVars);
@@ -101,9 +104,6 @@ const { data } = await CreateCircleDraft(dataConnect, createCircleDraftVars);
 
 // Operation UpdateCircleConfigurationWithAudit:  For variables, look at type UpdateCircleConfigurationWithAuditVars in ../index.d.ts
 const { data } = await UpdateCircleConfigurationWithAudit(dataConnect, updateCircleConfigurationWithAuditVars);
-
-// Operation TransitionCircleWithAudit:  For variables, look at type TransitionCircleWithAuditVars in ../index.d.ts
-const { data } = await TransitionCircleWithAudit(dataConnect, transitionCircleWithAuditVars);
 
 
 ```

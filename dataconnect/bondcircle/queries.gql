@@ -79,6 +79,7 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     createdAt
     updatedAt
     completedAt
+    retentionDueAt
     archiveAt
     purgeAt
     creator {
@@ -90,6 +91,46 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     membershipStatus
     user {
       id
+    }
+  }
+}
+
+query GetCircleLifecycleSummary($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    status
+    completionType
+    memberCount
+    pricingPlan
+    createdAt
+    completedAt
+    retentionDueAt
+    archiveAt
+    purgeAt
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+  ) {
+    user {
+      id
+    }
+  }
+  activityLogs(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: DESC }
+    limit: 50
+  ) {
+    id
+    eventType
+    createdAt
+    actor {
+      id
+      displayName
     }
   }
 }
@@ -120,9 +161,16 @@ query GetGiftCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     paymentAccountNumber
     targetAmount
     contributedAmount
+    memberCount
     memberLimit
+    pricingPlan
     deadline
     status
+    completionType
+    completedAt
+    retentionDueAt
+    archiveAt
+    purgeAt
     creator {
       id
     }
@@ -280,6 +328,7 @@ mutation TransitionCircleWithAudit(
   $toStatus: String!
   $updatedAt: Timestamp!
   $completedAt: Timestamp
+  $retentionDueAt: Timestamp
   $archiveAt: Timestamp
   $purgeAt: Timestamp
 ) @auth(level: NO_ACCESS) @transaction {
@@ -289,6 +338,7 @@ mutation TransitionCircleWithAudit(
       status: $toStatus
       updatedAt: $updatedAt
       completedAt: $completedAt
+      retentionDueAt: $retentionDueAt
       archiveAt: $archiveAt
       purgeAt: $purgeAt
     }
@@ -311,6 +361,29 @@ mutation TransitionCircleWithAudit(
       eventType: $toStatus
       entityId: $actorId
       metadata: $toStatus
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation SetCircleCompletionTypeWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $completionType: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: { completionType: $completionType, updatedAt: $updatedAt }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "completion_recorded"
+      fromStatus: "completed"
+      toStatus: "completed"
+      materialChanges: $completionType
       createdAt: $updatedAt
     }
   )
@@ -420,9 +493,16 @@ query GetAsoEbiCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     paymentAccountName
     paymentAccountNumber
     memberLimit
+    memberCount
+    pricingPlan
     contributedAmount
     eventDate
     status
+    completionType
+    completedAt
+    retentionDueAt
+    archiveAt
+    purgeAt
     creator {
       id
     }
@@ -632,9 +712,15 @@ query GetSupportCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     paymentAccountNumber
     targetAmount
     contributedAmount
+    memberCount
     memberLimit
+    pricingPlan
     deadline
     status
+    completedAt
+    retentionDueAt
+    archiveAt
+    purgeAt
     creator {
       id
     }
@@ -2104,6 +2190,181 @@ mutation CreateEmailDelivery(
       failureReason: $failureReason
       createdAt: $createdAt
       updatedAt: $createdAt
+    }
+  )
+}
+
+query GetRetentionCandidates($now: Timestamp!) @auth(level: NO_ACCESS) {
+  circles(
+    where: {
+      status: { in: ["completed", "cancelled", "archived"] }
+      retentionDueAt: { le: $now }
+      purgeAt: { isNull: true }
+    }
+    orderBy: { retentionDueAt: ASC }
+    limit: 50
+  ) {
+    id
+    retentionDueAt
+  }
+}
+
+query GetCircleRetentionPayload($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    type
+    status
+    retentionDueAt
+    purgeAt
+    imageStoragePath
+  }
+  receipts(where: { circleId: { eq: $circleId } }) {
+    id
+    imageStoragePath
+  }
+  circleMemberships(where: { circleId: { eq: $circleId } }) {
+    receiptStoragePath
+  }
+  asoEbiTiers(where: { circleId: { eq: $circleId } }) {
+    fabricImageStoragePath
+    appreciationGiftImageStoragePath
+  }
+  retentionPurgeAttempts(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { attemptNumber: DESC }
+    limit: 1
+  ) {
+    attemptNumber
+    status
+    startedAt
+    nextRetryAt
+  }
+  invitations(where: { circleId: { eq: $circleId } }) {
+    id
+  }
+}
+
+query GetStoragePathReferences($path: String!) @auth(level: NO_ACCESS) {
+  circles(where: { imageStoragePath: { eq: $path } }, limit: 2) {
+    id
+  }
+  receipts(where: { imageStoragePath: { eq: $path } }, limit: 2) {
+    id
+    circle {
+      id
+    }
+  }
+  circleMemberships(where: { receiptStoragePath: { eq: $path } }, limit: 2) {
+    circle {
+      id
+    }
+  }
+  fabricReferences: asoEbiTiers(
+    where: { fabricImageStoragePath: { eq: $path } }
+    limit: 2
+  ) {
+    id
+    circle {
+      id
+    }
+  }
+  giftReferences: asoEbiTiers(
+    where: { appreciationGiftImageStoragePath: { eq: $path } }
+    limit: 2
+  ) {
+    id
+    circle {
+      id
+    }
+  }
+}
+
+mutation CreateRetentionPurgeAttempt(
+  $attemptId: UUID!
+  $circleId: UUID!
+  $attemptNumber: Int!
+  $startedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  retentionPurgeAttempt_insert(
+    data: {
+      id: $attemptId
+      circle: { id: $circleId }
+      status: "running"
+      attemptNumber: $attemptNumber
+      startedAt: $startedAt
+      createdAt: $startedAt
+      updatedAt: $startedAt
+    }
+  )
+}
+
+mutation CompleteRetentionPurgeAttempt(
+  $attemptId: UUID!
+  $status: String!
+  $deletedFileCount: Int!
+  $skippedSharedFileCount: Int!
+  $failureReason: String
+  $nextRetryAt: Timestamp
+  $completedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  retentionPurgeAttempt_update(
+    key: { id: $attemptId }
+    data: {
+      status: $status
+      deletedFileCount: $deletedFileCount
+      skippedSharedFileCount: $skippedSharedFileCount
+      failureReason: $failureReason
+      nextRetryAt: $nextRetryAt
+      completedAt: $completedAt
+      updatedAt: $completedAt
+    }
+  )
+}
+
+mutation PurgeInvitationAcceptances($invitationId: UUID!)
+@auth(level: NO_ACCESS) {
+  invitationAcceptance_deleteMany(
+    where: { invitationId: { eq: $invitationId } }
+  )
+}
+
+mutation PurgeCircleSensitiveData($circleId: UUID!, $purgeAt: Timestamp!)
+@auth(level: NO_ACCESS)
+@transaction {
+  commentReport_deleteMany(where: { circleId: { eq: $circleId } })
+  comment_deleteMany(where: { circleId: { eq: $circleId } })
+  announcement_deleteMany(where: { circleId: { eq: $circleId } })
+  supportUpdate_deleteMany(where: { circleId: { eq: $circleId } })
+  receipt_deleteMany(where: { circleId: { eq: $circleId } })
+  invitation_deleteMany(where: { circleId: { eq: $circleId } })
+  notification_deleteMany(where: { circleId: { eq: $circleId } })
+  circleMembership_deleteMany(where: { circleId: { eq: $circleId } })
+  asoEbiTier_deleteMany(where: { circleId: { eq: $circleId } })
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      name: "Purged circle"
+      description: ""
+      imageUrl: null
+      imageStoragePath: null
+      giftTitle: null
+      contributionMode: null
+      eventType: null
+      organizerName: null
+      supportType: null
+      beneficiaryName: null
+      beneficiaryRelationship: null
+      paymentBankName: null
+      paymentAccountName: null
+      paymentAccountNumber: null
+      targetAmount: 0
+      contributedAmount: 0
+      deadline: null
+      eventDate: null
+      completionType: null
+      status: "purged"
+      purgeAt: $purgeAt
+      updatedAt: $purgeAt
     }
   )
 }

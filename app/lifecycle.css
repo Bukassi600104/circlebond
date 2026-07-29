@@ -1,0 +1,269 @@
+.bc-lifecycle {
+  display: grid;
+  gap: 15px;
+  max-width: 1180px;
+  margin: 18px auto 0;
+  border: 1px solid #dce5e1;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f8fcfa, #fff8f2);
+  padding: 17px;
+  color: #183b35;
+}
+
+.bc-lifecycle > header,
+.bc-lifecycle > header > div,
+.bc-lifecycle > footer,
+.bc-lifecycle-dialog footer {
+  display: flex;
+  align-items: center;
+}
+
+.bc-lifecycle > header {
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bc-lifecycle > header > div {
+  gap: 10px;
+}
+
+.bc-lifecycle > header > div > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e0f0ea;
+  color: #07584f;
+}
+
+.bc-lifecycle small {
+  color: #6b7975;
+  font-size: 0.69rem;
+}
+
+.bc-lifecycle h2,
+.bc-lifecycle h3,
+.bc-lifecycle p {
+  margin: 0;
+}
+
+.bc-lifecycle h2 {
+  margin-top: 2px;
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+}
+
+.bc-lifecycle > header > strong {
+  border-radius: 999px;
+  background: #e5f2ee;
+  padding: 5px 9px;
+  color: #07584f;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+
+.bc-lifecycle > p {
+  max-width: 720px;
+  color: #5d6b67;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.bc-lifecycle-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 9px;
+}
+
+.bc-lifecycle-summary > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  border: 1px solid #e4e8e5;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 82%);
+  padding: 11px;
+}
+
+.bc-lifecycle-summary > div > span {
+  grid-row: 1 / 3;
+  color: #07584f;
+}
+
+.bc-lifecycle-summary strong {
+  font-size: 0.8rem;
+}
+
+.bc-lifecycle-retention {
+  border-left: 3px solid #e6a934;
+  background: #fff8e8;
+  padding: 9px 11px;
+  color: #65593e;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.bc-lifecycle-timeline h3 {
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+}
+
+.bc-lifecycle-timeline ol {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+}
+
+.bc-lifecycle-timeline li {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 7px;
+  min-width: 155px;
+}
+
+.bc-lifecycle-timeline li > span {
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: #ff654d;
+  box-shadow: 0 0 0 4px #ffe5df;
+}
+
+.bc-lifecycle-timeline li div {
+  display: grid;
+  gap: 2px;
+}
+
+.bc-lifecycle-timeline li strong {
+  font-size: 0.72rem;
+  text-transform: capitalize;
+}
+
+.bc-lifecycle > footer {
+  justify-content: flex-end;
+  gap: 7px;
+  border-top: 1px solid #e3e8e5;
+  padding-top: 12px;
+}
+
+.bc-lifecycle button,
+.bc-lifecycle a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #b9cdc6;
+  border-radius: 8px;
+  background: white;
+  padding: 7px 10px;
+  color: #07584f;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bc-lifecycle .is-primary {
+  border-color: #07584f;
+  background: #07584f;
+  color: white;
+}
+
+.bc-lifecycle .is-danger {
+  border-color: #b74435;
+  background: #b74435;
+  color: white;
+}
+
+.bc-lifecycle-dialog {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(10 39 34 / 48%);
+  padding: 18px;
+  backdrop-filter: blur(5px);
+}
+
+.bc-lifecycle-dialog > section {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  width: min(430px, 100%);
+  border-radius: 16px;
+  background: #fffdf9;
+  padding: 20px;
+  box-shadow: 0 20px 70px rgb(4 39 33 / 24%);
+}
+
+.bc-lifecycle-dialog > section > p {
+  color: #5e6a67;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.bc-lifecycle-dialog__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px !important;
+}
+
+.bc-lifecycle-dialog fieldset {
+  display: grid;
+  gap: 7px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.bc-lifecycle-dialog legend {
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.bc-lifecycle-dialog label {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid #e2e6e3;
+  border-radius: 9px;
+  background: white;
+  padding: 8px;
+  font-size: 0.76rem;
+}
+
+.bc-lifecycle-dialog footer {
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.bc-lifecycle-error {
+  border-radius: 8px;
+  background: #ffebe7;
+  padding: 8px !important;
+  color: #9f3427 !important;
+  font-size: 0.74rem !important;
+}
+
+@media (max-width: 700px) {
+  .bc-lifecycle-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-lifecycle > footer {
+    flex-wrap: wrap;
+  }
+
+  .bc-lifecycle > footer > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

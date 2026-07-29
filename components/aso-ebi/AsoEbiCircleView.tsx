@@ -77,6 +77,9 @@ export function AsoEbiCircleView({
   const viewer = circle.members.find((member) => member.id === viewerId);
   const canManage =
     circle.creatorId === viewerId || viewer?.role === "co_admin";
+  const readOnly = ["completed", "cancelled", "archived", "purged"].includes(
+    circle.status,
+  );
 
   async function selectTier(tierId: string) {
     setBusy(`tier:${tierId}`);
@@ -177,6 +180,7 @@ export function AsoEbiCircleView({
           <ContributionWorkspace
             circleId={circle.id}
             heading="Your Aso-Ebi contribution"
+            readOnly={readOnly}
           />
           <section className="bc-aso-tier-picker">
             <header>
@@ -239,7 +243,7 @@ export function AsoEbiCircleView({
                       ) : null}
                       <button
                         type="button"
-                        disabled={selected || Boolean(busy)}
+                        disabled={readOnly || selected || Boolean(busy)}
                         onClick={() => selectTier(tier.id)}
                       >
                         {busy === `tier:${tier.id}`
@@ -271,7 +275,7 @@ export function AsoEbiCircleView({
                   }{" "}
                   tier selections
                 </small>
-                {canManage ? (
+                {canManage && !readOnly ? (
                   <InvitationManager
                     circleId={circle.id}
                     openSlots={circle.memberLimit - circle.members.length}
@@ -302,7 +306,7 @@ export function AsoEbiCircleView({
                     <span className={`is-${member.fulfilmentStatus}`}>
                       {label(member.fulfilmentStatus)}
                     </span>
-                    {canManage && choices.length ? (
+                    {canManage && !readOnly && choices.length ? (
                       <label>
                         <span>Update delivery status</span>
                         <select

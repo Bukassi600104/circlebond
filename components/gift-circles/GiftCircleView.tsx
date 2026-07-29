@@ -400,6 +400,9 @@ export function GiftCircleView({
       ? Math.min(100, Math.round((confirmed / circle.targetAmount) * 100))
       : 0;
   const creator = circle.creatorId === viewerId;
+  const readOnly = ["completed", "cancelled", "archived", "purged"].includes(
+    circle.status,
+  );
   const slots = Array.from(
     { length: circle.memberLimit },
     (_, index) => circle.members[index] ?? null,
@@ -459,7 +462,7 @@ export function GiftCircleView({
                   <button
                     type="button"
                     className="bc-gift-member bc-gift-member--open"
-                    disabled={!creator}
+                    disabled={!creator || readOnly}
                     aria-label={`Open member slot ${index + 1}`}
                   >
                     <span className="bc-gift-member__avatar">
@@ -531,7 +534,9 @@ export function GiftCircleView({
                 </span>
                 <h2>Members</h2>
               </div>
-              {creator && circle.members.length < circle.memberLimit ? (
+              {creator &&
+              !readOnly &&
+              circle.members.length < circle.memberLimit ? (
                 <InvitationManager
                   circleId={circle.id}
                   contributionMode={circle.contributionMode}
@@ -648,7 +653,7 @@ export function GiftCircleView({
               </div>
             </dl>
             {selected.id === viewerId ? (
-              <ContributionWorkspace circleId={circle.id} />
+              <ContributionWorkspace circleId={circle.id} readOnly={readOnly} />
             ) : (
               <div className="bc-gift-panel__private">
                 <Clock3 size={16} aria-hidden="true" />

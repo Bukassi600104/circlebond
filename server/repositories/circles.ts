@@ -29,6 +29,7 @@ type CircleEngineQuery = {
     createdAt: string;
     updatedAt: string;
     completedAt?: string | null;
+    retentionDueAt?: string | null;
     archiveAt?: string | null;
     purgeAt?: string | null;
     creator: { id: string };
@@ -60,6 +61,7 @@ function mapCircle(
     createdAt: circle.createdAt,
     updatedAt: circle.updatedAt,
     completedAt: circle.completedAt ?? null,
+    retentionDueAt: circle.retentionDueAt ?? null,
     archiveAt: circle.archiveAt ?? null,
     purgeAt: circle.purgeAt ?? null,
   };
@@ -169,7 +171,7 @@ export class FirebaseCircleStore implements CircleStore {
     nextStatus: CircleState,
     timestamps: Pick<
       CircleRecord,
-      "updatedAt" | "completedAt" | "archiveAt" | "purgeAt"
+      "updatedAt" | "completedAt" | "retentionDueAt" | "archiveAt" | "purgeAt"
     >,
   ) {
     await getBondCircleDataConnect().executeMutation(

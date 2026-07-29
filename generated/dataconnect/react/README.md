@@ -20,6 +20,7 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetCurrentUser*](#getcurrentuser)
   - [*GetDashboardCircles*](#getdashboardcircles)
   - [*GetCircleEngineRecord*](#getcircleenginerecord)
+  - [*GetCircleLifecycleSummary*](#getcirclelifecyclesummary)
   - [*FindUserByEmail*](#finduserbyemail)
   - [*GetGiftCircleDetail*](#getgiftcircledetail)
   - [*GetCircleAuditEntries*](#getcircleauditentries)
@@ -40,11 +41,15 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*FindNotificationRecipientByEmail*](#findnotificationrecipientbyemail)
   - [*GetDeadlineNotificationCandidates*](#getdeadlinenotificationcandidates)
   - [*GetUserDeadlineNotificationCandidates*](#getuserdeadlinenotificationcandidates)
+  - [*GetRetentionCandidates*](#getretentioncandidates)
+  - [*GetCircleRetentionPayload*](#getcircleretentionpayload)
+  - [*GetStoragePathReferences*](#getstoragepathreferences)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
   - [*UpdateCircleConfigurationWithAudit*](#updatecircleconfigurationwithaudit)
   - [*TransitionCircleWithAudit*](#transitioncirclewithaudit)
+  - [*SetCircleCompletionTypeWithAudit*](#setcirclecompletiontypewithaudit)
   - [*AddCircleMemberWithAudit*](#addcirclememberwithaudit)
   - [*ConfigureGiftCircle*](#configuregiftcircle)
   - [*SetGiftMemberAllocation*](#setgiftmemberallocation)
@@ -83,6 +88,10 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*UpdateNotificationPreferences*](#updatenotificationpreferences)
   - [*SetCircleNotificationMute*](#setcirclenotificationmute)
   - [*CreateEmailDelivery*](#createemaildelivery)
+  - [*CreateRetentionPurgeAttempt*](#createretentionpurgeattempt)
+  - [*CompleteRetentionPurgeAttempt*](#completeretentionpurgeattempt)
+  - [*PurgeInvitationAcceptances*](#purgeinvitationacceptances)
+  - [*PurgeCircleSensitiveData*](#purgecirclesensitivedata)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `bondcircle`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -390,6 +399,7 @@ export interface GetCircleEngineRecordData {
     createdAt: TimestampString;
     updatedAt: TimestampString;
     completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
     archiveAt?: TimestampString | null;
     purgeAt?: TimestampString | null;
     creator: {
@@ -418,7 +428,7 @@ import { useGetCircleEngineRecord } from '@bondcircle/dataconnect/react'
 export default function GetCircleEngineRecordComponent() {
   // The `useGetCircleEngineRecord` Query hook requires an argument of type `GetCircleEngineRecordVariables`:
   const getCircleEngineRecordVars: GetCircleEngineRecordVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -453,6 +463,120 @@ export default function GetCircleEngineRecordComponent() {
   if (query.isSuccess) {
     console.log(query.data.circle);
     console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleLifecycleSummary
+You can execute the `GetCircleLifecycleSummary` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleLifecycleSummary(dc: DataConnect, vars: GetCircleLifecycleSummaryVariables, options?: useDataConnectQueryOptions<GetCircleLifecycleSummaryData>): UseDataConnectQueryResult<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleLifecycleSummary(vars: GetCircleLifecycleSummaryVariables, options?: useDataConnectQueryOptions<GetCircleLifecycleSummaryData>): UseDataConnectQueryResult<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+```
+
+### Variables
+The `GetCircleLifecycleSummary` Query requires an argument of type `GetCircleLifecycleSummaryVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleLifecycleSummaryVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleLifecycleSummary` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleLifecycleSummary` Query is of type `GetCircleLifecycleSummaryData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleLifecycleSummaryData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    completionType?: string | null;
+    memberCount: number;
+    pricingPlan: string;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      user: {
+        id: string;
+      } & User_Key;
+    })[];
+      activityLogs: ({
+        id: UUIDString;
+        eventType: string;
+        createdAt: TimestampString;
+        actor?: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & ActivityLog_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleLifecycleSummary`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleLifecycleSummaryVariables } from '@bondcircle/dataconnect';
+import { useGetCircleLifecycleSummary } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleLifecycleSummaryComponent() {
+  // The `useGetCircleLifecycleSummary` Query hook requires an argument of type `GetCircleLifecycleSummaryVariables`:
+  const getCircleLifecycleSummaryVars: GetCircleLifecycleSummaryVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleLifecycleSummary(getCircleLifecycleSummaryVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleLifecycleSummary({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleLifecycleSummary(dataConnect, getCircleLifecycleSummaryVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleLifecycleSummary(getCircleLifecycleSummaryVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleLifecycleSummary(dataConnect, getCircleLifecycleSummaryVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.activityLogs);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -508,7 +632,7 @@ import { useFindUserByEmail } from '@bondcircle/dataconnect/react'
 export default function FindUserByEmailComponent() {
   // The `useFindUserByEmail` Query hook requires an argument of type `FindUserByEmailVariables`:
   const findUserByEmailVars: FindUserByEmailVariables = {
-    email: ...,
+    email: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -588,9 +712,16 @@ export interface GetGiftCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -625,7 +756,7 @@ import { useGetGiftCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetGiftCircleDetailComponent() {
   // The `useGetGiftCircleDetail` Query hook requires an argument of type `GetGiftCircleDetailVariables`:
   const getGiftCircleDetailVars: GetGiftCircleDetailVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -718,7 +849,7 @@ import { useGetCircleAuditEntries } from '@bondcircle/dataconnect/react'
 export default function GetCircleAuditEntriesComponent() {
   // The `useGetCircleAuditEntries` Query hook requires an argument of type `GetCircleAuditEntriesVariables`:
   const getCircleAuditEntriesVars: GetCircleAuditEntriesVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -797,9 +928,16 @@ export interface GetAsoEbiCircleDetailData {
     paymentAccountName?: string | null;
     paymentAccountNumber?: string | null;
     memberLimit: number;
+    memberCount: number;
+    pricingPlan: string;
     contributedAmount: number;
     eventDate?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -852,7 +990,7 @@ import { useGetAsoEbiCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetAsoEbiCircleDetailComponent() {
   // The `useGetAsoEbiCircleDetail` Query hook requires an argument of type `GetAsoEbiCircleDetailVariables`:
   const getAsoEbiCircleDetailVars: GetAsoEbiCircleDetailVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -942,9 +1080,15 @@ export interface GetSupportCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -987,7 +1131,7 @@ import { useGetSupportCircleDetail } from '@bondcircle/dataconnect/react'
 export default function GetSupportCircleDetailComponent() {
   // The `useGetSupportCircleDetail` Query hook requires an argument of type `GetSupportCircleDetailVariables`:
   const getSupportCircleDetailVars: GetSupportCircleDetailVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1113,7 +1257,7 @@ import { useGetInvitationByTokenHash } from '@bondcircle/dataconnect/react'
 export default function GetInvitationByTokenHashComponent() {
   // The `useGetInvitationByTokenHash` Query hook requires an argument of type `GetInvitationByTokenHashVariables`:
   const getInvitationByTokenHashVars: GetInvitationByTokenHashVariables = {
-    tokenHash: ...,
+    tokenHash: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1209,7 +1353,7 @@ import { useGetCircleInvitations } from '@bondcircle/dataconnect/react'
 export default function GetCircleInvitationsComponent() {
   // The `useGetCircleInvitations` Query hook requires an argument of type `GetCircleInvitationsVariables`:
   const getCircleInvitationsVars: GetCircleInvitationsVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1302,7 +1446,7 @@ import { useGetInvitationAcceptances } from '@bondcircle/dataconnect/react'
 export default function GetInvitationAcceptancesComponent() {
   // The `useGetInvitationAcceptances` Query hook requires an argument of type `GetInvitationAcceptancesVariables`:
   const getInvitationAcceptancesVars: GetInvitationAcceptancesVariables = {
-    invitationId: ...,
+    invitationId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1428,7 +1572,7 @@ import { useGetContributionWorkspace } from '@bondcircle/dataconnect/react'
 export default function GetContributionWorkspaceComponent() {
   // The `useGetContributionWorkspace` Query hook requires an argument of type `GetContributionWorkspaceVariables`:
   const getContributionWorkspaceVars: GetContributionWorkspaceVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1586,7 +1730,7 @@ import { useGetCircleCommunication } from '@bondcircle/dataconnect/react'
 export default function GetCircleCommunicationComponent() {
   // The `useGetCircleCommunication` Query hook requires an argument of type `GetCircleCommunicationVariables`:
   const getCircleCommunicationVars: GetCircleCommunicationVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1677,9 +1821,9 @@ import { useGetRecentCommentsByAuthor } from '@bondcircle/dataconnect/react'
 export default function GetRecentCommentsByAuthorComponent() {
   // The `useGetRecentCommentsByAuthor` Query hook requires an argument of type `GetRecentCommentsByAuthorVariables`:
   const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
-    circleId: ...,
-    authorId: ...,
-    since: ...,
+    circleId: ..., 
+    authorId: ..., 
+    since: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1764,8 +1908,8 @@ import { useGetOpenCommentReportsByReporter } from '@bondcircle/dataconnect/reac
 export default function GetOpenCommentReportsByReporterComponent() {
   // The `useGetOpenCommentReportsByReporter` Query hook requires an argument of type `GetOpenCommentReportsByReporterVariables`:
   const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
-    commentId: ...,
-    reporterId: ...,
+    commentId: ..., 
+    reporterId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1862,7 +2006,7 @@ import { useGetActivityLogsForCircles } from '@bondcircle/dataconnect/react'
 export default function GetActivityLogsForCirclesComponent() {
   // The `useGetActivityLogsForCircles` Query hook requires an argument of type `GetActivityLogsForCirclesVariables`:
   const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
-    circleIds: ...,
+    circleIds: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -1975,7 +2119,7 @@ import { useGetUserNotifications } from '@bondcircle/dataconnect/react'
 export default function GetUserNotificationsComponent() {
   // The `useGetUserNotifications` Query hook requires an argument of type `GetUserNotificationsVariables`:
   const getUserNotificationsVars: GetUserNotificationsVariables = {
-    userId: ...,
+    userId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2089,7 +2233,7 @@ import { useGetNotificationContext } from '@bondcircle/dataconnect/react'
 export default function GetNotificationContextComponent() {
   // The `useGetNotificationContext` Query hook requires an argument of type `GetNotificationContextVariables`:
   const getNotificationContextVars: GetNotificationContextVariables = {
-    circleId: ...,
+    circleId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2175,8 +2319,8 @@ import { useGetNotificationDedupe } from '@bondcircle/dataconnect/react'
 export default function GetNotificationDedupeComponent() {
   // The `useGetNotificationDedupe` Query hook requires an argument of type `GetNotificationDedupeVariables`:
   const getNotificationDedupeVars: GetNotificationDedupeVariables = {
-    recipientId: ...,
-    dedupeKey: ...,
+    recipientId: ..., 
+    dedupeKey: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2262,9 +2406,9 @@ import { useGetRecentReminderNotifications } from '@bondcircle/dataconnect/react
 export default function GetRecentReminderNotificationsComponent() {
   // The `useGetRecentReminderNotifications` Query hook requires an argument of type `GetRecentReminderNotificationsVariables`:
   const getRecentReminderNotificationsVars: GetRecentReminderNotificationsVariables = {
-    circleId: ...,
-    recipientId: ...,
-    since: ...,
+    circleId: ..., 
+    recipientId: ..., 
+    since: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2354,7 +2498,7 @@ import { useFindNotificationRecipientByEmail } from '@bondcircle/dataconnect/rea
 export default function FindNotificationRecipientByEmailComponent() {
   // The `useFindNotificationRecipientByEmail` Query hook requires an argument of type `FindNotificationRecipientByEmailVariables`:
   const findNotificationRecipientByEmailVars: FindNotificationRecipientByEmailVariables = {
-    email: ...,
+    email: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2442,8 +2586,8 @@ import { useGetDeadlineNotificationCandidates } from '@bondcircle/dataconnect/re
 export default function GetDeadlineNotificationCandidatesComponent() {
   // The `useGetDeadlineNotificationCandidates` Query hook requires an argument of type `GetDeadlineNotificationCandidatesVariables`:
   const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
-    from: ...,
-    to: ...,
+    from: ..., 
+    to: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2532,7 +2676,7 @@ import { useGetUserDeadlineNotificationCandidates } from '@bondcircle/dataconnec
 export default function GetUserDeadlineNotificationCandidatesComponent() {
   // The `useGetUserDeadlineNotificationCandidates` Query hook requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`:
   const getUserDeadlineNotificationCandidatesVars: GetUserDeadlineNotificationCandidatesVariables = {
-    userId: ...,
+    userId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -2566,6 +2710,316 @@ export default function GetUserDeadlineNotificationCandidatesComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetRetentionCandidates
+You can execute the `GetRetentionCandidates` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetRetentionCandidates(dc: DataConnect, vars: GetRetentionCandidatesVariables, options?: useDataConnectQueryOptions<GetRetentionCandidatesData>): UseDataConnectQueryResult<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetRetentionCandidates(vars: GetRetentionCandidatesVariables, options?: useDataConnectQueryOptions<GetRetentionCandidatesData>): UseDataConnectQueryResult<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+```
+
+### Variables
+The `GetRetentionCandidates` Query requires an argument of type `GetRetentionCandidatesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetRetentionCandidatesVariables {
+  now: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `GetRetentionCandidates` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetRetentionCandidates` Query is of type `GetRetentionCandidatesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetRetentionCandidatesData {
+  circles: ({
+    id: UUIDString;
+    retentionDueAt?: TimestampString | null;
+  } & Circle_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetRetentionCandidates`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetRetentionCandidatesVariables } from '@bondcircle/dataconnect';
+import { useGetRetentionCandidates } from '@bondcircle/dataconnect/react'
+
+export default function GetRetentionCandidatesComponent() {
+  // The `useGetRetentionCandidates` Query hook requires an argument of type `GetRetentionCandidatesVariables`:
+  const getRetentionCandidatesVars: GetRetentionCandidatesVariables = {
+    now: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetRetentionCandidates(getRetentionCandidatesVars);
+  // Variables can be defined inline as well.
+  const query = useGetRetentionCandidates({ now: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetRetentionCandidates(dataConnect, getRetentionCandidatesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRetentionCandidates(getRetentionCandidatesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRetentionCandidates(dataConnect, getRetentionCandidatesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circles);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleRetentionPayload
+You can execute the `GetCircleRetentionPayload` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleRetentionPayload(dc: DataConnect, vars: GetCircleRetentionPayloadVariables, options?: useDataConnectQueryOptions<GetCircleRetentionPayloadData>): UseDataConnectQueryResult<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleRetentionPayload(vars: GetCircleRetentionPayloadVariables, options?: useDataConnectQueryOptions<GetCircleRetentionPayloadData>): UseDataConnectQueryResult<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+```
+
+### Variables
+The `GetCircleRetentionPayload` Query requires an argument of type `GetCircleRetentionPayloadVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleRetentionPayloadVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleRetentionPayload` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleRetentionPayload` Query is of type `GetCircleRetentionPayloadData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleRetentionPayloadData {
+  circle?: {
+    id: UUIDString;
+    type: string;
+    status: string;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    imageStoragePath?: string | null;
+  } & Circle_Key;
+    receipts: ({
+      id: UUIDString;
+      imageStoragePath: string;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        receiptStoragePath?: string | null;
+      })[];
+        asoEbiTiers: ({
+          fabricImageStoragePath?: string | null;
+          appreciationGiftImageStoragePath?: string | null;
+        })[];
+          retentionPurgeAttempts: ({
+            attemptNumber: number;
+            status: string;
+            startedAt: TimestampString;
+            nextRetryAt?: TimestampString | null;
+          })[];
+            invitations: ({
+              id: UUIDString;
+            } & Invitation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleRetentionPayload`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleRetentionPayloadVariables } from '@bondcircle/dataconnect';
+import { useGetCircleRetentionPayload } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleRetentionPayloadComponent() {
+  // The `useGetCircleRetentionPayload` Query hook requires an argument of type `GetCircleRetentionPayloadVariables`:
+  const getCircleRetentionPayloadVars: GetCircleRetentionPayloadVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleRetentionPayload(getCircleRetentionPayloadVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleRetentionPayload({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleRetentionPayload(dataConnect, getCircleRetentionPayloadVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionPayload(getCircleRetentionPayloadVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionPayload(dataConnect, getCircleRetentionPayloadVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.receipts);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.asoEbiTiers);
+    console.log(query.data.retentionPurgeAttempts);
+    console.log(query.data.invitations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetStoragePathReferences
+You can execute the `GetStoragePathReferences` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetStoragePathReferences(dc: DataConnect, vars: GetStoragePathReferencesVariables, options?: useDataConnectQueryOptions<GetStoragePathReferencesData>): UseDataConnectQueryResult<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetStoragePathReferences(vars: GetStoragePathReferencesVariables, options?: useDataConnectQueryOptions<GetStoragePathReferencesData>): UseDataConnectQueryResult<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+```
+
+### Variables
+The `GetStoragePathReferences` Query requires an argument of type `GetStoragePathReferencesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetStoragePathReferencesVariables {
+  path: string;
+}
+```
+### Return Type
+Recall that calling the `GetStoragePathReferences` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetStoragePathReferences` Query is of type `GetStoragePathReferencesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetStoragePathReferencesData {
+  circles: ({
+    id: UUIDString;
+  } & Circle_Key)[];
+    receipts: ({
+      id: UUIDString;
+      circle: {
+        id: UUIDString;
+      } & Circle_Key;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        circle: {
+          id: UUIDString;
+        } & Circle_Key;
+      })[];
+        fabricReferences: ({
+          id: UUIDString;
+          circle: {
+            id: UUIDString;
+          } & Circle_Key;
+        } & AsoEbiTier_Key)[];
+          giftReferences: ({
+            id: UUIDString;
+            circle: {
+              id: UUIDString;
+            } & Circle_Key;
+          } & AsoEbiTier_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetStoragePathReferences`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetStoragePathReferencesVariables } from '@bondcircle/dataconnect';
+import { useGetStoragePathReferences } from '@bondcircle/dataconnect/react'
+
+export default function GetStoragePathReferencesComponent() {
+  // The `useGetStoragePathReferences` Query hook requires an argument of type `GetStoragePathReferencesVariables`:
+  const getStoragePathReferencesVars: GetStoragePathReferencesVariables = {
+    path: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetStoragePathReferences(getStoragePathReferencesVars);
+  // Variables can be defined inline as well.
+  const query = useGetStoragePathReferences({ path: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetStoragePathReferences(dataConnect, getStoragePathReferencesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetStoragePathReferences(getStoragePathReferencesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetStoragePathReferences(dataConnect, getStoragePathReferencesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circles);
+    console.log(query.data.receipts);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.fabricReferences);
+    console.log(query.data.giftReferences);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -2666,7 +3120,7 @@ export default function UpsertCurrentUserComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpsertCurrentUser` Mutation requires an argument of type `UpsertCurrentUserVariables`:
   const upsertCurrentUserVars: UpsertCurrentUserVariables = {
-    displayName: ...,
+    displayName: ..., 
     phone: ..., // optional
     email: ..., // optional
     profileImage: ..., // optional
@@ -2780,19 +3234,19 @@ export default function CreateCircleDraftComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateCircleDraft` Mutation requires an argument of type `CreateCircleDraftVariables`:
   const createCircleDraftVars: CreateCircleDraftVariables = {
-    creatorId: ...,
-    name: ...,
-    type: ...,
-    description: ...,
-    targetAmount: ...,
-    pricingPlan: ...,
-    memberLimit: ...,
-    activationPrice: ...,
+    creatorId: ..., 
+    name: ..., 
+    type: ..., 
+    description: ..., 
+    targetAmount: ..., 
+    pricingPlan: ..., 
+    memberLimit: ..., 
+    activationPrice: ..., 
     deadline: ..., // optional
     eventDate: ..., // optional
-    visibility: ...,
-    createdAt: ...,
-    updatedAt: ...,
+    visibility: ..., 
+    createdAt: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(createCircleDraftVars);
   // Variables can be defined inline as well.
@@ -2904,21 +3358,21 @@ export default function UpdateCircleConfigurationWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateCircleConfigurationWithAudit` Mutation requires an argument of type `UpdateCircleConfigurationWithAuditVariables`:
   const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAuditVariables = {
-    circleId: ...,
-    actorId: ...,
-    action: ...,
-    status: ...,
-    name: ...,
-    description: ...,
-    targetAmount: ...,
-    pricingPlan: ...,
-    memberLimit: ...,
-    activationPrice: ...,
+    circleId: ..., 
+    actorId: ..., 
+    action: ..., 
+    status: ..., 
+    name: ..., 
+    description: ..., 
+    targetAmount: ..., 
+    pricingPlan: ..., 
+    memberLimit: ..., 
+    activationPrice: ..., 
     deadline: ..., // optional
     eventDate: ..., // optional
-    visibility: ...,
-    updatedAt: ...,
-    materialChanges: ...,
+    visibility: ..., 
+    updatedAt: ..., 
+    materialChanges: ..., 
   };
   mutation.mutate(updateCircleConfigurationWithAuditVars);
   // Variables can be defined inline as well.
@@ -2969,6 +3423,7 @@ export interface TransitionCircleWithAuditVariables {
   toStatus: string;
   updatedAt: TimestampString;
   completedAt?: TimestampString | null;
+  retentionDueAt?: TimestampString | null;
   archiveAt?: TimestampString | null;
   purgeAt?: TimestampString | null;
 }
@@ -3022,18 +3477,19 @@ export default function TransitionCircleWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useTransitionCircleWithAudit` Mutation requires an argument of type `TransitionCircleWithAuditVariables`:
   const transitionCircleWithAuditVars: TransitionCircleWithAuditVariables = {
-    circleId: ...,
-    actorId: ...,
-    fromStatus: ...,
-    toStatus: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    fromStatus: ..., 
+    toStatus: ..., 
+    updatedAt: ..., 
     completedAt: ..., // optional
+    retentionDueAt: ..., // optional
     archiveAt: ..., // optional
     purgeAt: ..., // optional
   };
   mutation.mutate(transitionCircleWithAuditVars);
   // Variables can be defined inline as well.
-  mutation.mutate({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., archiveAt: ..., purgeAt: ..., });
+  mutation.mutate({ circleId: ..., actorId: ..., fromStatus: ..., toStatus: ..., updatedAt: ..., completedAt: ..., retentionDueAt: ..., archiveAt: ..., purgeAt: ..., });
 
   // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
   const options = {
@@ -3055,6 +3511,108 @@ export default function TransitionCircleWithAuditComponent() {
     console.log(mutation.data.circle_update);
     console.log(mutation.data.circleAuditEntry_insert);
     console.log(mutation.data.activityLog_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SetCircleCompletionTypeWithAudit
+You can execute the `SetCircleCompletionTypeWithAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSetCircleCompletionTypeWithAudit(options?: useDataConnectMutationOptions<SetCircleCompletionTypeWithAuditData, FirebaseError, SetCircleCompletionTypeWithAuditVariables>): UseDataConnectMutationResult<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSetCircleCompletionTypeWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<SetCircleCompletionTypeWithAuditData, FirebaseError, SetCircleCompletionTypeWithAuditVariables>): UseDataConnectMutationResult<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+```
+
+### Variables
+The `SetCircleCompletionTypeWithAudit` Mutation requires an argument of type `SetCircleCompletionTypeWithAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SetCircleCompletionTypeWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  completionType: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `SetCircleCompletionTypeWithAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SetCircleCompletionTypeWithAudit` Mutation is of type `SetCircleCompletionTypeWithAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SetCircleCompletionTypeWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SetCircleCompletionTypeWithAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SetCircleCompletionTypeWithAuditVariables } from '@bondcircle/dataconnect';
+import { useSetCircleCompletionTypeWithAudit } from '@bondcircle/dataconnect/react'
+
+export default function SetCircleCompletionTypeWithAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSetCircleCompletionTypeWithAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSetCircleCompletionTypeWithAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetCircleCompletionTypeWithAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSetCircleCompletionTypeWithAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSetCircleCompletionTypeWithAudit` Mutation requires an argument of type `SetCircleCompletionTypeWithAuditVariables`:
+  const setCircleCompletionTypeWithAuditVars: SetCircleCompletionTypeWithAuditVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    completionType: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(setCircleCompletionTypeWithAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., completionType: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(setCircleCompletionTypeWithAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -3131,11 +3689,11 @@ export default function AddCircleMemberWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAddCircleMemberWithAudit` Mutation requires an argument of type `AddCircleMemberWithAuditVariables`:
   const addCircleMemberWithAuditVars: AddCircleMemberWithAuditVariables = {
-    circleId: ...,
-    actorId: ...,
-    memberId: ...,
-    role: ...,
-    createdAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    memberId: ..., 
+    role: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(addCircleMemberWithAuditVars);
   // Variables can be defined inline as well.
@@ -3241,16 +3799,16 @@ export default function ConfigureGiftCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureGiftCircle` Mutation requires an argument of type `ConfigureGiftCircleVariables`:
   const configureGiftCircleVars: ConfigureGiftCircleVariables = {
-    circleId: ...,
-    actorId: ...,
-    giftTitle: ...,
-    contributionMode: ...,
-    paymentBankName: ...,
-    paymentAccountName: ...,
-    paymentAccountNumber: ...,
-    imageUrl: ...,
-    imageStoragePath: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    giftTitle: ..., 
+    contributionMode: ..., 
+    paymentBankName: ..., 
+    paymentAccountName: ..., 
+    paymentAccountNumber: ..., 
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(configureGiftCircleVars);
   // Variables can be defined inline as well.
@@ -3348,10 +3906,10 @@ export default function SetGiftMemberAllocationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetGiftMemberAllocation` Mutation requires an argument of type `SetGiftMemberAllocationVariables`:
   const setGiftMemberAllocationVars: SetGiftMemberAllocationVariables = {
-    circleId: ...,
-    memberId: ...,
-    expectedAmount: ...,
-    contributionStatus: ...,
+    circleId: ..., 
+    memberId: ..., 
+    expectedAmount: ..., 
+    contributionStatus: ..., 
   };
   mutation.mutate(setGiftMemberAllocationVars);
   // Variables can be defined inline as well.
@@ -3455,16 +4013,16 @@ export default function ConfigureAsoEbiCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureAsoEbiCircle` Mutation requires an argument of type `ConfigureAsoEbiCircleVariables`:
   const configureAsoEbiCircleVars: ConfigureAsoEbiCircleVariables = {
-    circleId: ...,
-    actorId: ...,
-    eventType: ...,
-    organizerName: ...,
-    paymentBankName: ...,
-    paymentAccountName: ...,
-    paymentAccountNumber: ...,
-    imageUrl: ...,
-    imageStoragePath: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    eventType: ..., 
+    organizerName: ..., 
+    paymentBankName: ..., 
+    paymentAccountName: ..., 
+    paymentAccountNumber: ..., 
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(configureAsoEbiCircleVars);
   // Variables can be defined inline as well.
@@ -3572,11 +4130,11 @@ export default function CreateAsoEbiTierComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateAsoEbiTier` Mutation requires an argument of type `CreateAsoEbiTierVariables`:
   const createAsoEbiTierVars: CreateAsoEbiTierVariables = {
-    tierId: ...,
-    circleId: ...,
-    name: ...,
-    price: ...,
-    fabricDescription: ...,
+    tierId: ..., 
+    circleId: ..., 
+    name: ..., 
+    price: ..., 
+    fabricDescription: ..., 
     fabricImageUrl: ..., // optional
     fabricImageStoragePath: ..., // optional
     appreciationGiftName: ..., // optional
@@ -3584,8 +4142,8 @@ export default function CreateAsoEbiTierComponent() {
     appreciationGiftImageStoragePath: ..., // optional
     availabilityNote: ..., // optional
     deliveryDetails: ..., // optional
-    sortOrder: ...,
-    createdAt: ...,
+    sortOrder: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createAsoEbiTierVars);
   // Variables can be defined inline as well.
@@ -3685,11 +4243,11 @@ export default function SelectAsoEbiTierComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSelectAsoEbiTier` Mutation requires an argument of type `SelectAsoEbiTierVariables`:
   const selectAsoEbiTierVars: SelectAsoEbiTierVariables = {
-    circleId: ...,
-    memberId: ...,
-    tierId: ...,
-    expectedAmount: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    memberId: ..., 
+    tierId: ..., 
+    expectedAmount: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(selectAsoEbiTierVars);
   // Variables can be defined inline as well.
@@ -3791,11 +4349,11 @@ export default function UpdateAsoEbiFulfilmentComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateAsoEbiFulfilment` Mutation requires an argument of type `UpdateAsoEbiFulfilmentVariables`:
   const updateAsoEbiFulfilmentVars: UpdateAsoEbiFulfilmentVariables = {
-    circleId: ...,
-    actorId: ...,
-    memberId: ...,
-    status: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    memberId: ..., 
+    status: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(updateAsoEbiFulfilmentVars);
   // Variables can be defined inline as well.
@@ -3908,23 +4466,23 @@ export default function ConfigureSupportCircleComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useConfigureSupportCircle` Mutation requires an argument of type `ConfigureSupportCircleVariables`:
   const configureSupportCircleVars: ConfigureSupportCircleVariables = {
-    circleId: ...,
-    actorId: ...,
-    supportType: ...,
-    beneficiaryName: ...,
+    circleId: ..., 
+    actorId: ..., 
+    supportType: ..., 
+    beneficiaryName: ..., 
     beneficiaryRelationship: ..., // optional
-    contributionMode: ...,
-    showBeneficiaryName: ...,
-    showTargetToMembers: ...,
-    showConfirmedTotalToMembers: ...,
-    hideIndividualAmounts: ...,
-    requireCreatorApproval: ...,
-    paymentBankName: ...,
-    paymentAccountName: ...,
-    paymentAccountNumber: ...,
-    imageUrl: ...,
-    imageStoragePath: ...,
-    updatedAt: ...,
+    contributionMode: ..., 
+    showBeneficiaryName: ..., 
+    showTargetToMembers: ..., 
+    showConfirmedTotalToMembers: ..., 
+    hideIndividualAmounts: ..., 
+    requireCreatorApproval: ..., 
+    paymentBankName: ..., 
+    paymentAccountName: ..., 
+    paymentAccountNumber: ..., 
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(configureSupportCircleVars);
   // Variables can be defined inline as well.
@@ -4023,10 +4581,10 @@ export default function RecordSupportPledgeComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRecordSupportPledge` Mutation requires an argument of type `RecordSupportPledgeVariables`:
   const recordSupportPledgeVars: RecordSupportPledgeVariables = {
-    circleId: ...,
-    memberId: ...,
-    amount: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    memberId: ..., 
+    amount: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(recordSupportPledgeVars);
   // Variables can be defined inline as well.
@@ -4124,10 +4682,10 @@ export default function SetSupportMemberAllocationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetSupportMemberAllocation` Mutation requires an argument of type `SetSupportMemberAllocationVariables`:
   const setSupportMemberAllocationVars: SetSupportMemberAllocationVariables = {
-    circleId: ...,
-    memberId: ...,
-    expectedAmount: ...,
-    contributionStatus: ...,
+    circleId: ..., 
+    memberId: ..., 
+    expectedAmount: ..., 
+    contributionStatus: ..., 
   };
   mutation.mutate(setSupportMemberAllocationVars);
   // Variables can be defined inline as well.
@@ -4225,10 +4783,10 @@ export default function CreateSupportUpdateComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateSupportUpdate` Mutation requires an argument of type `CreateSupportUpdateVariables`:
   const createSupportUpdateVars: CreateSupportUpdateVariables = {
-    circleId: ...,
-    authorId: ...,
-    body: ...,
-    createdAt: ...,
+    circleId: ..., 
+    authorId: ..., 
+    body: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createSupportUpdateVars);
   // Variables can be defined inline as well.
@@ -4327,10 +4885,10 @@ export default function SetSupportCompletionTypeComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetSupportCompletionType` Mutation requires an argument of type `SetSupportCompletionTypeVariables`:
   const setSupportCompletionTypeVars: SetSupportCompletionTypeVariables = {
-    circleId: ...,
-    actorId: ...,
-    completionType: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    completionType: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(setSupportCompletionTypeVars);
   // Variables can be defined inline as well.
@@ -4438,18 +4996,18 @@ export default function CreateInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateInvitation` Mutation requires an argument of type `CreateInvitationVariables`:
   const createInvitationVars: CreateInvitationVariables = {
-    circleId: ...,
-    invitedById: ...,
-    tokenHash: ...,
-    mode: ...,
+    circleId: ..., 
+    invitedById: ..., 
+    tokenHash: ..., 
+    mode: ..., 
     recipientName: ..., // optional
     recipientEmail: ..., // optional
     recipientPhone: ..., // optional
-    expectedAmount: ...,
-    requireApproval: ...,
-    maxUses: ...,
-    expiresAt: ...,
-    createdAt: ...,
+    expectedAmount: ..., 
+    requireApproval: ..., 
+    maxUses: ..., 
+    expiresAt: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createInvitationVars);
   // Variables can be defined inline as well.
@@ -4552,13 +5110,13 @@ export default function UpdateInvitationStateComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateInvitationState` Mutation requires an argument of type `UpdateInvitationStateVariables`:
   const updateInvitationStateVars: UpdateInvitationStateVariables = {
-    invitationId: ...,
-    actorId: ...,
-    circleId: ...,
-    state: ...,
+    invitationId: ..., 
+    actorId: ..., 
+    circleId: ..., 
+    state: ..., 
     openedAt: ..., // optional
     revokedAt: ..., // optional
-    updatedAt: ...,
+    updatedAt: ..., 
   };
   mutation.mutate(updateInvitationStateVars);
   // Variables can be defined inline as well.
@@ -4666,15 +5224,15 @@ export default function AcceptInvitationWithMembershipComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useAcceptInvitationWithMembership` Mutation requires an argument of type `AcceptInvitationWithMembershipVariables`:
   const acceptInvitationWithMembershipVars: AcceptInvitationWithMembershipVariables = {
-    invitationId: ...,
-    circleId: ...,
-    userId: ...,
-    role: ...,
-    expectedAmount: ...,
-    nextMemberCount: ...,
-    nextInvitationState: ...,
-    nextUseCount: ...,
-    respondedAt: ...,
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    role: ..., 
+    expectedAmount: ..., 
+    nextMemberCount: ..., 
+    nextInvitationState: ..., 
+    nextUseCount: ..., 
+    respondedAt: ..., 
   };
   mutation.mutate(acceptInvitationWithMembershipVars);
   // Variables can be defined inline as well.
@@ -4778,10 +5336,10 @@ export default function RequestInvitationApprovalComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRequestInvitationApproval` Mutation requires an argument of type `RequestInvitationApprovalVariables`:
   const requestInvitationApprovalVars: RequestInvitationApprovalVariables = {
-    invitationId: ...,
-    circleId: ...,
-    userId: ...,
-    respondedAt: ...,
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    respondedAt: ..., 
   };
   mutation.mutate(requestInvitationApprovalVars);
   // Variables can be defined inline as well.
@@ -4890,17 +5448,17 @@ export default function SubmitReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSubmitReceiptWithAudit` Mutation requires an argument of type `SubmitReceiptWithAuditVariables`:
   const submitReceiptWithAuditVars: SubmitReceiptWithAuditVariables = {
-    receiptId: ...,
-    circleId: ...,
-    uploaderId: ...,
-    amount: ...,
+    receiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    amount: ..., 
     note: ..., // optional
-    imageUrl: ...,
-    imageStoragePath: ...,
-    contentType: ...,
-    status: ...,
-    overpaymentAmount: ...,
-    submittedAt: ...,
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    contentType: ..., 
+    status: ..., 
+    overpaymentAmount: ..., 
+    submittedAt: ..., 
   };
   mutation.mutate(submitReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -5012,18 +5570,18 @@ export default function ReplaceReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReplaceReceiptWithAudit` Mutation requires an argument of type `ReplaceReceiptWithAuditVariables`:
   const replaceReceiptWithAuditVars: ReplaceReceiptWithAuditVariables = {
-    receiptId: ...,
-    replacedReceiptId: ...,
-    circleId: ...,
-    uploaderId: ...,
-    amount: ...,
+    receiptId: ..., 
+    replacedReceiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    amount: ..., 
     note: ..., // optional
-    imageUrl: ...,
-    imageStoragePath: ...,
-    contentType: ...,
-    status: ...,
-    overpaymentAmount: ...,
-    submittedAt: ...,
+    imageUrl: ..., 
+    imageStoragePath: ..., 
+    contentType: ..., 
+    status: ..., 
+    overpaymentAmount: ..., 
+    submittedAt: ..., 
   };
   mutation.mutate(replaceReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -5136,18 +5694,18 @@ export default function ReviewReceiptWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReviewReceiptWithAudit` Mutation requires an argument of type `ReviewReceiptWithAuditVariables`:
   const reviewReceiptWithAuditVars: ReviewReceiptWithAuditVariables = {
-    receiptId: ...,
-    circleId: ...,
-    uploaderId: ...,
-    reviewerId: ...,
-    receiptStatus: ...,
+    receiptId: ..., 
+    circleId: ..., 
+    uploaderId: ..., 
+    reviewerId: ..., 
+    receiptStatus: ..., 
     rejectionReason: ..., // optional
-    reviewedAt: ...,
-    membershipStatus: ...,
-    nextConfirmedAmount: ...,
-    nextCircleContributedAmount: ...,
-    auditAction: ...,
-    materialChanges: ...,
+    reviewedAt: ..., 
+    membershipStatus: ..., 
+    nextConfirmedAmount: ..., 
+    nextCircleContributedAmount: ..., 
+    auditAction: ..., 
+    materialChanges: ..., 
   };
   mutation.mutate(reviewReceiptWithAuditVars);
   // Variables can be defined inline as well.
@@ -5259,16 +5817,16 @@ export default function ApproveInvitationMembershipComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useApproveInvitationMembership` Mutation requires an argument of type `ApproveInvitationMembershipVariables`:
   const approveInvitationMembershipVars: ApproveInvitationMembershipVariables = {
-    invitationId: ...,
-    circleId: ...,
-    actorId: ...,
-    userId: ...,
-    role: ...,
-    expectedAmount: ...,
-    nextMemberCount: ...,
-    nextInvitationState: ...,
-    nextUseCount: ...,
-    respondedAt: ...,
+    invitationId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    userId: ..., 
+    role: ..., 
+    expectedAmount: ..., 
+    nextMemberCount: ..., 
+    nextInvitationState: ..., 
+    nextUseCount: ..., 
+    respondedAt: ..., 
   };
   mutation.mutate(approveInvitationMembershipVars);
   // Variables can be defined inline as well.
@@ -5373,11 +5931,11 @@ export default function DeclineInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeclineInvitation` Mutation requires an argument of type `DeclineInvitationVariables`:
   const declineInvitationVars: DeclineInvitationVariables = {
-    invitationId: ...,
-    circleId: ...,
-    userId: ...,
-    state: ...,
-    respondedAt: ...,
+    invitationId: ..., 
+    circleId: ..., 
+    userId: ..., 
+    state: ..., 
+    respondedAt: ..., 
   };
   mutation.mutate(declineInvitationVars);
   // Variables can be defined inline as well.
@@ -5476,10 +6034,10 @@ export default function RequestReplacementInvitationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRequestReplacementInvitation` Mutation requires an argument of type `RequestReplacementInvitationVariables`:
   const requestReplacementInvitationVars: RequestReplacementInvitationVariables = {
-    invitationId: ...,
-    circleId: ...,
-    actorId: ...,
-    requestedAt: ...,
+    invitationId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    requestedAt: ..., 
   };
   mutation.mutate(requestReplacementInvitationVars);
   // Variables can be defined inline as well.
@@ -5585,17 +6143,17 @@ export default function CreateAnnouncementWithActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateAnnouncementWithActivity` Mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
   const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
-    announcementId: ...,
-    announcementEntityId: ...,
-    activityId: ...,
-    circleId: ...,
-    authorId: ...,
-    title: ...,
-    body: ...,
-    pinned: ...,
+    announcementId: ..., 
+    announcementEntityId: ..., 
+    activityId: ..., 
+    circleId: ..., 
+    authorId: ..., 
+    title: ..., 
+    body: ..., 
+    pinned: ..., 
     important: ..., // optional
-    commentsEnabled: ...,
-    createdAt: ...,
+    commentsEnabled: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createAnnouncementWithActivityVars);
   // Variables can be defined inline as well.
@@ -5701,16 +6259,16 @@ export default function UpdateAnnouncementWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateAnnouncementWithAudit` Mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
   const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
-    announcementId: ...,
-    circleId: ...,
-    actorId: ...,
-    title: ...,
-    body: ...,
-    pinned: ...,
+    announcementId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    title: ..., 
+    body: ..., 
+    pinned: ..., 
     important: ..., // optional
-    commentsEnabled: ...,
-    updatedAt: ...,
-    materialChanges: ...,
+    commentsEnabled: ..., 
+    updatedAt: ..., 
+    materialChanges: ..., 
   };
   mutation.mutate(updateAnnouncementWithAuditVars);
   // Variables can be defined inline as well.
@@ -5810,11 +6368,11 @@ export default function DeleteAnnouncementWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeleteAnnouncementWithAudit` Mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
   const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
-    announcementId: ...,
-    announcementEntityId: ...,
-    circleId: ...,
-    actorId: ...,
-    deletedAt: ...,
+    announcementId: ..., 
+    announcementEntityId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    deletedAt: ..., 
   };
   mutation.mutate(deleteAnnouncementWithAuditVars);
   // Variables can be defined inline as well.
@@ -5914,11 +6472,11 @@ export default function SetCircleCommentsWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetCircleCommentsWithAudit` Mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
   const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
-    circleId: ...,
-    actorId: ...,
-    commentsEnabled: ...,
-    materialChanges: ...,
-    updatedAt: ...,
+    circleId: ..., 
+    actorId: ..., 
+    commentsEnabled: ..., 
+    materialChanges: ..., 
+    updatedAt: ..., 
   };
   mutation.mutate(setCircleCommentsWithAuditVars);
   // Variables can be defined inline as well.
@@ -6022,15 +6580,15 @@ export default function CreateCommentWithActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateCommentWithActivity` Mutation requires an argument of type `CreateCommentWithActivityVariables`:
   const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
-    commentId: ...,
-    commentEntityId: ...,
-    activityId: ...,
-    circleId: ...,
-    authorId: ...,
+    commentId: ..., 
+    commentEntityId: ..., 
+    activityId: ..., 
+    circleId: ..., 
+    authorId: ..., 
     announcementId: ..., // optional
     parentCommentId: ..., // optional
-    body: ...,
-    createdAt: ...,
+    body: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createCommentWithActivityVars);
   // Variables can be defined inline as well.
@@ -6130,11 +6688,11 @@ export default function DeleteOwnCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDeleteOwnCommentWithAudit` Mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
   const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
-    commentId: ...,
-    commentEntityId: ...,
-    circleId: ...,
-    actorId: ...,
-    deletedAt: ...,
+    commentId: ..., 
+    commentEntityId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    deletedAt: ..., 
   };
   mutation.mutate(deleteOwnCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -6235,11 +6793,11 @@ export default function ModerateCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useModerateCommentWithAudit` Mutation requires an argument of type `ModerateCommentWithAuditVariables`:
   const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
-    commentId: ...,
-    circleId: ...,
-    actorId: ...,
-    reason: ...,
-    moderatedAt: ...,
+    commentId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    reason: ..., 
+    moderatedAt: ..., 
   };
   mutation.mutate(moderateCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -6342,13 +6900,13 @@ export default function ReportCommentWithAuditComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useReportCommentWithAudit` Mutation requires an argument of type `ReportCommentWithAuditVariables`:
   const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
-    reportId: ...,
-    commentId: ...,
-    commentEntityId: ...,
-    circleId: ...,
-    reporterId: ...,
-    reason: ...,
-    createdAt: ...,
+    reportId: ..., 
+    commentId: ..., 
+    commentEntityId: ..., 
+    circleId: ..., 
+    reporterId: ..., 
+    reason: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(reportCommentWithAuditVars);
   // Variables can be defined inline as well.
@@ -6449,13 +7007,13 @@ export default function RecordSystemActivityComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useRecordSystemActivity` Mutation requires an argument of type `RecordSystemActivityVariables`:
   const recordSystemActivityVars: RecordSystemActivityVariables = {
-    activityId: ...,
-    circleId: ...,
-    actorId: ...,
-    eventType: ...,
-    entityId: ...,
-    metadata: ...,
-    createdAt: ...,
+    activityId: ..., 
+    circleId: ..., 
+    actorId: ..., 
+    eventType: ..., 
+    entityId: ..., 
+    metadata: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(recordSystemActivityVars);
   // Variables can be defined inline as well.
@@ -6557,15 +7115,15 @@ export default function CreateNotificationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateNotification` Mutation requires an argument of type `CreateNotificationVariables`:
   const createNotificationVars: CreateNotificationVariables = {
-    notificationId: ...,
-    recipientId: ...,
+    notificationId: ..., 
+    recipientId: ..., 
     circleId: ..., // optional
-    type: ...,
-    title: ...,
-    body: ...,
-    deepLink: ...,
-    dedupeKey: ...,
-    createdAt: ...,
+    type: ..., 
+    title: ..., 
+    body: ..., 
+    deepLink: ..., 
+    dedupeKey: ..., 
+    createdAt: ..., 
   };
   mutation.mutate(createNotificationVars);
   // Variables can be defined inline as well.
@@ -6661,9 +7219,9 @@ export default function MarkNotificationReadComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useMarkNotificationRead` Mutation requires an argument of type `MarkNotificationReadVariables`:
   const markNotificationReadVars: MarkNotificationReadVariables = {
-    notificationId: ...,
-    recipientId: ...,
-    readAt: ...,
+    notificationId: ..., 
+    recipientId: ..., 
+    readAt: ..., 
   };
   mutation.mutate(markNotificationReadVars);
   // Variables can be defined inline as well.
@@ -6759,9 +7317,9 @@ export default function DismissNotificationComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useDismissNotification` Mutation requires an argument of type `DismissNotificationVariables`:
   const dismissNotificationVars: DismissNotificationVariables = {
-    notificationId: ...,
-    recipientId: ...,
-    dismissedAt: ...,
+    notificationId: ..., 
+    recipientId: ..., 
+    dismissedAt: ..., 
   };
   mutation.mutate(dismissNotificationVars);
   // Variables can be defined inline as well.
@@ -6856,8 +7414,8 @@ export default function MarkAllNotificationsReadComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useMarkAllNotificationsRead` Mutation requires an argument of type `MarkAllNotificationsReadVariables`:
   const markAllNotificationsReadVars: MarkAllNotificationsReadVariables = {
-    recipientId: ...,
-    readAt: ...,
+    recipientId: ..., 
+    readAt: ..., 
   };
   mutation.mutate(markAllNotificationsReadVars);
   // Variables can be defined inline as well.
@@ -6957,13 +7515,13 @@ export default function UpdateNotificationPreferencesComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useUpdateNotificationPreferences` Mutation requires an argument of type `UpdateNotificationPreferencesVariables`:
   const updateNotificationPreferencesVars: UpdateNotificationPreferencesVariables = {
-    userId: ...,
-    emailNotifications: ...,
-    browserPushNotifications: ...,
-    commentNotifications: ...,
-    contributionReminders: ...,
-    circleUpdateNotifications: ...,
-    marketingCommunication: ...,
+    userId: ..., 
+    emailNotifications: ..., 
+    browserPushNotifications: ..., 
+    commentNotifications: ..., 
+    contributionReminders: ..., 
+    circleUpdateNotifications: ..., 
+    marketingCommunication: ..., 
   };
   mutation.mutate(updateNotificationPreferencesVars);
   // Variables can be defined inline as well.
@@ -7059,9 +7617,9 @@ export default function SetCircleNotificationMuteComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useSetCircleNotificationMute` Mutation requires an argument of type `SetCircleNotificationMuteVariables`:
   const setCircleNotificationMuteVars: SetCircleNotificationMuteVariables = {
-    circleId: ...,
-    userId: ...,
-    notificationsMuted: ...,
+    circleId: ..., 
+    userId: ..., 
+    notificationsMuted: ..., 
   };
   mutation.mutate(setCircleNotificationMuteVars);
   // Variables can be defined inline as well.
@@ -7163,15 +7721,15 @@ export default function CreateEmailDeliveryComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useCreateEmailDelivery` Mutation requires an argument of type `CreateEmailDeliveryVariables`:
   const createEmailDeliveryVars: CreateEmailDeliveryVariables = {
-    deliveryId: ...,
+    deliveryId: ..., 
     notificationId: ..., // optional
     recipientId: ..., // optional
-    eventType: ...,
-    destinationMasked: ...,
-    status: ...,
+    eventType: ..., 
+    destinationMasked: ..., 
+    status: ..., 
     providerMessageId: ..., // optional
     failureReason: ..., // optional
-    createdAt: ...,
+    createdAt: ..., 
   };
   mutation.mutate(createEmailDeliveryVars);
   // Variables can be defined inline as well.
@@ -7195,6 +7753,420 @@ export default function CreateEmailDeliveryComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.emailDelivery_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateRetentionPurgeAttempt
+You can execute the `CreateRetentionPurgeAttempt` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateRetentionPurgeAttempt(options?: useDataConnectMutationOptions<CreateRetentionPurgeAttemptData, FirebaseError, CreateRetentionPurgeAttemptVariables>): UseDataConnectMutationResult<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateRetentionPurgeAttempt(dc: DataConnect, options?: useDataConnectMutationOptions<CreateRetentionPurgeAttemptData, FirebaseError, CreateRetentionPurgeAttemptVariables>): UseDataConnectMutationResult<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+```
+
+### Variables
+The `CreateRetentionPurgeAttempt` Mutation requires an argument of type `CreateRetentionPurgeAttemptVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  circleId: UUIDString;
+  attemptNumber: number;
+  startedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateRetentionPurgeAttempt` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateRetentionPurgeAttempt` Mutation is of type `CreateRetentionPurgeAttemptData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateRetentionPurgeAttemptData {
+  retentionPurgeAttempt_insert: RetentionPurgeAttempt_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateRetentionPurgeAttempt`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+import { useCreateRetentionPurgeAttempt } from '@bondcircle/dataconnect/react'
+
+export default function CreateRetentionPurgeAttemptComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateRetentionPurgeAttempt();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateRetentionPurgeAttempt(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateRetentionPurgeAttempt(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateRetentionPurgeAttempt(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateRetentionPurgeAttempt` Mutation requires an argument of type `CreateRetentionPurgeAttemptVariables`:
+  const createRetentionPurgeAttemptVars: CreateRetentionPurgeAttemptVariables = {
+    attemptId: ..., 
+    circleId: ..., 
+    attemptNumber: ..., 
+    startedAt: ..., 
+  };
+  mutation.mutate(createRetentionPurgeAttemptVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ attemptId: ..., circleId: ..., attemptNumber: ..., startedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createRetentionPurgeAttemptVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.retentionPurgeAttempt_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CompleteRetentionPurgeAttempt
+You can execute the `CompleteRetentionPurgeAttempt` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCompleteRetentionPurgeAttempt(options?: useDataConnectMutationOptions<CompleteRetentionPurgeAttemptData, FirebaseError, CompleteRetentionPurgeAttemptVariables>): UseDataConnectMutationResult<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCompleteRetentionPurgeAttempt(dc: DataConnect, options?: useDataConnectMutationOptions<CompleteRetentionPurgeAttemptData, FirebaseError, CompleteRetentionPurgeAttemptVariables>): UseDataConnectMutationResult<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+```
+
+### Variables
+The `CompleteRetentionPurgeAttempt` Mutation requires an argument of type `CompleteRetentionPurgeAttemptVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CompleteRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  status: string;
+  deletedFileCount: number;
+  skippedSharedFileCount: number;
+  failureReason?: string | null;
+  nextRetryAt?: TimestampString | null;
+  completedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CompleteRetentionPurgeAttempt` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CompleteRetentionPurgeAttempt` Mutation is of type `CompleteRetentionPurgeAttemptData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CompleteRetentionPurgeAttemptData {
+  retentionPurgeAttempt_update?: RetentionPurgeAttempt_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CompleteRetentionPurgeAttempt`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CompleteRetentionPurgeAttemptVariables } from '@bondcircle/dataconnect';
+import { useCompleteRetentionPurgeAttempt } from '@bondcircle/dataconnect/react'
+
+export default function CompleteRetentionPurgeAttemptComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCompleteRetentionPurgeAttempt();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCompleteRetentionPurgeAttempt(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCompleteRetentionPurgeAttempt(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCompleteRetentionPurgeAttempt(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCompleteRetentionPurgeAttempt` Mutation requires an argument of type `CompleteRetentionPurgeAttemptVariables`:
+  const completeRetentionPurgeAttemptVars: CompleteRetentionPurgeAttemptVariables = {
+    attemptId: ..., 
+    status: ..., 
+    deletedFileCount: ..., 
+    skippedSharedFileCount: ..., 
+    failureReason: ..., // optional
+    nextRetryAt: ..., // optional
+    completedAt: ..., 
+  };
+  mutation.mutate(completeRetentionPurgeAttemptVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ attemptId: ..., status: ..., deletedFileCount: ..., skippedSharedFileCount: ..., failureReason: ..., nextRetryAt: ..., completedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(completeRetentionPurgeAttemptVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.retentionPurgeAttempt_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## PurgeInvitationAcceptances
+You can execute the `PurgeInvitationAcceptances` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+usePurgeInvitationAcceptances(options?: useDataConnectMutationOptions<PurgeInvitationAcceptancesData, FirebaseError, PurgeInvitationAcceptancesVariables>): UseDataConnectMutationResult<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+usePurgeInvitationAcceptances(dc: DataConnect, options?: useDataConnectMutationOptions<PurgeInvitationAcceptancesData, FirebaseError, PurgeInvitationAcceptancesVariables>): UseDataConnectMutationResult<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+```
+
+### Variables
+The `PurgeInvitationAcceptances` Mutation requires an argument of type `PurgeInvitationAcceptancesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface PurgeInvitationAcceptancesVariables {
+  invitationId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `PurgeInvitationAcceptances` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `PurgeInvitationAcceptances` Mutation is of type `PurgeInvitationAcceptancesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface PurgeInvitationAcceptancesData {
+  invitationAcceptance_deleteMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `PurgeInvitationAcceptances`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, PurgeInvitationAcceptancesVariables } from '@bondcircle/dataconnect';
+import { usePurgeInvitationAcceptances } from '@bondcircle/dataconnect/react'
+
+export default function PurgeInvitationAcceptancesComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = usePurgeInvitationAcceptances();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = usePurgeInvitationAcceptances(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = usePurgeInvitationAcceptances(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = usePurgeInvitationAcceptances(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `usePurgeInvitationAcceptances` Mutation requires an argument of type `PurgeInvitationAcceptancesVariables`:
+  const purgeInvitationAcceptancesVars: PurgeInvitationAcceptancesVariables = {
+    invitationId: ..., 
+  };
+  mutation.mutate(purgeInvitationAcceptancesVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(purgeInvitationAcceptancesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitationAcceptance_deleteMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## PurgeCircleSensitiveData
+You can execute the `PurgeCircleSensitiveData` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+usePurgeCircleSensitiveData(options?: useDataConnectMutationOptions<PurgeCircleSensitiveDataData, FirebaseError, PurgeCircleSensitiveDataVariables>): UseDataConnectMutationResult<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+usePurgeCircleSensitiveData(dc: DataConnect, options?: useDataConnectMutationOptions<PurgeCircleSensitiveDataData, FirebaseError, PurgeCircleSensitiveDataVariables>): UseDataConnectMutationResult<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+```
+
+### Variables
+The `PurgeCircleSensitiveData` Mutation requires an argument of type `PurgeCircleSensitiveDataVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface PurgeCircleSensitiveDataVariables {
+  circleId: UUIDString;
+  purgeAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `PurgeCircleSensitiveData` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `PurgeCircleSensitiveData` Mutation is of type `PurgeCircleSensitiveDataData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface PurgeCircleSensitiveDataData {
+  commentReport_deleteMany: number;
+  comment_deleteMany: number;
+  announcement_deleteMany: number;
+  supportUpdate_deleteMany: number;
+  receipt_deleteMany: number;
+  invitation_deleteMany: number;
+  notification_deleteMany: number;
+  circleMembership_deleteMany: number;
+  asoEbiTier_deleteMany: number;
+  circle_update?: Circle_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `PurgeCircleSensitiveData`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, PurgeCircleSensitiveDataVariables } from '@bondcircle/dataconnect';
+import { usePurgeCircleSensitiveData } from '@bondcircle/dataconnect/react'
+
+export default function PurgeCircleSensitiveDataComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = usePurgeCircleSensitiveData();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = usePurgeCircleSensitiveData(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = usePurgeCircleSensitiveData(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = usePurgeCircleSensitiveData(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `usePurgeCircleSensitiveData` Mutation requires an argument of type `PurgeCircleSensitiveDataVariables`:
+  const purgeCircleSensitiveDataVars: PurgeCircleSensitiveDataVariables = {
+    circleId: ..., 
+    purgeAt: ..., 
+  };
+  mutation.mutate(purgeCircleSensitiveDataVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., purgeAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(purgeCircleSensitiveDataVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.commentReport_deleteMany);
+    console.log(mutation.data.comment_deleteMany);
+    console.log(mutation.data.announcement_deleteMany);
+    console.log(mutation.data.supportUpdate_deleteMany);
+    console.log(mutation.data.receipt_deleteMany);
+    console.log(mutation.data.invitation_deleteMany);
+    console.log(mutation.data.notification_deleteMany);
+    console.log(mutation.data.circleMembership_deleteMany);
+    console.log(mutation.data.asoEbiTier_deleteMany);
+    console.log(mutation.data.circle_update);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

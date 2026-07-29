@@ -62,6 +62,7 @@ type Circle @table {
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
   completedAt: Timestamp
+  retentionDueAt: Timestamp
   archiveAt: Timestamp
   purgeAt: Timestamp
 }
@@ -197,6 +198,21 @@ type EmailDelivery @table {
   status: String!
   providerMessageId: String
   failureReason: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type RetentionPurgeAttempt @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  status: String!
+  attemptNumber: Int! @default(value: 1)
+  deletedFileCount: Int! @default(value: 0)
+  skippedSharedFileCount: Int! @default(value: 0)
+  failureReason: String
+  nextRetryAt: Timestamp
+  startedAt: Timestamp! @default(expr: "request.time")
+  completedAt: Timestamp
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }

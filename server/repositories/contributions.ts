@@ -227,6 +227,9 @@ export async function reviewContributionReceipt(input: {
   if (!workspace?.canReview) {
     throw new Error("Only the creator or an authorised co-admin can review.");
   }
+  if (!["active", "published"].includes(workspace.circle.status)) {
+    throw new Error("Receipt review is closed for this circle.");
+  }
   const receipt = workspace.reviewQueue.find(
     (candidate) => candidate.id === input.receiptId,
   );

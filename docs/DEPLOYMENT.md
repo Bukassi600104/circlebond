@@ -30,7 +30,7 @@ Required groups:
 - `AUTH_EMAIL_OTP_MODE=production`
 - `AUTH_EMAIL_SMTP_URL` and `AUTH_EMAIL_FROM`: transactional email delivery
 - `NEXT_PUBLIC_APP_URL`: canonical HTTPS origin used in notification email links
-- `CRON_SECRET`: required only when enabling the optional external deadline scheduler
+- `CRON_SECRET`: required for the daily retention purge job configured in `vercel.json`
 
 When entering `FIREBASE_PRIVATE_KEY` in Vercel, preserve newline characters using the escaped `\n` form expected by the application.
 
@@ -67,7 +67,9 @@ Verify on the deployed domain:
 - Production OTP messages are delivered and development codes are never displayed.
 - Notification deep links open the correct circle and never expose receipt details in email previews.
 - Upcoming deadlines appear when an authenticated member opens the application.
-- If the optional external deadline scheduler is enabled, its job succeeds only with the configured `CRON_SECRET`.
+- The daily retention job succeeds only with the configured `CRON_SECRET`.
+- Completed and cancelled circles become read-only immediately and show the correct 30-day purge date.
+- Eligible private receipt and temporary circle files are removed, shared files are retained, and purge failures create retryable alert logs.
 - Failed notification email deliveries are retained as delivery records.
 - Server logs contain no credentials, raw invitation tokens, OTP secrets, or personal payment evidence.
 

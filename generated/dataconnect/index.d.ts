@@ -113,6 +113,20 @@ export interface Comment_Key {
   __typename?: 'Comment_Key';
 }
 
+export interface CompleteRetentionPurgeAttemptData {
+  retentionPurgeAttempt_update?: RetentionPurgeAttempt_Key | null;
+}
+
+export interface CompleteRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  status: string;
+  deletedFileCount: number;
+  skippedSharedFileCount: number;
+  failureReason?: string | null;
+  nextRetryAt?: TimestampString | null;
+  completedAt: TimestampString;
+}
+
 export interface ConfigureAsoEbiCircleData {
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -308,6 +322,17 @@ export interface CreateNotificationVariables {
   createdAt: TimestampString;
 }
 
+export interface CreateRetentionPurgeAttemptData {
+  retentionPurgeAttempt_insert: RetentionPurgeAttempt_Key;
+}
+
+export interface CreateRetentionPurgeAttemptVariables {
+  attemptId: UUIDString;
+  circleId: UUIDString;
+  attemptNumber: number;
+  startedAt: TimestampString;
+}
+
 export interface CreateSupportUpdateData {
   supportUpdate_insert: SupportUpdate_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -443,9 +468,16 @@ export interface GetAsoEbiCircleDetailData {
     paymentAccountName?: string | null;
     paymentAccountNumber?: string | null;
     memberLimit: number;
+    memberCount: number;
+    pricingPlan: string;
     contributedAmount: number;
     eventDate?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -606,6 +638,7 @@ export interface GetCircleEngineRecordData {
     createdAt: TimestampString;
     updatedAt: TimestampString;
     completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
     archiveAt?: TimestampString | null;
     purgeAt?: TimestampString | null;
     creator: {
@@ -644,6 +677,79 @@ export interface GetCircleInvitationsData {
 }
 
 export interface GetCircleInvitationsVariables {
+  circleId: UUIDString;
+}
+
+export interface GetCircleLifecycleSummaryData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    completionType?: string | null;
+    memberCount: number;
+    pricingPlan: string;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      user: {
+        id: string;
+      } & User_Key;
+    })[];
+      activityLogs: ({
+        id: UUIDString;
+        eventType: string;
+        createdAt: TimestampString;
+        actor?: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & ActivityLog_Key)[];
+}
+
+export interface GetCircleLifecycleSummaryVariables {
+  circleId: UUIDString;
+}
+
+export interface GetCircleRetentionPayloadData {
+  circle?: {
+    id: UUIDString;
+    type: string;
+    status: string;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    imageStoragePath?: string | null;
+  } & Circle_Key;
+    receipts: ({
+      id: UUIDString;
+      imageStoragePath: string;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        receiptStoragePath?: string | null;
+      })[];
+        asoEbiTiers: ({
+          fabricImageStoragePath?: string | null;
+          appreciationGiftImageStoragePath?: string | null;
+        })[];
+          retentionPurgeAttempts: ({
+            attemptNumber: number;
+            status: string;
+            startedAt: TimestampString;
+            nextRetryAt?: TimestampString | null;
+          })[];
+            invitations: ({
+              id: UUIDString;
+            } & Invitation_Key)[];
+}
+
+export interface GetCircleRetentionPayloadVariables {
   circleId: UUIDString;
 }
 
@@ -771,9 +877,16 @@ export interface GetGiftCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completionType?: string | null;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -952,6 +1065,50 @@ export interface GetRecentReminderNotificationsVariables {
   since: TimestampString;
 }
 
+export interface GetRetentionCandidatesData {
+  circles: ({
+    id: UUIDString;
+    retentionDueAt?: TimestampString | null;
+  } & Circle_Key)[];
+}
+
+export interface GetRetentionCandidatesVariables {
+  now: TimestampString;
+}
+
+export interface GetStoragePathReferencesData {
+  circles: ({
+    id: UUIDString;
+  } & Circle_Key)[];
+    receipts: ({
+      id: UUIDString;
+      circle: {
+        id: UUIDString;
+      } & Circle_Key;
+    } & Receipt_Key)[];
+      circleMemberships: ({
+        circle: {
+          id: UUIDString;
+        } & Circle_Key;
+      })[];
+        fabricReferences: ({
+          id: UUIDString;
+          circle: {
+            id: UUIDString;
+          } & Circle_Key;
+        } & AsoEbiTier_Key)[];
+          giftReferences: ({
+            id: UUIDString;
+            circle: {
+              id: UUIDString;
+            } & Circle_Key;
+          } & AsoEbiTier_Key)[];
+}
+
+export interface GetStoragePathReferencesVariables {
+  path: string;
+}
+
 export interface GetSupportCircleDetailData {
   circle?: {
     id: UUIDString;
@@ -975,9 +1132,15 @@ export interface GetSupportCircleDetailData {
     paymentAccountNumber?: string | null;
     targetAmount: number;
     contributedAmount: number;
+    memberCount: number;
     memberLimit: number;
+    pricingPlan: string;
     deadline?: DateString | null;
     status: string;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    archiveAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
     creator: {
       id: string;
     } & User_Key;
@@ -1114,6 +1277,32 @@ export interface Notification_Key {
   __typename?: 'Notification_Key';
 }
 
+export interface PurgeCircleSensitiveDataData {
+  commentReport_deleteMany: number;
+  comment_deleteMany: number;
+  announcement_deleteMany: number;
+  supportUpdate_deleteMany: number;
+  receipt_deleteMany: number;
+  invitation_deleteMany: number;
+  notification_deleteMany: number;
+  circleMembership_deleteMany: number;
+  asoEbiTier_deleteMany: number;
+  circle_update?: Circle_Key | null;
+}
+
+export interface PurgeCircleSensitiveDataVariables {
+  circleId: UUIDString;
+  purgeAt: TimestampString;
+}
+
+export interface PurgeInvitationAcceptancesData {
+  invitationAcceptance_deleteMany: number;
+}
+
+export interface PurgeInvitationAcceptancesVariables {
+  invitationId: UUIDString;
+}
+
 export interface Receipt_Key {
   id: UUIDString;
   __typename?: 'Receipt_Key';
@@ -1207,6 +1396,11 @@ export interface RequestReplacementInvitationVariables {
   requestedAt: TimestampString;
 }
 
+export interface RetentionPurgeAttempt_Key {
+  id: UUIDString;
+  __typename?: 'RetentionPurgeAttempt_Key';
+}
+
 export interface ReviewReceiptWithAuditData {
   receipt_update?: Receipt_Key | null;
   circleMembership_update?: CircleMembership_Key | null;
@@ -1254,6 +1448,18 @@ export interface SetCircleCommentsWithAuditVariables {
   actorId: string;
   commentsEnabled: boolean;
   materialChanges: string;
+  updatedAt: TimestampString;
+}
+
+export interface SetCircleCompletionTypeWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface SetCircleCompletionTypeWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  completionType: string;
   updatedAt: TimestampString;
 }
 
@@ -1340,6 +1546,7 @@ export interface TransitionCircleWithAuditVariables {
   toStatus: string;
   updatedAt: TimestampString;
   completedAt?: TimestampString | null;
+  retentionDueAt?: TimestampString | null;
   archiveAt?: TimestampString | null;
   purgeAt?: TimestampString | null;
 }
@@ -1494,6 +1701,18 @@ export const getCircleEngineRecordRef: GetCircleEngineRecordRef;
 export function getCircleEngineRecord(vars: GetCircleEngineRecordVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleEngineRecordData, GetCircleEngineRecordVariables>;
 export function getCircleEngineRecord(dc: DataConnect, vars: GetCircleEngineRecordVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleEngineRecordData, GetCircleEngineRecordVariables>;
 
+interface GetCircleLifecycleSummaryRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleLifecycleSummaryVariables): QueryRef<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCircleLifecycleSummaryVariables): QueryRef<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+  operationName: string;
+}
+export const getCircleLifecycleSummaryRef: GetCircleLifecycleSummaryRef;
+
+export function getCircleLifecycleSummary(vars: GetCircleLifecycleSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+export function getCircleLifecycleSummary(dc: DataConnect, vars: GetCircleLifecycleSummaryVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleLifecycleSummaryData, GetCircleLifecycleSummaryVariables>;
+
 interface FindUserByEmailRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: FindUserByEmailVariables): QueryRef<FindUserByEmailData, FindUserByEmailVariables>;
@@ -1565,6 +1784,18 @@ export const transitionCircleWithAuditRef: TransitionCircleWithAuditRef;
 
 export function transitionCircleWithAudit(vars: TransitionCircleWithAuditVariables): MutationPromise<TransitionCircleWithAuditData, TransitionCircleWithAuditVariables>;
 export function transitionCircleWithAudit(dc: DataConnect, vars: TransitionCircleWithAuditVariables): MutationPromise<TransitionCircleWithAuditData, TransitionCircleWithAuditVariables>;
+
+interface SetCircleCompletionTypeWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleCompletionTypeWithAuditVariables): MutationRef<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SetCircleCompletionTypeWithAuditVariables): MutationRef<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+  operationName: string;
+}
+export const setCircleCompletionTypeWithAuditRef: SetCircleCompletionTypeWithAuditRef;
+
+export function setCircleCompletionTypeWithAudit(vars: SetCircleCompletionTypeWithAuditVariables): MutationPromise<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
+export function setCircleCompletionTypeWithAudit(dc: DataConnect, vars: SetCircleCompletionTypeWithAuditVariables): MutationPromise<SetCircleCompletionTypeWithAuditData, SetCircleCompletionTypeWithAuditVariables>;
 
 interface AddCircleMemberWithAuditRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -2225,4 +2456,88 @@ export const createEmailDeliveryRef: CreateEmailDeliveryRef;
 
 export function createEmailDelivery(vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
 export function createEmailDelivery(dc: DataConnect, vars: CreateEmailDeliveryVariables): MutationPromise<CreateEmailDeliveryData, CreateEmailDeliveryVariables>;
+
+interface GetRetentionCandidatesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRetentionCandidatesVariables): QueryRef<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetRetentionCandidatesVariables): QueryRef<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+  operationName: string;
+}
+export const getRetentionCandidatesRef: GetRetentionCandidatesRef;
+
+export function getRetentionCandidates(vars: GetRetentionCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+export function getRetentionCandidates(dc: DataConnect, vars: GetRetentionCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionCandidatesData, GetRetentionCandidatesVariables>;
+
+interface GetCircleRetentionPayloadRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleRetentionPayloadVariables): QueryRef<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCircleRetentionPayloadVariables): QueryRef<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+  operationName: string;
+}
+export const getCircleRetentionPayloadRef: GetCircleRetentionPayloadRef;
+
+export function getCircleRetentionPayload(vars: GetCircleRetentionPayloadVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+export function getCircleRetentionPayload(dc: DataConnect, vars: GetCircleRetentionPayloadVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPayloadData, GetCircleRetentionPayloadVariables>;
+
+interface GetStoragePathReferencesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetStoragePathReferencesVariables): QueryRef<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetStoragePathReferencesVariables): QueryRef<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+  operationName: string;
+}
+export const getStoragePathReferencesRef: GetStoragePathReferencesRef;
+
+export function getStoragePathReferences(vars: GetStoragePathReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+export function getStoragePathReferences(dc: DataConnect, vars: GetStoragePathReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetStoragePathReferencesData, GetStoragePathReferencesVariables>;
+
+interface CreateRetentionPurgeAttemptRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateRetentionPurgeAttemptVariables): MutationRef<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateRetentionPurgeAttemptVariables): MutationRef<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+  operationName: string;
+}
+export const createRetentionPurgeAttemptRef: CreateRetentionPurgeAttemptRef;
+
+export function createRetentionPurgeAttempt(vars: CreateRetentionPurgeAttemptVariables): MutationPromise<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+export function createRetentionPurgeAttempt(dc: DataConnect, vars: CreateRetentionPurgeAttemptVariables): MutationPromise<CreateRetentionPurgeAttemptData, CreateRetentionPurgeAttemptVariables>;
+
+interface CompleteRetentionPurgeAttemptRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CompleteRetentionPurgeAttemptVariables): MutationRef<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CompleteRetentionPurgeAttemptVariables): MutationRef<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+  operationName: string;
+}
+export const completeRetentionPurgeAttemptRef: CompleteRetentionPurgeAttemptRef;
+
+export function completeRetentionPurgeAttempt(vars: CompleteRetentionPurgeAttemptVariables): MutationPromise<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+export function completeRetentionPurgeAttempt(dc: DataConnect, vars: CompleteRetentionPurgeAttemptVariables): MutationPromise<CompleteRetentionPurgeAttemptData, CompleteRetentionPurgeAttemptVariables>;
+
+interface PurgeInvitationAcceptancesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: PurgeInvitationAcceptancesVariables): MutationRef<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: PurgeInvitationAcceptancesVariables): MutationRef<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+  operationName: string;
+}
+export const purgeInvitationAcceptancesRef: PurgeInvitationAcceptancesRef;
+
+export function purgeInvitationAcceptances(vars: PurgeInvitationAcceptancesVariables): MutationPromise<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+export function purgeInvitationAcceptances(dc: DataConnect, vars: PurgeInvitationAcceptancesVariables): MutationPromise<PurgeInvitationAcceptancesData, PurgeInvitationAcceptancesVariables>;
+
+interface PurgeCircleSensitiveDataRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: PurgeCircleSensitiveDataVariables): MutationRef<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: PurgeCircleSensitiveDataVariables): MutationRef<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+  operationName: string;
+}
+export const purgeCircleSensitiveDataRef: PurgeCircleSensitiveDataRef;
+
+export function purgeCircleSensitiveData(vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+export function purgeCircleSensitiveData(dc: DataConnect, vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
 

@@ -73,9 +73,11 @@ async function csrfToken() {
 function ReceiptHistory({
   receipts,
   onReplace,
+  readOnly,
 }: {
   receipts: Receipt[];
   onReplace: (receiptId: string) => void;
+  readOnly: boolean;
 }) {
   if (!receipts.length) {
     return (
@@ -107,7 +109,7 @@ function ReceiptHistory({
             <a href={receipt.imageUrl} target="_blank" rel="noreferrer">
               <Eye size={13} aria-hidden="true" /> View receipt
             </a>
-            {receipt.status === "rejected" ? (
+            {receipt.status === "rejected" && !readOnly ? (
               <button type="button" onClick={() => onReplace(receipt.id)}>
                 <RefreshCw size={13} aria-hidden="true" /> Replace
               </button>
@@ -122,9 +124,11 @@ function ReceiptHistory({
 export function ContributionWorkspace({
   circleId,
   heading = "Your contribution",
+  readOnly = false,
 }: {
   circleId: string;
   heading?: string;
+  readOnly?: boolean;
 }) {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
@@ -313,18 +317,24 @@ export function ContributionWorkspace({
           {error}
         </p>
       ) : null}
-      <div className="bc-contribution-actions">
-        <button type="button" onClick={() => openUpload()}>
-          <Upload size={15} aria-hidden="true" />
-          Upload receipt / record partial
-        </button>
-      </div>
+      {!readOnly ? (
+        <div className="bc-contribution-actions">
+          <button type="button" onClick={() => openUpload()}>
+            <Upload size={15} aria-hidden="true" />
+            Upload receipt / record partial
+          </button>
+        </div>
+      ) : null}
       <section className="bc-contribution-history">
         <h3>Submitted receipts</h3>
-        <ReceiptHistory receipts={workspace.receipts} onReplace={openUpload} />
+        <ReceiptHistory
+          receipts={workspace.receipts}
+          onReplace={openUpload}
+          readOnly={readOnly}
+        />
       </section>
 
-      {workspace.canReview ? (
+      {workspace.canReview && !readOnly ? (
         <section className="bc-review-queue">
           <header>
             <ShieldCheck size={17} aria-hidden="true" />

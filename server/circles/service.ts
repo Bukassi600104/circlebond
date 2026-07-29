@@ -11,6 +11,7 @@ import {
   type CircleType,
   type PricingPlan,
 } from "./engine.ts";
+import { retentionDueAt } from "../retention/rules.ts";
 
 export type CircleRecord = {
   id: string;
@@ -29,6 +30,7 @@ export type CircleRecord = {
   createdAt: string;
   updatedAt: string;
   completedAt: string | null;
+  retentionDueAt: string | null;
   archiveAt: string | null;
   purgeAt: string | null;
 };
@@ -78,7 +80,7 @@ export interface CircleStore {
     nextStatus: CircleState,
     timestamps: Pick<
       CircleRecord,
-      "updatedAt" | "completedAt" | "archiveAt" | "purgeAt"
+      "updatedAt" | "completedAt" | "archiveAt" | "purgeAt" | "retentionDueAt"
     >,
   ): Promise<CircleRecord>;
   memberCount(circleId: string): Promise<number>;
@@ -145,6 +147,7 @@ export async function createCircleDraft(
       createdAt: timestamp,
       updatedAt: timestamp,
       completedAt: null,
+      retentionDueAt: null,
       archiveAt: null,
       purgeAt: null,
     },
@@ -233,6 +236,10 @@ export async function transitionCircleState(
   return store.transition(circle, actorId, nextStatus, {
     updatedAt: timestamp,
     completedAt: nextStatus === "completed" ? timestamp : circle.completedAt,
+    retentionDueAt:
+      nextStatus === "completed" || nextStatus === "cancelled"
+        ? retentionDueAt(new Date(timestamp))
+        : circle.retentionDueAt,
     archiveAt: nextStatus === "archived" ? timestamp : circle.archiveAt,
     purgeAt: nextStatus === "purged" ? timestamp : circle.purgeAt,
   });

@@ -379,6 +379,108 @@ test("Firebase persists Support Circle privacy, pledges, updates and support-del
   assert.equal(detail.data.supportUpdates.length, 1);
 });
 
+test("Firebase completes, archives, and purges private circle data while retaining the audit record", async () => {
+  const creatorId = `retention-test-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Retention Test Organizer",
+    email: `${creatorId}@example.test`,
+  });
+  const createdAt = new Date().toISOString();
+  const created = await dataConnect.executeMutation("CreateCircleDraft", {
+    creatorId,
+    name: "Retention Verification Circle",
+    type: "support",
+    description: "Private content scheduled for deletion.",
+    targetAmount: 100000,
+    pricingPlan: "free",
+    memberLimit: 3,
+    activationPrice: 0,
+    deadline: "2026-09-30",
+    eventDate: null,
+    visibility: "private",
+    createdAt,
+    updatedAt: createdAt,
+  });
+  const circleId = created.data.circle_insert.id;
+  await dataConnect.executeMutation("CreateSupportUpdate", {
+    circleId,
+    authorId: creatorId,
+    body: "Temporary private communication.",
+    createdAt: new Date().toISOString(),
+  });
+
+  const completedAt = new Date().toISOString();
+  const retentionDueAt = new Date(
+    new Date(completedAt).getTime() + 30 * 86_400_000,
+  ).toISOString();
+  for (const [fromStatus, toStatus] of [
+    ["draft", "published"],
+    ["published", "active"],
+    ["active", "target_reached"],
+    ["target_reached", "fulfilment"],
+    ["fulfilment", "completed"],
+  ]) {
+    await dataConnect.executeMutation("TransitionCircleWithAudit", {
+      circleId,
+      actorId: creatorId,
+      fromStatus,
+      toStatus,
+      updatedAt: completedAt,
+      completedAt: toStatus === "completed" ? completedAt : null,
+      retentionDueAt: toStatus === "completed" ? retentionDueAt : null,
+      archiveAt: null,
+      purgeAt: null,
+    });
+  }
+  await dataConnect.executeMutation("SetCircleCompletionTypeWithAudit", {
+    circleId,
+    actorId: creatorId,
+    completionType: "support_delivered",
+    updatedAt: completedAt,
+  });
+  await dataConnect.executeMutation("TransitionCircleWithAudit", {
+    circleId,
+    actorId: creatorId,
+    fromStatus: "completed",
+    toStatus: "archived",
+    updatedAt: completedAt,
+    completedAt,
+    retentionDueAt,
+    archiveAt: completedAt,
+    purgeAt: null,
+  });
+
+  const beforePurge = await dataConnect.executeQuery(
+    "GetCircleRetentionPayload",
+    { circleId },
+  );
+  assert.equal(beforePurge.data.circle.status, "archived");
+  assert.equal(
+    new Date(beforePurge.data.circle.retentionDueAt).getTime(),
+    new Date(retentionDueAt).getTime(),
+  );
+
+  const purgeAt = new Date().toISOString();
+  await dataConnect.executeMutation("PurgeCircleSensitiveData", {
+    circleId,
+    purgeAt,
+  });
+
+  const purged = await dataConnect.executeQuery("GetSupportCircleDetail", {
+    circleId,
+  });
+  assert.equal(purged.data.circle.status, "purged");
+  assert.equal(purged.data.circle.description, "");
+  assert.equal(purged.data.circle.paymentAccountNumber, null);
+  assert.equal(purged.data.circleMemberships.length, 0);
+  assert.equal(purged.data.supportUpdates.length, 0);
+  const audits = await dataConnect.executeQuery("GetCircleAuditEntries", {
+    circleId,
+  });
+  assert.ok(audits.data.circleAuditEntries.length >= 8);
+});
+
 test("Firebase persists secure invitations, approvals, revocation and multi-circle membership", async () => {
   const creatorId = `invite-creator-${randomUUID()}`;
   const memberId = `invite-member-${randomUUID()}`;

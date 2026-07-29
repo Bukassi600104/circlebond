@@ -9,6 +9,8 @@ import { loadAsoEbiCircle } from "@/server/repositories/aso-ebi-circles";
 import { SupportCircleView } from "@/components/support-circles/SupportCircleView";
 import { loadSupportCircle } from "@/server/repositories/support-circles";
 import { CircleCommunicationSection } from "@/components/communication/CircleCommunicationSection";
+import { CircleLifecyclePanel } from "@/components/lifecycle/CircleLifecyclePanel";
+import { loadCircleLifecycle } from "@/server/repositories/lifecycle";
 
 export default async function CircleOverviewPage({
   params,
@@ -17,11 +19,14 @@ export default async function CircleOverviewPage({
 }) {
   const session = await requireSession();
   const { circleId } = await params;
+  const lifecycle = await loadCircleLifecycle(circleId, session.uid);
+  if (!lifecycle) notFound();
   const giftCircle = await loadGiftCircle(circleId, session.uid);
   if (giftCircle) {
     return (
       <>
         <GiftCircleView circle={giftCircle} viewerId={session.uid} />
+        <CircleLifecyclePanel summary={lifecycle} />
         <CircleCommunicationSection
           circleId={circleId}
           viewerId={session.uid}
@@ -34,6 +39,7 @@ export default async function CircleOverviewPage({
     return (
       <>
         <AsoEbiCircleView circle={asoEbiCircle} viewerId={session.uid} />
+        <CircleLifecyclePanel summary={lifecycle} />
         <CircleCommunicationSection
           circleId={circleId}
           viewerId={session.uid}
@@ -46,6 +52,7 @@ export default async function CircleOverviewPage({
     return (
       <>
         <SupportCircleView circle={supportCircle} viewerId={session.uid} />
+        <CircleLifecyclePanel summary={lifecycle} />
         <CircleCommunicationSection
           circleId={circleId}
           viewerId={session.uid}
