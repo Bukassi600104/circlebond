@@ -16,6 +16,76 @@ const dataConnect = getDataConnect(
   app,
 );
 
+test("Firebase persists owner access, operational telemetry and immutable admin audit", async () => {
+  const ownerId = `owner-test-${randomUUID()}`;
+  const targetId = `owner-target-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: ownerId,
+    displayName: "Owner Operations Test",
+    email: `${ownerId}@example.test`,
+  });
+  await dataConnect.upsert("user", {
+    id: targetId,
+    displayName: "Owner Target Test",
+    email: `${targetId}@example.test`,
+  });
+
+  const createdAt = new Date().toISOString();
+  await dataConnect.executeMutation("ProvisionOwnerAdministrator", {
+    userId: ownerId,
+    createdAt,
+  });
+  await dataConnect.executeMutation("RecordOperationalEvent", {
+    category: "upload",
+    eventType: "receipt",
+    outcome: "failed",
+    reasonCode: "format_rejected",
+    circleId: null,
+    createdAt,
+  });
+  await dataConnect.executeMutation("RecordOwnerAdminAudit", {
+    actorId: ownerId,
+    action: "user_account_lookup",
+    targetType: "user",
+    targetId,
+    purpose: "security",
+    outcome: "succeeded",
+    metadata: '{"found":true}',
+    createdAt,
+  });
+
+  const owner = await dataConnect.executeQuery("GetOwnerAdministrator", {
+    userId: ownerId,
+  });
+  assert.equal(owner.data.ownerAdministrators[0].role, "owner");
+  assert.equal(owner.data.ownerAdministrators[0].status, "active");
+
+  const overview = await dataConnect.executeQuery("GetOwnerPlatformOverview");
+  assert.ok(
+    overview.data.uploadOutcomes.some(
+      (entry) => entry.outcome === "failed" && entry._count >= 1,
+    ),
+  );
+  assert.ok(
+    overview.data.recentAdminActions.some(
+      (entry) =>
+        entry.actor.id === ownerId &&
+        entry.action === "user_account_lookup" &&
+        entry.purpose === "security",
+    ),
+  );
+
+  await dataConnect.executeMutation("SuspendOwnerTargetUser", {
+    userId: targetId,
+    reasonCode: "abuse",
+    suspendedAt: new Date().toISOString(),
+  });
+  const target = await dataConnect.executeQuery("GetUserAccountStatus", {
+    userId: targetId,
+  });
+  assert.equal(target.data.user.accountStatus, "suspended");
+});
+
 test("Firebase persists a draft, creator membership, transitions, and audit history atomically", async () => {
   const creatorId = `circle-test-${randomUUID()}`;
   await dataConnect.upsert("user", {

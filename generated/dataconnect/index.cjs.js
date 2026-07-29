@@ -1069,3 +1069,206 @@ exports.purgeCircleSensitiveData = function purgeCircleSensitiveData(dcOrVars, v
   return executeMutation(purgeCircleSensitiveDataRef(dcInstance, inputVars));
 }
 ;
+
+const getOwnerAdministratorRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerAdministrator', inputVars);
+}
+getOwnerAdministratorRef.operationName = 'GetOwnerAdministrator';
+exports.getOwnerAdministratorRef = getOwnerAdministratorRef;
+
+exports.getOwnerAdministrator = function getOwnerAdministrator(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOwnerAdministratorRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getUserAccountStatusRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserAccountStatus', inputVars);
+}
+getUserAccountStatusRef.operationName = 'GetUserAccountStatus';
+exports.getUserAccountStatusRef = getUserAccountStatusRef;
+
+exports.getUserAccountStatus = function getUserAccountStatus(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getUserAccountStatusRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getOwnerPlatformOverviewRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerPlatformOverview');
+}
+getOwnerPlatformOverviewRef.operationName = 'GetOwnerPlatformOverview';
+exports.getOwnerPlatformOverviewRef = getOwnerPlatformOverviewRef;
+
+exports.getOwnerPlatformOverview = function getOwnerPlatformOverview(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(getOwnerPlatformOverviewRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getOwnerReportReviewRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerReportReview', inputVars);
+}
+getOwnerReportReviewRef.operationName = 'GetOwnerReportReview';
+exports.getOwnerReportReviewRef = getOwnerReportReviewRef;
+
+exports.getOwnerReportReview = function getOwnerReportReview(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOwnerReportReviewRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getOwnerUserByIdentifierRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerUserByIdentifier', inputVars);
+}
+getOwnerUserByIdentifierRef.operationName = 'GetOwnerUserByIdentifier';
+exports.getOwnerUserByIdentifierRef = getOwnerUserByIdentifierRef;
+
+exports.getOwnerUserByIdentifier = function getOwnerUserByIdentifier(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOwnerUserByIdentifierRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const getOwnerOperationalExportRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerOperationalExport');
+}
+getOwnerOperationalExportRef.operationName = 'GetOwnerOperationalExport';
+exports.getOwnerOperationalExportRef = getOwnerOperationalExportRef;
+
+exports.getOwnerOperationalExport = function getOwnerOperationalExport(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(getOwnerOperationalExportRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const recordOperationalEventRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RecordOperationalEvent', inputVars);
+}
+recordOperationalEventRef.operationName = 'RecordOperationalEvent';
+exports.recordOperationalEventRef = recordOperationalEventRef;
+
+exports.recordOperationalEvent = function recordOperationalEvent(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(recordOperationalEventRef(dcInstance, inputVars));
+}
+;
+
+const recordOwnerAdminAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RecordOwnerAdminAudit', inputVars);
+}
+recordOwnerAdminAuditRef.operationName = 'RecordOwnerAdminAudit';
+exports.recordOwnerAdminAuditRef = recordOwnerAdminAuditRef;
+
+exports.recordOwnerAdminAudit = function recordOwnerAdminAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(recordOwnerAdminAuditRef(dcInstance, inputVars));
+}
+;
+
+const resolveOwnerCommentReportRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ResolveOwnerCommentReport', inputVars);
+}
+resolveOwnerCommentReportRef.operationName = 'ResolveOwnerCommentReport';
+exports.resolveOwnerCommentReportRef = resolveOwnerCommentReportRef;
+
+exports.resolveOwnerCommentReport = function resolveOwnerCommentReport(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(resolveOwnerCommentReportRef(dcInstance, inputVars));
+}
+;
+
+const dismissOwnerCommentReportRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DismissOwnerCommentReport', inputVars);
+}
+dismissOwnerCommentReportRef.operationName = 'DismissOwnerCommentReport';
+exports.dismissOwnerCommentReportRef = dismissOwnerCommentReportRef;
+
+exports.dismissOwnerCommentReport = function dismissOwnerCommentReport(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(dismissOwnerCommentReportRef(dcInstance, inputVars));
+}
+;
+
+const suspendOwnerTargetUserRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SuspendOwnerTargetUser', inputVars);
+}
+suspendOwnerTargetUserRef.operationName = 'SuspendOwnerTargetUser';
+exports.suspendOwnerTargetUserRef = suspendOwnerTargetUserRef;
+
+exports.suspendOwnerTargetUser = function suspendOwnerTargetUser(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(suspendOwnerTargetUserRef(dcInstance, inputVars));
+}
+;
+
+const revokeCompromisedInvitationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RevokeCompromisedInvitation', inputVars);
+}
+revokeCompromisedInvitationRef.operationName = 'RevokeCompromisedInvitation';
+exports.revokeCompromisedInvitationRef = revokeCompromisedInvitationRef;
+
+exports.revokeCompromisedInvitation = function revokeCompromisedInvitation(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(revokeCompromisedInvitationRef(dcInstance, inputVars));
+}
+;
+
+const getOwnerInvitationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerInvitation', inputVars);
+}
+getOwnerInvitationRef.operationName = 'GetOwnerInvitation';
+exports.getOwnerInvitationRef = getOwnerInvitationRef;
+
+exports.getOwnerInvitation = function getOwnerInvitation(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOwnerInvitationRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
+const provisionOwnerAdministratorRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ProvisionOwnerAdministrator', inputVars);
+}
+provisionOwnerAdministratorRef.operationName = 'ProvisionOwnerAdministrator';
+exports.provisionOwnerAdministratorRef = provisionOwnerAdministratorRef;
+
+exports.provisionOwnerAdministrator = function provisionOwnerAdministrator(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(provisionOwnerAdministratorRef(dcInstance, inputVars));
+}
+;

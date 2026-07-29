@@ -44,6 +44,13 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetRetentionCandidates*](#getretentioncandidates)
   - [*GetCircleRetentionPayload*](#getcircleretentionpayload)
   - [*GetStoragePathReferences*](#getstoragepathreferences)
+  - [*GetOwnerAdministrator*](#getowneradministrator)
+  - [*GetUserAccountStatus*](#getuseraccountstatus)
+  - [*GetOwnerPlatformOverview*](#getownerplatformoverview)
+  - [*GetOwnerReportReview*](#getownerreportreview)
+  - [*GetOwnerUserByIdentifier*](#getowneruserbyidentifier)
+  - [*GetOwnerOperationalExport*](#getowneroperationalexport)
+  - [*GetOwnerInvitation*](#getownerinvitation)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -92,6 +99,13 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*CompleteRetentionPurgeAttempt*](#completeretentionpurgeattempt)
   - [*PurgeInvitationAcceptances*](#purgeinvitationacceptances)
   - [*PurgeCircleSensitiveData*](#purgecirclesensitivedata)
+  - [*RecordOperationalEvent*](#recordoperationalevent)
+  - [*RecordOwnerAdminAudit*](#recordowneradminaudit)
+  - [*ResolveOwnerCommentReport*](#resolveownercommentreport)
+  - [*DismissOwnerCommentReport*](#dismissownercommentreport)
+  - [*SuspendOwnerTargetUser*](#suspendownertargetuser)
+  - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
+  - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `bondcircle`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -3020,6 +3034,782 @@ export default function GetStoragePathReferencesComponent() {
     console.log(query.data.circleMemberships);
     console.log(query.data.fabricReferences);
     console.log(query.data.giftReferences);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerAdministrator
+You can execute the `GetOwnerAdministrator` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerAdministrator(dc: DataConnect, vars: GetOwnerAdministratorVariables, options?: useDataConnectQueryOptions<GetOwnerAdministratorData>): UseDataConnectQueryResult<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerAdministrator(vars: GetOwnerAdministratorVariables, options?: useDataConnectQueryOptions<GetOwnerAdministratorData>): UseDataConnectQueryResult<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+```
+
+### Variables
+The `GetOwnerAdministrator` Query requires an argument of type `GetOwnerAdministratorVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetOwnerAdministratorVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetOwnerAdministrator` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerAdministrator` Query is of type `GetOwnerAdministratorData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerAdministratorData {
+  ownerAdministrators: ({
+    role: string;
+    status: string;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+    } & User_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerAdministrator`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+import { useGetOwnerAdministrator } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerAdministratorComponent() {
+  // The `useGetOwnerAdministrator` Query hook requires an argument of type `GetOwnerAdministratorVariables`:
+  const getOwnerAdministratorVars: GetOwnerAdministratorVariables = {
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerAdministrator(getOwnerAdministratorVars);
+  // Variables can be defined inline as well.
+  const query = useGetOwnerAdministrator({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerAdministrator(dataConnect, getOwnerAdministratorVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerAdministrator(getOwnerAdministratorVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerAdministrator(dataConnect, getOwnerAdministratorVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.ownerAdministrators);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserAccountStatus
+You can execute the `GetUserAccountStatus` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserAccountStatus(dc: DataConnect, vars: GetUserAccountStatusVariables, options?: useDataConnectQueryOptions<GetUserAccountStatusData>): UseDataConnectQueryResult<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserAccountStatus(vars: GetUserAccountStatusVariables, options?: useDataConnectQueryOptions<GetUserAccountStatusData>): UseDataConnectQueryResult<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+```
+
+### Variables
+The `GetUserAccountStatus` Query requires an argument of type `GetUserAccountStatusVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserAccountStatusVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserAccountStatus` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserAccountStatus` Query is of type `GetUserAccountStatusData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserAccountStatusData {
+  user?: {
+    id: string;
+    accountStatus: string;
+  } & User_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserAccountStatus`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserAccountStatusVariables } from '@bondcircle/dataconnect';
+import { useGetUserAccountStatus } from '@bondcircle/dataconnect/react'
+
+export default function GetUserAccountStatusComponent() {
+  // The `useGetUserAccountStatus` Query hook requires an argument of type `GetUserAccountStatusVariables`:
+  const getUserAccountStatusVars: GetUserAccountStatusVariables = {
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserAccountStatus(getUserAccountStatusVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserAccountStatus({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserAccountStatus(dataConnect, getUserAccountStatusVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserAccountStatus(getUserAccountStatusVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserAccountStatus(dataConnect, getUserAccountStatusVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerPlatformOverview
+You can execute the `GetOwnerPlatformOverview` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerPlatformOverview(dc: DataConnect, options?: useDataConnectQueryOptions<GetOwnerPlatformOverviewData>): UseDataConnectQueryResult<GetOwnerPlatformOverviewData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerPlatformOverview(options?: useDataConnectQueryOptions<GetOwnerPlatformOverviewData>): UseDataConnectQueryResult<GetOwnerPlatformOverviewData, undefined>;
+```
+
+### Variables
+The `GetOwnerPlatformOverview` Query has no variables.
+### Return Type
+Recall that calling the `GetOwnerPlatformOverview` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerPlatformOverview` Query is of type `GetOwnerPlatformOverviewData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerPlatformOverviewData {
+  totalUsers: ({
+    _count: number;
+  })[];
+    usersByStatus: ({
+      accountStatus: string;
+      _count: number;
+    })[];
+      totalCircles: ({
+        _count: number;
+      })[];
+        circlesByType: ({
+          type: string;
+          _count: number;
+        })[];
+          circlesByStatus: ({
+            status: string;
+            _count: number;
+          })[];
+            circlesByPlan: ({
+              pricingPlan: string;
+              _count: number;
+            })[];
+              invitationTotals: ({
+                _count: number;
+                acceptedAt_count: number;
+              })[];
+                uploadOutcomes: ({
+                  outcome: string;
+                  _count: number;
+                })[];
+                  reportStatuses: ({
+                    status: string;
+                    _count: number;
+                  })[];
+                    authOutcomes: ({
+                      outcome: string;
+                      _count: number;
+                    })[];
+                      emailOutcomes: ({
+                        status: string;
+                        _count: number;
+                      })[];
+                        retentionCandidates: ({
+                          _count: number;
+                        })[];
+                          retentionAttempts: ({
+                            id: UUIDString;
+                            status: string;
+                            attemptNumber: number;
+                            deletedFileCount: number;
+                            skippedSharedFileCount: number;
+                            failureReason?: string | null;
+                            nextRetryAt?: TimestampString | null;
+                            startedAt: TimestampString;
+                            completedAt?: TimestampString | null;
+                            circle: {
+                              id: UUIDString;
+                              type: string;
+                              status: string;
+                              retentionDueAt?: TimestampString | null;
+                            } & Circle_Key;
+                          } & RetentionPurgeAttempt_Key)[];
+                            reportedComments: ({
+                              id: UUIDString;
+                              reason: string;
+                              status: string;
+                              createdAt: TimestampString;
+                              reporter: {
+                                id: string;
+                                displayName: string;
+                              } & User_Key;
+                                comment: {
+                                  id: UUIDString;
+                                  status: string;
+                                  author: {
+                                    id: string;
+                                    displayName: string;
+                                    accountStatus: string;
+                                  } & User_Key;
+                                } & Comment_Key;
+                                  circle: {
+                                    id: UUIDString;
+                                    name: string;
+                                    type: string;
+                                  } & Circle_Key;
+                            } & CommentReport_Key)[];
+                              activeInvitations: ({
+                                id: UUIDString;
+                                mode: string;
+                                state: string;
+                                useCount: number;
+                                maxUses: number;
+                                expiresAt: TimestampString;
+                                createdAt: TimestampString;
+                                circle: {
+                                  id: UUIDString;
+                                  name: string;
+                                  type: string;
+                                } & Circle_Key;
+                                  invitedBy: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                              } & Invitation_Key)[];
+                                recentAdminActions: ({
+                                  id: UUIDString;
+                                  action: string;
+                                  targetType: string;
+                                  targetId: string;
+                                  purpose: string;
+                                  outcome: string;
+                                  metadata: string;
+                                  createdAt: TimestampString;
+                                  actor: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                                } & OwnerAdminAuditEvent_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerPlatformOverview`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@bondcircle/dataconnect';
+import { useGetOwnerPlatformOverview } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerPlatformOverviewComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerPlatformOverview();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerPlatformOverview(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerPlatformOverview(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerPlatformOverview(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.totalUsers);
+    console.log(query.data.usersByStatus);
+    console.log(query.data.totalCircles);
+    console.log(query.data.circlesByType);
+    console.log(query.data.circlesByStatus);
+    console.log(query.data.circlesByPlan);
+    console.log(query.data.invitationTotals);
+    console.log(query.data.uploadOutcomes);
+    console.log(query.data.reportStatuses);
+    console.log(query.data.authOutcomes);
+    console.log(query.data.emailOutcomes);
+    console.log(query.data.retentionCandidates);
+    console.log(query.data.retentionAttempts);
+    console.log(query.data.reportedComments);
+    console.log(query.data.activeInvitations);
+    console.log(query.data.recentAdminActions);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerReportReview
+You can execute the `GetOwnerReportReview` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerReportReview(dc: DataConnect, vars: GetOwnerReportReviewVariables, options?: useDataConnectQueryOptions<GetOwnerReportReviewData>): UseDataConnectQueryResult<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerReportReview(vars: GetOwnerReportReviewVariables, options?: useDataConnectQueryOptions<GetOwnerReportReviewData>): UseDataConnectQueryResult<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+```
+
+### Variables
+The `GetOwnerReportReview` Query requires an argument of type `GetOwnerReportReviewVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetOwnerReportReviewVariables {
+  reportId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetOwnerReportReview` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerReportReview` Query is of type `GetOwnerReportReviewData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerReportReviewData {
+  commentReport?: {
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+      comment: {
+        id: UUIDString;
+        body: string;
+        status: string;
+        createdAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+          accountStatus: string;
+        } & User_Key;
+      } & Comment_Key;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+  } & CommentReport_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerReportReview`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetOwnerReportReviewVariables } from '@bondcircle/dataconnect';
+import { useGetOwnerReportReview } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerReportReviewComponent() {
+  // The `useGetOwnerReportReview` Query hook requires an argument of type `GetOwnerReportReviewVariables`:
+  const getOwnerReportReviewVars: GetOwnerReportReviewVariables = {
+    reportId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerReportReview(getOwnerReportReviewVars);
+  // Variables can be defined inline as well.
+  const query = useGetOwnerReportReview({ reportId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerReportReview(dataConnect, getOwnerReportReviewVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerReportReview(getOwnerReportReviewVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerReportReview(dataConnect, getOwnerReportReviewVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.commentReport);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerUserByIdentifier
+You can execute the `GetOwnerUserByIdentifier` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerUserByIdentifier(dc: DataConnect, vars: GetOwnerUserByIdentifierVariables, options?: useDataConnectQueryOptions<GetOwnerUserByIdentifierData>): UseDataConnectQueryResult<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerUserByIdentifier(vars: GetOwnerUserByIdentifierVariables, options?: useDataConnectQueryOptions<GetOwnerUserByIdentifierData>): UseDataConnectQueryResult<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+```
+
+### Variables
+The `GetOwnerUserByIdentifier` Query requires an argument of type `GetOwnerUserByIdentifierVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetOwnerUserByIdentifierVariables {
+  userId: string;
+  email: string;
+}
+```
+### Return Type
+Recall that calling the `GetOwnerUserByIdentifier` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerUserByIdentifier` Query is of type `GetOwnerUserByIdentifierData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerUserByIdentifierData {
+  userById?: {
+    id: string;
+    displayName: string;
+    email?: string | null;
+    accountStatus: string;
+    suspendedAt?: TimestampString | null;
+  } & User_Key;
+    usersByEmail: ({
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+      suspendedAt?: TimestampString | null;
+    } & User_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerUserByIdentifier`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetOwnerUserByIdentifierVariables } from '@bondcircle/dataconnect';
+import { useGetOwnerUserByIdentifier } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerUserByIdentifierComponent() {
+  // The `useGetOwnerUserByIdentifier` Query hook requires an argument of type `GetOwnerUserByIdentifierVariables`:
+  const getOwnerUserByIdentifierVars: GetOwnerUserByIdentifierVariables = {
+    userId: ..., 
+    email: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerUserByIdentifier(getOwnerUserByIdentifierVars);
+  // Variables can be defined inline as well.
+  const query = useGetOwnerUserByIdentifier({ userId: ..., email: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerUserByIdentifier(dataConnect, getOwnerUserByIdentifierVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerUserByIdentifier(getOwnerUserByIdentifierVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerUserByIdentifier(dataConnect, getOwnerUserByIdentifierVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.userById);
+    console.log(query.data.usersByEmail);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerOperationalExport
+You can execute the `GetOwnerOperationalExport` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerOperationalExport(dc: DataConnect, options?: useDataConnectQueryOptions<GetOwnerOperationalExportData>): UseDataConnectQueryResult<GetOwnerOperationalExportData, undefined>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerOperationalExport(options?: useDataConnectQueryOptions<GetOwnerOperationalExportData>): UseDataConnectQueryResult<GetOwnerOperationalExportData, undefined>;
+```
+
+### Variables
+The `GetOwnerOperationalExport` Query has no variables.
+### Return Type
+Recall that calling the `GetOwnerOperationalExport` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerOperationalExport` Query is of type `GetOwnerOperationalExportData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerOperationalExportData {
+  circles: ({
+    id: UUIDString;
+    type: string;
+    status: string;
+    pricingPlan: string;
+    memberCount: number;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+  } & Circle_Key)[];
+    commentReports: ({
+      id: UUIDString;
+      reason: string;
+      status: string;
+      createdAt: TimestampString;
+      circle: {
+        id: UUIDString;
+        type: string;
+      } & Circle_Key;
+    } & CommentReport_Key)[];
+      retentionPurgeAttempts: ({
+        id: UUIDString;
+        status: string;
+        attemptNumber: number;
+        deletedFileCount: number;
+        skippedSharedFileCount: number;
+        failureReason?: string | null;
+        startedAt: TimestampString;
+        completedAt?: TimestampString | null;
+        circle: {
+          id: UUIDString;
+          type: string;
+        } & Circle_Key;
+      } & RetentionPurgeAttempt_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerOperationalExport`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig } from '@bondcircle/dataconnect';
+import { useGetOwnerOperationalExport } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerOperationalExportComponent() {
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerOperationalExport();
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerOperationalExport(dataConnect);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerOperationalExport(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerOperationalExport(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circles);
+    console.log(query.data.commentReports);
+    console.log(query.data.retentionPurgeAttempts);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerInvitation
+You can execute the `GetOwnerInvitation` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerInvitation(dc: DataConnect, vars: GetOwnerInvitationVariables, options?: useDataConnectQueryOptions<GetOwnerInvitationData>): UseDataConnectQueryResult<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerInvitation(vars: GetOwnerInvitationVariables, options?: useDataConnectQueryOptions<GetOwnerInvitationData>): UseDataConnectQueryResult<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+```
+
+### Variables
+The `GetOwnerInvitation` Query requires an argument of type `GetOwnerInvitationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetOwnerInvitationVariables {
+  invitationId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetOwnerInvitation` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerInvitation` Query is of type `GetOwnerInvitationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerInvitationData {
+  invitation?: {
+    id: UUIDString;
+    state: string;
+    expiresAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Invitation_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerInvitation`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetOwnerInvitationVariables } from '@bondcircle/dataconnect';
+import { useGetOwnerInvitation } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerInvitationComponent() {
+  // The `useGetOwnerInvitation` Query hook requires an argument of type `GetOwnerInvitationVariables`:
+  const getOwnerInvitationVars: GetOwnerInvitationVariables = {
+    invitationId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerInvitation(getOwnerInvitationVars);
+  // Variables can be defined inline as well.
+  const query = useGetOwnerInvitation({ invitationId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerInvitation(dataConnect, getOwnerInvitationVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerInvitation(getOwnerInvitationVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerInvitation(dataConnect, getOwnerInvitationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitation);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -8167,6 +8957,708 @@ export default function PurgeCircleSensitiveDataComponent() {
     console.log(mutation.data.circleMembership_deleteMany);
     console.log(mutation.data.asoEbiTier_deleteMany);
     console.log(mutation.data.circle_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RecordOperationalEvent
+You can execute the `RecordOperationalEvent` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRecordOperationalEvent(options?: useDataConnectMutationOptions<RecordOperationalEventData, FirebaseError, RecordOperationalEventVariables>): UseDataConnectMutationResult<RecordOperationalEventData, RecordOperationalEventVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRecordOperationalEvent(dc: DataConnect, options?: useDataConnectMutationOptions<RecordOperationalEventData, FirebaseError, RecordOperationalEventVariables>): UseDataConnectMutationResult<RecordOperationalEventData, RecordOperationalEventVariables>;
+```
+
+### Variables
+The `RecordOperationalEvent` Mutation requires an argument of type `RecordOperationalEventVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RecordOperationalEventVariables {
+  category: string;
+  eventType: string;
+  outcome: string;
+  reasonCode?: string | null;
+  circleId?: UUIDString | null;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RecordOperationalEvent` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RecordOperationalEvent` Mutation is of type `RecordOperationalEventData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RecordOperationalEventData {
+  operationalEvent_insert: OperationalEvent_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RecordOperationalEvent`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RecordOperationalEventVariables } from '@bondcircle/dataconnect';
+import { useRecordOperationalEvent } from '@bondcircle/dataconnect/react'
+
+export default function RecordOperationalEventComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRecordOperationalEvent();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRecordOperationalEvent(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordOperationalEvent(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordOperationalEvent(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRecordOperationalEvent` Mutation requires an argument of type `RecordOperationalEventVariables`:
+  const recordOperationalEventVars: RecordOperationalEventVariables = {
+    category: ..., 
+    eventType: ..., 
+    outcome: ..., 
+    reasonCode: ..., // optional
+    circleId: ..., // optional
+    createdAt: ..., 
+  };
+  mutation.mutate(recordOperationalEventVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ category: ..., eventType: ..., outcome: ..., reasonCode: ..., circleId: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(recordOperationalEventVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.operationalEvent_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RecordOwnerAdminAudit
+You can execute the `RecordOwnerAdminAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRecordOwnerAdminAudit(options?: useDataConnectMutationOptions<RecordOwnerAdminAuditData, FirebaseError, RecordOwnerAdminAuditVariables>): UseDataConnectMutationResult<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRecordOwnerAdminAudit(dc: DataConnect, options?: useDataConnectMutationOptions<RecordOwnerAdminAuditData, FirebaseError, RecordOwnerAdminAuditVariables>): UseDataConnectMutationResult<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+```
+
+### Variables
+The `RecordOwnerAdminAudit` Mutation requires an argument of type `RecordOwnerAdminAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RecordOwnerAdminAuditVariables {
+  actorId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  purpose: string;
+  outcome: string;
+  metadata: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RecordOwnerAdminAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RecordOwnerAdminAudit` Mutation is of type `RecordOwnerAdminAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RecordOwnerAdminAuditData {
+  ownerAdminAuditEvent_insert: OwnerAdminAuditEvent_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RecordOwnerAdminAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RecordOwnerAdminAuditVariables } from '@bondcircle/dataconnect';
+import { useRecordOwnerAdminAudit } from '@bondcircle/dataconnect/react'
+
+export default function RecordOwnerAdminAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRecordOwnerAdminAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRecordOwnerAdminAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordOwnerAdminAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRecordOwnerAdminAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRecordOwnerAdminAudit` Mutation requires an argument of type `RecordOwnerAdminAuditVariables`:
+  const recordOwnerAdminAuditVars: RecordOwnerAdminAuditVariables = {
+    actorId: ..., 
+    action: ..., 
+    targetType: ..., 
+    targetId: ..., 
+    purpose: ..., 
+    outcome: ..., 
+    metadata: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(recordOwnerAdminAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ actorId: ..., action: ..., targetType: ..., targetId: ..., purpose: ..., outcome: ..., metadata: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(recordOwnerAdminAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.ownerAdminAuditEvent_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ResolveOwnerCommentReport
+You can execute the `ResolveOwnerCommentReport` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useResolveOwnerCommentReport(options?: useDataConnectMutationOptions<ResolveOwnerCommentReportData, FirebaseError, ResolveOwnerCommentReportVariables>): UseDataConnectMutationResult<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useResolveOwnerCommentReport(dc: DataConnect, options?: useDataConnectMutationOptions<ResolveOwnerCommentReportData, FirebaseError, ResolveOwnerCommentReportVariables>): UseDataConnectMutationResult<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+```
+
+### Variables
+The `ResolveOwnerCommentReport` Mutation requires an argument of type `ResolveOwnerCommentReportVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ResolveOwnerCommentReportVariables {
+  reportId: UUIDString;
+  reportStatus: string;
+  commentId: UUIDString;
+  commentStatus: string;
+  deletionReason?: string | null;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ResolveOwnerCommentReport` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ResolveOwnerCommentReport` Mutation is of type `ResolveOwnerCommentReportData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ResolveOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+  comment_update?: Comment_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ResolveOwnerCommentReport`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ResolveOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+import { useResolveOwnerCommentReport } from '@bondcircle/dataconnect/react'
+
+export default function ResolveOwnerCommentReportComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useResolveOwnerCommentReport();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useResolveOwnerCommentReport(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useResolveOwnerCommentReport(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useResolveOwnerCommentReport(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useResolveOwnerCommentReport` Mutation requires an argument of type `ResolveOwnerCommentReportVariables`:
+  const resolveOwnerCommentReportVars: ResolveOwnerCommentReportVariables = {
+    reportId: ..., 
+    reportStatus: ..., 
+    commentId: ..., 
+    commentStatus: ..., 
+    deletionReason: ..., // optional
+    updatedAt: ..., 
+  };
+  mutation.mutate(resolveOwnerCommentReportVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ reportId: ..., reportStatus: ..., commentId: ..., commentStatus: ..., deletionReason: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(resolveOwnerCommentReportVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.commentReport_update);
+    console.log(mutation.data.comment_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DismissOwnerCommentReport
+You can execute the `DismissOwnerCommentReport` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useDismissOwnerCommentReport(options?: useDataConnectMutationOptions<DismissOwnerCommentReportData, FirebaseError, DismissOwnerCommentReportVariables>): UseDataConnectMutationResult<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDismissOwnerCommentReport(dc: DataConnect, options?: useDataConnectMutationOptions<DismissOwnerCommentReportData, FirebaseError, DismissOwnerCommentReportVariables>): UseDataConnectMutationResult<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+```
+
+### Variables
+The `DismissOwnerCommentReport` Mutation requires an argument of type `DismissOwnerCommentReportVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DismissOwnerCommentReportVariables {
+  reportId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `DismissOwnerCommentReport` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DismissOwnerCommentReport` Mutation is of type `DismissOwnerCommentReportData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DismissOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DismissOwnerCommentReport`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DismissOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+import { useDismissOwnerCommentReport } from '@bondcircle/dataconnect/react'
+
+export default function DismissOwnerCommentReportComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDismissOwnerCommentReport();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDismissOwnerCommentReport(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDismissOwnerCommentReport(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDismissOwnerCommentReport(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDismissOwnerCommentReport` Mutation requires an argument of type `DismissOwnerCommentReportVariables`:
+  const dismissOwnerCommentReportVars: DismissOwnerCommentReportVariables = {
+    reportId: ..., 
+  };
+  mutation.mutate(dismissOwnerCommentReportVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ reportId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(dismissOwnerCommentReportVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.commentReport_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## SuspendOwnerTargetUser
+You can execute the `SuspendOwnerTargetUser` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSuspendOwnerTargetUser(options?: useDataConnectMutationOptions<SuspendOwnerTargetUserData, FirebaseError, SuspendOwnerTargetUserVariables>): UseDataConnectMutationResult<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSuspendOwnerTargetUser(dc: DataConnect, options?: useDataConnectMutationOptions<SuspendOwnerTargetUserData, FirebaseError, SuspendOwnerTargetUserVariables>): UseDataConnectMutationResult<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+```
+
+### Variables
+The `SuspendOwnerTargetUser` Mutation requires an argument of type `SuspendOwnerTargetUserVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SuspendOwnerTargetUserVariables {
+  userId: string;
+  reasonCode: string;
+  suspendedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `SuspendOwnerTargetUser` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SuspendOwnerTargetUser` Mutation is of type `SuspendOwnerTargetUserData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SuspendOwnerTargetUserData {
+  user_update?: User_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SuspendOwnerTargetUser`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SuspendOwnerTargetUserVariables } from '@bondcircle/dataconnect';
+import { useSuspendOwnerTargetUser } from '@bondcircle/dataconnect/react'
+
+export default function SuspendOwnerTargetUserComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSuspendOwnerTargetUser();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSuspendOwnerTargetUser(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSuspendOwnerTargetUser(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSuspendOwnerTargetUser(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSuspendOwnerTargetUser` Mutation requires an argument of type `SuspendOwnerTargetUserVariables`:
+  const suspendOwnerTargetUserVars: SuspendOwnerTargetUserVariables = {
+    userId: ..., 
+    reasonCode: ..., 
+    suspendedAt: ..., 
+  };
+  mutation.mutate(suspendOwnerTargetUserVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., reasonCode: ..., suspendedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(suspendOwnerTargetUserVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RevokeCompromisedInvitation
+You can execute the `RevokeCompromisedInvitation` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRevokeCompromisedInvitation(options?: useDataConnectMutationOptions<RevokeCompromisedInvitationData, FirebaseError, RevokeCompromisedInvitationVariables>): UseDataConnectMutationResult<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRevokeCompromisedInvitation(dc: DataConnect, options?: useDataConnectMutationOptions<RevokeCompromisedInvitationData, FirebaseError, RevokeCompromisedInvitationVariables>): UseDataConnectMutationResult<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+```
+
+### Variables
+The `RevokeCompromisedInvitation` Mutation requires an argument of type `RevokeCompromisedInvitationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RevokeCompromisedInvitationVariables {
+  invitationId: UUIDString;
+  revokedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RevokeCompromisedInvitation` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RevokeCompromisedInvitation` Mutation is of type `RevokeCompromisedInvitationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RevokeCompromisedInvitationData {
+  invitation_update?: Invitation_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RevokeCompromisedInvitation`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RevokeCompromisedInvitationVariables } from '@bondcircle/dataconnect';
+import { useRevokeCompromisedInvitation } from '@bondcircle/dataconnect/react'
+
+export default function RevokeCompromisedInvitationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRevokeCompromisedInvitation();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRevokeCompromisedInvitation(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRevokeCompromisedInvitation(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRevokeCompromisedInvitation(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRevokeCompromisedInvitation` Mutation requires an argument of type `RevokeCompromisedInvitationVariables`:
+  const revokeCompromisedInvitationVars: RevokeCompromisedInvitationVariables = {
+    invitationId: ..., 
+    revokedAt: ..., 
+  };
+  mutation.mutate(revokeCompromisedInvitationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ invitationId: ..., revokedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(revokeCompromisedInvitationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.invitation_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ProvisionOwnerAdministrator
+You can execute the `ProvisionOwnerAdministrator` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useProvisionOwnerAdministrator(options?: useDataConnectMutationOptions<ProvisionOwnerAdministratorData, FirebaseError, ProvisionOwnerAdministratorVariables>): UseDataConnectMutationResult<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useProvisionOwnerAdministrator(dc: DataConnect, options?: useDataConnectMutationOptions<ProvisionOwnerAdministratorData, FirebaseError, ProvisionOwnerAdministratorVariables>): UseDataConnectMutationResult<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+```
+
+### Variables
+The `ProvisionOwnerAdministrator` Mutation requires an argument of type `ProvisionOwnerAdministratorVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ProvisionOwnerAdministratorVariables {
+  userId: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ProvisionOwnerAdministrator` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ProvisionOwnerAdministrator` Mutation is of type `ProvisionOwnerAdministratorData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ProvisionOwnerAdministratorData {
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ProvisionOwnerAdministrator`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ProvisionOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+import { useProvisionOwnerAdministrator } from '@bondcircle/dataconnect/react'
+
+export default function ProvisionOwnerAdministratorComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useProvisionOwnerAdministrator();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useProvisionOwnerAdministrator(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useProvisionOwnerAdministrator(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useProvisionOwnerAdministrator(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useProvisionOwnerAdministrator` Mutation requires an argument of type `ProvisionOwnerAdministratorVariables`:
+  const provisionOwnerAdministratorVars: ProvisionOwnerAdministratorVariables = {
+    userId: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(provisionOwnerAdministratorVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(provisionOwnerAdministratorVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.ownerAdministrator_upsert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }

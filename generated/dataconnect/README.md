@@ -37,6 +37,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetRetentionCandidates*](#getretentioncandidates)
   - [*GetCircleRetentionPayload*](#getcircleretentionpayload)
   - [*GetStoragePathReferences*](#getstoragepathreferences)
+  - [*GetOwnerAdministrator*](#getowneradministrator)
+  - [*GetUserAccountStatus*](#getuseraccountstatus)
+  - [*GetOwnerPlatformOverview*](#getownerplatformoverview)
+  - [*GetOwnerReportReview*](#getownerreportreview)
+  - [*GetOwnerUserByIdentifier*](#getowneruserbyidentifier)
+  - [*GetOwnerOperationalExport*](#getowneroperationalexport)
+  - [*GetOwnerInvitation*](#getownerinvitation)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -85,6 +92,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*CompleteRetentionPurgeAttempt*](#completeretentionpurgeattempt)
   - [*PurgeInvitationAcceptances*](#purgeinvitationacceptances)
   - [*PurgeCircleSensitiveData*](#purgecirclesensitivedata)
+  - [*RecordOperationalEvent*](#recordoperationalevent)
+  - [*RecordOwnerAdminAudit*](#recordowneradminaudit)
+  - [*ResolveOwnerCommentReport*](#resolveownercommentreport)
+  - [*DismissOwnerCommentReport*](#dismissownercommentreport)
+  - [*SuspendOwnerTargetUser*](#suspendownertargetuser)
+  - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
+  - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bondcircle`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -3777,6 +3791,1016 @@ executeQuery(ref).then((response) => {
   console.log(data.circleMemberships);
   console.log(data.fabricReferences);
   console.log(data.giftReferences);
+});
+```
+
+## GetOwnerAdministrator
+You can execute the `GetOwnerAdministrator` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerAdministrator(vars: GetOwnerAdministratorVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+
+interface GetOwnerAdministratorRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerAdministratorVariables): QueryRef<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+}
+export const getOwnerAdministratorRef: GetOwnerAdministratorRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerAdministrator(dc: DataConnect, vars: GetOwnerAdministratorVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+
+interface GetOwnerAdministratorRef {
+  ...
+  (dc: DataConnect, vars: GetOwnerAdministratorVariables): QueryRef<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+}
+export const getOwnerAdministratorRef: GetOwnerAdministratorRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerAdministratorRef:
+```typescript
+const name = getOwnerAdministratorRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerAdministrator` query requires an argument of type `GetOwnerAdministratorVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOwnerAdministratorVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetOwnerAdministrator` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerAdministratorData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerAdministratorData {
+  ownerAdministrators: ({
+    role: string;
+    status: string;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+    } & User_Key;
+  })[];
+}
+```
+### Using `GetOwnerAdministrator`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerAdministrator, GetOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerAdministrator` query requires an argument of type `GetOwnerAdministratorVariables`:
+const getOwnerAdministratorVars: GetOwnerAdministratorVariables = {
+  userId: ..., 
+};
+
+// Call the `getOwnerAdministrator()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerAdministrator(getOwnerAdministratorVars);
+// Variables can be defined inline as well.
+const { data } = await getOwnerAdministrator({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerAdministrator(dataConnect, getOwnerAdministratorVars);
+
+console.log(data.ownerAdministrators);
+
+// Or, you can use the `Promise` API.
+getOwnerAdministrator(getOwnerAdministratorVars).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdministrators);
+});
+```
+
+### Using `GetOwnerAdministrator`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerAdministratorRef, GetOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerAdministrator` query requires an argument of type `GetOwnerAdministratorVariables`:
+const getOwnerAdministratorVars: GetOwnerAdministratorVariables = {
+  userId: ..., 
+};
+
+// Call the `getOwnerAdministratorRef()` function to get a reference to the query.
+const ref = getOwnerAdministratorRef(getOwnerAdministratorVars);
+// Variables can be defined inline as well.
+const ref = getOwnerAdministratorRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerAdministratorRef(dataConnect, getOwnerAdministratorVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.ownerAdministrators);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdministrators);
+});
+```
+
+## GetUserAccountStatus
+You can execute the `GetUserAccountStatus` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getUserAccountStatus(vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+
+interface GetUserAccountStatusRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserAccountStatusVariables): QueryRef<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+}
+export const getUserAccountStatusRef: GetUserAccountStatusRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getUserAccountStatus(dc: DataConnect, vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+
+interface GetUserAccountStatusRef {
+  ...
+  (dc: DataConnect, vars: GetUserAccountStatusVariables): QueryRef<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+}
+export const getUserAccountStatusRef: GetUserAccountStatusRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getUserAccountStatusRef:
+```typescript
+const name = getUserAccountStatusRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetUserAccountStatus` query requires an argument of type `GetUserAccountStatusVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetUserAccountStatusVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetUserAccountStatus` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetUserAccountStatusData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetUserAccountStatusData {
+  user?: {
+    id: string;
+    accountStatus: string;
+  } & User_Key;
+}
+```
+### Using `GetUserAccountStatus`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getUserAccountStatus, GetUserAccountStatusVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserAccountStatus` query requires an argument of type `GetUserAccountStatusVariables`:
+const getUserAccountStatusVars: GetUserAccountStatusVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserAccountStatus()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getUserAccountStatus(getUserAccountStatusVars);
+// Variables can be defined inline as well.
+const { data } = await getUserAccountStatus({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getUserAccountStatus(dataConnect, getUserAccountStatusVars);
+
+console.log(data.user);
+
+// Or, you can use the `Promise` API.
+getUserAccountStatus(getUserAccountStatusVars).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+});
+```
+
+### Using `GetUserAccountStatus`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getUserAccountStatusRef, GetUserAccountStatusVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserAccountStatus` query requires an argument of type `GetUserAccountStatusVariables`:
+const getUserAccountStatusVars: GetUserAccountStatusVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserAccountStatusRef()` function to get a reference to the query.
+const ref = getUserAccountStatusRef(getUserAccountStatusVars);
+// Variables can be defined inline as well.
+const ref = getUserAccountStatusRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getUserAccountStatusRef(dataConnect, getUserAccountStatusVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.user);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+});
+```
+
+## GetOwnerPlatformOverview
+You can execute the `GetOwnerPlatformOverview` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerPlatformOverview(options?: ExecuteQueryOptions): QueryPromise<GetOwnerPlatformOverviewData, undefined>;
+
+interface GetOwnerPlatformOverviewRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetOwnerPlatformOverviewData, undefined>;
+}
+export const getOwnerPlatformOverviewRef: GetOwnerPlatformOverviewRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerPlatformOverview(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetOwnerPlatformOverviewData, undefined>;
+
+interface GetOwnerPlatformOverviewRef {
+  ...
+  (dc: DataConnect): QueryRef<GetOwnerPlatformOverviewData, undefined>;
+}
+export const getOwnerPlatformOverviewRef: GetOwnerPlatformOverviewRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerPlatformOverviewRef:
+```typescript
+const name = getOwnerPlatformOverviewRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerPlatformOverview` query has no variables.
+### Return Type
+Recall that executing the `GetOwnerPlatformOverview` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerPlatformOverviewData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerPlatformOverviewData {
+  totalUsers: ({
+    _count: number;
+  })[];
+    usersByStatus: ({
+      accountStatus: string;
+      _count: number;
+    })[];
+      totalCircles: ({
+        _count: number;
+      })[];
+        circlesByType: ({
+          type: string;
+          _count: number;
+        })[];
+          circlesByStatus: ({
+            status: string;
+            _count: number;
+          })[];
+            circlesByPlan: ({
+              pricingPlan: string;
+              _count: number;
+            })[];
+              invitationTotals: ({
+                _count: number;
+                acceptedAt_count: number;
+              })[];
+                uploadOutcomes: ({
+                  outcome: string;
+                  _count: number;
+                })[];
+                  reportStatuses: ({
+                    status: string;
+                    _count: number;
+                  })[];
+                    authOutcomes: ({
+                      outcome: string;
+                      _count: number;
+                    })[];
+                      emailOutcomes: ({
+                        status: string;
+                        _count: number;
+                      })[];
+                        retentionCandidates: ({
+                          _count: number;
+                        })[];
+                          retentionAttempts: ({
+                            id: UUIDString;
+                            status: string;
+                            attemptNumber: number;
+                            deletedFileCount: number;
+                            skippedSharedFileCount: number;
+                            failureReason?: string | null;
+                            nextRetryAt?: TimestampString | null;
+                            startedAt: TimestampString;
+                            completedAt?: TimestampString | null;
+                            circle: {
+                              id: UUIDString;
+                              type: string;
+                              status: string;
+                              retentionDueAt?: TimestampString | null;
+                            } & Circle_Key;
+                          } & RetentionPurgeAttempt_Key)[];
+                            reportedComments: ({
+                              id: UUIDString;
+                              reason: string;
+                              status: string;
+                              createdAt: TimestampString;
+                              reporter: {
+                                id: string;
+                                displayName: string;
+                              } & User_Key;
+                                comment: {
+                                  id: UUIDString;
+                                  status: string;
+                                  author: {
+                                    id: string;
+                                    displayName: string;
+                                    accountStatus: string;
+                                  } & User_Key;
+                                } & Comment_Key;
+                                  circle: {
+                                    id: UUIDString;
+                                    name: string;
+                                    type: string;
+                                  } & Circle_Key;
+                            } & CommentReport_Key)[];
+                              activeInvitations: ({
+                                id: UUIDString;
+                                mode: string;
+                                state: string;
+                                useCount: number;
+                                maxUses: number;
+                                expiresAt: TimestampString;
+                                createdAt: TimestampString;
+                                circle: {
+                                  id: UUIDString;
+                                  name: string;
+                                  type: string;
+                                } & Circle_Key;
+                                  invitedBy: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                              } & Invitation_Key)[];
+                                recentAdminActions: ({
+                                  id: UUIDString;
+                                  action: string;
+                                  targetType: string;
+                                  targetId: string;
+                                  purpose: string;
+                                  outcome: string;
+                                  metadata: string;
+                                  createdAt: TimestampString;
+                                  actor: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                                } & OwnerAdminAuditEvent_Key)[];
+}
+```
+### Using `GetOwnerPlatformOverview`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerPlatformOverview } from '@bondcircle/dataconnect';
+
+
+// Call the `getOwnerPlatformOverview()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerPlatformOverview();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerPlatformOverview(dataConnect);
+
+console.log(data.totalUsers);
+console.log(data.usersByStatus);
+console.log(data.totalCircles);
+console.log(data.circlesByType);
+console.log(data.circlesByStatus);
+console.log(data.circlesByPlan);
+console.log(data.invitationTotals);
+console.log(data.uploadOutcomes);
+console.log(data.reportStatuses);
+console.log(data.authOutcomes);
+console.log(data.emailOutcomes);
+console.log(data.retentionCandidates);
+console.log(data.retentionAttempts);
+console.log(data.reportedComments);
+console.log(data.activeInvitations);
+console.log(data.recentAdminActions);
+
+// Or, you can use the `Promise` API.
+getOwnerPlatformOverview().then((response) => {
+  const data = response.data;
+  console.log(data.totalUsers);
+  console.log(data.usersByStatus);
+  console.log(data.totalCircles);
+  console.log(data.circlesByType);
+  console.log(data.circlesByStatus);
+  console.log(data.circlesByPlan);
+  console.log(data.invitationTotals);
+  console.log(data.uploadOutcomes);
+  console.log(data.reportStatuses);
+  console.log(data.authOutcomes);
+  console.log(data.emailOutcomes);
+  console.log(data.retentionCandidates);
+  console.log(data.retentionAttempts);
+  console.log(data.reportedComments);
+  console.log(data.activeInvitations);
+  console.log(data.recentAdminActions);
+});
+```
+
+### Using `GetOwnerPlatformOverview`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerPlatformOverviewRef } from '@bondcircle/dataconnect';
+
+
+// Call the `getOwnerPlatformOverviewRef()` function to get a reference to the query.
+const ref = getOwnerPlatformOverviewRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerPlatformOverviewRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.totalUsers);
+console.log(data.usersByStatus);
+console.log(data.totalCircles);
+console.log(data.circlesByType);
+console.log(data.circlesByStatus);
+console.log(data.circlesByPlan);
+console.log(data.invitationTotals);
+console.log(data.uploadOutcomes);
+console.log(data.reportStatuses);
+console.log(data.authOutcomes);
+console.log(data.emailOutcomes);
+console.log(data.retentionCandidates);
+console.log(data.retentionAttempts);
+console.log(data.reportedComments);
+console.log(data.activeInvitations);
+console.log(data.recentAdminActions);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.totalUsers);
+  console.log(data.usersByStatus);
+  console.log(data.totalCircles);
+  console.log(data.circlesByType);
+  console.log(data.circlesByStatus);
+  console.log(data.circlesByPlan);
+  console.log(data.invitationTotals);
+  console.log(data.uploadOutcomes);
+  console.log(data.reportStatuses);
+  console.log(data.authOutcomes);
+  console.log(data.emailOutcomes);
+  console.log(data.retentionCandidates);
+  console.log(data.retentionAttempts);
+  console.log(data.reportedComments);
+  console.log(data.activeInvitations);
+  console.log(data.recentAdminActions);
+});
+```
+
+## GetOwnerReportReview
+You can execute the `GetOwnerReportReview` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerReportReview(vars: GetOwnerReportReviewVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+
+interface GetOwnerReportReviewRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerReportReviewVariables): QueryRef<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+}
+export const getOwnerReportReviewRef: GetOwnerReportReviewRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerReportReview(dc: DataConnect, vars: GetOwnerReportReviewVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+
+interface GetOwnerReportReviewRef {
+  ...
+  (dc: DataConnect, vars: GetOwnerReportReviewVariables): QueryRef<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+}
+export const getOwnerReportReviewRef: GetOwnerReportReviewRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerReportReviewRef:
+```typescript
+const name = getOwnerReportReviewRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerReportReview` query requires an argument of type `GetOwnerReportReviewVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOwnerReportReviewVariables {
+  reportId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetOwnerReportReview` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerReportReviewData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerReportReviewData {
+  commentReport?: {
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+      comment: {
+        id: UUIDString;
+        body: string;
+        status: string;
+        createdAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+          accountStatus: string;
+        } & User_Key;
+      } & Comment_Key;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+  } & CommentReport_Key;
+}
+```
+### Using `GetOwnerReportReview`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerReportReview, GetOwnerReportReviewVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerReportReview` query requires an argument of type `GetOwnerReportReviewVariables`:
+const getOwnerReportReviewVars: GetOwnerReportReviewVariables = {
+  reportId: ..., 
+};
+
+// Call the `getOwnerReportReview()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerReportReview(getOwnerReportReviewVars);
+// Variables can be defined inline as well.
+const { data } = await getOwnerReportReview({ reportId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerReportReview(dataConnect, getOwnerReportReviewVars);
+
+console.log(data.commentReport);
+
+// Or, you can use the `Promise` API.
+getOwnerReportReview(getOwnerReportReviewVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport);
+});
+```
+
+### Using `GetOwnerReportReview`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerReportReviewRef, GetOwnerReportReviewVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerReportReview` query requires an argument of type `GetOwnerReportReviewVariables`:
+const getOwnerReportReviewVars: GetOwnerReportReviewVariables = {
+  reportId: ..., 
+};
+
+// Call the `getOwnerReportReviewRef()` function to get a reference to the query.
+const ref = getOwnerReportReviewRef(getOwnerReportReviewVars);
+// Variables can be defined inline as well.
+const ref = getOwnerReportReviewRef({ reportId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerReportReviewRef(dataConnect, getOwnerReportReviewVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.commentReport);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport);
+});
+```
+
+## GetOwnerUserByIdentifier
+You can execute the `GetOwnerUserByIdentifier` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerUserByIdentifier(vars: GetOwnerUserByIdentifierVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+
+interface GetOwnerUserByIdentifierRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerUserByIdentifierVariables): QueryRef<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+}
+export const getOwnerUserByIdentifierRef: GetOwnerUserByIdentifierRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerUserByIdentifier(dc: DataConnect, vars: GetOwnerUserByIdentifierVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+
+interface GetOwnerUserByIdentifierRef {
+  ...
+  (dc: DataConnect, vars: GetOwnerUserByIdentifierVariables): QueryRef<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+}
+export const getOwnerUserByIdentifierRef: GetOwnerUserByIdentifierRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerUserByIdentifierRef:
+```typescript
+const name = getOwnerUserByIdentifierRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerUserByIdentifier` query requires an argument of type `GetOwnerUserByIdentifierVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOwnerUserByIdentifierVariables {
+  userId: string;
+  email: string;
+}
+```
+### Return Type
+Recall that executing the `GetOwnerUserByIdentifier` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerUserByIdentifierData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerUserByIdentifierData {
+  userById?: {
+    id: string;
+    displayName: string;
+    email?: string | null;
+    accountStatus: string;
+    suspendedAt?: TimestampString | null;
+  } & User_Key;
+    usersByEmail: ({
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+      suspendedAt?: TimestampString | null;
+    } & User_Key)[];
+}
+```
+### Using `GetOwnerUserByIdentifier`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerUserByIdentifier, GetOwnerUserByIdentifierVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerUserByIdentifier` query requires an argument of type `GetOwnerUserByIdentifierVariables`:
+const getOwnerUserByIdentifierVars: GetOwnerUserByIdentifierVariables = {
+  userId: ..., 
+  email: ..., 
+};
+
+// Call the `getOwnerUserByIdentifier()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerUserByIdentifier(getOwnerUserByIdentifierVars);
+// Variables can be defined inline as well.
+const { data } = await getOwnerUserByIdentifier({ userId: ..., email: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerUserByIdentifier(dataConnect, getOwnerUserByIdentifierVars);
+
+console.log(data.userById);
+console.log(data.usersByEmail);
+
+// Or, you can use the `Promise` API.
+getOwnerUserByIdentifier(getOwnerUserByIdentifierVars).then((response) => {
+  const data = response.data;
+  console.log(data.userById);
+  console.log(data.usersByEmail);
+});
+```
+
+### Using `GetOwnerUserByIdentifier`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerUserByIdentifierRef, GetOwnerUserByIdentifierVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerUserByIdentifier` query requires an argument of type `GetOwnerUserByIdentifierVariables`:
+const getOwnerUserByIdentifierVars: GetOwnerUserByIdentifierVariables = {
+  userId: ..., 
+  email: ..., 
+};
+
+// Call the `getOwnerUserByIdentifierRef()` function to get a reference to the query.
+const ref = getOwnerUserByIdentifierRef(getOwnerUserByIdentifierVars);
+// Variables can be defined inline as well.
+const ref = getOwnerUserByIdentifierRef({ userId: ..., email: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerUserByIdentifierRef(dataConnect, getOwnerUserByIdentifierVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.userById);
+console.log(data.usersByEmail);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.userById);
+  console.log(data.usersByEmail);
+});
+```
+
+## GetOwnerOperationalExport
+You can execute the `GetOwnerOperationalExport` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerOperationalExport(options?: ExecuteQueryOptions): QueryPromise<GetOwnerOperationalExportData, undefined>;
+
+interface GetOwnerOperationalExportRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetOwnerOperationalExportData, undefined>;
+}
+export const getOwnerOperationalExportRef: GetOwnerOperationalExportRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerOperationalExport(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetOwnerOperationalExportData, undefined>;
+
+interface GetOwnerOperationalExportRef {
+  ...
+  (dc: DataConnect): QueryRef<GetOwnerOperationalExportData, undefined>;
+}
+export const getOwnerOperationalExportRef: GetOwnerOperationalExportRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerOperationalExportRef:
+```typescript
+const name = getOwnerOperationalExportRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerOperationalExport` query has no variables.
+### Return Type
+Recall that executing the `GetOwnerOperationalExport` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerOperationalExportData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerOperationalExportData {
+  circles: ({
+    id: UUIDString;
+    type: string;
+    status: string;
+    pricingPlan: string;
+    memberCount: number;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+  } & Circle_Key)[];
+    commentReports: ({
+      id: UUIDString;
+      reason: string;
+      status: string;
+      createdAt: TimestampString;
+      circle: {
+        id: UUIDString;
+        type: string;
+      } & Circle_Key;
+    } & CommentReport_Key)[];
+      retentionPurgeAttempts: ({
+        id: UUIDString;
+        status: string;
+        attemptNumber: number;
+        deletedFileCount: number;
+        skippedSharedFileCount: number;
+        failureReason?: string | null;
+        startedAt: TimestampString;
+        completedAt?: TimestampString | null;
+        circle: {
+          id: UUIDString;
+          type: string;
+        } & Circle_Key;
+      } & RetentionPurgeAttempt_Key)[];
+}
+```
+### Using `GetOwnerOperationalExport`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerOperationalExport } from '@bondcircle/dataconnect';
+
+
+// Call the `getOwnerOperationalExport()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerOperationalExport();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerOperationalExport(dataConnect);
+
+console.log(data.circles);
+console.log(data.commentReports);
+console.log(data.retentionPurgeAttempts);
+
+// Or, you can use the `Promise` API.
+getOwnerOperationalExport().then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.commentReports);
+  console.log(data.retentionPurgeAttempts);
+});
+```
+
+### Using `GetOwnerOperationalExport`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerOperationalExportRef } from '@bondcircle/dataconnect';
+
+
+// Call the `getOwnerOperationalExportRef()` function to get a reference to the query.
+const ref = getOwnerOperationalExportRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerOperationalExportRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circles);
+console.log(data.commentReports);
+console.log(data.retentionPurgeAttempts);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.commentReports);
+  console.log(data.retentionPurgeAttempts);
+});
+```
+
+## GetOwnerInvitation
+You can execute the `GetOwnerInvitation` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerInvitation(vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+
+interface GetOwnerInvitationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerInvitationVariables): QueryRef<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+}
+export const getOwnerInvitationRef: GetOwnerInvitationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerInvitation(dc: DataConnect, vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+
+interface GetOwnerInvitationRef {
+  ...
+  (dc: DataConnect, vars: GetOwnerInvitationVariables): QueryRef<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+}
+export const getOwnerInvitationRef: GetOwnerInvitationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerInvitationRef:
+```typescript
+const name = getOwnerInvitationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerInvitation` query requires an argument of type `GetOwnerInvitationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOwnerInvitationVariables {
+  invitationId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetOwnerInvitation` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerInvitationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerInvitationData {
+  invitation?: {
+    id: UUIDString;
+    state: string;
+    expiresAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Invitation_Key;
+}
+```
+### Using `GetOwnerInvitation`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerInvitation, GetOwnerInvitationVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerInvitation` query requires an argument of type `GetOwnerInvitationVariables`:
+const getOwnerInvitationVars: GetOwnerInvitationVariables = {
+  invitationId: ..., 
+};
+
+// Call the `getOwnerInvitation()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerInvitation(getOwnerInvitationVars);
+// Variables can be defined inline as well.
+const { data } = await getOwnerInvitation({ invitationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerInvitation(dataConnect, getOwnerInvitationVars);
+
+console.log(data.invitation);
+
+// Or, you can use the `Promise` API.
+getOwnerInvitation(getOwnerInvitationVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitation);
+});
+```
+
+### Using `GetOwnerInvitation`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerInvitationRef, GetOwnerInvitationVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerInvitation` query requires an argument of type `GetOwnerInvitationVariables`:
+const getOwnerInvitationVars: GetOwnerInvitationVariables = {
+  invitationId: ..., 
+};
+
+// Call the `getOwnerInvitationRef()` function to get a reference to the query.
+const ref = getOwnerInvitationRef(getOwnerInvitationVars);
+// Variables can be defined inline as well.
+const ref = getOwnerInvitationRef({ invitationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerInvitationRef(dataConnect, getOwnerInvitationVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.invitation);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitation);
 });
 ```
 
@@ -10103,6 +11127,837 @@ executeMutation(ref).then((response) => {
   console.log(data.circleMembership_deleteMany);
   console.log(data.asoEbiTier_deleteMany);
   console.log(data.circle_update);
+});
+```
+
+## RecordOperationalEvent
+You can execute the `RecordOperationalEvent` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+recordOperationalEvent(vars: RecordOperationalEventVariables): MutationPromise<RecordOperationalEventData, RecordOperationalEventVariables>;
+
+interface RecordOperationalEventRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordOperationalEventVariables): MutationRef<RecordOperationalEventData, RecordOperationalEventVariables>;
+}
+export const recordOperationalEventRef: RecordOperationalEventRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+recordOperationalEvent(dc: DataConnect, vars: RecordOperationalEventVariables): MutationPromise<RecordOperationalEventData, RecordOperationalEventVariables>;
+
+interface RecordOperationalEventRef {
+  ...
+  (dc: DataConnect, vars: RecordOperationalEventVariables): MutationRef<RecordOperationalEventData, RecordOperationalEventVariables>;
+}
+export const recordOperationalEventRef: RecordOperationalEventRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the recordOperationalEventRef:
+```typescript
+const name = recordOperationalEventRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RecordOperationalEvent` mutation requires an argument of type `RecordOperationalEventVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RecordOperationalEventVariables {
+  category: string;
+  eventType: string;
+  outcome: string;
+  reasonCode?: string | null;
+  circleId?: UUIDString | null;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `RecordOperationalEvent` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RecordOperationalEventData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RecordOperationalEventData {
+  operationalEvent_insert: OperationalEvent_Key;
+}
+```
+### Using `RecordOperationalEvent`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, recordOperationalEvent, RecordOperationalEventVariables } from '@bondcircle/dataconnect';
+
+// The `RecordOperationalEvent` mutation requires an argument of type `RecordOperationalEventVariables`:
+const recordOperationalEventVars: RecordOperationalEventVariables = {
+  category: ..., 
+  eventType: ..., 
+  outcome: ..., 
+  reasonCode: ..., // optional
+  circleId: ..., // optional
+  createdAt: ..., 
+};
+
+// Call the `recordOperationalEvent()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await recordOperationalEvent(recordOperationalEventVars);
+// Variables can be defined inline as well.
+const { data } = await recordOperationalEvent({ category: ..., eventType: ..., outcome: ..., reasonCode: ..., circleId: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await recordOperationalEvent(dataConnect, recordOperationalEventVars);
+
+console.log(data.operationalEvent_insert);
+
+// Or, you can use the `Promise` API.
+recordOperationalEvent(recordOperationalEventVars).then((response) => {
+  const data = response.data;
+  console.log(data.operationalEvent_insert);
+});
+```
+
+### Using `RecordOperationalEvent`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, recordOperationalEventRef, RecordOperationalEventVariables } from '@bondcircle/dataconnect';
+
+// The `RecordOperationalEvent` mutation requires an argument of type `RecordOperationalEventVariables`:
+const recordOperationalEventVars: RecordOperationalEventVariables = {
+  category: ..., 
+  eventType: ..., 
+  outcome: ..., 
+  reasonCode: ..., // optional
+  circleId: ..., // optional
+  createdAt: ..., 
+};
+
+// Call the `recordOperationalEventRef()` function to get a reference to the mutation.
+const ref = recordOperationalEventRef(recordOperationalEventVars);
+// Variables can be defined inline as well.
+const ref = recordOperationalEventRef({ category: ..., eventType: ..., outcome: ..., reasonCode: ..., circleId: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = recordOperationalEventRef(dataConnect, recordOperationalEventVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.operationalEvent_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.operationalEvent_insert);
+});
+```
+
+## RecordOwnerAdminAudit
+You can execute the `RecordOwnerAdminAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+recordOwnerAdminAudit(vars: RecordOwnerAdminAuditVariables): MutationPromise<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+
+interface RecordOwnerAdminAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordOwnerAdminAuditVariables): MutationRef<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+}
+export const recordOwnerAdminAuditRef: RecordOwnerAdminAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+recordOwnerAdminAudit(dc: DataConnect, vars: RecordOwnerAdminAuditVariables): MutationPromise<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+
+interface RecordOwnerAdminAuditRef {
+  ...
+  (dc: DataConnect, vars: RecordOwnerAdminAuditVariables): MutationRef<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+}
+export const recordOwnerAdminAuditRef: RecordOwnerAdminAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the recordOwnerAdminAuditRef:
+```typescript
+const name = recordOwnerAdminAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RecordOwnerAdminAudit` mutation requires an argument of type `RecordOwnerAdminAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RecordOwnerAdminAuditVariables {
+  actorId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  purpose: string;
+  outcome: string;
+  metadata: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `RecordOwnerAdminAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RecordOwnerAdminAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RecordOwnerAdminAuditData {
+  ownerAdminAuditEvent_insert: OwnerAdminAuditEvent_Key;
+}
+```
+### Using `RecordOwnerAdminAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, recordOwnerAdminAudit, RecordOwnerAdminAuditVariables } from '@bondcircle/dataconnect';
+
+// The `RecordOwnerAdminAudit` mutation requires an argument of type `RecordOwnerAdminAuditVariables`:
+const recordOwnerAdminAuditVars: RecordOwnerAdminAuditVariables = {
+  actorId: ..., 
+  action: ..., 
+  targetType: ..., 
+  targetId: ..., 
+  purpose: ..., 
+  outcome: ..., 
+  metadata: ..., 
+  createdAt: ..., 
+};
+
+// Call the `recordOwnerAdminAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await recordOwnerAdminAudit(recordOwnerAdminAuditVars);
+// Variables can be defined inline as well.
+const { data } = await recordOwnerAdminAudit({ actorId: ..., action: ..., targetType: ..., targetId: ..., purpose: ..., outcome: ..., metadata: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await recordOwnerAdminAudit(dataConnect, recordOwnerAdminAuditVars);
+
+console.log(data.ownerAdminAuditEvent_insert);
+
+// Or, you can use the `Promise` API.
+recordOwnerAdminAudit(recordOwnerAdminAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdminAuditEvent_insert);
+});
+```
+
+### Using `RecordOwnerAdminAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, recordOwnerAdminAuditRef, RecordOwnerAdminAuditVariables } from '@bondcircle/dataconnect';
+
+// The `RecordOwnerAdminAudit` mutation requires an argument of type `RecordOwnerAdminAuditVariables`:
+const recordOwnerAdminAuditVars: RecordOwnerAdminAuditVariables = {
+  actorId: ..., 
+  action: ..., 
+  targetType: ..., 
+  targetId: ..., 
+  purpose: ..., 
+  outcome: ..., 
+  metadata: ..., 
+  createdAt: ..., 
+};
+
+// Call the `recordOwnerAdminAuditRef()` function to get a reference to the mutation.
+const ref = recordOwnerAdminAuditRef(recordOwnerAdminAuditVars);
+// Variables can be defined inline as well.
+const ref = recordOwnerAdminAuditRef({ actorId: ..., action: ..., targetType: ..., targetId: ..., purpose: ..., outcome: ..., metadata: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = recordOwnerAdminAuditRef(dataConnect, recordOwnerAdminAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.ownerAdminAuditEvent_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdminAuditEvent_insert);
+});
+```
+
+## ResolveOwnerCommentReport
+You can execute the `ResolveOwnerCommentReport` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+resolveOwnerCommentReport(vars: ResolveOwnerCommentReportVariables): MutationPromise<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+
+interface ResolveOwnerCommentReportRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ResolveOwnerCommentReportVariables): MutationRef<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+}
+export const resolveOwnerCommentReportRef: ResolveOwnerCommentReportRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+resolveOwnerCommentReport(dc: DataConnect, vars: ResolveOwnerCommentReportVariables): MutationPromise<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+
+interface ResolveOwnerCommentReportRef {
+  ...
+  (dc: DataConnect, vars: ResolveOwnerCommentReportVariables): MutationRef<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+}
+export const resolveOwnerCommentReportRef: ResolveOwnerCommentReportRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the resolveOwnerCommentReportRef:
+```typescript
+const name = resolveOwnerCommentReportRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ResolveOwnerCommentReport` mutation requires an argument of type `ResolveOwnerCommentReportVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ResolveOwnerCommentReportVariables {
+  reportId: UUIDString;
+  reportStatus: string;
+  commentId: UUIDString;
+  commentStatus: string;
+  deletionReason?: string | null;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ResolveOwnerCommentReport` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ResolveOwnerCommentReportData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ResolveOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+  comment_update?: Comment_Key | null;
+}
+```
+### Using `ResolveOwnerCommentReport`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, resolveOwnerCommentReport, ResolveOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+
+// The `ResolveOwnerCommentReport` mutation requires an argument of type `ResolveOwnerCommentReportVariables`:
+const resolveOwnerCommentReportVars: ResolveOwnerCommentReportVariables = {
+  reportId: ..., 
+  reportStatus: ..., 
+  commentId: ..., 
+  commentStatus: ..., 
+  deletionReason: ..., // optional
+  updatedAt: ..., 
+};
+
+// Call the `resolveOwnerCommentReport()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await resolveOwnerCommentReport(resolveOwnerCommentReportVars);
+// Variables can be defined inline as well.
+const { data } = await resolveOwnerCommentReport({ reportId: ..., reportStatus: ..., commentId: ..., commentStatus: ..., deletionReason: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await resolveOwnerCommentReport(dataConnect, resolveOwnerCommentReportVars);
+
+console.log(data.commentReport_update);
+console.log(data.comment_update);
+
+// Or, you can use the `Promise` API.
+resolveOwnerCommentReport(resolveOwnerCommentReportVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_update);
+  console.log(data.comment_update);
+});
+```
+
+### Using `ResolveOwnerCommentReport`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, resolveOwnerCommentReportRef, ResolveOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+
+// The `ResolveOwnerCommentReport` mutation requires an argument of type `ResolveOwnerCommentReportVariables`:
+const resolveOwnerCommentReportVars: ResolveOwnerCommentReportVariables = {
+  reportId: ..., 
+  reportStatus: ..., 
+  commentId: ..., 
+  commentStatus: ..., 
+  deletionReason: ..., // optional
+  updatedAt: ..., 
+};
+
+// Call the `resolveOwnerCommentReportRef()` function to get a reference to the mutation.
+const ref = resolveOwnerCommentReportRef(resolveOwnerCommentReportVars);
+// Variables can be defined inline as well.
+const ref = resolveOwnerCommentReportRef({ reportId: ..., reportStatus: ..., commentId: ..., commentStatus: ..., deletionReason: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = resolveOwnerCommentReportRef(dataConnect, resolveOwnerCommentReportVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.commentReport_update);
+console.log(data.comment_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_update);
+  console.log(data.comment_update);
+});
+```
+
+## DismissOwnerCommentReport
+You can execute the `DismissOwnerCommentReport` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+dismissOwnerCommentReport(vars: DismissOwnerCommentReportVariables): MutationPromise<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+
+interface DismissOwnerCommentReportRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DismissOwnerCommentReportVariables): MutationRef<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+}
+export const dismissOwnerCommentReportRef: DismissOwnerCommentReportRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+dismissOwnerCommentReport(dc: DataConnect, vars: DismissOwnerCommentReportVariables): MutationPromise<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+
+interface DismissOwnerCommentReportRef {
+  ...
+  (dc: DataConnect, vars: DismissOwnerCommentReportVariables): MutationRef<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+}
+export const dismissOwnerCommentReportRef: DismissOwnerCommentReportRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the dismissOwnerCommentReportRef:
+```typescript
+const name = dismissOwnerCommentReportRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DismissOwnerCommentReport` mutation requires an argument of type `DismissOwnerCommentReportVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DismissOwnerCommentReportVariables {
+  reportId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DismissOwnerCommentReport` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DismissOwnerCommentReportData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DismissOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+}
+```
+### Using `DismissOwnerCommentReport`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, dismissOwnerCommentReport, DismissOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+
+// The `DismissOwnerCommentReport` mutation requires an argument of type `DismissOwnerCommentReportVariables`:
+const dismissOwnerCommentReportVars: DismissOwnerCommentReportVariables = {
+  reportId: ..., 
+};
+
+// Call the `dismissOwnerCommentReport()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await dismissOwnerCommentReport(dismissOwnerCommentReportVars);
+// Variables can be defined inline as well.
+const { data } = await dismissOwnerCommentReport({ reportId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await dismissOwnerCommentReport(dataConnect, dismissOwnerCommentReportVars);
+
+console.log(data.commentReport_update);
+
+// Or, you can use the `Promise` API.
+dismissOwnerCommentReport(dismissOwnerCommentReportVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_update);
+});
+```
+
+### Using `DismissOwnerCommentReport`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, dismissOwnerCommentReportRef, DismissOwnerCommentReportVariables } from '@bondcircle/dataconnect';
+
+// The `DismissOwnerCommentReport` mutation requires an argument of type `DismissOwnerCommentReportVariables`:
+const dismissOwnerCommentReportVars: DismissOwnerCommentReportVariables = {
+  reportId: ..., 
+};
+
+// Call the `dismissOwnerCommentReportRef()` function to get a reference to the mutation.
+const ref = dismissOwnerCommentReportRef(dismissOwnerCommentReportVars);
+// Variables can be defined inline as well.
+const ref = dismissOwnerCommentReportRef({ reportId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = dismissOwnerCommentReportRef(dataConnect, dismissOwnerCommentReportVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.commentReport_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_update);
+});
+```
+
+## SuspendOwnerTargetUser
+You can execute the `SuspendOwnerTargetUser` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+suspendOwnerTargetUser(vars: SuspendOwnerTargetUserVariables): MutationPromise<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+
+interface SuspendOwnerTargetUserRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SuspendOwnerTargetUserVariables): MutationRef<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+}
+export const suspendOwnerTargetUserRef: SuspendOwnerTargetUserRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+suspendOwnerTargetUser(dc: DataConnect, vars: SuspendOwnerTargetUserVariables): MutationPromise<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+
+interface SuspendOwnerTargetUserRef {
+  ...
+  (dc: DataConnect, vars: SuspendOwnerTargetUserVariables): MutationRef<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+}
+export const suspendOwnerTargetUserRef: SuspendOwnerTargetUserRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the suspendOwnerTargetUserRef:
+```typescript
+const name = suspendOwnerTargetUserRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SuspendOwnerTargetUser` mutation requires an argument of type `SuspendOwnerTargetUserVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SuspendOwnerTargetUserVariables {
+  userId: string;
+  reasonCode: string;
+  suspendedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `SuspendOwnerTargetUser` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SuspendOwnerTargetUserData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SuspendOwnerTargetUserData {
+  user_update?: User_Key | null;
+}
+```
+### Using `SuspendOwnerTargetUser`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, suspendOwnerTargetUser, SuspendOwnerTargetUserVariables } from '@bondcircle/dataconnect';
+
+// The `SuspendOwnerTargetUser` mutation requires an argument of type `SuspendOwnerTargetUserVariables`:
+const suspendOwnerTargetUserVars: SuspendOwnerTargetUserVariables = {
+  userId: ..., 
+  reasonCode: ..., 
+  suspendedAt: ..., 
+};
+
+// Call the `suspendOwnerTargetUser()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await suspendOwnerTargetUser(suspendOwnerTargetUserVars);
+// Variables can be defined inline as well.
+const { data } = await suspendOwnerTargetUser({ userId: ..., reasonCode: ..., suspendedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await suspendOwnerTargetUser(dataConnect, suspendOwnerTargetUserVars);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+suspendOwnerTargetUser(suspendOwnerTargetUserVars).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+### Using `SuspendOwnerTargetUser`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, suspendOwnerTargetUserRef, SuspendOwnerTargetUserVariables } from '@bondcircle/dataconnect';
+
+// The `SuspendOwnerTargetUser` mutation requires an argument of type `SuspendOwnerTargetUserVariables`:
+const suspendOwnerTargetUserVars: SuspendOwnerTargetUserVariables = {
+  userId: ..., 
+  reasonCode: ..., 
+  suspendedAt: ..., 
+};
+
+// Call the `suspendOwnerTargetUserRef()` function to get a reference to the mutation.
+const ref = suspendOwnerTargetUserRef(suspendOwnerTargetUserVars);
+// Variables can be defined inline as well.
+const ref = suspendOwnerTargetUserRef({ userId: ..., reasonCode: ..., suspendedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = suspendOwnerTargetUserRef(dataConnect, suspendOwnerTargetUserVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+## RevokeCompromisedInvitation
+You can execute the `RevokeCompromisedInvitation` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+revokeCompromisedInvitation(vars: RevokeCompromisedInvitationVariables): MutationPromise<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+
+interface RevokeCompromisedInvitationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RevokeCompromisedInvitationVariables): MutationRef<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+}
+export const revokeCompromisedInvitationRef: RevokeCompromisedInvitationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+revokeCompromisedInvitation(dc: DataConnect, vars: RevokeCompromisedInvitationVariables): MutationPromise<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+
+interface RevokeCompromisedInvitationRef {
+  ...
+  (dc: DataConnect, vars: RevokeCompromisedInvitationVariables): MutationRef<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+}
+export const revokeCompromisedInvitationRef: RevokeCompromisedInvitationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the revokeCompromisedInvitationRef:
+```typescript
+const name = revokeCompromisedInvitationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RevokeCompromisedInvitation` mutation requires an argument of type `RevokeCompromisedInvitationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RevokeCompromisedInvitationVariables {
+  invitationId: UUIDString;
+  revokedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `RevokeCompromisedInvitation` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RevokeCompromisedInvitationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RevokeCompromisedInvitationData {
+  invitation_update?: Invitation_Key | null;
+}
+```
+### Using `RevokeCompromisedInvitation`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, revokeCompromisedInvitation, RevokeCompromisedInvitationVariables } from '@bondcircle/dataconnect';
+
+// The `RevokeCompromisedInvitation` mutation requires an argument of type `RevokeCompromisedInvitationVariables`:
+const revokeCompromisedInvitationVars: RevokeCompromisedInvitationVariables = {
+  invitationId: ..., 
+  revokedAt: ..., 
+};
+
+// Call the `revokeCompromisedInvitation()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await revokeCompromisedInvitation(revokeCompromisedInvitationVars);
+// Variables can be defined inline as well.
+const { data } = await revokeCompromisedInvitation({ invitationId: ..., revokedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await revokeCompromisedInvitation(dataConnect, revokeCompromisedInvitationVars);
+
+console.log(data.invitation_update);
+
+// Or, you can use the `Promise` API.
+revokeCompromisedInvitation(revokeCompromisedInvitationVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitation_update);
+});
+```
+
+### Using `RevokeCompromisedInvitation`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, revokeCompromisedInvitationRef, RevokeCompromisedInvitationVariables } from '@bondcircle/dataconnect';
+
+// The `RevokeCompromisedInvitation` mutation requires an argument of type `RevokeCompromisedInvitationVariables`:
+const revokeCompromisedInvitationVars: RevokeCompromisedInvitationVariables = {
+  invitationId: ..., 
+  revokedAt: ..., 
+};
+
+// Call the `revokeCompromisedInvitationRef()` function to get a reference to the mutation.
+const ref = revokeCompromisedInvitationRef(revokeCompromisedInvitationVars);
+// Variables can be defined inline as well.
+const ref = revokeCompromisedInvitationRef({ invitationId: ..., revokedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = revokeCompromisedInvitationRef(dataConnect, revokeCompromisedInvitationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.invitation_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitation_update);
+});
+```
+
+## ProvisionOwnerAdministrator
+You can execute the `ProvisionOwnerAdministrator` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+provisionOwnerAdministrator(vars: ProvisionOwnerAdministratorVariables): MutationPromise<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+
+interface ProvisionOwnerAdministratorRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ProvisionOwnerAdministratorVariables): MutationRef<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+}
+export const provisionOwnerAdministratorRef: ProvisionOwnerAdministratorRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+provisionOwnerAdministrator(dc: DataConnect, vars: ProvisionOwnerAdministratorVariables): MutationPromise<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+
+interface ProvisionOwnerAdministratorRef {
+  ...
+  (dc: DataConnect, vars: ProvisionOwnerAdministratorVariables): MutationRef<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+}
+export const provisionOwnerAdministratorRef: ProvisionOwnerAdministratorRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the provisionOwnerAdministratorRef:
+```typescript
+const name = provisionOwnerAdministratorRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ProvisionOwnerAdministrator` mutation requires an argument of type `ProvisionOwnerAdministratorVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ProvisionOwnerAdministratorVariables {
+  userId: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ProvisionOwnerAdministrator` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ProvisionOwnerAdministratorData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ProvisionOwnerAdministratorData {
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+```
+### Using `ProvisionOwnerAdministrator`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, provisionOwnerAdministrator, ProvisionOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+
+// The `ProvisionOwnerAdministrator` mutation requires an argument of type `ProvisionOwnerAdministratorVariables`:
+const provisionOwnerAdministratorVars: ProvisionOwnerAdministratorVariables = {
+  userId: ..., 
+  createdAt: ..., 
+};
+
+// Call the `provisionOwnerAdministrator()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await provisionOwnerAdministrator(provisionOwnerAdministratorVars);
+// Variables can be defined inline as well.
+const { data } = await provisionOwnerAdministrator({ userId: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await provisionOwnerAdministrator(dataConnect, provisionOwnerAdministratorVars);
+
+console.log(data.ownerAdministrator_upsert);
+
+// Or, you can use the `Promise` API.
+provisionOwnerAdministrator(provisionOwnerAdministratorVars).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdministrator_upsert);
+});
+```
+
+### Using `ProvisionOwnerAdministrator`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, provisionOwnerAdministratorRef, ProvisionOwnerAdministratorVariables } from '@bondcircle/dataconnect';
+
+// The `ProvisionOwnerAdministrator` mutation requires an argument of type `ProvisionOwnerAdministratorVariables`:
+const provisionOwnerAdministratorVars: ProvisionOwnerAdministratorVariables = {
+  userId: ..., 
+  createdAt: ..., 
+};
+
+// Call the `provisionOwnerAdministratorRef()` function to get a reference to the mutation.
+const ref = provisionOwnerAdministratorRef(provisionOwnerAdministratorVars);
+// Variables can be defined inline as well.
+const ref = provisionOwnerAdministratorRef({ userId: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = provisionOwnerAdministratorRef(dataConnect, provisionOwnerAdministratorVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.ownerAdministrator_upsert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.ownerAdministrator_upsert);
 });
 ```
 

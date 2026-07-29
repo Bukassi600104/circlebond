@@ -239,5 +239,8 @@ test("onboarding uses the supplied artwork and keeps its composition centered", 
     styles,
     /\.bc-onboarding section[\s\S]*text-align:\s*center[\s\S]*justify-items:\s*center/,
   );
-  assert.match(styles, /\.bc-onboarding footer[\s\S]*justify-content:\s*center/);
+  assert.match(
+    styles,
+    /\.bc-onboarding footer[\s\S]*justify-content:\s*center/,
+  );
 });

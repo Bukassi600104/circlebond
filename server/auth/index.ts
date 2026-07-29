@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
+import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { SESSION_MAX_AGE_MS } from "./security";
 
 export const SESSION_COOKIE = "__session";
@@ -21,7 +22,17 @@ export async function readSession(): Promise<DecodedIdToken | null> {
   const session = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!session) return null;
   try {
-    return await getFirebaseAdminAuth().verifySessionCookie(session, true);
+    // Keep revocation checking explicit: suspended/disabled Firebase sessions must fail.
+    // prettier-ignore
+    const decoded = await getFirebaseAdminAuth().verifySessionCookie(session, true);
+    const response = await getBondCircleDataConnect().executeQuery<
+      { user?: { accountStatus: string } },
+      { userId: string }
+    >("GetUserAccountStatus", { userId: decoded.uid });
+    if (response.data.user && response.data.user.accountStatus !== "active") {
+      return null;
+    }
+    return decoded;
   } catch {
     return null;
   }

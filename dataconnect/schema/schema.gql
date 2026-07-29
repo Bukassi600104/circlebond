@@ -12,6 +12,39 @@ type User @table {
   contributionReminders: Boolean! @default(value: true)
   circleUpdateNotifications: Boolean! @default(value: true)
   marketingCommunication: Boolean! @default(value: false)
+  accountStatus: String! @default(value: "active")
+  suspendedAt: Timestamp
+  suspensionReasonCode: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type OwnerAdministrator @table(key: ["user"]) {
+  user: User!
+  role: String! @default(value: "owner")
+  status: String! @default(value: "active")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type OwnerAdminAuditEvent @table {
+  id: UUID! @default(expr: "uuidV4()")
+  actor: User!
+  action: String!
+  targetType: String!
+  targetId: String!
+  purpose: String!
+  outcome: String!
+  metadata: String! @default(value: "{}")
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type OperationalEvent @table {
+  id: UUID! @default(expr: "uuidV4()")
+  category: String!
+  eventType: String!
+  outcome: String!
+  reasonCode: String
+  circleId: UUID
   createdAt: Timestamp! @default(expr: "request.time")
 }
 

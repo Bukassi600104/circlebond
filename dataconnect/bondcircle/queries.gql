@@ -2368,3 +2368,365 @@ mutation PurgeCircleSensitiveData($circleId: UUID!, $purgeAt: Timestamp!)
     }
   )
 }
+
+query GetOwnerAdministrator($userId: String!) @auth(level: NO_ACCESS) {
+  ownerAdministrators(
+    where: { userId: { eq: $userId }, status: { eq: "active" } }
+    limit: 1
+  ) {
+    role
+    status
+    user {
+      id
+      displayName
+      email
+      accountStatus
+    }
+  }
+}
+
+query GetUserAccountStatus($userId: String!) @auth(level: NO_ACCESS) {
+  user(key: { id: $userId }) {
+    id
+    accountStatus
+  }
+}
+
+query GetOwnerPlatformOverview @auth(level: NO_ACCESS) {
+  totalUsers: users {
+    _count
+  }
+  usersByStatus: users {
+    accountStatus
+    _count
+  }
+  totalCircles: circles {
+    _count
+  }
+  circlesByType: circles {
+    type
+    _count
+  }
+  circlesByStatus: circles {
+    status
+    _count
+  }
+  circlesByPlan: circles {
+    pricingPlan
+    _count
+  }
+  invitationTotals: invitations {
+    _count
+    acceptedAt_count
+  }
+  uploadOutcomes: operationalEvents(where: { category: { eq: "upload" } }) {
+    outcome
+    _count
+  }
+  reportStatuses: commentReports {
+    status
+    _count
+  }
+  authOutcomes: authAuditEvents {
+    outcome
+    _count
+  }
+  emailOutcomes: emailDeliveries {
+    status
+    _count
+  }
+  retentionCandidates: circles(
+    where: {
+      status: { in: ["completed", "cancelled", "archived"] }
+      retentionDueAt: { isNull: false }
+      purgeAt: { isNull: true }
+    }
+  ) {
+    _count
+  }
+  retentionAttempts: retentionPurgeAttempts(
+    orderBy: { createdAt: DESC }
+    limit: 20
+  ) {
+    id
+    status
+    attemptNumber
+    deletedFileCount
+    skippedSharedFileCount
+    failureReason
+    nextRetryAt
+    startedAt
+    completedAt
+    circle {
+      id
+      type
+      status
+      retentionDueAt
+    }
+  }
+  reportedComments: commentReports(orderBy: { createdAt: DESC }, limit: 50) {
+    id
+    reason
+    status
+    createdAt
+    reporter {
+      id
+      displayName
+    }
+    comment {
+      id
+      status
+      author {
+        id
+        displayName
+        accountStatus
+      }
+    }
+    circle {
+      id
+      name
+      type
+    }
+  }
+  activeInvitations: invitations(
+    where: { state: { in: ["created", "opened", "pending_approval"] } }
+    orderBy: { createdAt: DESC }
+    limit: 50
+  ) {
+    id
+    mode
+    state
+    useCount
+    maxUses
+    expiresAt
+    createdAt
+    circle {
+      id
+      name
+      type
+    }
+    invitedBy {
+      id
+      displayName
+    }
+  }
+  recentAdminActions: ownerAdminAuditEvents(
+    orderBy: { createdAt: DESC }
+    limit: 50
+  ) {
+    id
+    action
+    targetType
+    targetId
+    purpose
+    outcome
+    metadata
+    createdAt
+    actor {
+      id
+      displayName
+    }
+  }
+}
+
+query GetOwnerReportReview($reportId: UUID!) @auth(level: NO_ACCESS) {
+  commentReport(key: { id: $reportId }) {
+    id
+    reason
+    status
+    createdAt
+    reporter {
+      id
+      displayName
+    }
+    comment {
+      id
+      body
+      status
+      createdAt
+      author {
+        id
+        displayName
+        accountStatus
+      }
+    }
+    circle {
+      id
+      name
+      type
+    }
+  }
+}
+
+query GetOwnerUserByIdentifier($userId: String!, $email: String!)
+@auth(level: NO_ACCESS) {
+  userById: user(key: { id: $userId }) {
+    id
+    displayName
+    email
+    accountStatus
+    suspendedAt
+  }
+  usersByEmail: users(where: { email: { eq: $email } }, limit: 1) {
+    id
+    displayName
+    email
+    accountStatus
+    suspendedAt
+  }
+}
+
+query GetOwnerOperationalExport @auth(level: NO_ACCESS) {
+  circles(orderBy: { createdAt: DESC }, limit: 10000) {
+    id
+    type
+    status
+    pricingPlan
+    memberCount
+    createdAt
+    completedAt
+    retentionDueAt
+    purgeAt
+  }
+  commentReports(orderBy: { createdAt: DESC }, limit: 10000) {
+    id
+    reason
+    status
+    createdAt
+    circle {
+      id
+      type
+    }
+  }
+  retentionPurgeAttempts(orderBy: { createdAt: DESC }, limit: 10000) {
+    id
+    status
+    attemptNumber
+    deletedFileCount
+    skippedSharedFileCount
+    failureReason
+    startedAt
+    completedAt
+    circle {
+      id
+      type
+    }
+  }
+}
+
+mutation RecordOperationalEvent(
+  $category: String!
+  $eventType: String!
+  $outcome: String!
+  $reasonCode: String
+  $circleId: UUID
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  operationalEvent_insert(
+    data: {
+      category: $category
+      eventType: $eventType
+      outcome: $outcome
+      reasonCode: $reasonCode
+      circleId: $circleId
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation RecordOwnerAdminAudit(
+  $actorId: String!
+  $action: String!
+  $targetType: String!
+  $targetId: String!
+  $purpose: String!
+  $outcome: String!
+  $metadata: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  ownerAdminAuditEvent_insert(
+    data: {
+      actor: { id: $actorId }
+      action: $action
+      targetType: $targetType
+      targetId: $targetId
+      purpose: $purpose
+      outcome: $outcome
+      metadata: $metadata
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation ResolveOwnerCommentReport(
+  $reportId: UUID!
+  $reportStatus: String!
+  $commentId: UUID!
+  $commentStatus: String!
+  $deletionReason: String
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  commentReport_update(key: { id: $reportId }, data: { status: $reportStatus })
+  comment_update(
+    key: { id: $commentId }
+    data: {
+      status: $commentStatus
+      deletionReason: $deletionReason
+      updatedAt: $updatedAt
+      deletedAt: $updatedAt
+    }
+  )
+}
+
+mutation DismissOwnerCommentReport($reportId: UUID!) @auth(level: NO_ACCESS) {
+  commentReport_update(key: { id: $reportId }, data: { status: "dismissed" })
+}
+
+mutation SuspendOwnerTargetUser(
+  $userId: String!
+  $reasonCode: String!
+  $suspendedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  user_update(
+    key: { id: $userId }
+    data: {
+      accountStatus: "suspended"
+      suspendedAt: $suspendedAt
+      suspensionReasonCode: $reasonCode
+    }
+  )
+}
+
+mutation RevokeCompromisedInvitation(
+  $invitationId: UUID!
+  $revokedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  invitation_update(
+    key: { id: $invitationId }
+    data: { state: "revoked", revokedAt: $revokedAt, updatedAt: $revokedAt }
+  )
+}
+
+query GetOwnerInvitation($invitationId: UUID!) @auth(level: NO_ACCESS) {
+  invitation(key: { id: $invitationId }) {
+    id
+    state
+    expiresAt
+    circle {
+      id
+    }
+  }
+}
+
+mutation ProvisionOwnerAdministrator($userId: String!, $createdAt: Timestamp!)
+@auth(level: NO_ACCESS) {
+  ownerAdministrator_upsert(
+    data: {
+      user: { id: $userId }
+      role: "owner"
+      status: "active"
+      createdAt: $createdAt
+      updatedAt: $createdAt
+    }
+  )
+}

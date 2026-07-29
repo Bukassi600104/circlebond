@@ -395,6 +395,14 @@ export interface DismissNotificationVariables {
   dismissedAt: TimestampString;
 }
 
+export interface DismissOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+}
+
+export interface DismissOwnerCommentReportVariables {
+  reportId: UUIDString;
+}
+
 export interface EmailDelivery_Key {
   id: UUIDString;
   __typename?: 'EmailDelivery_Key';
@@ -1041,6 +1049,252 @@ export interface GetOpenCommentReportsByReporterVariables {
   reporterId: string;
 }
 
+export interface GetOwnerAdministratorData {
+  ownerAdministrators: ({
+    role: string;
+    status: string;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+    } & User_Key;
+  })[];
+}
+
+export interface GetOwnerAdministratorVariables {
+  userId: string;
+}
+
+export interface GetOwnerInvitationData {
+  invitation?: {
+    id: UUIDString;
+    state: string;
+    expiresAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Invitation_Key;
+}
+
+export interface GetOwnerInvitationVariables {
+  invitationId: UUIDString;
+}
+
+export interface GetOwnerOperationalExportData {
+  circles: ({
+    id: UUIDString;
+    type: string;
+    status: string;
+    pricingPlan: string;
+    memberCount: number;
+    createdAt: TimestampString;
+    completedAt?: TimestampString | null;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+  } & Circle_Key)[];
+    commentReports: ({
+      id: UUIDString;
+      reason: string;
+      status: string;
+      createdAt: TimestampString;
+      circle: {
+        id: UUIDString;
+        type: string;
+      } & Circle_Key;
+    } & CommentReport_Key)[];
+      retentionPurgeAttempts: ({
+        id: UUIDString;
+        status: string;
+        attemptNumber: number;
+        deletedFileCount: number;
+        skippedSharedFileCount: number;
+        failureReason?: string | null;
+        startedAt: TimestampString;
+        completedAt?: TimestampString | null;
+        circle: {
+          id: UUIDString;
+          type: string;
+        } & Circle_Key;
+      } & RetentionPurgeAttempt_Key)[];
+}
+
+export interface GetOwnerPlatformOverviewData {
+  totalUsers: ({
+    _count: number;
+  })[];
+    usersByStatus: ({
+      accountStatus: string;
+      _count: number;
+    })[];
+      totalCircles: ({
+        _count: number;
+      })[];
+        circlesByType: ({
+          type: string;
+          _count: number;
+        })[];
+          circlesByStatus: ({
+            status: string;
+            _count: number;
+          })[];
+            circlesByPlan: ({
+              pricingPlan: string;
+              _count: number;
+            })[];
+              invitationTotals: ({
+                _count: number;
+                acceptedAt_count: number;
+              })[];
+                uploadOutcomes: ({
+                  outcome: string;
+                  _count: number;
+                })[];
+                  reportStatuses: ({
+                    status: string;
+                    _count: number;
+                  })[];
+                    authOutcomes: ({
+                      outcome: string;
+                      _count: number;
+                    })[];
+                      emailOutcomes: ({
+                        status: string;
+                        _count: number;
+                      })[];
+                        retentionCandidates: ({
+                          _count: number;
+                        })[];
+                          retentionAttempts: ({
+                            id: UUIDString;
+                            status: string;
+                            attemptNumber: number;
+                            deletedFileCount: number;
+                            skippedSharedFileCount: number;
+                            failureReason?: string | null;
+                            nextRetryAt?: TimestampString | null;
+                            startedAt: TimestampString;
+                            completedAt?: TimestampString | null;
+                            circle: {
+                              id: UUIDString;
+                              type: string;
+                              status: string;
+                              retentionDueAt?: TimestampString | null;
+                            } & Circle_Key;
+                          } & RetentionPurgeAttempt_Key)[];
+                            reportedComments: ({
+                              id: UUIDString;
+                              reason: string;
+                              status: string;
+                              createdAt: TimestampString;
+                              reporter: {
+                                id: string;
+                                displayName: string;
+                              } & User_Key;
+                                comment: {
+                                  id: UUIDString;
+                                  status: string;
+                                  author: {
+                                    id: string;
+                                    displayName: string;
+                                    accountStatus: string;
+                                  } & User_Key;
+                                } & Comment_Key;
+                                  circle: {
+                                    id: UUIDString;
+                                    name: string;
+                                    type: string;
+                                  } & Circle_Key;
+                            } & CommentReport_Key)[];
+                              activeInvitations: ({
+                                id: UUIDString;
+                                mode: string;
+                                state: string;
+                                useCount: number;
+                                maxUses: number;
+                                expiresAt: TimestampString;
+                                createdAt: TimestampString;
+                                circle: {
+                                  id: UUIDString;
+                                  name: string;
+                                  type: string;
+                                } & Circle_Key;
+                                  invitedBy: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                              } & Invitation_Key)[];
+                                recentAdminActions: ({
+                                  id: UUIDString;
+                                  action: string;
+                                  targetType: string;
+                                  targetId: string;
+                                  purpose: string;
+                                  outcome: string;
+                                  metadata: string;
+                                  createdAt: TimestampString;
+                                  actor: {
+                                    id: string;
+                                    displayName: string;
+                                  } & User_Key;
+                                } & OwnerAdminAuditEvent_Key)[];
+}
+
+export interface GetOwnerReportReviewData {
+  commentReport?: {
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+      comment: {
+        id: UUIDString;
+        body: string;
+        status: string;
+        createdAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+          accountStatus: string;
+        } & User_Key;
+      } & Comment_Key;
+        circle: {
+          id: UUIDString;
+          name: string;
+          type: string;
+        } & Circle_Key;
+  } & CommentReport_Key;
+}
+
+export interface GetOwnerReportReviewVariables {
+  reportId: UUIDString;
+}
+
+export interface GetOwnerUserByIdentifierData {
+  userById?: {
+    id: string;
+    displayName: string;
+    email?: string | null;
+    accountStatus: string;
+    suspendedAt?: TimestampString | null;
+  } & User_Key;
+    usersByEmail: ({
+      id: string;
+      displayName: string;
+      email?: string | null;
+      accountStatus: string;
+      suspendedAt?: TimestampString | null;
+    } & User_Key)[];
+}
+
+export interface GetOwnerUserByIdentifierVariables {
+  userId: string;
+  email: string;
+}
+
 export interface GetRecentCommentsByAuthorData {
   comments: ({
     createdAt: TimestampString;
@@ -1174,6 +1428,17 @@ export interface GetSupportCircleDetailVariables {
   circleId: UUIDString;
 }
 
+export interface GetUserAccountStatusData {
+  user?: {
+    id: string;
+    accountStatus: string;
+  } & User_Key;
+}
+
+export interface GetUserAccountStatusVariables {
+  userId: string;
+}
+
 export interface GetUserDeadlineNotificationCandidatesData {
   circleMemberships: ({
     circle: {
@@ -1277,6 +1542,30 @@ export interface Notification_Key {
   __typename?: 'Notification_Key';
 }
 
+export interface OperationalEvent_Key {
+  id: UUIDString;
+  __typename?: 'OperationalEvent_Key';
+}
+
+export interface OwnerAdminAuditEvent_Key {
+  id: UUIDString;
+  __typename?: 'OwnerAdminAuditEvent_Key';
+}
+
+export interface OwnerAdministrator_Key {
+  userId: string;
+  __typename?: 'OwnerAdministrator_Key';
+}
+
+export interface ProvisionOwnerAdministratorData {
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+
+export interface ProvisionOwnerAdministratorVariables {
+  userId: string;
+  createdAt: TimestampString;
+}
+
 export interface PurgeCircleSensitiveDataData {
   commentReport_deleteMany: number;
   comment_deleteMany: number;
@@ -1306,6 +1595,34 @@ export interface PurgeInvitationAcceptancesVariables {
 export interface Receipt_Key {
   id: UUIDString;
   __typename?: 'Receipt_Key';
+}
+
+export interface RecordOperationalEventData {
+  operationalEvent_insert: OperationalEvent_Key;
+}
+
+export interface RecordOperationalEventVariables {
+  category: string;
+  eventType: string;
+  outcome: string;
+  reasonCode?: string | null;
+  circleId?: UUIDString | null;
+  createdAt: TimestampString;
+}
+
+export interface RecordOwnerAdminAuditData {
+  ownerAdminAuditEvent_insert: OwnerAdminAuditEvent_Key;
+}
+
+export interface RecordOwnerAdminAuditVariables {
+  actorId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  purpose: string;
+  outcome: string;
+  metadata: string;
+  createdAt: TimestampString;
 }
 
 export interface RecordSupportPledgeData {
@@ -1396,6 +1713,20 @@ export interface RequestReplacementInvitationVariables {
   requestedAt: TimestampString;
 }
 
+export interface ResolveOwnerCommentReportData {
+  commentReport_update?: CommentReport_Key | null;
+  comment_update?: Comment_Key | null;
+}
+
+export interface ResolveOwnerCommentReportVariables {
+  reportId: UUIDString;
+  reportStatus: string;
+  commentId: UUIDString;
+  commentStatus: string;
+  deletionReason?: string | null;
+  updatedAt: TimestampString;
+}
+
 export interface RetentionPurgeAttempt_Key {
   id: UUIDString;
   __typename?: 'RetentionPurgeAttempt_Key';
@@ -1422,6 +1753,15 @@ export interface ReviewReceiptWithAuditVariables {
   nextCircleContributedAmount: number;
   auditAction: string;
   materialChanges: string;
+}
+
+export interface RevokeCompromisedInvitationData {
+  invitation_update?: Invitation_Key | null;
+}
+
+export interface RevokeCompromisedInvitationVariables {
+  invitationId: UUIDString;
+  revokedAt: TimestampString;
 }
 
 export interface SelectAsoEbiTierData {
@@ -1531,6 +1871,16 @@ export interface SubmitReceiptWithAuditVariables {
 export interface SupportUpdate_Key {
   id: UUIDString;
   __typename?: 'SupportUpdate_Key';
+}
+
+export interface SuspendOwnerTargetUserData {
+  user_update?: User_Key | null;
+}
+
+export interface SuspendOwnerTargetUserVariables {
+  userId: string;
+  reasonCode: string;
+  suspendedAt: TimestampString;
 }
 
 export interface TransitionCircleWithAuditData {
@@ -2540,4 +2890,172 @@ export const purgeCircleSensitiveDataRef: PurgeCircleSensitiveDataRef;
 
 export function purgeCircleSensitiveData(vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
 export function purgeCircleSensitiveData(dc: DataConnect, vars: PurgeCircleSensitiveDataVariables): MutationPromise<PurgeCircleSensitiveDataData, PurgeCircleSensitiveDataVariables>;
+
+interface GetOwnerAdministratorRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerAdministratorVariables): QueryRef<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetOwnerAdministratorVariables): QueryRef<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+  operationName: string;
+}
+export const getOwnerAdministratorRef: GetOwnerAdministratorRef;
+
+export function getOwnerAdministrator(vars: GetOwnerAdministratorVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+export function getOwnerAdministrator(dc: DataConnect, vars: GetOwnerAdministratorVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerAdministratorData, GetOwnerAdministratorVariables>;
+
+interface GetUserAccountStatusRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserAccountStatusVariables): QueryRef<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserAccountStatusVariables): QueryRef<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+  operationName: string;
+}
+export const getUserAccountStatusRef: GetUserAccountStatusRef;
+
+export function getUserAccountStatus(vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+export function getUserAccountStatus(dc: DataConnect, vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+
+interface GetOwnerPlatformOverviewRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetOwnerPlatformOverviewData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<GetOwnerPlatformOverviewData, undefined>;
+  operationName: string;
+}
+export const getOwnerPlatformOverviewRef: GetOwnerPlatformOverviewRef;
+
+export function getOwnerPlatformOverview(options?: ExecuteQueryOptions): QueryPromise<GetOwnerPlatformOverviewData, undefined>;
+export function getOwnerPlatformOverview(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetOwnerPlatformOverviewData, undefined>;
+
+interface GetOwnerReportReviewRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerReportReviewVariables): QueryRef<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetOwnerReportReviewVariables): QueryRef<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+  operationName: string;
+}
+export const getOwnerReportReviewRef: GetOwnerReportReviewRef;
+
+export function getOwnerReportReview(vars: GetOwnerReportReviewVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+export function getOwnerReportReview(dc: DataConnect, vars: GetOwnerReportReviewVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerReportReviewData, GetOwnerReportReviewVariables>;
+
+interface GetOwnerUserByIdentifierRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerUserByIdentifierVariables): QueryRef<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetOwnerUserByIdentifierVariables): QueryRef<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+  operationName: string;
+}
+export const getOwnerUserByIdentifierRef: GetOwnerUserByIdentifierRef;
+
+export function getOwnerUserByIdentifier(vars: GetOwnerUserByIdentifierVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+export function getOwnerUserByIdentifier(dc: DataConnect, vars: GetOwnerUserByIdentifierVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerUserByIdentifierData, GetOwnerUserByIdentifierVariables>;
+
+interface GetOwnerOperationalExportRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetOwnerOperationalExportData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<GetOwnerOperationalExportData, undefined>;
+  operationName: string;
+}
+export const getOwnerOperationalExportRef: GetOwnerOperationalExportRef;
+
+export function getOwnerOperationalExport(options?: ExecuteQueryOptions): QueryPromise<GetOwnerOperationalExportData, undefined>;
+export function getOwnerOperationalExport(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetOwnerOperationalExportData, undefined>;
+
+interface RecordOperationalEventRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordOperationalEventVariables): MutationRef<RecordOperationalEventData, RecordOperationalEventVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RecordOperationalEventVariables): MutationRef<RecordOperationalEventData, RecordOperationalEventVariables>;
+  operationName: string;
+}
+export const recordOperationalEventRef: RecordOperationalEventRef;
+
+export function recordOperationalEvent(vars: RecordOperationalEventVariables): MutationPromise<RecordOperationalEventData, RecordOperationalEventVariables>;
+export function recordOperationalEvent(dc: DataConnect, vars: RecordOperationalEventVariables): MutationPromise<RecordOperationalEventData, RecordOperationalEventVariables>;
+
+interface RecordOwnerAdminAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordOwnerAdminAuditVariables): MutationRef<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RecordOwnerAdminAuditVariables): MutationRef<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+  operationName: string;
+}
+export const recordOwnerAdminAuditRef: RecordOwnerAdminAuditRef;
+
+export function recordOwnerAdminAudit(vars: RecordOwnerAdminAuditVariables): MutationPromise<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+export function recordOwnerAdminAudit(dc: DataConnect, vars: RecordOwnerAdminAuditVariables): MutationPromise<RecordOwnerAdminAuditData, RecordOwnerAdminAuditVariables>;
+
+interface ResolveOwnerCommentReportRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ResolveOwnerCommentReportVariables): MutationRef<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ResolveOwnerCommentReportVariables): MutationRef<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+  operationName: string;
+}
+export const resolveOwnerCommentReportRef: ResolveOwnerCommentReportRef;
+
+export function resolveOwnerCommentReport(vars: ResolveOwnerCommentReportVariables): MutationPromise<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+export function resolveOwnerCommentReport(dc: DataConnect, vars: ResolveOwnerCommentReportVariables): MutationPromise<ResolveOwnerCommentReportData, ResolveOwnerCommentReportVariables>;
+
+interface DismissOwnerCommentReportRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DismissOwnerCommentReportVariables): MutationRef<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DismissOwnerCommentReportVariables): MutationRef<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+  operationName: string;
+}
+export const dismissOwnerCommentReportRef: DismissOwnerCommentReportRef;
+
+export function dismissOwnerCommentReport(vars: DismissOwnerCommentReportVariables): MutationPromise<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+export function dismissOwnerCommentReport(dc: DataConnect, vars: DismissOwnerCommentReportVariables): MutationPromise<DismissOwnerCommentReportData, DismissOwnerCommentReportVariables>;
+
+interface SuspendOwnerTargetUserRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SuspendOwnerTargetUserVariables): MutationRef<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SuspendOwnerTargetUserVariables): MutationRef<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+  operationName: string;
+}
+export const suspendOwnerTargetUserRef: SuspendOwnerTargetUserRef;
+
+export function suspendOwnerTargetUser(vars: SuspendOwnerTargetUserVariables): MutationPromise<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+export function suspendOwnerTargetUser(dc: DataConnect, vars: SuspendOwnerTargetUserVariables): MutationPromise<SuspendOwnerTargetUserData, SuspendOwnerTargetUserVariables>;
+
+interface RevokeCompromisedInvitationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RevokeCompromisedInvitationVariables): MutationRef<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RevokeCompromisedInvitationVariables): MutationRef<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+  operationName: string;
+}
+export const revokeCompromisedInvitationRef: RevokeCompromisedInvitationRef;
+
+export function revokeCompromisedInvitation(vars: RevokeCompromisedInvitationVariables): MutationPromise<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+export function revokeCompromisedInvitation(dc: DataConnect, vars: RevokeCompromisedInvitationVariables): MutationPromise<RevokeCompromisedInvitationData, RevokeCompromisedInvitationVariables>;
+
+interface GetOwnerInvitationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerInvitationVariables): QueryRef<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetOwnerInvitationVariables): QueryRef<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+  operationName: string;
+}
+export const getOwnerInvitationRef: GetOwnerInvitationRef;
+
+export function getOwnerInvitation(vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+export function getOwnerInvitation(dc: DataConnect, vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+
+interface ProvisionOwnerAdministratorRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ProvisionOwnerAdministratorVariables): MutationRef<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ProvisionOwnerAdministratorVariables): MutationRef<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+  operationName: string;
+}
+export const provisionOwnerAdministratorRef: ProvisionOwnerAdministratorRef;
+
+export function provisionOwnerAdministrator(vars: ProvisionOwnerAdministratorVariables): MutationPromise<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
+export function provisionOwnerAdministrator(dc: DataConnect, vars: ProvisionOwnerAdministratorVariables): MutationPromise<ProvisionOwnerAdministratorData, ProvisionOwnerAdministratorVariables>;
 

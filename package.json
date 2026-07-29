@@ -34,7 +34,8 @@
     "firebase:emulators": "firebase emulators:start --only auth,dataconnect,storage",
     "firebase:sdk": "firebase dataconnect:sdk:generate",
     "firebase:migrate": "firebase dataconnect:sql:migrate",
-    "firebase:deploy:data": "firebase deploy --only dataconnect"
+    "firebase:deploy:data": "firebase deploy --only dataconnect",
+    "owner:provision": "node --env-file=.env.local scripts/provision-owner.mjs"
   },
   "dependencies": {
     "@bondcircle/dataconnect": "file:generated/dataconnect",

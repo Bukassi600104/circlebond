@@ -19,6 +19,7 @@ import {
   setSupportMemberAllocation,
 } from "@/server/repositories/support-circles";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
+import { recordUploadOutcome } from "@/server/repositories/operational-events";
 
 export const runtime = "nodejs";
 
@@ -44,6 +45,8 @@ function validImageBytes(bytes: Uint8Array, type: string) {
 }
 
 export async function POST(request: Request) {
+  let uploadAttempted = false;
+  let metricCircleId: string | null = null;
   try {
     await assertTrustedMutation(request);
     const session = await readSession();
@@ -113,6 +116,7 @@ export async function POST(request: Request) {
         "Add a bank name, account name and valid 10-digit account number.",
       );
     }
+    uploadAttempted = true;
     if (
       !(supportingImage instanceof File) ||
       supportingImage.size < 1 ||
@@ -174,6 +178,7 @@ export async function POST(request: Request) {
       },
       firebaseCircleStore,
     );
+    metricCircleId = circle.id;
 
     for (const invite of resolved) {
       await addCircleMember(
@@ -261,8 +266,21 @@ export async function POST(request: Request) {
       firebaseCircleStore,
     );
 
+    await recordUploadOutcome({
+      kind: "support_image",
+      outcome: "succeeded",
+      circleId: circle.id,
+    });
     return NextResponse.json({ circleId: circle.id }, { status: 201 });
   } catch (error) {
+    if (uploadAttempted) {
+      await recordUploadOutcome({
+        kind: "support_image",
+        outcome: "failed",
+        circleId: metricCircleId,
+        error,
+      });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unable to create." },
       { status: 400 },

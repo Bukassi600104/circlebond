@@ -7,6 +7,7 @@ import {
   loadContributionWorkspace,
   submitContributionReceipt,
 } from "@/server/repositories/contributions";
+import { recordUploadOutcome } from "@/server/repositories/operational-events";
 
 export const runtime = "nodejs";
 
@@ -64,6 +65,8 @@ export async function POST(
   context: { params: Promise<{ circleId: string }> },
 ) {
   let uploadedPath: string | null = null;
+  let uploadAttempted = false;
+  let metricCircleId: string | null = null;
   try {
     await assertTrustedMutation(request);
     const session = await readSession();
@@ -71,6 +74,8 @@ export async function POST(
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
     const { circleId } = await context.params;
+    metricCircleId = circleId;
+    uploadAttempted = true;
     const form = await request.formData();
     const receiptImage = form.get("receiptImage");
     const amount = Number(String(form.get("amount") ?? ""));
@@ -122,6 +127,11 @@ export async function POST(
       contentType: receiptImage.type,
       replacementOfId,
     });
+    await recordUploadOutcome({
+      kind: "receipt",
+      outcome: "succeeded",
+      circleId,
+    });
     return NextResponse.json({ receiptId, ...result }, { status: 201 });
   } catch (error) {
     if (uploadedPath) {
@@ -130,6 +140,14 @@ export async function POST(
         .file(uploadedPath)
         .delete({ ignoreNotFound: true })
         .catch(() => undefined);
+    }
+    if (uploadAttempted) {
+      await recordUploadOutcome({
+        kind: "receipt",
+        outcome: "failed",
+        circleId: metricCircleId,
+        error,
+      });
     }
     return NextResponse.json(
       {

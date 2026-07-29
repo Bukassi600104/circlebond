@@ -20,6 +20,7 @@ import {
   createAsoEbiTier,
 } from "@/server/repositories/aso-ebi-circles";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
+import { recordUploadOutcome } from "@/server/repositories/operational-events";
 
 export const runtime = "nodejs";
 
@@ -76,6 +77,8 @@ function optionalFile(form: FormData, key: string) {
 }
 
 export async function POST(request: Request) {
+  let uploadAttempted = false;
+  let metricCircleId: string | null = null;
   try {
     await assertTrustedMutation(request);
     const session = await readSession();
@@ -133,6 +136,7 @@ export async function POST(request: Request) {
         "Add a bank name, account name and valid 10-digit account number.",
       );
     }
+    uploadAttempted = true;
     if (!(fabricImage instanceof File) || fabricImage.size < 1) {
       throw new Error("Add the main fabric image.");
     }
@@ -185,6 +189,7 @@ export async function POST(request: Request) {
       },
       firebaseCircleStore,
     );
+    metricCircleId = circle.id;
 
     for (const user of resolvedMembers) {
       await addCircleMember(
@@ -256,8 +261,21 @@ export async function POST(request: Request) {
       firebaseCircleStore,
     );
 
+    await recordUploadOutcome({
+      kind: "aso_ebi_image",
+      outcome: "succeeded",
+      circleId: circle.id,
+    });
     return NextResponse.json({ circleId: circle.id }, { status: 201 });
   } catch (error) {
+    if (uploadAttempted) {
+      await recordUploadOutcome({
+        kind: "aso_ebi_image",
+        outcome: "failed",
+        circleId: metricCircleId,
+        error,
+      });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unable to create." },
       { status: 400 },
