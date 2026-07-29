@@ -1,4 +1,4 @@
-import { getCurrentUserRef, upsertCurrentUserRef, getDashboardCirclesRef, getCircleEngineRecordRef, findUserByEmailRef, getGiftCircleDetailRef, getCircleAuditEntriesRef, createCircleDraftRef, updateCircleConfigurationWithAuditRef, transitionCircleWithAuditRef, addCircleMemberWithAuditRef, configureGiftCircleRef, setGiftMemberAllocationRef, getAsoEbiCircleDetailRef, configureAsoEbiCircleRef, createAsoEbiTierRef, selectAsoEbiTierRef, updateAsoEbiFulfilmentRef, getSupportCircleDetailRef, configureSupportCircleRef, recordSupportPledgeRef, setSupportMemberAllocationRef, createSupportUpdateRef, setSupportCompletionTypeRef, getInvitationByTokenHashRef, getCircleInvitationsRef, getInvitationAcceptancesRef, createInvitationRef, updateInvitationStateRef, acceptInvitationWithMembershipRef, requestInvitationApprovalRef, getContributionWorkspaceRef, submitReceiptWithAuditRef, replaceReceiptWithAuditRef, reviewReceiptWithAuditRef, approveInvitationMembershipRef, declineInvitationRef, requestReplacementInvitationRef, connectorConfig } from '../../esm/index.esm.js';
+import { getCurrentUserRef, upsertCurrentUserRef, getDashboardCirclesRef, getCircleEngineRecordRef, findUserByEmailRef, getGiftCircleDetailRef, getCircleAuditEntriesRef, createCircleDraftRef, updateCircleConfigurationWithAuditRef, transitionCircleWithAuditRef, addCircleMemberWithAuditRef, configureGiftCircleRef, setGiftMemberAllocationRef, getAsoEbiCircleDetailRef, configureAsoEbiCircleRef, createAsoEbiTierRef, selectAsoEbiTierRef, updateAsoEbiFulfilmentRef, getSupportCircleDetailRef, configureSupportCircleRef, recordSupportPledgeRef, setSupportMemberAllocationRef, createSupportUpdateRef, setSupportCompletionTypeRef, getInvitationByTokenHashRef, getCircleInvitationsRef, getInvitationAcceptancesRef, createInvitationRef, updateInvitationStateRef, acceptInvitationWithMembershipRef, requestInvitationApprovalRef, getContributionWorkspaceRef, submitReceiptWithAuditRef, replaceReceiptWithAuditRef, reviewReceiptWithAuditRef, approveInvitationMembershipRef, declineInvitationRef, requestReplacementInvitationRef, getCircleCommunicationRef, getRecentCommentsByAuthorRef, getOpenCommentReportsByReporterRef, getActivityLogsForCirclesRef, createAnnouncementWithActivityRef, updateAnnouncementWithAuditRef, deleteAnnouncementWithAuditRef, setCircleCommentsWithAuditRef, createCommentWithActivityRef, deleteOwnCommentWithAuditRef, moderateCommentWithAuditRef, reportCommentWithAuditRef, recordSystemActivityRef, connectorConfig } from '../../esm/index.esm.js';
 import { validateArgs, CallerSdkTypeEnum } from 'firebase/data-connect';
 import { useDataConnectQuery, useDataConnectMutation, validateReactArgs } from '@tanstack-query-firebase/react/data-connect';
 
@@ -278,6 +278,102 @@ export function useRequestReplacementInvitation(dcOrOptions, options) {
   const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return requestReplacementInvitationRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+export function useGetCircleCommunication(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleCommunicationRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useGetRecentCommentsByAuthor(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getRecentCommentsByAuthorRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useGetOpenCommentReportsByReporter(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getOpenCommentReportsByReporterRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useGetActivityLogsForCircles(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getActivityLogsForCirclesRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+export function useCreateAnnouncementWithActivity(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return createAnnouncementWithActivityRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useUpdateAnnouncementWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return updateAnnouncementWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useDeleteAnnouncementWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return deleteAnnouncementWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useSetCircleCommentsWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return setCircleCommentsWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useCreateCommentWithActivity(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return createCommentWithActivityRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useDeleteOwnCommentWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return deleteOwnCommentWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useModerateCommentWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return moderateCommentWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useReportCommentWithAudit(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return reportCommentWithAuditRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useRecordSystemActivity(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return recordSystemActivityRef(dcInstance, vars);
   }
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }

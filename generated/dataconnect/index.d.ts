@@ -16,6 +16,7 @@ export interface AcceptInvitationWithMembershipData {
   circle_update?: Circle_Key | null;
   invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface AcceptInvitationWithMembershipVariables {
@@ -30,9 +31,15 @@ export interface AcceptInvitationWithMembershipVariables {
   respondedAt: TimestampString;
 }
 
+export interface ActivityLog_Key {
+  id: UUIDString;
+  __typename?: 'ActivityLog_Key';
+}
+
 export interface AddCircleMemberWithAuditData {
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface AddCircleMemberWithAuditVariables {
@@ -43,12 +50,18 @@ export interface AddCircleMemberWithAuditVariables {
   createdAt: TimestampString;
 }
 
+export interface Announcement_Key {
+  id: UUIDString;
+  __typename?: 'Announcement_Key';
+}
+
 export interface ApproveInvitationMembershipData {
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_update?: InvitationAcceptance_Key | null;
   circle_update?: Circle_Key | null;
   invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface ApproveInvitationMembershipVariables {
@@ -88,6 +101,16 @@ export interface CircleMembership_Key {
 export interface Circle_Key {
   id: UUIDString;
   __typename?: 'Circle_Key';
+}
+
+export interface CommentReport_Key {
+  id: UUIDString;
+  __typename?: 'CommentReport_Key';
+}
+
+export interface Comment_Key {
+  id: UUIDString;
+  __typename?: 'Comment_Key';
 }
 
 export interface ConfigureAsoEbiCircleData {
@@ -151,6 +174,25 @@ export interface ConfigureSupportCircleVariables {
   updatedAt: TimestampString;
 }
 
+export interface CreateAnnouncementWithActivityData {
+  announcement_insert: Announcement_Key;
+  activityLog_insert: ActivityLog_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface CreateAnnouncementWithActivityVariables {
+  announcementId: UUIDString;
+  announcementEntityId: string;
+  activityId: UUIDString;
+  circleId: UUIDString;
+  authorId: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  commentsEnabled: boolean;
+  createdAt: TimestampString;
+}
+
 export interface CreateAsoEbiTierData {
   asoEbiTier_insert: AsoEbiTier_Key;
 }
@@ -176,6 +218,7 @@ export interface CreateCircleDraftData {
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface CreateCircleDraftVariables {
@@ -194,9 +237,27 @@ export interface CreateCircleDraftVariables {
   updatedAt: TimestampString;
 }
 
+export interface CreateCommentWithActivityData {
+  comment_insert: Comment_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+
+export interface CreateCommentWithActivityVariables {
+  commentId: UUIDString;
+  commentEntityId: string;
+  activityId: UUIDString;
+  circleId: UUIDString;
+  authorId: string;
+  announcementId?: UUIDString | null;
+  parentCommentId?: UUIDString | null;
+  body: string;
+  createdAt: TimestampString;
+}
+
 export interface CreateInvitationData {
   invitation_insert: Invitation_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface CreateInvitationVariables {
@@ -240,6 +301,32 @@ export interface DeclineInvitationVariables {
   respondedAt: TimestampString;
 }
 
+export interface DeleteAnnouncementWithAuditData {
+  announcement_update?: Announcement_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface DeleteAnnouncementWithAuditVariables {
+  announcementId: UUIDString;
+  announcementEntityId: string;
+  circleId: UUIDString;
+  actorId: string;
+  deletedAt: TimestampString;
+}
+
+export interface DeleteOwnCommentWithAuditData {
+  comment_update?: Comment_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface DeleteOwnCommentWithAuditVariables {
+  commentId: UUIDString;
+  commentEntityId: string;
+  circleId: UUIDString;
+  actorId: string;
+  deletedAt: TimestampString;
+}
+
 export interface FindUserByEmailData {
   users: ({
     id: string;
@@ -253,6 +340,29 @@ export interface FindUserByEmailData {
 
 export interface FindUserByEmailVariables {
   email: string;
+}
+
+export interface GetActivityLogsForCirclesData {
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    entityId: string;
+    metadata: string;
+    createdAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
+      actor?: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+  } & ActivityLog_Key)[];
+}
+
+export interface GetActivityLogsForCirclesVariables {
+  circleIds: UUIDString[];
 }
 
 export interface GetAsoEbiCircleDetailData {
@@ -333,6 +443,85 @@ export interface GetCircleAuditEntriesVariables {
   circleId: UUIDString;
 }
 
+export interface GetCircleCommunicationData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    commentsEnabled: boolean;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      user: {
+        id: string;
+        displayName: string;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      announcements: ({
+        id: UUIDString;
+        title: string;
+        body: string;
+        pinned: boolean;
+        commentsEnabled: boolean;
+        createdAt: TimestampString;
+        updatedAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & Announcement_Key)[];
+        comments: ({
+          id: UUIDString;
+          announcementId?: UUIDString | null;
+          parentCommentId?: UUIDString | null;
+          body: string;
+          status: string;
+          deletionReason?: string | null;
+          createdAt: TimestampString;
+          updatedAt: TimestampString;
+          deletedAt?: TimestampString | null;
+          author: {
+            id: string;
+            displayName: string;
+            profileImage?: string | null;
+          } & User_Key;
+        } & Comment_Key)[];
+          commentReports: ({
+            id: UUIDString;
+            reason: string;
+            status: string;
+            createdAt: TimestampString;
+            comment: {
+              id: UUIDString;
+            } & Comment_Key;
+              reporter: {
+                id: string;
+                displayName: string;
+              } & User_Key;
+          } & CommentReport_Key)[];
+            activityLogs: ({
+              id: UUIDString;
+              eventType: string;
+              entityId: string;
+              metadata: string;
+              createdAt: TimestampString;
+              actor?: {
+                id: string;
+                displayName: string;
+              } & User_Key;
+            } & ActivityLog_Key)[];
+}
+
+export interface GetCircleCommunicationVariables {
+  circleId: UUIDString;
+}
+
 export interface GetCircleEngineRecordData {
   circle?: {
     id: UUIDString;
@@ -396,6 +585,7 @@ export interface GetContributionWorkspaceData {
     id: UUIDString;
     name: string;
     type: string;
+    targetAmount: number;
     contributedAmount: number;
     status: string;
     creator: {
@@ -597,6 +787,29 @@ export interface GetInvitationByTokenHashVariables {
   tokenHash: string;
 }
 
+export interface GetOpenCommentReportsByReporterData {
+  commentReports: ({
+    id: UUIDString;
+  } & CommentReport_Key)[];
+}
+
+export interface GetOpenCommentReportsByReporterVariables {
+  commentId: UUIDString;
+  reporterId: string;
+}
+
+export interface GetRecentCommentsByAuthorData {
+  comments: ({
+    createdAt: TimestampString;
+  })[];
+}
+
+export interface GetRecentCommentsByAuthorVariables {
+  circleId: UUIDString;
+  authorId: string;
+  since: TimestampString;
+}
+
 export interface GetSupportCircleDetailData {
   circle?: {
     id: UUIDString;
@@ -667,6 +880,20 @@ export interface Invitation_Key {
   __typename?: 'Invitation_Key';
 }
 
+export interface ModerateCommentWithAuditData {
+  comment_update?: Comment_Key | null;
+  commentReport_updateMany: number;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ModerateCommentWithAuditVariables {
+  commentId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  reason: string;
+  moderatedAt: TimestampString;
+}
+
 export interface Receipt_Key {
   id: UUIDString;
   __typename?: 'Receipt_Key';
@@ -684,11 +911,26 @@ export interface RecordSupportPledgeVariables {
   updatedAt: TimestampString;
 }
 
+export interface RecordSystemActivityData {
+  activityLog_insert: ActivityLog_Key;
+}
+
+export interface RecordSystemActivityVariables {
+  activityId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  eventType: string;
+  entityId: string;
+  metadata: string;
+  createdAt: TimestampString;
+}
+
 export interface ReplaceReceiptWithAuditData {
   receipt_update?: Receipt_Key | null;
   receipt_insert: Receipt_Key;
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface ReplaceReceiptWithAuditVariables {
@@ -704,6 +946,21 @@ export interface ReplaceReceiptWithAuditVariables {
   status: string;
   overpaymentAmount: number;
   submittedAt: TimestampString;
+}
+
+export interface ReportCommentWithAuditData {
+  commentReport_insert: CommentReport_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface ReportCommentWithAuditVariables {
+  reportId: UUIDString;
+  commentId: UUIDString;
+  commentEntityId: string;
+  circleId: UUIDString;
+  reporterId: string;
+  reason: string;
+  createdAt: TimestampString;
 }
 
 export interface RequestInvitationApprovalData {
@@ -735,6 +992,7 @@ export interface ReviewReceiptWithAuditData {
   circleMembership_update?: CircleMembership_Key | null;
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface ReviewReceiptWithAuditVariables {
@@ -755,6 +1013,7 @@ export interface ReviewReceiptWithAuditVariables {
 export interface SelectAsoEbiTierData {
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface SelectAsoEbiTierVariables {
@@ -762,6 +1021,19 @@ export interface SelectAsoEbiTierVariables {
   memberId: string;
   tierId: UUIDString;
   expectedAmount: number;
+  updatedAt: TimestampString;
+}
+
+export interface SetCircleCommentsWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface SetCircleCommentsWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  commentsEnabled: boolean;
+  materialChanges: string;
   updatedAt: TimestampString;
 }
 
@@ -803,6 +1075,7 @@ export interface SubmitReceiptWithAuditData {
   receipt_insert: Receipt_Key;
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface SubmitReceiptWithAuditVariables {
@@ -827,6 +1100,7 @@ export interface SupportUpdate_Key {
 export interface TransitionCircleWithAuditData {
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface TransitionCircleWithAuditVariables {
@@ -840,9 +1114,27 @@ export interface TransitionCircleWithAuditVariables {
   purgeAt?: TimestampString | null;
 }
 
+export interface UpdateAnnouncementWithAuditData {
+  announcement_update?: Announcement_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface UpdateAnnouncementWithAuditVariables {
+  announcementId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  commentsEnabled: boolean;
+  updatedAt: TimestampString;
+  materialChanges: string;
+}
+
 export interface UpdateAsoEbiFulfilmentData {
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 
 export interface UpdateAsoEbiFulfilmentVariables {
@@ -1364,4 +1656,160 @@ export const requestReplacementInvitationRef: RequestReplacementInvitationRef;
 
 export function requestReplacementInvitation(vars: RequestReplacementInvitationVariables): MutationPromise<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
 export function requestReplacementInvitation(dc: DataConnect, vars: RequestReplacementInvitationVariables): MutationPromise<RequestReplacementInvitationData, RequestReplacementInvitationVariables>;
+
+interface GetCircleCommunicationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleCommunicationVariables): QueryRef<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCircleCommunicationVariables): QueryRef<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+  operationName: string;
+}
+export const getCircleCommunicationRef: GetCircleCommunicationRef;
+
+export function getCircleCommunication(vars: GetCircleCommunicationVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+export function getCircleCommunication(dc: DataConnect, vars: GetCircleCommunicationVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+
+interface GetRecentCommentsByAuthorRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRecentCommentsByAuthorVariables): QueryRef<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetRecentCommentsByAuthorVariables): QueryRef<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+  operationName: string;
+}
+export const getRecentCommentsByAuthorRef: GetRecentCommentsByAuthorRef;
+
+export function getRecentCommentsByAuthor(vars: GetRecentCommentsByAuthorVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+export function getRecentCommentsByAuthor(dc: DataConnect, vars: GetRecentCommentsByAuthorVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+
+interface GetOpenCommentReportsByReporterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOpenCommentReportsByReporterVariables): QueryRef<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetOpenCommentReportsByReporterVariables): QueryRef<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+  operationName: string;
+}
+export const getOpenCommentReportsByReporterRef: GetOpenCommentReportsByReporterRef;
+
+export function getOpenCommentReportsByReporter(vars: GetOpenCommentReportsByReporterVariables, options?: ExecuteQueryOptions): QueryPromise<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+export function getOpenCommentReportsByReporter(dc: DataConnect, vars: GetOpenCommentReportsByReporterVariables, options?: ExecuteQueryOptions): QueryPromise<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+
+interface GetActivityLogsForCirclesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetActivityLogsForCirclesVariables): QueryRef<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetActivityLogsForCirclesVariables): QueryRef<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+  operationName: string;
+}
+export const getActivityLogsForCirclesRef: GetActivityLogsForCirclesRef;
+
+export function getActivityLogsForCircles(vars: GetActivityLogsForCirclesVariables, options?: ExecuteQueryOptions): QueryPromise<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+export function getActivityLogsForCircles(dc: DataConnect, vars: GetActivityLogsForCirclesVariables, options?: ExecuteQueryOptions): QueryPromise<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+
+interface CreateAnnouncementWithActivityRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateAnnouncementWithActivityVariables): MutationRef<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateAnnouncementWithActivityVariables): MutationRef<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+  operationName: string;
+}
+export const createAnnouncementWithActivityRef: CreateAnnouncementWithActivityRef;
+
+export function createAnnouncementWithActivity(vars: CreateAnnouncementWithActivityVariables): MutationPromise<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+export function createAnnouncementWithActivity(dc: DataConnect, vars: CreateAnnouncementWithActivityVariables): MutationPromise<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+
+interface UpdateAnnouncementWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateAnnouncementWithAuditVariables): MutationRef<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateAnnouncementWithAuditVariables): MutationRef<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+  operationName: string;
+}
+export const updateAnnouncementWithAuditRef: UpdateAnnouncementWithAuditRef;
+
+export function updateAnnouncementWithAudit(vars: UpdateAnnouncementWithAuditVariables): MutationPromise<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+export function updateAnnouncementWithAudit(dc: DataConnect, vars: UpdateAnnouncementWithAuditVariables): MutationPromise<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+
+interface DeleteAnnouncementWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteAnnouncementWithAuditVariables): MutationRef<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteAnnouncementWithAuditVariables): MutationRef<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+  operationName: string;
+}
+export const deleteAnnouncementWithAuditRef: DeleteAnnouncementWithAuditRef;
+
+export function deleteAnnouncementWithAudit(vars: DeleteAnnouncementWithAuditVariables): MutationPromise<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+export function deleteAnnouncementWithAudit(dc: DataConnect, vars: DeleteAnnouncementWithAuditVariables): MutationPromise<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+
+interface SetCircleCommentsWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleCommentsWithAuditVariables): MutationRef<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SetCircleCommentsWithAuditVariables): MutationRef<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+  operationName: string;
+}
+export const setCircleCommentsWithAuditRef: SetCircleCommentsWithAuditRef;
+
+export function setCircleCommentsWithAudit(vars: SetCircleCommentsWithAuditVariables): MutationPromise<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+export function setCircleCommentsWithAudit(dc: DataConnect, vars: SetCircleCommentsWithAuditVariables): MutationPromise<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+
+interface CreateCommentWithActivityRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateCommentWithActivityVariables): MutationRef<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateCommentWithActivityVariables): MutationRef<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+  operationName: string;
+}
+export const createCommentWithActivityRef: CreateCommentWithActivityRef;
+
+export function createCommentWithActivity(vars: CreateCommentWithActivityVariables): MutationPromise<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+export function createCommentWithActivity(dc: DataConnect, vars: CreateCommentWithActivityVariables): MutationPromise<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+
+interface DeleteOwnCommentWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteOwnCommentWithAuditVariables): MutationRef<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteOwnCommentWithAuditVariables): MutationRef<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+  operationName: string;
+}
+export const deleteOwnCommentWithAuditRef: DeleteOwnCommentWithAuditRef;
+
+export function deleteOwnCommentWithAudit(vars: DeleteOwnCommentWithAuditVariables): MutationPromise<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+export function deleteOwnCommentWithAudit(dc: DataConnect, vars: DeleteOwnCommentWithAuditVariables): MutationPromise<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+
+interface ModerateCommentWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ModerateCommentWithAuditVariables): MutationRef<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ModerateCommentWithAuditVariables): MutationRef<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+  operationName: string;
+}
+export const moderateCommentWithAuditRef: ModerateCommentWithAuditRef;
+
+export function moderateCommentWithAudit(vars: ModerateCommentWithAuditVariables): MutationPromise<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+export function moderateCommentWithAudit(dc: DataConnect, vars: ModerateCommentWithAuditVariables): MutationPromise<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+
+interface ReportCommentWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReportCommentWithAuditVariables): MutationRef<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ReportCommentWithAuditVariables): MutationRef<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+  operationName: string;
+}
+export const reportCommentWithAuditRef: ReportCommentWithAuditRef;
+
+export function reportCommentWithAudit(vars: ReportCommentWithAuditVariables): MutationPromise<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+export function reportCommentWithAudit(dc: DataConnect, vars: ReportCommentWithAuditVariables): MutationPromise<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+
+interface RecordSystemActivityRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordSystemActivityVariables): MutationRef<RecordSystemActivityData, RecordSystemActivityVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RecordSystemActivityVariables): MutationRef<RecordSystemActivityData, RecordSystemActivityVariables>;
+  operationName: string;
+}
+export const recordSystemActivityRef: RecordSystemActivityRef;
+
+export function recordSystemActivity(vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
+export function recordSystemActivity(dc: DataConnect, vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
 

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { requireSession } from "@/server/auth";
 import "../dashboard.css";
+import "../communication.css";
 
 export default async function AccountLayout({
   children,

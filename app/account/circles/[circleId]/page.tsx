@@ -8,6 +8,7 @@ import { AsoEbiCircleView } from "@/components/aso-ebi/AsoEbiCircleView";
 import { loadAsoEbiCircle } from "@/server/repositories/aso-ebi-circles";
 import { SupportCircleView } from "@/components/support-circles/SupportCircleView";
 import { loadSupportCircle } from "@/server/repositories/support-circles";
+import { CircleCommunicationSection } from "@/components/communication/CircleCommunicationSection";
 
 export default async function CircleOverviewPage({
   params,
@@ -18,15 +19,39 @@ export default async function CircleOverviewPage({
   const { circleId } = await params;
   const giftCircle = await loadGiftCircle(circleId, session.uid);
   if (giftCircle) {
-    return <GiftCircleView circle={giftCircle} viewerId={session.uid} />;
+    return (
+      <>
+        <GiftCircleView circle={giftCircle} viewerId={session.uid} />
+        <CircleCommunicationSection
+          circleId={circleId}
+          viewerId={session.uid}
+        />
+      </>
+    );
   }
   const asoEbiCircle = await loadAsoEbiCircle(circleId, session.uid);
   if (asoEbiCircle) {
-    return <AsoEbiCircleView circle={asoEbiCircle} viewerId={session.uid} />;
+    return (
+      <>
+        <AsoEbiCircleView circle={asoEbiCircle} viewerId={session.uid} />
+        <CircleCommunicationSection
+          circleId={circleId}
+          viewerId={session.uid}
+        />
+      </>
+    );
   }
   const supportCircle = await loadSupportCircle(circleId, session.uid);
   if (supportCircle) {
-    return <SupportCircleView circle={supportCircle} viewerId={session.uid} />;
+    return (
+      <>
+        <SupportCircleView circle={supportCircle} viewerId={session.uid} />
+        <CircleCommunicationSection
+          circleId={circleId}
+          viewerId={session.uid}
+        />
+      </>
+    );
   }
   const circles = await loadDashboardCircles(session.uid);
   const circle = circles.find((item) => item.id === circleId);

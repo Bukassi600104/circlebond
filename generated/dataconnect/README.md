@@ -22,6 +22,10 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetCircleInvitations*](#getcircleinvitations)
   - [*GetInvitationAcceptances*](#getinvitationacceptances)
   - [*GetContributionWorkspace*](#getcontributionworkspace)
+  - [*GetCircleCommunication*](#getcirclecommunication)
+  - [*GetRecentCommentsByAuthor*](#getrecentcommentsbyauthor)
+  - [*GetOpenCommentReportsByReporter*](#getopencommentreportsbyreporter)
+  - [*GetActivityLogsForCircles*](#getactivitylogsforcircles)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -49,6 +53,15 @@ This README will guide you through the process of using the generated JavaScript
   - [*ApproveInvitationMembership*](#approveinvitationmembership)
   - [*DeclineInvitation*](#declineinvitation)
   - [*RequestReplacementInvitation*](#requestreplacementinvitation)
+  - [*CreateAnnouncementWithActivity*](#createannouncementwithactivity)
+  - [*UpdateAnnouncementWithAudit*](#updateannouncementwithaudit)
+  - [*DeleteAnnouncementWithAudit*](#deleteannouncementwithaudit)
+  - [*SetCircleCommentsWithAudit*](#setcirclecommentswithaudit)
+  - [*CreateCommentWithActivity*](#createcommentwithactivity)
+  - [*DeleteOwnCommentWithAudit*](#deleteowncommentwithaudit)
+  - [*ModerateCommentWithAudit*](#moderatecommentwithaudit)
+  - [*ReportCommentWithAudit*](#reportcommentwithaudit)
+  - [*RecordSystemActivity*](#recordsystemactivity)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bondcircle`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -1614,6 +1627,7 @@ export interface GetContributionWorkspaceData {
     id: UUIDString;
     name: string;
     type: string;
+    targetAmount: number;
     contributedAmount: number;
     status: string;
     creator: {
@@ -1724,6 +1738,561 @@ executeQuery(ref).then((response) => {
   console.log(data.circle);
   console.log(data.circleMemberships);
   console.log(data.receipts);
+});
+```
+
+## GetCircleCommunication
+You can execute the `GetCircleCommunication` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleCommunication(vars: GetCircleCommunicationVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+
+interface GetCircleCommunicationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleCommunicationVariables): QueryRef<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+}
+export const getCircleCommunicationRef: GetCircleCommunicationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleCommunication(dc: DataConnect, vars: GetCircleCommunicationVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+
+interface GetCircleCommunicationRef {
+  ...
+  (dc: DataConnect, vars: GetCircleCommunicationVariables): QueryRef<GetCircleCommunicationData, GetCircleCommunicationVariables>;
+}
+export const getCircleCommunicationRef: GetCircleCommunicationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleCommunicationRef:
+```typescript
+const name = getCircleCommunicationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleCommunicationVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleCommunication` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleCommunicationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleCommunicationData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    commentsEnabled: boolean;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+    circleMemberships: ({
+      role: string;
+      membershipStatus: string;
+      user: {
+        id: string;
+        displayName: string;
+        profileImage?: string | null;
+      } & User_Key;
+    })[];
+      announcements: ({
+        id: UUIDString;
+        title: string;
+        body: string;
+        pinned: boolean;
+        commentsEnabled: boolean;
+        createdAt: TimestampString;
+        updatedAt: TimestampString;
+        author: {
+          id: string;
+          displayName: string;
+        } & User_Key;
+      } & Announcement_Key)[];
+        comments: ({
+          id: UUIDString;
+          announcementId?: UUIDString | null;
+          parentCommentId?: UUIDString | null;
+          body: string;
+          status: string;
+          deletionReason?: string | null;
+          createdAt: TimestampString;
+          updatedAt: TimestampString;
+          deletedAt?: TimestampString | null;
+          author: {
+            id: string;
+            displayName: string;
+            profileImage?: string | null;
+          } & User_Key;
+        } & Comment_Key)[];
+          commentReports: ({
+            id: UUIDString;
+            reason: string;
+            status: string;
+            createdAt: TimestampString;
+            comment: {
+              id: UUIDString;
+            } & Comment_Key;
+              reporter: {
+                id: string;
+                displayName: string;
+              } & User_Key;
+          } & CommentReport_Key)[];
+            activityLogs: ({
+              id: UUIDString;
+              eventType: string;
+              entityId: string;
+              metadata: string;
+              createdAt: TimestampString;
+              actor?: {
+                id: string;
+                displayName: string;
+              } & User_Key;
+            } & ActivityLog_Key)[];
+}
+```
+### Using `GetCircleCommunication`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommunication, GetCircleCommunicationVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
+const getCircleCommunicationVars: GetCircleCommunicationVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleCommunication()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleCommunication(getCircleCommunicationVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleCommunication({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleCommunication(dataConnect, getCircleCommunicationVars);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.announcements);
+console.log(data.comments);
+console.log(data.commentReports);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+getCircleCommunication(getCircleCommunicationVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.announcements);
+  console.log(data.comments);
+  console.log(data.commentReports);
+  console.log(data.activityLogs);
+});
+```
+
+### Using `GetCircleCommunication`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommunicationRef, GetCircleCommunicationVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommunication` query requires an argument of type `GetCircleCommunicationVariables`:
+const getCircleCommunicationVars: GetCircleCommunicationVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleCommunicationRef()` function to get a reference to the query.
+const ref = getCircleCommunicationRef(getCircleCommunicationVars);
+// Variables can be defined inline as well.
+const ref = getCircleCommunicationRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleCommunicationRef(dataConnect, getCircleCommunicationVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.announcements);
+console.log(data.comments);
+console.log(data.commentReports);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.announcements);
+  console.log(data.comments);
+  console.log(data.commentReports);
+  console.log(data.activityLogs);
+});
+```
+
+## GetRecentCommentsByAuthor
+You can execute the `GetRecentCommentsByAuthor` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getRecentCommentsByAuthor(vars: GetRecentCommentsByAuthorVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+
+interface GetRecentCommentsByAuthorRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRecentCommentsByAuthorVariables): QueryRef<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+}
+export const getRecentCommentsByAuthorRef: GetRecentCommentsByAuthorRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRecentCommentsByAuthor(dc: DataConnect, vars: GetRecentCommentsByAuthorVariables, options?: ExecuteQueryOptions): QueryPromise<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+
+interface GetRecentCommentsByAuthorRef {
+  ...
+  (dc: DataConnect, vars: GetRecentCommentsByAuthorVariables): QueryRef<GetRecentCommentsByAuthorData, GetRecentCommentsByAuthorVariables>;
+}
+export const getRecentCommentsByAuthorRef: GetRecentCommentsByAuthorRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRecentCommentsByAuthorRef:
+```typescript
+const name = getRecentCommentsByAuthorRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRecentCommentsByAuthorVariables {
+  circleId: UUIDString;
+  authorId: string;
+  since: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `GetRecentCommentsByAuthor` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRecentCommentsByAuthorData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRecentCommentsByAuthorData {
+  comments: ({
+    createdAt: TimestampString;
+  })[];
+}
+```
+### Using `GetRecentCommentsByAuthor`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRecentCommentsByAuthor, GetRecentCommentsByAuthorVariables } from '@bondcircle/dataconnect';
+
+// The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
+const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
+  circleId: ..., 
+  authorId: ..., 
+  since: ..., 
+};
+
+// Call the `getRecentCommentsByAuthor()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRecentCommentsByAuthor(getRecentCommentsByAuthorVars);
+// Variables can be defined inline as well.
+const { data } = await getRecentCommentsByAuthor({ circleId: ..., authorId: ..., since: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRecentCommentsByAuthor(dataConnect, getRecentCommentsByAuthorVars);
+
+console.log(data.comments);
+
+// Or, you can use the `Promise` API.
+getRecentCommentsByAuthor(getRecentCommentsByAuthorVars).then((response) => {
+  const data = response.data;
+  console.log(data.comments);
+});
+```
+
+### Using `GetRecentCommentsByAuthor`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRecentCommentsByAuthorRef, GetRecentCommentsByAuthorVariables } from '@bondcircle/dataconnect';
+
+// The `GetRecentCommentsByAuthor` query requires an argument of type `GetRecentCommentsByAuthorVariables`:
+const getRecentCommentsByAuthorVars: GetRecentCommentsByAuthorVariables = {
+  circleId: ..., 
+  authorId: ..., 
+  since: ..., 
+};
+
+// Call the `getRecentCommentsByAuthorRef()` function to get a reference to the query.
+const ref = getRecentCommentsByAuthorRef(getRecentCommentsByAuthorVars);
+// Variables can be defined inline as well.
+const ref = getRecentCommentsByAuthorRef({ circleId: ..., authorId: ..., since: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRecentCommentsByAuthorRef(dataConnect, getRecentCommentsByAuthorVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.comments);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.comments);
+});
+```
+
+## GetOpenCommentReportsByReporter
+You can execute the `GetOpenCommentReportsByReporter` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOpenCommentReportsByReporter(vars: GetOpenCommentReportsByReporterVariables, options?: ExecuteQueryOptions): QueryPromise<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+
+interface GetOpenCommentReportsByReporterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOpenCommentReportsByReporterVariables): QueryRef<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+}
+export const getOpenCommentReportsByReporterRef: GetOpenCommentReportsByReporterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOpenCommentReportsByReporter(dc: DataConnect, vars: GetOpenCommentReportsByReporterVariables, options?: ExecuteQueryOptions): QueryPromise<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+
+interface GetOpenCommentReportsByReporterRef {
+  ...
+  (dc: DataConnect, vars: GetOpenCommentReportsByReporterVariables): QueryRef<GetOpenCommentReportsByReporterData, GetOpenCommentReportsByReporterVariables>;
+}
+export const getOpenCommentReportsByReporterRef: GetOpenCommentReportsByReporterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOpenCommentReportsByReporterRef:
+```typescript
+const name = getOpenCommentReportsByReporterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOpenCommentReportsByReporterVariables {
+  commentId: UUIDString;
+  reporterId: string;
+}
+```
+### Return Type
+Recall that executing the `GetOpenCommentReportsByReporter` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOpenCommentReportsByReporterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOpenCommentReportsByReporterData {
+  commentReports: ({
+    id: UUIDString;
+  } & CommentReport_Key)[];
+}
+```
+### Using `GetOpenCommentReportsByReporter`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOpenCommentReportsByReporter, GetOpenCommentReportsByReporterVariables } from '@bondcircle/dataconnect';
+
+// The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
+const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
+  commentId: ..., 
+  reporterId: ..., 
+};
+
+// Call the `getOpenCommentReportsByReporter()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOpenCommentReportsByReporter(getOpenCommentReportsByReporterVars);
+// Variables can be defined inline as well.
+const { data } = await getOpenCommentReportsByReporter({ commentId: ..., reporterId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOpenCommentReportsByReporter(dataConnect, getOpenCommentReportsByReporterVars);
+
+console.log(data.commentReports);
+
+// Or, you can use the `Promise` API.
+getOpenCommentReportsByReporter(getOpenCommentReportsByReporterVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReports);
+});
+```
+
+### Using `GetOpenCommentReportsByReporter`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOpenCommentReportsByReporterRef, GetOpenCommentReportsByReporterVariables } from '@bondcircle/dataconnect';
+
+// The `GetOpenCommentReportsByReporter` query requires an argument of type `GetOpenCommentReportsByReporterVariables`:
+const getOpenCommentReportsByReporterVars: GetOpenCommentReportsByReporterVariables = {
+  commentId: ..., 
+  reporterId: ..., 
+};
+
+// Call the `getOpenCommentReportsByReporterRef()` function to get a reference to the query.
+const ref = getOpenCommentReportsByReporterRef(getOpenCommentReportsByReporterVars);
+// Variables can be defined inline as well.
+const ref = getOpenCommentReportsByReporterRef({ commentId: ..., reporterId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOpenCommentReportsByReporterRef(dataConnect, getOpenCommentReportsByReporterVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.commentReports);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReports);
+});
+```
+
+## GetActivityLogsForCircles
+You can execute the `GetActivityLogsForCircles` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getActivityLogsForCircles(vars: GetActivityLogsForCirclesVariables, options?: ExecuteQueryOptions): QueryPromise<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+
+interface GetActivityLogsForCirclesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetActivityLogsForCirclesVariables): QueryRef<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+}
+export const getActivityLogsForCirclesRef: GetActivityLogsForCirclesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getActivityLogsForCircles(dc: DataConnect, vars: GetActivityLogsForCirclesVariables, options?: ExecuteQueryOptions): QueryPromise<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+
+interface GetActivityLogsForCirclesRef {
+  ...
+  (dc: DataConnect, vars: GetActivityLogsForCirclesVariables): QueryRef<GetActivityLogsForCirclesData, GetActivityLogsForCirclesVariables>;
+}
+export const getActivityLogsForCirclesRef: GetActivityLogsForCirclesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getActivityLogsForCirclesRef:
+```typescript
+const name = getActivityLogsForCirclesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetActivityLogsForCirclesVariables {
+  circleIds: UUIDString[];
+}
+```
+### Return Type
+Recall that executing the `GetActivityLogsForCircles` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetActivityLogsForCirclesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetActivityLogsForCirclesData {
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    entityId: string;
+    metadata: string;
+    createdAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
+      actor?: {
+        id: string;
+        displayName: string;
+      } & User_Key;
+  } & ActivityLog_Key)[];
+}
+```
+### Using `GetActivityLogsForCircles`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getActivityLogsForCircles, GetActivityLogsForCirclesVariables } from '@bondcircle/dataconnect';
+
+// The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
+const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
+  circleIds: ..., 
+};
+
+// Call the `getActivityLogsForCircles()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getActivityLogsForCircles(getActivityLogsForCirclesVars);
+// Variables can be defined inline as well.
+const { data } = await getActivityLogsForCircles({ circleIds: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getActivityLogsForCircles(dataConnect, getActivityLogsForCirclesVars);
+
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+getActivityLogsForCircles(getActivityLogsForCirclesVars).then((response) => {
+  const data = response.data;
+  console.log(data.activityLogs);
+});
+```
+
+### Using `GetActivityLogsForCircles`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getActivityLogsForCirclesRef, GetActivityLogsForCirclesVariables } from '@bondcircle/dataconnect';
+
+// The `GetActivityLogsForCircles` query requires an argument of type `GetActivityLogsForCirclesVariables`:
+const getActivityLogsForCirclesVars: GetActivityLogsForCirclesVariables = {
+  circleIds: ..., 
+};
+
+// Call the `getActivityLogsForCirclesRef()` function to get a reference to the query.
+const ref = getActivityLogsForCirclesRef(getActivityLogsForCirclesVars);
+// Variables can be defined inline as well.
+const ref = getActivityLogsForCirclesRef({ circleIds: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getActivityLogsForCirclesRef(dataConnect, getActivityLogsForCirclesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.activityLogs);
 });
 ```
 
@@ -1924,6 +2493,7 @@ export interface CreateCircleDraftData {
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `CreateCircleDraft`'s action shortcut function
@@ -1962,6 +2532,7 @@ const { data } = await createCircleDraft(dataConnect, createCircleDraftVars);
 console.log(data.circle_insert);
 console.log(data.circleMembership_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 createCircleDraft(createCircleDraftVars).then((response) => {
@@ -1969,6 +2540,7 @@ createCircleDraft(createCircleDraftVars).then((response) => {
   console.log(data.circle_insert);
   console.log(data.circleMembership_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -2011,6 +2583,7 @@ const { data } = await executeMutation(ref);
 console.log(data.circle_insert);
 console.log(data.circleMembership_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -2018,6 +2591,7 @@ executeMutation(ref).then((response) => {
   console.log(data.circle_insert);
   console.log(data.circleMembership_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -2229,6 +2803,7 @@ The `data` property is an object of type `TransitionCircleWithAuditData`, which 
 export interface TransitionCircleWithAuditData {
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `TransitionCircleWithAudit`'s action shortcut function
@@ -2261,12 +2836,14 @@ const { data } = await transitionCircleWithAudit(dataConnect, transitionCircleWi
 
 console.log(data.circle_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 transitionCircleWithAudit(transitionCircleWithAuditVars).then((response) => {
   const data = response.data;
   console.log(data.circle_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -2303,12 +2880,14 @@ const { data } = await executeMutation(ref);
 
 console.log(data.circle_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circle_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -2361,6 +2940,7 @@ The `data` property is an object of type `AddCircleMemberWithAuditData`, which i
 export interface AddCircleMemberWithAuditData {
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `AddCircleMemberWithAudit`'s action shortcut function
@@ -2390,12 +2970,14 @@ const { data } = await addCircleMemberWithAudit(dataConnect, addCircleMemberWith
 
 console.log(data.circleMembership_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 addCircleMemberWithAudit(addCircleMemberWithAuditVars).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -2429,12 +3011,14 @@ const { data } = await executeMutation(ref);
 
 console.log(data.circleMembership_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -3035,6 +3619,7 @@ The `data` property is an object of type `SelectAsoEbiTierData`, which is define
 export interface SelectAsoEbiTierData {
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `SelectAsoEbiTier`'s action shortcut function
@@ -3064,12 +3649,14 @@ const { data } = await selectAsoEbiTier(dataConnect, selectAsoEbiTierVars);
 
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 selectAsoEbiTier(selectAsoEbiTierVars).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -3103,12 +3690,14 @@ const { data } = await executeMutation(ref);
 
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -3161,6 +3750,7 @@ The `data` property is an object of type `UpdateAsoEbiFulfilmentData`, which is 
 export interface UpdateAsoEbiFulfilmentData {
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `UpdateAsoEbiFulfilment`'s action shortcut function
@@ -3190,12 +3780,14 @@ const { data } = await updateAsoEbiFulfilment(dataConnect, updateAsoEbiFulfilmen
 
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 updateAsoEbiFulfilment(updateAsoEbiFulfilmentVars).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -3229,12 +3821,14 @@ const { data } = await executeMutation(ref);
 
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -3943,6 +4537,7 @@ The `data` property is an object of type `CreateInvitationData`, which is define
 export interface CreateInvitationData {
   invitation_insert: Invitation_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `CreateInvitation`'s action shortcut function
@@ -3979,12 +4574,14 @@ const { data } = await createInvitation(dataConnect, createInvitationVars);
 
 console.log(data.invitation_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 createInvitation(createInvitationVars).then((response) => {
   const data = response.data;
   console.log(data.invitation_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4025,12 +4622,14 @@ const { data } = await executeMutation(ref);
 
 console.log(data.invitation_insert);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.invitation_insert);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4222,6 +4821,7 @@ export interface AcceptInvitationWithMembershipData {
   circle_update?: Circle_Key | null;
   invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `AcceptInvitationWithMembership`'s action shortcut function
@@ -4258,6 +4858,7 @@ console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 acceptInvitationWithMembership(acceptInvitationWithMembershipVars).then((response) => {
@@ -4267,6 +4868,7 @@ acceptInvitationWithMembership(acceptInvitationWithMembershipVars).then((respons
   console.log(data.circle_update);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4307,6 +4909,7 @@ console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -4316,6 +4919,7 @@ executeMutation(ref).then((response) => {
   console.log(data.circle_update);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4503,6 +5107,7 @@ export interface SubmitReceiptWithAuditData {
   receipt_insert: Receipt_Key;
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `SubmitReceiptWithAudit`'s action shortcut function
@@ -4539,6 +5144,7 @@ const { data } = await submitReceiptWithAudit(dataConnect, submitReceiptWithAudi
 console.log(data.receipt_insert);
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 submitReceiptWithAudit(submitReceiptWithAuditVars).then((response) => {
@@ -4546,6 +5152,7 @@ submitReceiptWithAudit(submitReceiptWithAuditVars).then((response) => {
   console.log(data.receipt_insert);
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4586,6 +5193,7 @@ const { data } = await executeMutation(ref);
 console.log(data.receipt_insert);
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -4593,6 +5201,7 @@ executeMutation(ref).then((response) => {
   console.log(data.receipt_insert);
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4654,6 +5263,7 @@ export interface ReplaceReceiptWithAuditData {
   receipt_insert: Receipt_Key;
   circleMembership_update?: CircleMembership_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `ReplaceReceiptWithAudit`'s action shortcut function
@@ -4692,6 +5302,7 @@ console.log(data.receipt_update);
 console.log(data.receipt_insert);
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 replaceReceiptWithAudit(replaceReceiptWithAuditVars).then((response) => {
@@ -4700,6 +5311,7 @@ replaceReceiptWithAudit(replaceReceiptWithAuditVars).then((response) => {
   console.log(data.receipt_insert);
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4742,6 +5354,7 @@ console.log(data.receipt_update);
 console.log(data.receipt_insert);
 console.log(data.circleMembership_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -4750,6 +5363,7 @@ executeMutation(ref).then((response) => {
   console.log(data.receipt_insert);
   console.log(data.circleMembership_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4811,6 +5425,7 @@ export interface ReviewReceiptWithAuditData {
   circleMembership_update?: CircleMembership_Key | null;
   circle_update?: Circle_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `ReviewReceiptWithAudit`'s action shortcut function
@@ -4849,6 +5464,7 @@ console.log(data.receipt_update);
 console.log(data.circleMembership_update);
 console.log(data.circle_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 reviewReceiptWithAudit(reviewReceiptWithAuditVars).then((response) => {
@@ -4857,6 +5473,7 @@ reviewReceiptWithAudit(reviewReceiptWithAuditVars).then((response) => {
   console.log(data.circleMembership_update);
   console.log(data.circle_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4899,6 +5516,7 @@ console.log(data.receipt_update);
 console.log(data.circleMembership_update);
 console.log(data.circle_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -4907,6 +5525,7 @@ executeMutation(ref).then((response) => {
   console.log(data.circleMembership_update);
   console.log(data.circle_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -4967,6 +5586,7 @@ export interface ApproveInvitationMembershipData {
   circle_update?: Circle_Key | null;
   invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
 }
 ```
 ### Using `ApproveInvitationMembership`'s action shortcut function
@@ -5004,6 +5624,7 @@ console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 approveInvitationMembership(approveInvitationMembershipVars).then((response) => {
@@ -5013,6 +5634,7 @@ approveInvitationMembership(approveInvitationMembershipVars).then((response) => 
   console.log(data.circle_update);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -5054,6 +5676,7 @@ console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
@@ -5063,6 +5686,7 @@ executeMutation(ref).then((response) => {
   console.log(data.circle_update);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
 });
 ```
 
@@ -5312,6 +5936,1196 @@ console.log(data.circleAuditEntry_insert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circleAuditEntry_insert);
+});
+```
+
+## CreateAnnouncementWithActivity
+You can execute the `CreateAnnouncementWithActivity` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createAnnouncementWithActivity(vars: CreateAnnouncementWithActivityVariables): MutationPromise<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+
+interface CreateAnnouncementWithActivityRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateAnnouncementWithActivityVariables): MutationRef<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+}
+export const createAnnouncementWithActivityRef: CreateAnnouncementWithActivityRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createAnnouncementWithActivity(dc: DataConnect, vars: CreateAnnouncementWithActivityVariables): MutationPromise<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+
+interface CreateAnnouncementWithActivityRef {
+  ...
+  (dc: DataConnect, vars: CreateAnnouncementWithActivityVariables): MutationRef<CreateAnnouncementWithActivityData, CreateAnnouncementWithActivityVariables>;
+}
+export const createAnnouncementWithActivityRef: CreateAnnouncementWithActivityRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createAnnouncementWithActivityRef:
+```typescript
+const name = createAnnouncementWithActivityRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateAnnouncementWithActivityVariables {
+  announcementId: UUIDString;
+  announcementEntityId: string;
+  activityId: UUIDString;
+  circleId: UUIDString;
+  authorId: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  commentsEnabled: boolean;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateAnnouncementWithActivity` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateAnnouncementWithActivityData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateAnnouncementWithActivityData {
+  announcement_insert: Announcement_Key;
+  activityLog_insert: ActivityLog_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `CreateAnnouncementWithActivity`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createAnnouncementWithActivity, CreateAnnouncementWithActivityVariables } from '@bondcircle/dataconnect';
+
+// The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
+const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
+  commentsEnabled: ..., 
+  createdAt: ..., 
+};
+
+// Call the `createAnnouncementWithActivity()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createAnnouncementWithActivity(createAnnouncementWithActivityVars);
+// Variables can be defined inline as well.
+const { data } = await createAnnouncementWithActivity({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createAnnouncementWithActivity(dataConnect, createAnnouncementWithActivityVars);
+
+console.log(data.announcement_insert);
+console.log(data.activityLog_insert);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+createAnnouncementWithActivity(createAnnouncementWithActivityVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_insert);
+  console.log(data.activityLog_insert);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `CreateAnnouncementWithActivity`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createAnnouncementWithActivityRef, CreateAnnouncementWithActivityVariables } from '@bondcircle/dataconnect';
+
+// The `CreateAnnouncementWithActivity` mutation requires an argument of type `CreateAnnouncementWithActivityVariables`:
+const createAnnouncementWithActivityVars: CreateAnnouncementWithActivityVariables = {
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
+  commentsEnabled: ..., 
+  createdAt: ..., 
+};
+
+// Call the `createAnnouncementWithActivityRef()` function to get a reference to the mutation.
+const ref = createAnnouncementWithActivityRef(createAnnouncementWithActivityVars);
+// Variables can be defined inline as well.
+const ref = createAnnouncementWithActivityRef({ announcementId: ..., announcementEntityId: ..., activityId: ..., circleId: ..., authorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createAnnouncementWithActivityRef(dataConnect, createAnnouncementWithActivityVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.announcement_insert);
+console.log(data.activityLog_insert);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_insert);
+  console.log(data.activityLog_insert);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## UpdateAnnouncementWithAudit
+You can execute the `UpdateAnnouncementWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateAnnouncementWithAudit(vars: UpdateAnnouncementWithAuditVariables): MutationPromise<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+
+interface UpdateAnnouncementWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateAnnouncementWithAuditVariables): MutationRef<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+}
+export const updateAnnouncementWithAuditRef: UpdateAnnouncementWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateAnnouncementWithAudit(dc: DataConnect, vars: UpdateAnnouncementWithAuditVariables): MutationPromise<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+
+interface UpdateAnnouncementWithAuditRef {
+  ...
+  (dc: DataConnect, vars: UpdateAnnouncementWithAuditVariables): MutationRef<UpdateAnnouncementWithAuditData, UpdateAnnouncementWithAuditVariables>;
+}
+export const updateAnnouncementWithAuditRef: UpdateAnnouncementWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateAnnouncementWithAuditRef:
+```typescript
+const name = updateAnnouncementWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateAnnouncementWithAuditVariables {
+  announcementId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  commentsEnabled: boolean;
+  updatedAt: TimestampString;
+  materialChanges: string;
+}
+```
+### Return Type
+Recall that executing the `UpdateAnnouncementWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateAnnouncementWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateAnnouncementWithAuditData {
+  announcement_update?: Announcement_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `UpdateAnnouncementWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateAnnouncementWithAudit, UpdateAnnouncementWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
+const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
+  announcementId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
+  commentsEnabled: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
+};
+
+// Call the `updateAnnouncementWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateAnnouncementWithAudit(updateAnnouncementWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await updateAnnouncementWithAudit({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateAnnouncementWithAudit(dataConnect, updateAnnouncementWithAuditVars);
+
+console.log(data.announcement_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+updateAnnouncementWithAudit(updateAnnouncementWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `UpdateAnnouncementWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateAnnouncementWithAuditRef, UpdateAnnouncementWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateAnnouncementWithAudit` mutation requires an argument of type `UpdateAnnouncementWithAuditVariables`:
+const updateAnnouncementWithAuditVars: UpdateAnnouncementWithAuditVariables = {
+  announcementId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  title: ..., 
+  body: ..., 
+  pinned: ..., 
+  commentsEnabled: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
+};
+
+// Call the `updateAnnouncementWithAuditRef()` function to get a reference to the mutation.
+const ref = updateAnnouncementWithAuditRef(updateAnnouncementWithAuditVars);
+// Variables can be defined inline as well.
+const ref = updateAnnouncementWithAuditRef({ announcementId: ..., circleId: ..., actorId: ..., title: ..., body: ..., pinned: ..., commentsEnabled: ..., updatedAt: ..., materialChanges: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateAnnouncementWithAuditRef(dataConnect, updateAnnouncementWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.announcement_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## DeleteAnnouncementWithAudit
+You can execute the `DeleteAnnouncementWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteAnnouncementWithAudit(vars: DeleteAnnouncementWithAuditVariables): MutationPromise<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+
+interface DeleteAnnouncementWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteAnnouncementWithAuditVariables): MutationRef<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+}
+export const deleteAnnouncementWithAuditRef: DeleteAnnouncementWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteAnnouncementWithAudit(dc: DataConnect, vars: DeleteAnnouncementWithAuditVariables): MutationPromise<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+
+interface DeleteAnnouncementWithAuditRef {
+  ...
+  (dc: DataConnect, vars: DeleteAnnouncementWithAuditVariables): MutationRef<DeleteAnnouncementWithAuditData, DeleteAnnouncementWithAuditVariables>;
+}
+export const deleteAnnouncementWithAuditRef: DeleteAnnouncementWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteAnnouncementWithAuditRef:
+```typescript
+const name = deleteAnnouncementWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteAnnouncementWithAuditVariables {
+  announcementId: UUIDString;
+  announcementEntityId: string;
+  circleId: UUIDString;
+  actorId: string;
+  deletedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `DeleteAnnouncementWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteAnnouncementWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteAnnouncementWithAuditData {
+  announcement_update?: Announcement_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `DeleteAnnouncementWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteAnnouncementWithAudit, DeleteAnnouncementWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
+const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
+};
+
+// Call the `deleteAnnouncementWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteAnnouncementWithAudit(deleteAnnouncementWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await deleteAnnouncementWithAudit({ announcementId: ..., announcementEntityId: ..., circleId: ..., actorId: ..., deletedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteAnnouncementWithAudit(dataConnect, deleteAnnouncementWithAuditVars);
+
+console.log(data.announcement_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+deleteAnnouncementWithAudit(deleteAnnouncementWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `DeleteAnnouncementWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteAnnouncementWithAuditRef, DeleteAnnouncementWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteAnnouncementWithAudit` mutation requires an argument of type `DeleteAnnouncementWithAuditVariables`:
+const deleteAnnouncementWithAuditVars: DeleteAnnouncementWithAuditVariables = {
+  announcementId: ..., 
+  announcementEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
+};
+
+// Call the `deleteAnnouncementWithAuditRef()` function to get a reference to the mutation.
+const ref = deleteAnnouncementWithAuditRef(deleteAnnouncementWithAuditVars);
+// Variables can be defined inline as well.
+const ref = deleteAnnouncementWithAuditRef({ announcementId: ..., announcementEntityId: ..., circleId: ..., actorId: ..., deletedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteAnnouncementWithAuditRef(dataConnect, deleteAnnouncementWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.announcement_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## SetCircleCommentsWithAudit
+You can execute the `SetCircleCommentsWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+setCircleCommentsWithAudit(vars: SetCircleCommentsWithAuditVariables): MutationPromise<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+
+interface SetCircleCommentsWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SetCircleCommentsWithAuditVariables): MutationRef<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+}
+export const setCircleCommentsWithAuditRef: SetCircleCommentsWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+setCircleCommentsWithAudit(dc: DataConnect, vars: SetCircleCommentsWithAuditVariables): MutationPromise<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+
+interface SetCircleCommentsWithAuditRef {
+  ...
+  (dc: DataConnect, vars: SetCircleCommentsWithAuditVariables): MutationRef<SetCircleCommentsWithAuditData, SetCircleCommentsWithAuditVariables>;
+}
+export const setCircleCommentsWithAuditRef: SetCircleCommentsWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the setCircleCommentsWithAuditRef:
+```typescript
+const name = setCircleCommentsWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SetCircleCommentsWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  commentsEnabled: boolean;
+  materialChanges: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `SetCircleCommentsWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SetCircleCommentsWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SetCircleCommentsWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `SetCircleCommentsWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, setCircleCommentsWithAudit, SetCircleCommentsWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
+const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  commentsEnabled: ..., 
+  materialChanges: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `setCircleCommentsWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await setCircleCommentsWithAudit(setCircleCommentsWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await setCircleCommentsWithAudit({ circleId: ..., actorId: ..., commentsEnabled: ..., materialChanges: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await setCircleCommentsWithAudit(dataConnect, setCircleCommentsWithAuditVars);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+setCircleCommentsWithAudit(setCircleCommentsWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `SetCircleCommentsWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, setCircleCommentsWithAuditRef, SetCircleCommentsWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `SetCircleCommentsWithAudit` mutation requires an argument of type `SetCircleCommentsWithAuditVariables`:
+const setCircleCommentsWithAuditVars: SetCircleCommentsWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  commentsEnabled: ..., 
+  materialChanges: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `setCircleCommentsWithAuditRef()` function to get a reference to the mutation.
+const ref = setCircleCommentsWithAuditRef(setCircleCommentsWithAuditVars);
+// Variables can be defined inline as well.
+const ref = setCircleCommentsWithAuditRef({ circleId: ..., actorId: ..., commentsEnabled: ..., materialChanges: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = setCircleCommentsWithAuditRef(dataConnect, setCircleCommentsWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## CreateCommentWithActivity
+You can execute the `CreateCommentWithActivity` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createCommentWithActivity(vars: CreateCommentWithActivityVariables): MutationPromise<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+
+interface CreateCommentWithActivityRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateCommentWithActivityVariables): MutationRef<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+}
+export const createCommentWithActivityRef: CreateCommentWithActivityRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createCommentWithActivity(dc: DataConnect, vars: CreateCommentWithActivityVariables): MutationPromise<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+
+interface CreateCommentWithActivityRef {
+  ...
+  (dc: DataConnect, vars: CreateCommentWithActivityVariables): MutationRef<CreateCommentWithActivityData, CreateCommentWithActivityVariables>;
+}
+export const createCommentWithActivityRef: CreateCommentWithActivityRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createCommentWithActivityRef:
+```typescript
+const name = createCommentWithActivityRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateCommentWithActivityVariables {
+  commentId: UUIDString;
+  commentEntityId: string;
+  activityId: UUIDString;
+  circleId: UUIDString;
+  authorId: string;
+  announcementId?: UUIDString | null;
+  parentCommentId?: UUIDString | null;
+  body: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateCommentWithActivity` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateCommentWithActivityData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateCommentWithActivityData {
+  comment_insert: Comment_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+```
+### Using `CreateCommentWithActivity`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createCommentWithActivity, CreateCommentWithActivityVariables } from '@bondcircle/dataconnect';
+
+// The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
+const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
+  commentId: ..., 
+  commentEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  announcementId: ..., // optional
+  parentCommentId: ..., // optional
+  body: ..., 
+  createdAt: ..., 
+};
+
+// Call the `createCommentWithActivity()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createCommentWithActivity(createCommentWithActivityVars);
+// Variables can be defined inline as well.
+const { data } = await createCommentWithActivity({ commentId: ..., commentEntityId: ..., activityId: ..., circleId: ..., authorId: ..., announcementId: ..., parentCommentId: ..., body: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createCommentWithActivity(dataConnect, createCommentWithActivityVars);
+
+console.log(data.comment_insert);
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+createCommentWithActivity(createCommentWithActivityVars).then((response) => {
+  const data = response.data;
+  console.log(data.comment_insert);
+  console.log(data.activityLog_insert);
+});
+```
+
+### Using `CreateCommentWithActivity`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createCommentWithActivityRef, CreateCommentWithActivityVariables } from '@bondcircle/dataconnect';
+
+// The `CreateCommentWithActivity` mutation requires an argument of type `CreateCommentWithActivityVariables`:
+const createCommentWithActivityVars: CreateCommentWithActivityVariables = {
+  commentId: ..., 
+  commentEntityId: ..., 
+  activityId: ..., 
+  circleId: ..., 
+  authorId: ..., 
+  announcementId: ..., // optional
+  parentCommentId: ..., // optional
+  body: ..., 
+  createdAt: ..., 
+};
+
+// Call the `createCommentWithActivityRef()` function to get a reference to the mutation.
+const ref = createCommentWithActivityRef(createCommentWithActivityVars);
+// Variables can be defined inline as well.
+const ref = createCommentWithActivityRef({ commentId: ..., commentEntityId: ..., activityId: ..., circleId: ..., authorId: ..., announcementId: ..., parentCommentId: ..., body: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createCommentWithActivityRef(dataConnect, createCommentWithActivityVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.comment_insert);
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.comment_insert);
+  console.log(data.activityLog_insert);
+});
+```
+
+## DeleteOwnCommentWithAudit
+You can execute the `DeleteOwnCommentWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteOwnCommentWithAudit(vars: DeleteOwnCommentWithAuditVariables): MutationPromise<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+
+interface DeleteOwnCommentWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteOwnCommentWithAuditVariables): MutationRef<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+}
+export const deleteOwnCommentWithAuditRef: DeleteOwnCommentWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteOwnCommentWithAudit(dc: DataConnect, vars: DeleteOwnCommentWithAuditVariables): MutationPromise<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+
+interface DeleteOwnCommentWithAuditRef {
+  ...
+  (dc: DataConnect, vars: DeleteOwnCommentWithAuditVariables): MutationRef<DeleteOwnCommentWithAuditData, DeleteOwnCommentWithAuditVariables>;
+}
+export const deleteOwnCommentWithAuditRef: DeleteOwnCommentWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteOwnCommentWithAuditRef:
+```typescript
+const name = deleteOwnCommentWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteOwnCommentWithAuditVariables {
+  commentId: UUIDString;
+  commentEntityId: string;
+  circleId: UUIDString;
+  actorId: string;
+  deletedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `DeleteOwnCommentWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteOwnCommentWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteOwnCommentWithAuditData {
+  comment_update?: Comment_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `DeleteOwnCommentWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteOwnCommentWithAudit, DeleteOwnCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
+const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
+};
+
+// Call the `deleteOwnCommentWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteOwnCommentWithAudit(deleteOwnCommentWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await deleteOwnCommentWithAudit({ commentId: ..., commentEntityId: ..., circleId: ..., actorId: ..., deletedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteOwnCommentWithAudit(dataConnect, deleteOwnCommentWithAuditVars);
+
+console.log(data.comment_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+deleteOwnCommentWithAudit(deleteOwnCommentWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.comment_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `DeleteOwnCommentWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteOwnCommentWithAuditRef, DeleteOwnCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteOwnCommentWithAudit` mutation requires an argument of type `DeleteOwnCommentWithAuditVariables`:
+const deleteOwnCommentWithAuditVars: DeleteOwnCommentWithAuditVariables = {
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  deletedAt: ..., 
+};
+
+// Call the `deleteOwnCommentWithAuditRef()` function to get a reference to the mutation.
+const ref = deleteOwnCommentWithAuditRef(deleteOwnCommentWithAuditVars);
+// Variables can be defined inline as well.
+const ref = deleteOwnCommentWithAuditRef({ commentId: ..., commentEntityId: ..., circleId: ..., actorId: ..., deletedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteOwnCommentWithAuditRef(dataConnect, deleteOwnCommentWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.comment_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.comment_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## ModerateCommentWithAudit
+You can execute the `ModerateCommentWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+moderateCommentWithAudit(vars: ModerateCommentWithAuditVariables): MutationPromise<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+
+interface ModerateCommentWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ModerateCommentWithAuditVariables): MutationRef<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+}
+export const moderateCommentWithAuditRef: ModerateCommentWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+moderateCommentWithAudit(dc: DataConnect, vars: ModerateCommentWithAuditVariables): MutationPromise<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+
+interface ModerateCommentWithAuditRef {
+  ...
+  (dc: DataConnect, vars: ModerateCommentWithAuditVariables): MutationRef<ModerateCommentWithAuditData, ModerateCommentWithAuditVariables>;
+}
+export const moderateCommentWithAuditRef: ModerateCommentWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the moderateCommentWithAuditRef:
+```typescript
+const name = moderateCommentWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ModerateCommentWithAuditVariables {
+  commentId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  reason: string;
+  moderatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ModerateCommentWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ModerateCommentWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ModerateCommentWithAuditData {
+  comment_update?: Comment_Key | null;
+  commentReport_updateMany: number;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `ModerateCommentWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, moderateCommentWithAudit, ModerateCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
+const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
+  commentId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  reason: ..., 
+  moderatedAt: ..., 
+};
+
+// Call the `moderateCommentWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await moderateCommentWithAudit(moderateCommentWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await moderateCommentWithAudit({ commentId: ..., circleId: ..., actorId: ..., reason: ..., moderatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await moderateCommentWithAudit(dataConnect, moderateCommentWithAuditVars);
+
+console.log(data.comment_update);
+console.log(data.commentReport_updateMany);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+moderateCommentWithAudit(moderateCommentWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.comment_update);
+  console.log(data.commentReport_updateMany);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `ModerateCommentWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, moderateCommentWithAuditRef, ModerateCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `ModerateCommentWithAudit` mutation requires an argument of type `ModerateCommentWithAuditVariables`:
+const moderateCommentWithAuditVars: ModerateCommentWithAuditVariables = {
+  commentId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  reason: ..., 
+  moderatedAt: ..., 
+};
+
+// Call the `moderateCommentWithAuditRef()` function to get a reference to the mutation.
+const ref = moderateCommentWithAuditRef(moderateCommentWithAuditVars);
+// Variables can be defined inline as well.
+const ref = moderateCommentWithAuditRef({ commentId: ..., circleId: ..., actorId: ..., reason: ..., moderatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = moderateCommentWithAuditRef(dataConnect, moderateCommentWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.comment_update);
+console.log(data.commentReport_updateMany);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.comment_update);
+  console.log(data.commentReport_updateMany);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## ReportCommentWithAudit
+You can execute the `ReportCommentWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+reportCommentWithAudit(vars: ReportCommentWithAuditVariables): MutationPromise<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+
+interface ReportCommentWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ReportCommentWithAuditVariables): MutationRef<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+}
+export const reportCommentWithAuditRef: ReportCommentWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+reportCommentWithAudit(dc: DataConnect, vars: ReportCommentWithAuditVariables): MutationPromise<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+
+interface ReportCommentWithAuditRef {
+  ...
+  (dc: DataConnect, vars: ReportCommentWithAuditVariables): MutationRef<ReportCommentWithAuditData, ReportCommentWithAuditVariables>;
+}
+export const reportCommentWithAuditRef: ReportCommentWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the reportCommentWithAuditRef:
+```typescript
+const name = reportCommentWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ReportCommentWithAuditVariables {
+  reportId: UUIDString;
+  commentId: UUIDString;
+  commentEntityId: string;
+  circleId: UUIDString;
+  reporterId: string;
+  reason: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ReportCommentWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ReportCommentWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ReportCommentWithAuditData {
+  commentReport_insert: CommentReport_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `ReportCommentWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, reportCommentWithAudit, ReportCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
+const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
+  reportId: ..., 
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  reporterId: ..., 
+  reason: ..., 
+  createdAt: ..., 
+};
+
+// Call the `reportCommentWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await reportCommentWithAudit(reportCommentWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await reportCommentWithAudit({ reportId: ..., commentId: ..., commentEntityId: ..., circleId: ..., reporterId: ..., reason: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await reportCommentWithAudit(dataConnect, reportCommentWithAuditVars);
+
+console.log(data.commentReport_insert);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+reportCommentWithAudit(reportCommentWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_insert);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `ReportCommentWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, reportCommentWithAuditRef, ReportCommentWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `ReportCommentWithAudit` mutation requires an argument of type `ReportCommentWithAuditVariables`:
+const reportCommentWithAuditVars: ReportCommentWithAuditVariables = {
+  reportId: ..., 
+  commentId: ..., 
+  commentEntityId: ..., 
+  circleId: ..., 
+  reporterId: ..., 
+  reason: ..., 
+  createdAt: ..., 
+};
+
+// Call the `reportCommentWithAuditRef()` function to get a reference to the mutation.
+const ref = reportCommentWithAuditRef(reportCommentWithAuditVars);
+// Variables can be defined inline as well.
+const ref = reportCommentWithAuditRef({ reportId: ..., commentId: ..., commentEntityId: ..., circleId: ..., reporterId: ..., reason: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = reportCommentWithAuditRef(dataConnect, reportCommentWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.commentReport_insert);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReport_insert);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## RecordSystemActivity
+You can execute the `RecordSystemActivity` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+recordSystemActivity(vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
+
+interface RecordSystemActivityRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RecordSystemActivityVariables): MutationRef<RecordSystemActivityData, RecordSystemActivityVariables>;
+}
+export const recordSystemActivityRef: RecordSystemActivityRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+recordSystemActivity(dc: DataConnect, vars: RecordSystemActivityVariables): MutationPromise<RecordSystemActivityData, RecordSystemActivityVariables>;
+
+interface RecordSystemActivityRef {
+  ...
+  (dc: DataConnect, vars: RecordSystemActivityVariables): MutationRef<RecordSystemActivityData, RecordSystemActivityVariables>;
+}
+export const recordSystemActivityRef: RecordSystemActivityRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the recordSystemActivityRef:
+```typescript
+const name = recordSystemActivityRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RecordSystemActivityVariables {
+  activityId: UUIDString;
+  circleId: UUIDString;
+  actorId: string;
+  eventType: string;
+  entityId: string;
+  metadata: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `RecordSystemActivity` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RecordSystemActivityData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RecordSystemActivityData {
+  activityLog_insert: ActivityLog_Key;
+}
+```
+### Using `RecordSystemActivity`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, recordSystemActivity, RecordSystemActivityVariables } from '@bondcircle/dataconnect';
+
+// The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
+const recordSystemActivityVars: RecordSystemActivityVariables = {
+  activityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  entityId: ..., 
+  metadata: ..., 
+  createdAt: ..., 
+};
+
+// Call the `recordSystemActivity()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await recordSystemActivity(recordSystemActivityVars);
+// Variables can be defined inline as well.
+const { data } = await recordSystemActivity({ activityId: ..., circleId: ..., actorId: ..., eventType: ..., entityId: ..., metadata: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await recordSystemActivity(dataConnect, recordSystemActivityVars);
+
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+recordSystemActivity(recordSystemActivityVars).then((response) => {
+  const data = response.data;
+  console.log(data.activityLog_insert);
+});
+```
+
+### Using `RecordSystemActivity`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, recordSystemActivityRef, RecordSystemActivityVariables } from '@bondcircle/dataconnect';
+
+// The `RecordSystemActivity` mutation requires an argument of type `RecordSystemActivityVariables`:
+const recordSystemActivityVars: RecordSystemActivityVariables = {
+  activityId: ..., 
+  circleId: ..., 
+  actorId: ..., 
+  eventType: ..., 
+  entityId: ..., 
+  metadata: ..., 
+  createdAt: ..., 
+};
+
+// Call the `recordSystemActivityRef()` function to get a reference to the mutation.
+const ref = recordSystemActivityRef(recordSystemActivityVars);
+// Variables can be defined inline as well.
+const ref = recordSystemActivityRef({ activityId: ..., circleId: ..., actorId: ..., eventType: ..., entityId: ..., metadata: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = recordSystemActivityRef(dataConnect, recordSystemActivityVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.activityLog_insert);
 });
 ```
 

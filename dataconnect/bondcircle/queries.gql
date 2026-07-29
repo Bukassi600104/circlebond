@@ -216,6 +216,16 @@ mutation CreateCircleDraft(
       createdAt: $createdAt
     }
   )
+  activityLog_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      actor: { id: $creatorId }
+      eventType: "circle_created"
+      entityId: $creatorId
+      metadata: "{}"
+      createdAt: $createdAt
+    }
+  )
 }
 
 mutation UpdateCircleConfigurationWithAudit(
@@ -294,6 +304,16 @@ mutation TransitionCircleWithAudit(
       createdAt: $updatedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      eventType: $toStatus
+      entityId: $actorId
+      metadata: $toStatus
+      createdAt: $updatedAt
+    }
+  )
 }
 
 mutation AddCircleMemberWithAudit(
@@ -320,6 +340,16 @@ mutation AddCircleMemberWithAudit(
       actor: { id: $actorId }
       action: "member_invited"
       materialChanges: $memberId
+      createdAt: $createdAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      eventType: "member_invited"
+      entityId: $memberId
+      metadata: "{}"
       createdAt: $createdAt
     }
   )
@@ -535,6 +565,16 @@ mutation SelectAsoEbiTier(
       createdAt: $updatedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $memberId }
+      eventType: "tier_selected"
+      entityId: $memberId
+      metadata: "{}"
+      createdAt: $updatedAt
+    }
+  )
 }
 
 mutation UpdateAsoEbiFulfilment(
@@ -554,6 +594,16 @@ mutation UpdateAsoEbiFulfilment(
       actor: { id: $actorId }
       action: "delivery_updated"
       materialChanges: $status
+      createdAt: $updatedAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      eventType: "delivery_updated"
+      entityId: $memberId
+      metadata: $status
       createdAt: $updatedAt
     }
   )
@@ -879,6 +929,16 @@ mutation CreateInvitation(
       createdAt: $createdAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $invitedById }
+      eventType: "member_invited"
+      entityId: $invitedById
+      metadata: "{}"
+      createdAt: $createdAt
+    }
+  )
 }
 
 mutation UpdateInvitationState(
@@ -965,6 +1025,16 @@ mutation AcceptInvitationWithMembership(
       createdAt: $respondedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $userId }
+      eventType: "member_joined"
+      entityId: $userId
+      metadata: "{}"
+      createdAt: $respondedAt
+    }
+  )
 }
 
 mutation RequestInvitationApproval(
@@ -1006,6 +1076,7 @@ query GetContributionWorkspace($circleId: UUID!) @auth(level: NO_ACCESS) {
     id
     name
     type
+    targetAmount
     contributedAmount
     status
     creator {
@@ -1099,6 +1170,16 @@ mutation SubmitReceiptWithAudit(
       createdAt: $submittedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $uploaderId }
+      eventType: "receipt_submitted"
+      entityId: $uploaderId
+      metadata: "{}"
+      createdAt: $submittedAt
+    }
+  )
 }
 
 mutation ReplaceReceiptWithAudit(
@@ -1149,6 +1230,16 @@ mutation ReplaceReceiptWithAudit(
       createdAt: $submittedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $uploaderId }
+      eventType: "receipt_submitted"
+      entityId: $uploaderId
+      metadata: "{\"replacement\":true}"
+      createdAt: $submittedAt
+    }
+  )
 }
 
 mutation ReviewReceiptWithAudit(
@@ -1194,6 +1285,16 @@ mutation ReviewReceiptWithAudit(
       actor: { id: $reviewerId }
       action: $auditAction
       materialChanges: $materialChanges
+      createdAt: $reviewedAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $reviewerId }
+      eventType: $receiptStatus
+      entityId: $uploaderId
+      metadata: $materialChanges
       createdAt: $reviewedAt
     }
   )
@@ -1249,6 +1350,16 @@ mutation ApproveInvitationMembership(
       createdAt: $respondedAt
     }
   )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $userId }
+      eventType: "member_joined"
+      entityId: $userId
+      metadata: "{}"
+      createdAt: $respondedAt
+    }
+  )
 }
 
 mutation DeclineInvitation(
@@ -1295,6 +1406,426 @@ mutation RequestReplacementInvitation(
       action: "replacement_invitation_requested"
       materialChanges: "replacement_invitation_requested"
       createdAt: $requestedAt
+    }
+  )
+}
+
+query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    status
+    commentsEnabled
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    user {
+      id
+      displayName
+      profileImage
+    }
+  }
+  announcements(
+    where: { circleId: { eq: $circleId }, deletedAt: { isNull: true } }
+    orderBy: [{ pinned: DESC }, { createdAt: DESC }]
+    limit: 100
+  ) {
+    id
+    title
+    body
+    pinned
+    commentsEnabled
+    createdAt
+    updatedAt
+    author {
+      id
+      displayName
+    }
+  }
+  comments(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: ASC }
+    limit: 300
+  ) {
+    id
+    announcementId
+    parentCommentId
+    body
+    status
+    deletionReason
+    createdAt
+    updatedAt
+    deletedAt
+    author {
+      id
+      displayName
+      profileImage
+    }
+  }
+  commentReports(
+    where: { circleId: { eq: $circleId }, status: { eq: "open" } }
+    orderBy: { createdAt: DESC }
+    limit: 100
+  ) {
+    id
+    reason
+    status
+    createdAt
+    comment {
+      id
+    }
+    reporter {
+      id
+      displayName
+    }
+  }
+  activityLogs(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: DESC }
+    limit: 200
+  ) {
+    id
+    eventType
+    entityId
+    metadata
+    createdAt
+    actor {
+      id
+      displayName
+    }
+  }
+}
+
+query GetRecentCommentsByAuthor(
+  $circleId: UUID!
+  $authorId: String!
+  $since: Timestamp!
+) @auth(level: NO_ACCESS) {
+  comments(
+    where: {
+      circleId: { eq: $circleId }
+      authorId: { eq: $authorId }
+      createdAt: { ge: $since }
+    }
+    orderBy: { createdAt: DESC }
+    limit: 5
+  ) {
+    createdAt
+  }
+}
+
+query GetOpenCommentReportsByReporter($commentId: UUID!, $reporterId: String!)
+@auth(level: NO_ACCESS) {
+  commentReports(
+    where: {
+      commentId: { eq: $commentId }
+      reporterId: { eq: $reporterId }
+      status: { eq: "open" }
+    }
+    limit: 1
+  ) {
+    id
+  }
+}
+
+query GetActivityLogsForCircles($circleIds: [UUID!]!) @auth(level: NO_ACCESS) {
+  activityLogs(
+    where: { circleId: { in: $circleIds } }
+    orderBy: { createdAt: DESC }
+    limit: 300
+  ) {
+    id
+    eventType
+    entityId
+    metadata
+    createdAt
+    circle {
+      id
+      name
+      type
+    }
+    actor {
+      id
+      displayName
+    }
+  }
+}
+
+mutation CreateAnnouncementWithActivity(
+  $announcementId: UUID!
+  $announcementEntityId: String!
+  $activityId: UUID!
+  $circleId: UUID!
+  $authorId: String!
+  $title: String!
+  $body: String!
+  $pinned: Boolean!
+  $commentsEnabled: Boolean!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  announcement_insert(
+    data: {
+      id: $announcementId
+      circle: { id: $circleId }
+      author: { id: $authorId }
+      title: $title
+      body: $body
+      pinned: $pinned
+      commentsEnabled: $commentsEnabled
+      createdAt: $createdAt
+      updatedAt: $createdAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      id: $activityId
+      circle: { id: $circleId }
+      actor: { id: $authorId }
+      eventType: "announcement_posted"
+      entityId: $announcementEntityId
+      metadata: "{}"
+      createdAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $authorId }
+      action: "announcement_created"
+      materialChanges: $announcementEntityId
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation UpdateAnnouncementWithAudit(
+  $announcementId: UUID!
+  $circleId: UUID!
+  $actorId: String!
+  $title: String!
+  $body: String!
+  $pinned: Boolean!
+  $commentsEnabled: Boolean!
+  $updatedAt: Timestamp!
+  $materialChanges: String!
+) @auth(level: NO_ACCESS) @transaction {
+  announcement_update(
+    key: { id: $announcementId }
+    data: {
+      title: $title
+      body: $body
+      pinned: $pinned
+      commentsEnabled: $commentsEnabled
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "announcement_updated"
+      materialChanges: $materialChanges
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation DeleteAnnouncementWithAudit(
+  $announcementId: UUID!
+  $announcementEntityId: String!
+  $circleId: UUID!
+  $actorId: String!
+  $deletedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  announcement_update(
+    key: { id: $announcementId }
+    data: { deletedAt: $deletedAt, updatedAt: $deletedAt }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "announcement_deleted"
+      materialChanges: $announcementEntityId
+      createdAt: $deletedAt
+    }
+  )
+}
+
+mutation SetCircleCommentsWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $commentsEnabled: Boolean!
+  $materialChanges: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: { commentsEnabled: $commentsEnabled, updatedAt: $updatedAt }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "circle_comments_updated"
+      materialChanges: $materialChanges
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation CreateCommentWithActivity(
+  $commentId: UUID!
+  $commentEntityId: String!
+  $activityId: UUID!
+  $circleId: UUID!
+  $authorId: String!
+  $announcementId: UUID
+  $parentCommentId: UUID
+  $body: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  comment_insert(
+    data: {
+      id: $commentId
+      circle: { id: $circleId }
+      author: { id: $authorId }
+      announcementId: $announcementId
+      parentCommentId: $parentCommentId
+      body: $body
+      status: "visible"
+      createdAt: $createdAt
+      updatedAt: $createdAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      id: $activityId
+      circle: { id: $circleId }
+      actor: { id: $authorId }
+      eventType: "comment_posted"
+      entityId: $commentEntityId
+      metadata: "{}"
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation DeleteOwnCommentWithAudit(
+  $commentId: UUID!
+  $commentEntityId: String!
+  $circleId: UUID!
+  $actorId: String!
+  $deletedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  comment_update(
+    key: { id: $commentId }
+    data: {
+      status: "deleted"
+      deletionReason: "Deleted by author"
+      deletedAt: $deletedAt
+      updatedAt: $deletedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "comment_deleted_by_author"
+      materialChanges: $commentEntityId
+      createdAt: $deletedAt
+    }
+  )
+}
+
+mutation ModerateCommentWithAudit(
+  $commentId: UUID!
+  $circleId: UUID!
+  $actorId: String!
+  $reason: String!
+  $moderatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  comment_update(
+    key: { id: $commentId }
+    data: {
+      status: "moderated"
+      deletionReason: $reason
+      deletedAt: $moderatedAt
+      updatedAt: $moderatedAt
+    }
+  )
+  commentReport_updateMany(
+    where: { commentId: { eq: $commentId }, status: { eq: "open" } }
+    data: { status: "resolved" }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: "comment_moderated"
+      materialChanges: $reason
+      createdAt: $moderatedAt
+    }
+  )
+}
+
+mutation ReportCommentWithAudit(
+  $reportId: UUID!
+  $commentId: UUID!
+  $commentEntityId: String!
+  $circleId: UUID!
+  $reporterId: String!
+  $reason: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  commentReport_insert(
+    data: {
+      id: $reportId
+      circle: { id: $circleId }
+      comment: { id: $commentId }
+      reporter: { id: $reporterId }
+      reason: $reason
+      status: "open"
+      createdAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $reporterId }
+      action: "comment_reported"
+      materialChanges: $commentEntityId
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation RecordSystemActivity(
+  $activityId: UUID!
+  $circleId: UUID!
+  $actorId: String!
+  $eventType: String!
+  $entityId: String!
+  $metadata: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  activityLog_insert(
+    data: {
+      id: $activityId
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      eventType: $eventType
+      entityId: $entityId
+      metadata: $metadata
+      createdAt: $createdAt
     }
   )
 }

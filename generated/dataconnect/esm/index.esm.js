@@ -473,3 +473,163 @@ export function requestReplacementInvitation(dcOrVars, vars) {
   return executeMutation(requestReplacementInvitationRef(dcInstance, inputVars));
 }
 
+export const getCircleCommunicationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleCommunication', inputVars);
+}
+getCircleCommunicationRef.operationName = 'GetCircleCommunication';
+
+export function getCircleCommunication(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleCommunicationRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+
+export const getRecentCommentsByAuthorRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetRecentCommentsByAuthor', inputVars);
+}
+getRecentCommentsByAuthorRef.operationName = 'GetRecentCommentsByAuthor';
+
+export function getRecentCommentsByAuthor(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getRecentCommentsByAuthorRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+
+export const getOpenCommentReportsByReporterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOpenCommentReportsByReporter', inputVars);
+}
+getOpenCommentReportsByReporterRef.operationName = 'GetOpenCommentReportsByReporter';
+
+export function getOpenCommentReportsByReporter(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOpenCommentReportsByReporterRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+
+export const getActivityLogsForCirclesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetActivityLogsForCircles', inputVars);
+}
+getActivityLogsForCirclesRef.operationName = 'GetActivityLogsForCircles';
+
+export function getActivityLogsForCircles(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getActivityLogsForCirclesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+
+export const createAnnouncementWithActivityRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateAnnouncementWithActivity', inputVars);
+}
+createAnnouncementWithActivityRef.operationName = 'CreateAnnouncementWithActivity';
+
+export function createAnnouncementWithActivity(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createAnnouncementWithActivityRef(dcInstance, inputVars));
+}
+
+export const updateAnnouncementWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateAnnouncementWithAudit', inputVars);
+}
+updateAnnouncementWithAuditRef.operationName = 'UpdateAnnouncementWithAudit';
+
+export function updateAnnouncementWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateAnnouncementWithAuditRef(dcInstance, inputVars));
+}
+
+export const deleteAnnouncementWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteAnnouncementWithAudit', inputVars);
+}
+deleteAnnouncementWithAuditRef.operationName = 'DeleteAnnouncementWithAudit';
+
+export function deleteAnnouncementWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteAnnouncementWithAuditRef(dcInstance, inputVars));
+}
+
+export const setCircleCommentsWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SetCircleCommentsWithAudit', inputVars);
+}
+setCircleCommentsWithAuditRef.operationName = 'SetCircleCommentsWithAudit';
+
+export function setCircleCommentsWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(setCircleCommentsWithAuditRef(dcInstance, inputVars));
+}
+
+export const createCommentWithActivityRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateCommentWithActivity', inputVars);
+}
+createCommentWithActivityRef.operationName = 'CreateCommentWithActivity';
+
+export function createCommentWithActivity(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createCommentWithActivityRef(dcInstance, inputVars));
+}
+
+export const deleteOwnCommentWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteOwnCommentWithAudit', inputVars);
+}
+deleteOwnCommentWithAuditRef.operationName = 'DeleteOwnCommentWithAudit';
+
+export function deleteOwnCommentWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteOwnCommentWithAuditRef(dcInstance, inputVars));
+}
+
+export const moderateCommentWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ModerateCommentWithAudit', inputVars);
+}
+moderateCommentWithAuditRef.operationName = 'ModerateCommentWithAudit';
+
+export function moderateCommentWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(moderateCommentWithAuditRef(dcInstance, inputVars));
+}
+
+export const reportCommentWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ReportCommentWithAudit', inputVars);
+}
+reportCommentWithAuditRef.operationName = 'ReportCommentWithAudit';
+
+export function reportCommentWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(reportCommentWithAuditRef(dcInstance, inputVars));
+}
+
+export const recordSystemActivityRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RecordSystemActivity', inputVars);
+}
+recordSystemActivityRef.operationName = 'RecordSystemActivity';
+
+export function recordSystemActivity(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(recordSystemActivityRef(dcInstance, inputVars));
+}
+

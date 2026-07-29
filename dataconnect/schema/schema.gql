@@ -38,6 +38,7 @@ type Circle @table {
   showConfirmedTotalToMembers: Boolean! @default(value: true)
   hideIndividualAmounts: Boolean! @default(value: true)
   requireCreatorApproval: Boolean! @default(value: false)
+  commentsEnabled: Boolean! @default(value: true)
   completionType: String
   paymentBankName: String
   paymentAccountName: String
@@ -115,6 +116,53 @@ type SupportUpdate @table {
   circle: Circle!
   author: User!
   body: String!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Announcement @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  author: User!
+  title: String!
+  body: String!
+  pinned: Boolean! @default(value: false)
+  commentsEnabled: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type Comment @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  announcementId: UUID
+  author: User!
+  parentCommentId: UUID
+  body: String!
+  status: String! @default(value: "visible")
+  deletionReason: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  deletedAt: Timestamp
+}
+
+type CommentReport @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  comment: Comment!
+  reporter: User!
+  reason: String!
+  status: String! @default(value: "open")
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type ActivityLog @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  actor: User
+  eventType: String!
+  entityId: String!
+  metadata: String! @default(value: "{}")
   createdAt: Timestamp! @default(expr: "request.time")
 }
 

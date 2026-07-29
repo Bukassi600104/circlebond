@@ -8,8 +8,10 @@ import { GiftCircleForm } from "@/components/gift-circles/GiftCircleForm";
 import { AsoEbiCircleForm } from "@/components/aso-ebi/AsoEbiCircleForm";
 import { SupportCircleForm } from "@/components/support-circles/SupportCircleForm";
 import { LogoutButton } from "@/features/auth/components";
+import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { requireSession } from "@/server/auth";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
+import { loadUserActivity } from "@/server/repositories/communication";
 
 const collectionSections = {
   circles: {
@@ -114,6 +116,23 @@ export default async function AccountSectionPage({
         description={collection.description}
         circles={circles.filter(collection.filter)}
       />
+    );
+  }
+
+  if (section === "activity") {
+    const events = await loadUserActivity(session.uid);
+    return (
+      <section className="bc-dashboard-activity">
+        <header>
+          <Link href="/account">← Dashboard</Link>
+          <h1>Activity</h1>
+          <p>
+            Verified system events across every circle you belong to. Members
+            cannot edit this timeline.
+          </p>
+        </header>
+        <ActivityFeed events={events} showCircleName />
+      </section>
     );
   }
 

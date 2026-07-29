@@ -6,7 +6,7 @@ BondCircle is a responsive web application for creating trusted circles around g
 
 ## Delivery status
 
-The product is being delivered against an approved 18-milestone production plan. Milestones 1–10 are implemented and verified:
+The product is being delivered against an approved 18-milestone production plan. Milestones 1–11 are implemented and verified:
 
 - Firebase-only application foundation
 - Design system and responsive component library
@@ -17,6 +17,7 @@ The product is being delivered against an approved 18-milestone production plan.
 - Gift, Aso-Ebi, and Support Circles
 - Secure invitations, creator approval, revocation, and multi-circle membership
 - Private receipt upload, partial contributions, review, replacement, and audit history
+- Official announcements, moderated comments and replies, and immutable activity feeds
 
 The web application has a live Vercel deployment for production-environment testing. Formal production readiness still requires the security, quality, deployment, and post-launch gates in Milestones 15–18; the live URL is not a substitute for those checks.
 
@@ -101,7 +102,7 @@ npm test
 - Optimized production build
 - Unit and integration coverage
 - Authentication E2E against Firebase emulators
-- Firebase Data Connect E2E for circle lifecycle, all three circle types, and invitations
+- Firebase Data Connect E2E for circle lifecycle, all three circle types, invitations, receipts, and activity logging
 
 GitHub Actions executes the same quality gates on pushes to `main` and pull requests.
 

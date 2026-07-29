@@ -1,5 +1,6 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import { recordSystemActivity } from "@/server/repositories/communication";
 import {
   canReviewReceipts,
   canViewReceipt,
@@ -31,6 +32,7 @@ type WorkspaceQuery = {
     id: string;
     name: string;
     type: string;
+    targetAmount: number;
     contributedAmount: number;
     status: string;
     creator: { id: string };
@@ -280,5 +282,22 @@ export async function reviewContributionReceipt(input: {
       rejectionReason: input.decision === "reject" ? reason : null,
     }),
   });
+  if (
+    input.decision === "approve" &&
+    workspace.circle.targetAmount > 0 &&
+    workspace.circle.contributedAmount < workspace.circle.targetAmount &&
+    nextCircleContributedAmount >= workspace.circle.targetAmount
+  ) {
+    await recordSystemActivity({
+      circleId: input.circleId,
+      actorId: input.reviewerId,
+      type: "target_reached",
+      entityId: input.circleId,
+      metadata: {
+        targetAmount: workspace.circle.targetAmount,
+        contributedAmount: nextCircleContributedAmount,
+      },
+    });
+  }
   return { receiptStatus, membershipStatus, reviewedAt };
 }
