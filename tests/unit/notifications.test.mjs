@@ -157,6 +157,7 @@ test("notification persistence, protected APIs, deep links, preferences and emai
     "UpdateNotificationPreferences",
     "SetCircleNotificationMute",
     "CreateEmailDelivery",
+    "GetUserDeadlineNotificationCandidates",
   ]) {
     assert.match(operations, new RegExp(operation));
   }

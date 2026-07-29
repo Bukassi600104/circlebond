@@ -1011,6 +1011,21 @@ export interface GetSupportCircleDetailVariables {
   circleId: UUIDString;
 }
 
+export interface GetUserDeadlineNotificationCandidatesData {
+  circleMemberships: ({
+    circle: {
+      id: UUIDString;
+      name: string;
+      status: string;
+      deadline?: DateString | null;
+    } & Circle_Key;
+  })[];
+}
+
+export interface GetUserDeadlineNotificationCandidatesVariables {
+  userId: string;
+}
+
 export interface GetUserNotificationsData {
   user?: {
     id: string;
@@ -2114,6 +2129,18 @@ export const getDeadlineNotificationCandidatesRef: GetDeadlineNotificationCandid
 
 export function getDeadlineNotificationCandidates(vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
 export function getDeadlineNotificationCandidates(dc: DataConnect, vars: GetDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetDeadlineNotificationCandidatesData, GetDeadlineNotificationCandidatesVariables>;
+
+interface GetUserDeadlineNotificationCandidatesRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserDeadlineNotificationCandidatesVariables): QueryRef<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserDeadlineNotificationCandidatesVariables): QueryRef<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+  operationName: string;
+}
+export const getUserDeadlineNotificationCandidatesRef: GetUserDeadlineNotificationCandidatesRef;
+
+export function getUserDeadlineNotificationCandidates(vars: GetUserDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+export function getUserDeadlineNotificationCandidates(dc: DataConnect, vars: GetUserDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
 
 interface CreateNotificationRef {
   /* Allow users to create refs without passing in DataConnect */

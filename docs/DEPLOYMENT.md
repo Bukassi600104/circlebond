@@ -30,7 +30,7 @@ Required groups:
 - `AUTH_EMAIL_OTP_MODE=production`
 - `AUTH_EMAIL_SMTP_URL` and `AUTH_EMAIL_FROM`: transactional email delivery
 - `NEXT_PUBLIC_APP_URL`: canonical HTTPS origin used in notification email links
-- `CRON_SECRET`: at least 32 random bytes used to authorize the daily deadline-notification job
+- `CRON_SECRET`: required only when enabling the optional external deadline scheduler
 
 When entering `FIREBASE_PRIVATE_KEY` in Vercel, preserve newline characters using the escaped `\n` form expected by the application.
 
@@ -66,7 +66,8 @@ Verify on the deployed domain:
 - Images upload and can be read only by authorized users.
 - Production OTP messages are delivered and development codes are never displayed.
 - Notification deep links open the correct circle and never expose receipt details in email previews.
-- The daily deadline job returns success only with the configured `CRON_SECRET`.
+- Upcoming deadlines appear when an authenticated member opens the application.
+- If the optional external deadline scheduler is enabled, its job succeeds only with the configured `CRON_SECRET`.
 - Failed notification email deliveries are retained as delivery records.
 - Server logs contain no credentials, raw invitation tokens, OTP secrets, or personal payment evidence.
 

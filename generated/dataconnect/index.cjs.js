@@ -827,6 +827,21 @@ exports.getDeadlineNotificationCandidates = function getDeadlineNotificationCand
 }
 ;
 
+const getUserDeadlineNotificationCandidatesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserDeadlineNotificationCandidates', inputVars);
+}
+getUserDeadlineNotificationCandidatesRef.operationName = 'GetUserDeadlineNotificationCandidates';
+exports.getUserDeadlineNotificationCandidatesRef = getUserDeadlineNotificationCandidatesRef;
+
+exports.getUserDeadlineNotificationCandidates = function getUserDeadlineNotificationCandidates(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getUserDeadlineNotificationCandidatesRef(dcInstance, inputVars), inputOpts && inputOpts.fetchPolicy);
+}
+;
+
 const createNotificationRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();

@@ -32,6 +32,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetRecentReminderNotifications*](#getrecentremindernotifications)
   - [*FindNotificationRecipientByEmail*](#findnotificationrecipientbyemail)
   - [*GetDeadlineNotificationCandidates*](#getdeadlinenotificationcandidates)
+  - [*GetUserDeadlineNotificationCandidates*](#getuserdeadlinenotificationcandidates)
 - [**Mutations**](#mutations)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
@@ -3065,6 +3066,122 @@ console.log(data.circles);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.circles);
+});
+```
+
+## GetUserDeadlineNotificationCandidates
+You can execute the `GetUserDeadlineNotificationCandidates` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getUserDeadlineNotificationCandidates(vars: GetUserDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+
+interface GetUserDeadlineNotificationCandidatesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserDeadlineNotificationCandidatesVariables): QueryRef<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+}
+export const getUserDeadlineNotificationCandidatesRef: GetUserDeadlineNotificationCandidatesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getUserDeadlineNotificationCandidates(dc: DataConnect, vars: GetUserDeadlineNotificationCandidatesVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+
+interface GetUserDeadlineNotificationCandidatesRef {
+  ...
+  (dc: DataConnect, vars: GetUserDeadlineNotificationCandidatesVariables): QueryRef<GetUserDeadlineNotificationCandidatesData, GetUserDeadlineNotificationCandidatesVariables>;
+}
+export const getUserDeadlineNotificationCandidatesRef: GetUserDeadlineNotificationCandidatesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getUserDeadlineNotificationCandidatesRef:
+```typescript
+const name = getUserDeadlineNotificationCandidatesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetUserDeadlineNotificationCandidates` query requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetUserDeadlineNotificationCandidatesVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetUserDeadlineNotificationCandidates` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetUserDeadlineNotificationCandidatesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetUserDeadlineNotificationCandidatesData {
+  circleMemberships: ({
+    circle: {
+      id: UUIDString;
+      name: string;
+      status: string;
+      deadline?: DateString | null;
+    } & Circle_Key;
+  })[];
+}
+```
+### Using `GetUserDeadlineNotificationCandidates`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getUserDeadlineNotificationCandidates, GetUserDeadlineNotificationCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserDeadlineNotificationCandidates` query requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`:
+const getUserDeadlineNotificationCandidatesVars: GetUserDeadlineNotificationCandidatesVariables = {
+  userId: ...,
+};
+
+// Call the `getUserDeadlineNotificationCandidates()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getUserDeadlineNotificationCandidates(getUserDeadlineNotificationCandidatesVars);
+// Variables can be defined inline as well.
+const { data } = await getUserDeadlineNotificationCandidates({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getUserDeadlineNotificationCandidates(dataConnect, getUserDeadlineNotificationCandidatesVars);
+
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+getUserDeadlineNotificationCandidates(getUserDeadlineNotificationCandidatesVars).then((response) => {
+  const data = response.data;
+  console.log(data.circleMemberships);
+});
+```
+
+### Using `GetUserDeadlineNotificationCandidates`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getUserDeadlineNotificationCandidatesRef, GetUserDeadlineNotificationCandidatesVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserDeadlineNotificationCandidates` query requires an argument of type `GetUserDeadlineNotificationCandidatesVariables`:
+const getUserDeadlineNotificationCandidatesVars: GetUserDeadlineNotificationCandidatesVariables = {
+  userId: ...,
+};
+
+// Call the `getUserDeadlineNotificationCandidatesRef()` function to get a reference to the query.
+const ref = getUserDeadlineNotificationCandidatesRef(getUserDeadlineNotificationCandidatesVars);
+// Variables can be defined inline as well.
+const ref = getUserDeadlineNotificationCandidatesRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getUserDeadlineNotificationCandidatesRef(dataConnect, getUserDeadlineNotificationCandidatesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circleMemberships);
 });
 ```
 

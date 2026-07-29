@@ -1969,6 +1969,21 @@ query GetDeadlineNotificationCandidates($from: Date!, $to: Date!)
   }
 }
 
+query GetUserDeadlineNotificationCandidates($userId: String!)
+@auth(level: NO_ACCESS) {
+  circleMemberships(
+    where: { userId: { eq: $userId }, membershipStatus: { eq: "joined" } }
+    limit: 200
+  ) {
+    circle {
+      id
+      name
+      status
+      deadline
+    }
+  }
+}
+
 mutation CreateNotification(
   $notificationId: UUID!
   $recipientId: String!

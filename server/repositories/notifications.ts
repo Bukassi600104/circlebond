@@ -315,6 +315,7 @@ type NotificationsQuery = {
 export async function loadNotificationWorkspace(
   userId: string,
 ): Promise<NotificationWorkspace> {
+  await processUserDeadlineNotifications(userId);
   const response = await getBondCircleDataConnect().executeQuery<
     NotificationsQuery,
     { userId: string }
@@ -357,6 +358,54 @@ export async function loadNotificationWorkspace(
         muted: membership.notificationsMuted,
       })),
   };
+}
+
+async function processUserDeadlineNotifications(userId: string) {
+  try {
+    const today = new Date();
+    const from = today.toISOString().slice(0, 10);
+    const toDate = new Date(today);
+    toDate.setUTCDate(toDate.getUTCDate() + 3);
+    const to = toDate.toISOString().slice(0, 10);
+    const response = await getBondCircleDataConnect().executeQuery<
+      {
+        circleMemberships: Array<{
+          circle: {
+            id: string;
+            status: string;
+            deadline?: string | null;
+          };
+        }>;
+      },
+      { userId: string }
+    >("GetUserDeadlineNotificationCandidates", { userId });
+    const openStates = new Set([
+      "published",
+      "active",
+      "target_reached",
+      "fulfilment",
+    ]);
+    for (const { circle } of response.data.circleMemberships) {
+      if (
+        circle.deadline &&
+        circle.deadline >= from &&
+        circle.deadline <= to &&
+        openStates.has(circle.status)
+      ) {
+        await safelyEmitNotification({
+          circleId: circle.id,
+          type: "deadline_approaching",
+          entityId: circle.deadline,
+          recipientIds: [userId],
+        });
+      }
+    }
+  } catch (error) {
+    logger.error("user_deadline_notification_failed", {
+      userId,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+  }
 }
 
 export async function markNotificationRead(
