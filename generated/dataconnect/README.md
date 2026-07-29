@@ -98,6 +98,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*DismissOwnerCommentReport*](#dismissownercommentreport)
   - [*SuspendOwnerTargetUser*](#suspendownertargetuser)
   - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
+  - [*ProvisionOwnerAccount*](#provisionowneraccount)
   - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
 
 # Accessing the connector
@@ -11846,6 +11847,129 @@ console.log(data.invitation_update);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.invitation_update);
+});
+```
+
+## ProvisionOwnerAccount
+You can execute the `ProvisionOwnerAccount` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+provisionOwnerAccount(vars: ProvisionOwnerAccountVariables): MutationPromise<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+
+interface ProvisionOwnerAccountRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ProvisionOwnerAccountVariables): MutationRef<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+}
+export const provisionOwnerAccountRef: ProvisionOwnerAccountRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+provisionOwnerAccount(dc: DataConnect, vars: ProvisionOwnerAccountVariables): MutationPromise<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+
+interface ProvisionOwnerAccountRef {
+  ...
+  (dc: DataConnect, vars: ProvisionOwnerAccountVariables): MutationRef<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+}
+export const provisionOwnerAccountRef: ProvisionOwnerAccountRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the provisionOwnerAccountRef:
+```typescript
+const name = provisionOwnerAccountRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ProvisionOwnerAccount` mutation requires an argument of type `ProvisionOwnerAccountVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ProvisionOwnerAccountVariables {
+  userId: string;
+  displayName: string;
+  email: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ProvisionOwnerAccount` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ProvisionOwnerAccountData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ProvisionOwnerAccountData {
+  user_upsert: User_Key;
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+```
+### Using `ProvisionOwnerAccount`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, provisionOwnerAccount, ProvisionOwnerAccountVariables } from '@bondcircle/dataconnect';
+
+// The `ProvisionOwnerAccount` mutation requires an argument of type `ProvisionOwnerAccountVariables`:
+const provisionOwnerAccountVars: ProvisionOwnerAccountVariables = {
+  userId: ..., 
+  displayName: ..., 
+  email: ..., 
+  createdAt: ..., 
+};
+
+// Call the `provisionOwnerAccount()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await provisionOwnerAccount(provisionOwnerAccountVars);
+// Variables can be defined inline as well.
+const { data } = await provisionOwnerAccount({ userId: ..., displayName: ..., email: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await provisionOwnerAccount(dataConnect, provisionOwnerAccountVars);
+
+console.log(data.user_upsert);
+console.log(data.ownerAdministrator_upsert);
+
+// Or, you can use the `Promise` API.
+provisionOwnerAccount(provisionOwnerAccountVars).then((response) => {
+  const data = response.data;
+  console.log(data.user_upsert);
+  console.log(data.ownerAdministrator_upsert);
+});
+```
+
+### Using `ProvisionOwnerAccount`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, provisionOwnerAccountRef, ProvisionOwnerAccountVariables } from '@bondcircle/dataconnect';
+
+// The `ProvisionOwnerAccount` mutation requires an argument of type `ProvisionOwnerAccountVariables`:
+const provisionOwnerAccountVars: ProvisionOwnerAccountVariables = {
+  userId: ..., 
+  displayName: ..., 
+  email: ..., 
+  createdAt: ..., 
+};
+
+// Call the `provisionOwnerAccountRef()` function to get a reference to the mutation.
+const ref = provisionOwnerAccountRef(provisionOwnerAccountVars);
+// Variables can be defined inline as well.
+const ref = provisionOwnerAccountRef({ userId: ..., displayName: ..., email: ..., createdAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = provisionOwnerAccountRef(dataConnect, provisionOwnerAccountVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.user_upsert);
+console.log(data.ownerAdministrator_upsert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user_upsert);
+  console.log(data.ownerAdministrator_upsert);
 });
 ```
 

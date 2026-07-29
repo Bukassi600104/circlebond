@@ -51,8 +51,10 @@ const dataConnect = getDataConnect(
   app,
 );
 
-await dataConnect.executeMutation("ProvisionOwnerAdministrator", {
+await dataConnect.executeMutation("ProvisionOwnerAccount", {
   userId: user.uid,
+  displayName: user.displayName?.trim() || "BondCircle Owner",
+  email: user.email,
   createdAt: new Date().toISOString(),
 });
 

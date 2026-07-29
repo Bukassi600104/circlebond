@@ -1259,6 +1259,20 @@ exports.getOwnerInvitation = function getOwnerInvitation(dcOrVars, varsOrOptions
 }
 ;
 
+const provisionOwnerAccountRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ProvisionOwnerAccount', inputVars);
+}
+provisionOwnerAccountRef.operationName = 'ProvisionOwnerAccount';
+exports.provisionOwnerAccountRef = provisionOwnerAccountRef;
+
+exports.provisionOwnerAccount = function provisionOwnerAccount(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(provisionOwnerAccountRef(dcInstance, inputVars));
+}
+;
+
 const provisionOwnerAdministratorRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();

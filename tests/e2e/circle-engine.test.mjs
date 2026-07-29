@@ -31,8 +31,10 @@ test("Firebase persists owner access, operational telemetry and immutable admin 
   });
 
   const createdAt = new Date().toISOString();
-  await dataConnect.executeMutation("ProvisionOwnerAdministrator", {
+  await dataConnect.executeMutation("ProvisionOwnerAccount", {
     userId: ownerId,
+    displayName: "Owner Operations Test",
+    email: `${ownerId}@example.test`,
     createdAt,
   });
   await dataConnect.executeMutation("RecordOperationalEvent", {

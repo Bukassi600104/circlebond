@@ -50,7 +50,8 @@ test("owner administration has separate access and no public registration", asyn
   assert.match(page, /loadOwnerOverview/);
   assert.match(page, /robots:\s*{[\s\S]*index:\s*false/);
   assert.match(provisioning, /emailVerified/);
-  assert.match(provisioning, /ProvisionOwnerAdministrator/);
+  assert.match(provisioning, /ProvisionOwnerAccount/);
+  assert.match(provisioning, /displayName/);
   assert.doesNotMatch(provisioning, /process\.env\.OWNER_EMAIL/);
 });
 

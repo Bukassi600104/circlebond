@@ -2718,6 +2718,31 @@ query GetOwnerInvitation($invitationId: UUID!) @auth(level: NO_ACCESS) {
   }
 }
 
+mutation ProvisionOwnerAccount(
+  $userId: String!
+  $displayName: String!
+  $email: String!
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  user_upsert(
+    data: {
+      id: $userId
+      displayName: $displayName
+      email: $email
+      accountStatus: "active"
+    }
+  )
+  ownerAdministrator_upsert(
+    data: {
+      user: { id: $userId }
+      role: "owner"
+      status: "active"
+      createdAt: $createdAt
+      updatedAt: $createdAt
+    }
+  )
+}
+
 mutation ProvisionOwnerAdministrator($userId: String!, $createdAt: Timestamp!)
 @auth(level: NO_ACCESS) {
   ownerAdministrator_upsert(

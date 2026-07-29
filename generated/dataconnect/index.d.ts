@@ -1557,6 +1557,18 @@ export interface OwnerAdministrator_Key {
   __typename?: 'OwnerAdministrator_Key';
 }
 
+export interface ProvisionOwnerAccountData {
+  user_upsert: User_Key;
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+
+export interface ProvisionOwnerAccountVariables {
+  userId: string;
+  displayName: string;
+  email: string;
+  createdAt: TimestampString;
+}
+
 export interface ProvisionOwnerAdministratorData {
   ownerAdministrator_upsert: OwnerAdministrator_Key;
 }
@@ -3046,6 +3058,18 @@ export const getOwnerInvitationRef: GetOwnerInvitationRef;
 
 export function getOwnerInvitation(vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
 export function getOwnerInvitation(dc: DataConnect, vars: GetOwnerInvitationVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerInvitationData, GetOwnerInvitationVariables>;
+
+interface ProvisionOwnerAccountRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ProvisionOwnerAccountVariables): MutationRef<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ProvisionOwnerAccountVariables): MutationRef<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+  operationName: string;
+}
+export const provisionOwnerAccountRef: ProvisionOwnerAccountRef;
+
+export function provisionOwnerAccount(vars: ProvisionOwnerAccountVariables): MutationPromise<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+export function provisionOwnerAccount(dc: DataConnect, vars: ProvisionOwnerAccountVariables): MutationPromise<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
 
 interface ProvisionOwnerAdministratorRef {
   /* Allow users to create refs without passing in DataConnect */

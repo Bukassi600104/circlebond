@@ -105,6 +105,7 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*DismissOwnerCommentReport*](#dismissownercommentreport)
   - [*SuspendOwnerTargetUser*](#suspendownertargetuser)
   - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
+  - [*ProvisionOwnerAccount*](#provisionowneraccount)
   - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
 
 # TanStack Query Firebase & TanStack React Query
@@ -9563,6 +9564,108 @@ export default function RevokeCompromisedInvitationComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.invitation_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ProvisionOwnerAccount
+You can execute the `ProvisionOwnerAccount` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useProvisionOwnerAccount(options?: useDataConnectMutationOptions<ProvisionOwnerAccountData, FirebaseError, ProvisionOwnerAccountVariables>): UseDataConnectMutationResult<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useProvisionOwnerAccount(dc: DataConnect, options?: useDataConnectMutationOptions<ProvisionOwnerAccountData, FirebaseError, ProvisionOwnerAccountVariables>): UseDataConnectMutationResult<ProvisionOwnerAccountData, ProvisionOwnerAccountVariables>;
+```
+
+### Variables
+The `ProvisionOwnerAccount` Mutation requires an argument of type `ProvisionOwnerAccountVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ProvisionOwnerAccountVariables {
+  userId: string;
+  displayName: string;
+  email: string;
+  createdAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `ProvisionOwnerAccount` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ProvisionOwnerAccount` Mutation is of type `ProvisionOwnerAccountData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ProvisionOwnerAccountData {
+  user_upsert: User_Key;
+  ownerAdministrator_upsert: OwnerAdministrator_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ProvisionOwnerAccount`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ProvisionOwnerAccountVariables } from '@bondcircle/dataconnect';
+import { useProvisionOwnerAccount } from '@bondcircle/dataconnect/react'
+
+export default function ProvisionOwnerAccountComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useProvisionOwnerAccount();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useProvisionOwnerAccount(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useProvisionOwnerAccount(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useProvisionOwnerAccount(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useProvisionOwnerAccount` Mutation requires an argument of type `ProvisionOwnerAccountVariables`:
+  const provisionOwnerAccountVars: ProvisionOwnerAccountVariables = {
+    userId: ..., 
+    displayName: ..., 
+    email: ..., 
+    createdAt: ..., 
+  };
+  mutation.mutate(provisionOwnerAccountVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., displayName: ..., email: ..., createdAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(provisionOwnerAccountVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.user_upsert);
+    console.log(mutation.data.ownerAdministrator_upsert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
