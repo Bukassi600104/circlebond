@@ -33,11 +33,28 @@ test("splash screen introduces the installed app with locked brand assets", asyn
   const styles = await source("app/auth.css");
 
   assert.match(splash, /bond-circle-mark\.png/);
-  assert.match(splash, /bond-circle-wordmark\.png/);
-  assert.match(splash, /Celebrate/);
-  assert.match(splash, /Support/);
-  assert.match(splash, /Together/);
+  assert.doesNotMatch(splash, /bond-circle-wordmark\.png/);
+  assert.doesNotMatch(splash, /Celebrate|Support|Together|<p>/);
+  assert.match(styles, /@keyframes bc-splash-gather/);
+  assert.match(styles, /@keyframes bc-splash-reveal/);
   assert.match(styles, /prefers-reduced-motion/);
+});
+
+test("onboarding artwork sits on a subtle multi-brand gradient canvas", async () => {
+  const styles = await source("app/auth.css");
+
+  assert.match(
+    styles,
+    /\.bc-onboarding[\s\S]*radial-gradient[\s\S]*--color-coral[\s\S]*--color-gold/,
+  );
+  assert.match(
+    styles,
+    /\.bc-onboarding__art img[\s\S]*mix-blend-mode:\s*multiply/,
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.bc-onboarding\s*\{[\s\S]{0,500}background:\s*var\(--color-cream\)/,
+  );
 });
 
 test("mobile app chrome accounts for device safe areas", async () => {
