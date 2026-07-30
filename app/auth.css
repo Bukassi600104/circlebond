@@ -1010,7 +1010,7 @@
   }
 
   .bc-otp input {
-    min-width: 2.5rem;
+    min-width: 0;
   }
 
   .bc-legal-modal {

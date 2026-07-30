@@ -217,6 +217,21 @@ test("email OTP verification resends in place, counts down, and submits on digit
   assert.match(styles, /\.bc-auth-story__copy\s*\{[\s\S]*text-align:\s*center/);
 });
 
+test("email OTP inputs stay inside the mobile viewport without iOS focus zoom", async () => {
+  const componentStyles = await source("app/components.css");
+  const authStyles = await source("app/auth.css");
+  const smallScreenRules = authStyles.slice(
+    authStyles.indexOf("@media (max-width: 24rem)"),
+  );
+
+  assert.match(
+    componentStyles,
+    /\.bc-otp input\s*\{[\s\S]*font-size:\s*16px[\s\S]*max-width:\s*100%/,
+  );
+  assert.match(smallScreenRules, /\.bc-otp input\s*\{[\s\S]*min-width:\s*0/);
+  assert.doesNotMatch(smallScreenRules, /min-width:\s*2\.5rem/);
+});
+
 test("Firebase Admin stays on the Vercel-compatible dependency line", async () => {
   const packageJson = JSON.parse(await source("package.json"));
 
