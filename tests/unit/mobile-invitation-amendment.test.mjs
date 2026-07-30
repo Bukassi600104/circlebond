@@ -28,22 +28,17 @@ test("all circle creation forms retain an iOS-safe mobile frame", async () => {
   assert.match(css.slice(finalMobileGuard), /font-size:\s*16px\s*!important/);
 });
 
-test("gift, Aso-Ebi and support creation accept secure invitations for non-members", async () => {
-  const helper = await source("server/circles/initial-invitations.ts");
-  assert.match(helper, /findUserByEmail/);
-  assert.match(helper, /createCircleInvitation/);
-  assert.match(helper, /emitNewInvitation/);
-  assert.match(helper, /markInvitationSent/);
-
+test("gift, Aso-Ebi and support creation do not process invitations", async () => {
   for (const route of [
     "app/api/circles/gift/route.ts",
     "app/api/circles/aso-ebi/route.ts",
     "app/api/circles/support/route.ts",
   ]) {
     const contents = await source(route);
-    assert.match(contents, /resolveInitialInvitees/);
-    assert.match(contents, /sendInitialInvitations/);
-    assert.doesNotMatch(contents, /does not have a BondCircle account yet/);
+    assert.doesNotMatch(contents, /resolveInitialInvitees/);
+    assert.doesNotMatch(contents, /sendInitialInvitations/);
+    assert.doesNotMatch(contents, /createInitialShareInvitation/);
+    assert.doesNotMatch(contents, /form,\s*"invites"/);
   }
 });
 
@@ -61,23 +56,41 @@ test("invitation sharing carries context and new users register before joining",
   assert.match(invitePage, /redirect\(`\/register\?next=/);
 });
 
-test("every circle creation flow pauses on a secure copy and native-share step", async () => {
-  const helper = await source("server/circles/initial-invitations.ts");
-  const success = await source(
-    "components/invitations/CircleCreationSuccess.tsx",
-  );
+test("every creation form opens its circle before invitations are offered", async () => {
+  for (const form of [
+    "components/gift-circles/GiftCircleForm.tsx",
+    "components/aso-ebi/AsoEbiCircleForm.tsx",
+    "components/support-circles/SupportCircleForm.tsx",
+  ]) {
+    const contents = await source(form);
+    assert.match(contents, /router\.push\(`\/account\/circles\/\$\{data\.circleId\}`\)/);
+    assert.doesNotMatch(contents, /CircleCreationSuccess/);
+    assert.doesNotMatch(contents, /Invite members|Invite supporters/);
+    assert.doesNotMatch(contents, /form\.set\(\s*"invites"/);
+  }
+});
 
-  assert.match(helper, /createInitialShareInvitation/);
-  assert.match(helper, /mode:\s*"open"/);
-  assert.match(helper, /maxUses/);
-  assert.match(helper, /shareStatus:\s*"unavailable"/);
-  assert.match(success, /navigator\.clipboard\.writeText\(share\.link\)/);
-  assert.match(
-    success,
-    /navigator\.clipboard\.writeText\(share\.shareMessage\)/,
-  );
-  assert.match(success, /navigator\.share/);
-  assert.match(success, /Open circle/);
+test("all circle pages own secure email, link, WhatsApp and native sharing", async () => {
+  const manager = await source("components/invitations/InvitationManager.tsx");
+  assert.match(manager, /mode === "open"/);
+  assert.match(manager, /Copy message/);
+  assert.match(manager, /navigator\.share/);
+  assert.match(manager, /https:\/\/wa\.me/);
+  assert.match(manager, /mailto:/);
+
+  for (const view of [
+    "components/gift-circles/GiftCircleView.tsx",
+    "components/aso-ebi/AsoEbiCircleView.tsx",
+    "components/support-circles/SupportCircleView.tsx",
+  ]) {
+    assert.match(await source(view), /<InvitationManager/);
+  }
+});
+
+test("optional circle images cannot block creation when the bucket is absent", async () => {
+  const helper = await source("server/uploads/circle-images.ts");
+  assert.match(helper, /bucket\.exists\(\)/);
+  assert.match(helper, /specified bucket does not exist/i);
 
   for (const route of [
     "app/api/circles/gift/route.ts",
@@ -85,8 +98,8 @@ test("every circle creation flow pauses on a secure copy and native-share step",
     "app/api/circles/support/route.ts",
   ]) {
     const contents = await source(route);
-    assert.match(contents, /createInitialShareInvitation/);
-    assert.match(contents, /share/);
+    assert.match(contents, /circleImageStorageAvailable/);
+    assert.match(contents, /CIRCLE_IMAGE_STORAGE_WARNING/);
   }
 
   for (const form of [
@@ -95,7 +108,6 @@ test("every circle creation flow pauses on a secure copy and native-share step",
     "components/support-circles/SupportCircleForm.tsx",
   ]) {
     const contents = await source(form);
-    assert.match(contents, /CircleCreationSuccess/);
-    assert.match(contents, /data\.share/);
+    assert.match(contents, /image \(optional\)/i);
   }
 });

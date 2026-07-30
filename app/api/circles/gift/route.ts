@@ -3,32 +3,25 @@ import { readSession } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
 import { enforceRateLimit } from "@/server/auth/security";
 import {
-  addCircleMember,
   createCircleDraft,
   transitionCircleState,
 } from "@/server/circles/service";
-import {
-  calculateEqualSlotAllocations,
-  validateCustomAllocations,
-} from "@/server/circles/gift";
+import { calculateEqualSlotAllocations } from "@/server/circles/gift";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
   configureGiftCircle,
   setGiftMemberAllocation,
 } from "@/server/repositories/gift-circles";
-import {
-  createInitialShareInvitation,
-  resolveInitialInvitees,
-  sendInitialInvitations,
-} from "@/server/circles/initial-invitations";
-import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
 import { sanitizeUploadedImage } from "@/server/uploads/images";
+import {
+  CIRCLE_IMAGE_STORAGE_WARNING,
+  circleImageStorageAvailable,
+  saveCircleImage,
+} from "@/server/uploads/circle-images";
 
 export const runtime = "nodejs";
-
-type InviteInput = { email: string; amount?: number };
 
 function text(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
@@ -70,7 +63,6 @@ export async function POST(request: Request) {
     const paymentAccountNumber = text(form, "paymentAccountNumber");
     const creatorAmount = Number(text(form, "creatorAmount") || "0");
     const image = form.get("giftImage");
-    const invites = JSON.parse(text(form, "invites") || "[]") as InviteInput[];
 
     if (!circleName || !giftTitle || !description || !deadline) {
       throw new Error("Complete every required Gift Circle field.");
@@ -107,35 +99,27 @@ export async function POST(request: Request) {
         "Add a bank name, account name and valid 10-digit account number.",
       );
     }
-    uploadAttempted = true;
-    if (!(image instanceof File)) {
-      throw new Error("Add a JPG, PNG or WebP gift image up to 5 MB.");
-    }
-    const sanitized = await sanitizeUploadedImage(
-      image,
-      "Add a valid JPG, PNG or WebP gift image up to 5 MB.",
-    );
-
-    const invitees = await resolveInitialInvitees(invites, session.uid);
-    const resolved = invitees.filter(
-      (
-        invite,
-      ): invite is typeof invite & { user: NonNullable<typeof invite.user> } =>
-        Boolean(invite.user),
-    );
-    if (invitees.length > memberCapacity - 1) {
-      throw new Error(
-        `This circle has ${memberCapacity - 1} member slots besides yours.`,
-      );
-    }
     if (
       contributionMode === "custom" &&
-      invitees.length !== memberCapacity - 1
+      (!Number.isInteger(creatorAmount) ||
+        creatorAmount < 0 ||
+        creatorAmount > targetAmount)
     ) {
-      throw new Error(
-        "Custom split requires every planned member and amount before creation.",
-      );
+      throw new Error("Enter a valid contribution amount for yourself.");
     }
+    const imageFile =
+      image instanceof File && image.size > 0 ? image : null;
+    const storageAvailable = imageFile
+      ? await circleImageStorageAvailable()
+      : false;
+    const sanitized =
+      imageFile && storageAvailable
+        ? await sanitizeUploadedImage(
+            imageFile,
+            "Add a valid JPG, PNG or WebP gift image up to 5 MB.",
+          )
+        : null;
+    uploadAttempted = Boolean(sanitized);
 
     const circle = await createCircleDraft(
       session.uid,
@@ -154,25 +138,12 @@ export async function POST(request: Request) {
     );
     metricCircleId = circle.id;
 
-    for (const invite of resolved) {
-      await addCircleMember(
-        session.uid,
-        circle.id,
-        invite.user.id,
-        "member",
-        firebaseCircleStore,
-      );
+    const imageStoragePath = sanitized
+      ? `circles/${circle.id}/gift/gift.${sanitized.extension}`
+      : "";
+    if (sanitized) {
+      await saveCircleImage(sanitized, imageStoragePath);
     }
-
-    const imageStoragePath = `circles/${circle.id}/gift/gift.${sanitized.extension}`;
-    await getFirebaseAdminStorage()
-      .bucket()
-      .file(imageStoragePath)
-      .save(sanitized.bytes, {
-        contentType: sanitized.contentType,
-        resumable: false,
-        metadata: { cacheControl: "private, max-age=3600" },
-      });
 
     await configureGiftCircle({
       circleId: circle.id,
@@ -182,7 +153,7 @@ export async function POST(request: Request) {
       paymentBankName,
       paymentAccountName,
       paymentAccountNumber,
-      imageUrl: `/api/circles/${circle.id}/gift-image`,
+      imageUrl: sanitized ? `/api/circles/${circle.id}/gift-image` : "",
       imageStoragePath,
     });
 
@@ -190,37 +161,10 @@ export async function POST(request: Request) {
       contributionMode === "equal"
         ? calculateEqualSlotAllocations(targetAmount, memberCapacity)
         : [];
-    if (contributionMode === "custom") {
-      validateCustomAllocations(targetAmount, [
-        { memberId: session.uid, expectedAmount: creatorAmount },
-        ...invitees.map((invite, index) => ({
-          memberId: invite.user?.id ?? `pending:${index}`,
-          expectedAmount: Number(invite.amount ?? 0),
-        })),
-      ]);
-    }
     const allocations =
       contributionMode === "equal"
-        ? [
-            { memberId: session.uid, expectedAmount: equalSlotAmounts[0] },
-            ...invitees.flatMap((invite, index) =>
-              invite.user
-                ? [
-                    {
-                      memberId: invite.user.id,
-                      expectedAmount: equalSlotAmounts[index + 1],
-                    },
-                  ]
-                : [],
-            ),
-          ]
-        : [
-            { memberId: session.uid, expectedAmount: creatorAmount },
-            ...resolved.map(({ amount, user }) => ({
-              memberId: user.id,
-              expectedAmount: Number(amount ?? 0),
-            })),
-          ];
+        ? [{ memberId: session.uid, expectedAmount: equalSlotAmounts[0] }]
+        : [{ memberId: session.uid, expectedAmount: creatorAmount }];
     for (const allocation of allocations) {
       await setGiftMemberAllocation({
         circleId: circle.id,
@@ -243,29 +187,21 @@ export async function POST(request: Request) {
       "active",
       firebaseCircleStore,
     );
-    await sendInitialInvitations({
-      circleId: circle.id,
-      creatorId: session.uid,
-      invitees,
-      expectedAmountFor: (invitee, index) =>
-        contributionMode === "equal"
-          ? equalSlotAmounts[index + 1]
-          : Number(invitee.amount ?? 0),
-    });
-    const { share, shareStatus } = await createInitialShareInvitation({
-      circleId: circle.id,
-      creatorId: session.uid,
-      maxUses: memberCapacity - 1 - invitees.length,
-      origin: new URL(request.url).origin,
-    });
-
-    await recordUploadOutcome({
-      kind: "gift_image",
-      outcome: "succeeded",
-      circleId: circle.id,
-    });
+    if (uploadAttempted) {
+      await recordUploadOutcome({
+        kind: "gift_image",
+        outcome: "succeeded",
+        circleId: circle.id,
+      });
+    }
     return NextResponse.json(
-      { circleId: circle.id, share, shareStatus },
+      {
+        circleId: circle.id,
+        warning:
+          imageFile && !storageAvailable
+            ? CIRCLE_IMAGE_STORAGE_WARNING
+            : undefined,
+      },
       { status: 201 },
     );
   } catch (error) {

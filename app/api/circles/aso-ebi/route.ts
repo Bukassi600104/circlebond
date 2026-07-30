@@ -9,27 +9,22 @@ import {
   type AsoEbiTierInput,
 } from "@/server/circles/aso-ebi";
 import {
-  addCircleMember,
   createCircleDraft,
   transitionCircleState,
 } from "@/server/circles/service";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
-  createInitialShareInvitation,
-  resolveInitialInvitees,
-  sendInitialInvitations,
-} from "@/server/circles/initial-invitations";
-import {
   configureAsoEbiCircle,
   createAsoEbiTier,
 } from "@/server/repositories/aso-ebi-circles";
-import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
+import { sanitizeUploadedImage } from "@/server/uploads/images";
 import {
-  sanitizeUploadedImage,
-  type SanitizedImage,
-} from "@/server/uploads/images";
+  CIRCLE_IMAGE_STORAGE_WARNING,
+  circleImageStorageAvailable,
+  saveCircleImage,
+} from "@/server/uploads/circle-images";
 
 export const runtime = "nodejs";
 
@@ -39,21 +34,9 @@ type TierInput = AsoEbiTierInput & {
   availabilityNote?: string;
   deliveryDetails?: string;
 };
-type InviteInput = { email: string };
 
 function text(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
-}
-
-async function saveImage(image: SanitizedImage, storagePath: string) {
-  await getFirebaseAdminStorage()
-    .bucket()
-    .file(storagePath)
-    .save(image.bytes, {
-      contentType: image.contentType,
-      resumable: false,
-      metadata: { cacheControl: "private, max-age=3600" },
-    });
 }
 
 function optionalFile(form: FormData, key: string) {
@@ -98,7 +81,6 @@ export async function POST(request: Request) {
     const tiers = assertAsoEbiTiers(
       JSON.parse(text(form, "tiers") || "[]") as TierInput[],
     );
-    const invites = JSON.parse(text(form, "invites") || "[]") as InviteInput[];
 
     if (
       !eventTitle ||
@@ -133,14 +115,6 @@ export async function POST(request: Request) {
         "Add a bank name, account name and valid 10-digit account number.",
       );
     }
-    uploadAttempted = true;
-    if (!(fabricImage instanceof File) || fabricImage.size < 1) {
-      throw new Error("Add the main fabric image.");
-    }
-    const sanitizedMainImage = await sanitizeUploadedImage(
-      fabricImage,
-      "Add a valid JPG, PNG or WebP main fabric image up to 5 MB.",
-    );
     for (const tier of tiers) {
       if (!/^[0-9a-f-]{36}$/i.test(tier.id)) {
         throw new Error("A tier identifier is invalid.");
@@ -155,16 +129,25 @@ export async function POST(request: Request) {
         }
       }
     }
-
-    const invitees = await resolveInitialInvitees(invites, session.uid);
-    if (invitees.length > memberCapacity - 1) {
-      throw new Error(
-        `This circle has ${memberCapacity - 1} member places besides yours.`,
-      );
-    }
-    const resolvedMembers = invitees.flatMap((invite) =>
-      invite.user ? [invite.user] : [],
+    const mainImageFile =
+      fabricImage instanceof File && fabricImage.size > 0 ? fabricImage : null;
+    const hasTierImage = tiers.some(
+      (tier) =>
+        Boolean(optionalFile(form, `tierFabricImage:${tier.id}`)) ||
+        Boolean(optionalFile(form, `tierGiftImage:${tier.id}`)),
     );
+    const hasAnyImage = Boolean(mainImageFile) || hasTierImage;
+    const storageAvailable = hasAnyImage
+      ? await circleImageStorageAvailable()
+      : false;
+    uploadAttempted = hasAnyImage && storageAvailable;
+    const sanitizedMainImage =
+      mainImageFile && storageAvailable
+        ? await sanitizeUploadedImage(
+            mainImageFile,
+            "Add a valid JPG, PNG or WebP main fabric image up to 5 MB.",
+          )
+        : null;
 
     const circle = await createCircleDraft(
       session.uid,
@@ -183,18 +166,12 @@ export async function POST(request: Request) {
     );
     metricCircleId = circle.id;
 
-    for (const user of resolvedMembers) {
-      await addCircleMember(
-        session.uid,
-        circle.id,
-        user.id,
-        "member",
-        firebaseCircleStore,
-      );
+    const mainPath = sanitizedMainImage
+      ? `circles/${circle.id}/aso-ebi/event.${sanitizedMainImage.extension}`
+      : "";
+    if (sanitizedMainImage) {
+      await saveCircleImage(sanitizedMainImage, mainPath);
     }
-
-    const mainPath = `circles/${circle.id}/aso-ebi/event.${sanitizedMainImage.extension}`;
-    await saveImage(sanitizedMainImage, mainPath);
     await configureAsoEbiCircle({
       circleId: circle.id,
       actorId: session.uid,
@@ -203,14 +180,20 @@ export async function POST(request: Request) {
       paymentBankName,
       paymentAccountName,
       paymentAccountNumber,
-      imageUrl: `/api/circles/${circle.id}/aso-ebi-image?asset=event`,
+      imageUrl: sanitizedMainImage
+        ? `/api/circles/${circle.id}/aso-ebi-image?asset=event`
+        : "",
       imageStoragePath: mainPath,
     });
 
     for (const [index, tier] of tiers.entries()) {
       const tierId = randomUUID().replaceAll("-", "");
-      const tierFabric = optionalFile(form, `tierFabricImage:${tier.id}`);
-      const tierGift = optionalFile(form, `tierGiftImage:${tier.id}`);
+      const tierFabric = storageAvailable
+        ? optionalFile(form, `tierFabricImage:${tier.id}`)
+        : null;
+      const tierGift = storageAvailable
+        ? optionalFile(form, `tierGiftImage:${tier.id}`)
+        : null;
       const sanitizedTierFabric = tierFabric
         ? await sanitizeUploadedImage(tierFabric)
         : null;
@@ -224,10 +207,10 @@ export async function POST(request: Request) {
         ? `circles/${circle.id}/aso-ebi/tiers/${tierId}/gift.${sanitizedTierGift!.extension}`
         : null;
       if (sanitizedTierFabric && fabricPath) {
-        await saveImage(sanitizedTierFabric, fabricPath);
+        await saveCircleImage(sanitizedTierFabric, fabricPath);
       }
       if (sanitizedTierGift && giftPath) {
-        await saveImage(sanitizedTierGift, giftPath);
+        await saveCircleImage(sanitizedTierGift, giftPath);
       }
       await createAsoEbiTier({
         tierId,
@@ -262,25 +245,21 @@ export async function POST(request: Request) {
       "active",
       firebaseCircleStore,
     );
-    await sendInitialInvitations({
-      circleId: circle.id,
-      creatorId: session.uid,
-      invitees,
-    });
-    const { share, shareStatus } = await createInitialShareInvitation({
-      circleId: circle.id,
-      creatorId: session.uid,
-      maxUses: memberCapacity - 1 - invitees.length,
-      origin: new URL(request.url).origin,
-    });
-
-    await recordUploadOutcome({
-      kind: "aso_ebi_image",
-      outcome: "succeeded",
-      circleId: circle.id,
-    });
+    if (uploadAttempted) {
+      await recordUploadOutcome({
+        kind: "aso_ebi_image",
+        outcome: "succeeded",
+        circleId: circle.id,
+      });
+    }
     return NextResponse.json(
-      { circleId: circle.id, share, shareStatus },
+      {
+        circleId: circle.id,
+        warning:
+          hasAnyImage && !storageAvailable
+            ? CIRCLE_IMAGE_STORAGE_WARNING
+            : undefined,
+      },
       { status: 201 },
     );
   } catch (error) {

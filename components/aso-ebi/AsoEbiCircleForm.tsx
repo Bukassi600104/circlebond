@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -17,13 +18,6 @@ import {
   planForMemberCount,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
-import {
-  CircleCreationSuccess,
-  type CircleCreationShareStatus,
-  type CircleCreationShareView,
-} from "@/components/invitations/CircleCreationSuccess";
-
-type Invite = { email: string };
 type TierDraft = {
   id: string;
   name: string;
@@ -74,26 +68,16 @@ async function csrfToken() {
 }
 
 export function AsoEbiCircleForm() {
+  const router = useRouter();
   const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
   const [tiers, setTiers] = useState<TierDraft[]>(() => [newTier()]);
-  const [invites, setInvites] = useState<Invite[]>([]);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [created, setCreated] = useState<{
-    circleId: string;
-    share: CircleCreationShareView | null;
-    shareStatus: CircleCreationShareStatus;
-  } | null>(null);
   const selectedPlan = CIRCLE_PRICING_PLANS[pricingPlan];
   const capacityNumber = Number(memberCapacity);
-  const validCapacity =
-    Number.isInteger(capacityNumber) &&
-    capacityNumber >= 2 &&
-    capacityNumber <= selectedPlan.memberLimit;
-  const openSlots = validCapacity ? capacityNumber - 1 : 0;
 
   function updateTier(id: string, changes: Partial<TierDraft>) {
     setTiers((current) =>
@@ -106,7 +90,6 @@ export function AsoEbiCircleForm() {
     const limit = CIRCLE_PRICING_PLANS[plan].memberLimit;
     if (capacityNumber > limit) {
       setMemberCapacity(String(limit));
-      setInvites((current) => current.slice(0, limit - 1));
     }
   }
 
@@ -125,7 +108,6 @@ export function AsoEbiCircleForm() {
           })),
         ),
       );
-      form.set("invites", JSON.stringify(invites));
       const csrf = await csrfToken();
       const response = await fetch("/api/circles/aso-ebi", {
         method: "POST",
@@ -134,18 +116,13 @@ export function AsoEbiCircleForm() {
       });
       const data = (await response.json()) as {
         circleId?: string;
-        share?: CircleCreationShareView | null;
-        shareStatus?: CircleCreationShareStatus;
         error?: string;
       };
       if (!response.ok || !data.circleId) {
         throw new Error(data.error ?? "Unable to create the Aso-Ebi Circle.");
       }
-      setCreated({
-        circleId: data.circleId,
-        share: data.share ?? null,
-        shareStatus: data.shareStatus ?? "unavailable",
-      });
+      router.push(`/account/circles/${data.circleId}`);
+      router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Please try again.");
       setBusy(false);
@@ -265,7 +242,6 @@ export function AsoEbiCircleForm() {
                     return;
                   }
                   if (Number.isInteger(requested) && requested >= 2) {
-                    setInvites((current) => current.slice(0, requested - 1));
                   }
                 }}
               />
@@ -287,14 +263,13 @@ export function AsoEbiCircleForm() {
               <ImagePlus size={25} aria-hidden="true" />
             )}
             <span>
-              <strong>Add the main fabric image</strong>
+              <strong>Add the main fabric image (optional)</strong>
               <small>JPG, PNG or WebP · up to 5 MB</small>
             </span>
             <input
               name="fabricImage"
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              required
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (preview) URL.revokeObjectURL(preview);
@@ -475,71 +450,6 @@ export function AsoEbiCircleForm() {
           </div>
         </section>
 
-        <section className="bc-gift-invites">
-          <header>
-            <div>
-              <h2>Invite members</h2>
-              <p>
-                Add existing members or email a secure registration invite.
-                Members choose their tier after joining. After creation, you can
-                also share a detailed WhatsApp or open link.
-              </p>
-            </div>
-            <button
-              type="button"
-              disabled={!validCapacity || invites.length >= openSlots}
-              onClick={() =>
-                setInvites((current) => [...current, { email: "" }])
-              }
-            >
-              <Plus size={15} aria-hidden="true" />
-              Add member
-            </button>
-          </header>
-          {invites.length ? (
-            <div className="bc-gift-invites__list">
-              {invites.map((invite, index) => (
-                <div key={index}>
-                  <label>
-                    Member email
-                    <input
-                      type="email"
-                      required
-                      value={invite.email}
-                      onChange={(event) =>
-                        setInvites((current) =>
-                          current.map((item, itemIndex) =>
-                            itemIndex === index
-                              ? { email: event.target.value }
-                              : item,
-                          ),
-                        )
-                      }
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    aria-label={`Remove member ${index + 1}`}
-                    onClick={() =>
-                      setInvites((current) =>
-                        current.filter((_, itemIndex) => itemIndex !== index),
-                      )
-                    }
-                  >
-                    <Trash2 size={16} aria-hidden="true" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="bc-gift-invites__empty">
-              {validCapacity
-                ? `${openSlots} member ${openSlots === 1 ? "place" : "places"} can be invited now or later.`
-                : "Choose the number of people before adding members."}
-            </p>
-          )}
-        </section>
-
         {error ? (
           <p className="bc-gift-create__error" role="alert">
             {error}
@@ -586,9 +496,6 @@ export function AsoEbiCircleForm() {
                 type="button"
                 onClick={() => {
                   setMemberCapacity(String(selectedPlan.memberLimit));
-                  setInvites((current) =>
-                    current.slice(0, selectedPlan.memberLimit - 1),
-                  );
                   setCapacityIssue(null);
                 }}
               >
@@ -609,13 +516,6 @@ export function AsoEbiCircleForm() {
             </footer>
           </section>
         </div>
-      ) : null}
-      {created ? (
-        <CircleCreationSuccess
-          circleId={created.circleId}
-          share={created.share}
-          shareStatus={created.shareStatus}
-        />
       ) : null}
     </section>
   );

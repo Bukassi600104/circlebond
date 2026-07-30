@@ -2,13 +2,12 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowUpRight,
   Check,
   ImagePlus,
-  Plus,
-  Trash2,
   X,
 } from "lucide-react";
 import {
@@ -16,14 +15,6 @@ import {
   planForMemberCount,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
-import {
-  CircleCreationSuccess,
-  type CircleCreationShareStatus,
-  type CircleCreationShareView,
-} from "@/components/invitations/CircleCreationSuccess";
-
-type Invite = { email: string; amount: string };
-
 const naira = new Intl.NumberFormat("en-NG", {
   style: "currency",
   currency: "NGN",
@@ -41,19 +32,14 @@ async function csrfToken() {
 }
 
 export function GiftCircleForm() {
+  const router = useRouter();
   const [mode, setMode] = useState<"equal" | "custom">("equal");
-  const [invites, setInvites] = useState<Invite[]>([]);
   const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [created, setCreated] = useState<{
-    circleId: string;
-    share: CircleCreationShareView | null;
-    shareStatus: CircleCreationShareStatus;
-  } | null>(null);
   const selectedTier = CIRCLE_PRICING_PLANS[pricingPlan];
   const capacityNumber = Number(memberCapacity);
   const validCapacity =
@@ -62,17 +48,11 @@ export function GiftCircleForm() {
     capacityNumber <= selectedTier.memberLimit;
   const openSlots = validCapacity ? capacityNumber - 1 : 0;
 
-  function addInvite() {
-    if (!validCapacity || invites.length >= openSlots) return;
-    setInvites((current) => [...current, { email: "", amount: "" }]);
-  }
-
   function selectPlan(plan: CirclePricingPlan) {
     setPricingPlan(plan);
     const limit = CIRCLE_PRICING_PLANS[plan].memberLimit;
     if (capacityNumber > limit) {
       setMemberCapacity(String(limit));
-      setInvites((current) => current.slice(0, limit - 1));
     }
   }
 
@@ -82,15 +62,6 @@ export function GiftCircleForm() {
     setBusy(true);
     try {
       const form = new FormData(event.currentTarget);
-      form.set(
-        "invites",
-        JSON.stringify(
-          invites.map((invite) => ({
-            email: invite.email,
-            amount: Number(invite.amount || "0"),
-          })),
-        ),
-      );
       const csrf = await csrfToken();
       const response = await fetch("/api/circles/gift", {
         method: "POST",
@@ -99,18 +70,13 @@ export function GiftCircleForm() {
       });
       const data = (await response.json()) as {
         circleId?: string;
-        share?: CircleCreationShareView | null;
-        shareStatus?: CircleCreationShareStatus;
         error?: string;
       };
       if (!response.ok || !data.circleId) {
         throw new Error(data.error ?? "Unable to create the Gift Circle.");
       }
-      setCreated({
-        circleId: data.circleId,
-        share: data.share ?? null,
-        shareStatus: data.shareStatus ?? "unavailable",
-      });
+      router.push(`/account/circles/${data.circleId}`);
+      router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Please try again.");
       setBusy(false);
@@ -220,7 +186,6 @@ export function GiftCircleForm() {
                   return;
                 }
                 if (Number.isInteger(requested) && requested >= 2) {
-                  setInvites((current) => current.slice(0, requested - 1));
                 }
               }}
             />
@@ -260,9 +225,21 @@ export function GiftCircleForm() {
               onChange={() => setMode("custom")}
             />
             <strong>Custom amounts</strong>
-            <span>Set the exact amount expected from each member.</span>
+            <span>Set your amount now; add member amounts after creation.</span>
           </label>
         </fieldset>
+        {mode === "custom" ? (
+          <label className="bc-gift-invites__creator">
+            Your contribution (₦)
+            <input
+              name="creatorAmount"
+              type="number"
+              min="0"
+              step="1"
+              required
+            />
+          </label>
+        ) : null}
 
         <section className="bc-gift-payment-setup">
           <header>
@@ -316,14 +293,13 @@ export function GiftCircleForm() {
             <ImagePlus size={25} aria-hidden="true" />
           )}
           <span>
-            <strong>Add gift image</strong>
+            <strong>Add gift image (optional)</strong>
             <small>JPG, PNG or WebP · up to 5 MB</small>
           </span>
           <input
             name="giftImage"
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            required
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (preview) URL.revokeObjectURL(preview);
@@ -331,112 +307,6 @@ export function GiftCircleForm() {
             }}
           />
         </label>
-
-        <section className="bc-gift-invites">
-          <header>
-            <div>
-              <h2>Invite members</h2>
-              <p>
-                Add existing members or email a secure registration invite.
-                After creation, you can also share a detailed WhatsApp or open
-                link.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={addInvite}
-              disabled={!validCapacity || invites.length >= openSlots}
-            >
-              <Plus size={15} aria-hidden="true" />
-              Add member
-            </button>
-          </header>
-          {mode === "custom" && (
-            <label className="bc-gift-invites__creator">
-              Your contribution (₦)
-              <input
-                name="creatorAmount"
-                type="number"
-                min="0"
-                step="1"
-                required
-              />
-            </label>
-          )}
-          {invites.length === 0 ? (
-            <p className="bc-gift-invites__empty">
-              {validCapacity
-                ? `You can create the circle now and fill its ${openSlots} open member ${
-                    openSlots === 1 ? "slot" : "slots"
-                  } later.`
-                : "Choose the number of people before adding members."}
-            </p>
-          ) : (
-            <div className="bc-gift-invites__list">
-              {invites.map((invite, index) => (
-                <div key={index}>
-                  <label>
-                    Member email
-                    <input
-                      type="email"
-                      value={invite.email}
-                      required
-                      onChange={(event) =>
-                        setInvites((current) =>
-                          current.map((item, itemIndex) =>
-                            itemIndex === index
-                              ? { ...item, email: event.target.value }
-                              : item,
-                          ),
-                        )
-                      }
-                    />
-                  </label>
-                  {mode === "custom" && (
-                    <label>
-                      Amount (₦)
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={invite.amount}
-                        required
-                        onChange={(event) =>
-                          setInvites((current) =>
-                            current.map((item, itemIndex) =>
-                              itemIndex === index
-                                ? { ...item, amount: event.target.value }
-                                : item,
-                            ),
-                          )
-                        }
-                      />
-                    </label>
-                  )}
-                  <button
-                    type="button"
-                    aria-label={`Remove member ${index + 1}`}
-                    onClick={() =>
-                      setInvites((current) =>
-                        current.filter((_, itemIndex) => itemIndex !== index),
-                      )
-                    }
-                  >
-                    <Trash2 size={16} aria-hidden="true" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {mode === "custom" &&
-            validCapacity &&
-            invites.length !== openSlots && (
-              <p className="bc-gift-invites__note">
-                Custom split requires an email and amount for all {openSlots}{" "}
-                other member slots before creation.
-              </p>
-            )}
-        </section>
 
         {error && (
           <p className="bc-gift-create__error" role="alert">
@@ -483,9 +353,6 @@ export function GiftCircleForm() {
                 type="button"
                 onClick={() => {
                   setMemberCapacity(String(selectedTier.memberLimit));
-                  setInvites((current) =>
-                    current.slice(0, selectedTier.memberLimit - 1),
-                  );
                   setCapacityIssue(null);
                 }}
               >
@@ -508,13 +375,6 @@ export function GiftCircleForm() {
           </section>
         </div>
       )}
-      {created ? (
-        <CircleCreationSuccess
-          circleId={created.circleId}
-          share={created.share}
-          shareStatus={created.shareStatus}
-        />
-      ) : null}
     </section>
   );
 }
