@@ -57,6 +57,24 @@ test("production server renders authentication screens, component library, and h
     assert.match(verifyHtml, /Verify your account/i);
     assert.match(verifyHtml, /Preparing verification/i);
 
+    const onboarding = await fetch(`${baseUrl}/onboarding`);
+    assert.equal(onboarding.status, 200);
+    const onboardingHtml = await onboarding.text();
+    assert.match(onboardingHtml, /Group gifts, made simple/i);
+    assert.match(onboardingHtml, /group-gifts\.jpg/i);
+
+    const manifest = await fetch(`${baseUrl}/manifest.webmanifest`);
+    assert.equal(manifest.status, 200);
+    const manifestBody = await manifest.json();
+    assert.equal(manifestBody.display, "standalone");
+    assert.equal(manifestBody.start_url, "/");
+
+    const home = await fetch(`${baseUrl}/`);
+    assert.equal(home.status, 200);
+    const homeHtml = await home.text();
+    assert.match(homeHtml, /BondCircle/i);
+    assert.doesNotMatch(homeHtml, /Your site is taking shape|codex-preview/i);
+
     const protectedPage = await fetch(`${baseUrl}/account`, {
       redirect: "manual",
     });
