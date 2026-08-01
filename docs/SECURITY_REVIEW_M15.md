@@ -34,14 +34,14 @@ Next.js/PostCSS/Sharp. Next.js was patched to 16.2.12, Sharp to 0.35.3, and
 patched PostCSS/Sharp versions are enforced across the tree. The post-fix audit
 contains no critical/high finding.
 
-Nine moderate transitive advisories remain:
+Eight moderate transitive advisories remain after updating `protobufjs` to its
+patched release:
 
-- `protobufjs`: the application does not parse user-supplied `.proto` schemas.
 - `uuid` below 11.1.1 inside Firebase/Google libraries: the affected
   buffer-taking v3/v5/v6 APIs are not called by BondCircle.
 
-Forcing incompatible transitive majors or downgrading Firebase Admin would add
-more production risk. These moderate, non-reachable findings are recorded for
+Forcing the Firebase Admin 14 major during this release would add more
+production risk. These moderate, non-reachable findings are recorded for
 upstream monitoring and do not violate the approved no-critical/high gate.
 
 ## Release evidence required

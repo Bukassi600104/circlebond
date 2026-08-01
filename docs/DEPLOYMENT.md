@@ -30,6 +30,7 @@ Required groups:
 - `AUTH_EMAIL_OTP_MODE=production`
 - `AUTH_EMAIL_SMTP_URL` and `AUTH_EMAIL_FROM`: transactional email delivery
 - `NEXT_PUBLIC_APP_URL`: canonical HTTPS origin used in notification email links
+- `NEXT_PUBLIC_ENABLE_ANALYTICS` and `NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS`: keep `false` until the matching Vercel feature and final Privacy Notice are approved
 - `CRON_SECRET`: required for the daily retention purge job configured in `vercel.json`
 
 When entering `FIREBASE_PRIVATE_KEY` in Vercel, preserve newline characters using the escaped `\n` form expected by the application.
@@ -57,6 +58,10 @@ npm test
 
 Verify on the deployed domain:
 
+```bash
+npm run verify:production -- --base-url https://www.bondcircles.com --storage-bucket bond-circle.firebasestorage.app
+```
+
 - `/api/health` returns a healthy response.
 - Email, phone, and Google sign-in complete successfully.
 - New-user invitation registration returns to the intended invitation.
@@ -72,6 +77,8 @@ Verify on the deployed domain:
 - Eligible private receipt and temporary circle files are removed, shared files are retained, and purge failures create retryable alert logs.
 - Failed notification email deliveries are retained as delivery records.
 - Server logs contain no credentials, raw invitation tokens, OTP secrets, or personal payment evidence.
+
+The automated verifier does not replace authenticated browser/device checks, a real OTP-delivery check, a backup restore rehearsal, or a rollback exercise. Record those checks in the private release ticket using [the production runbook](PRODUCTION_RUNBOOK_M17.md).
 
 ## 5. Rollback
 

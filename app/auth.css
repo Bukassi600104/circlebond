@@ -729,6 +729,29 @@
   color: var(--color-text-secondary);
 }
 
+.bc-legal-page article section {
+  margin-top: var(--space-6);
+}
+
+.bc-legal-page article h2 {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-brand);
+  font-size: var(--text-h3);
+}
+
+.bc-legal-page article li {
+  margin-block: var(--space-2);
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.bc-legal-page article footer {
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: var(--border);
+}
+
 .bc-legal-modal {
   position: fixed;
   inset: 0;

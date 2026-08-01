@@ -5,9 +5,13 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@fontsource/lora/600.css";
 import "./globals.css";
+import { ProductionObservability } from "@/components/observability/ProductionObservability";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://www.bondcircles.com",
+  ),
   title: {
     default: "BondCircle",
     template: "%s — BondCircle",
@@ -46,6 +50,7 @@ export default function RootLayout({
       <body>
         {children}
         <InstallPrompt />
+        <ProductionObservability />
       </body>
     </html>
   );

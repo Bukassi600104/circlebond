@@ -6,7 +6,7 @@ BondCircle is a responsive web application for creating trusted circles around g
 
 ## Delivery status
 
-The product is being delivered against an approved 18-milestone production plan. Milestones 1–14 are implemented and verified:
+The product is being delivered against an approved 18-milestone production plan. Milestones 1–16 are implemented and verified; Milestone 17 production deployment is in progress:
 
 - Firebase-only application foundation
 - Design system and responsive component library
@@ -21,8 +21,10 @@ The product is being delivered against an approved 18-milestone production plan.
 - In-app notifications, critical transactional email, preferences, muted circles, protected reminders, and deadline scheduling
 - Creator-controlled completion and cancellation, read-only archives, visible 30-day retention countdowns, reference-aware private file deletion, retryable scheduled purges, and minimal audit-safe historical records
 - Separate owner administration with aggregate platform health, purpose-limited abuse review, account suspension, compromised-invite revocation, approved operational exports, upload telemetry, and an immutable administrative audit trail
+- Security hardening, dependency review, private-upload controls, CSRF/origin enforcement, durable abuse controls, and browser security headers
+- Automated production builds, unit/integration/rendered-page coverage, Firebase Auth and Data Connect emulator E2E, lint, formatting, strict TypeScript, and the documented device QA matrix
 
-The web application has a live Vercel deployment for production-environment testing. Formal production readiness still requires the security, quality, deployment, and post-launch gates in Milestones 15–18; the live URL is not a substitute for those checks.
+The web application has a live Vercel deployment for production-environment testing. Formal production readiness still requires the provider-side and acceptance gates in Milestones 17–18; the live URL is not a substitute for those checks. The current Milestone 17 blockers are tracked in [the production runbook](docs/PRODUCTION_RUNBOOK_M17.md) and must not be marked complete until the production Storage bucket, final legal/incident details, provider monitoring configuration, backup/rollback exercise, and live authenticated smoke tests pass.
 
 ## Technology
 
@@ -99,6 +101,7 @@ npm run format:check
 npm run lint
 npm run typecheck
 npm test
+npm run verify:production
 ```
 
 `npm test` includes:
@@ -122,7 +125,7 @@ The application is designed for Vercel hosting with Firebase providing authentic
 6. run the full verification suite.
 7. Verify `/api/health`, authentication, invitations, uploads, and database persistence on the deployed domain.
 
-The detailed checklist is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+The detailed checklist is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), with operational backup, rollback, monitoring, and incident procedures in [docs/PRODUCTION_RUNBOOK_M17.md](docs/PRODUCTION_RUNBOOK_M17.md).
 
 ## Product documentation
 
