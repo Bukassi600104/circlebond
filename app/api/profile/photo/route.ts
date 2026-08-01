@@ -11,6 +11,26 @@ import { sanitizeUploadedImage } from "@/server/uploads/images";
 
 export const runtime = "nodejs";
 
+function isMissingBucketError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: number | string; message?: string };
+  return (
+    candidate.code === 404 ||
+    candidate.code === "404" ||
+    /specified bucket does not exist|not found/i.test(candidate.message ?? "")
+  );
+}
+
+async function profilePhotoStorageAvailable() {
+  try {
+    const [exists] = await getFirebaseAdminStorage().bucket().exists();
+    return exists;
+  } catch (error) {
+    if (isMissingBucketError(error)) return false;
+    throw error;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     await assertTrustedMutation(request);
@@ -28,6 +48,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Photo update limit reached. Try again later." },
         { status: 429 },
+      );
+    }
+    if (!(await profilePhotoStorageAvailable())) {
+      return NextResponse.json(
+        {
+          error:
+            "Profile photo storage is not enabled yet. Your account was not changed.",
+        },
+        { status: 503 },
       );
     }
 
