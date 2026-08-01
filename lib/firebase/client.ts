@@ -10,8 +10,21 @@ import { getFirebaseClientEnv } from "@/lib/env";
 
 let authInitialized = false;
 
+function getFirebaseBrowserConfig() {
+  const config = getFirebaseClientEnv();
+  if (
+    typeof window !== "undefined" &&
+    ["bondcircles.com", "www.bondcircles.com"].includes(
+      window.location.hostname,
+    )
+  ) {
+    return { ...config, authDomain: window.location.host };
+  }
+  return config;
+}
+
 export function getFirebaseClientApp() {
-  return getApps().length ? getApp() : initializeApp(getFirebaseClientEnv());
+  return getApps().length ? getApp() : initializeApp(getFirebaseBrowserConfig());
 }
 
 export function getFirebaseAuth() {

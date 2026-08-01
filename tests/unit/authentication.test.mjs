@@ -232,6 +232,22 @@ test("authentication provider requests cannot leave the sign-in form spinning fo
   assert.match(email, /socketTimeout/);
 });
 
+test("mobile Google sign-in redirects through the production origin and reports its own loading state", async () => {
+  const client = await source("features/auth/client.ts");
+  const components = await source("features/auth/components.tsx");
+  const firebaseClient = await source("lib/firebase/client.ts");
+  const nextConfig = await source("next.config.ts");
+
+  assert.match(client, /signInWithRedirect/);
+  assert.match(client, /getRedirectResult/);
+  assert.match(client, /display-mode:\s*standalone/);
+  assert.match(client, /sessionStorage/);
+  assert.match(firebaseClient, /window\.location\.host/);
+  assert.match(nextConfig, /\/__\/auth\/:path\*/);
+  assert.match(components, /loading=\{contactLoading\}/);
+  assert.match(components, /loading=\{googleLoading\}/);
+});
+
 test("email OTP inputs stay inside the mobile viewport without iOS focus zoom", async () => {
   const componentStyles = await source("app/components.css");
   const authStyles = await source("app/auth.css");

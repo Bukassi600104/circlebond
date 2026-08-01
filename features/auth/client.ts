@@ -1,11 +1,13 @@
 "use client";
 
 import {
+  getRedirectResult,
   GoogleAuthProvider,
   RecaptchaVerifier,
   signInWithCustomToken,
   signInWithPhoneNumber,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type ConfirmationResult,
   type User,
@@ -13,6 +15,7 @@ import {
 import { getFirebaseAuth } from "@/lib/firebase/client";
 
 let phoneConfirmation: ConfirmationResult | null = null;
+const GOOGLE_REDIRECT_PENDING = "bondcircle-google-redirect-pending";
 
 function withTimeout<T>(operation: Promise<T>, timeoutMs: number, message: string) {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -48,18 +51,66 @@ export async function exchangeSession(user: User) {
   return data;
 }
 
+function shouldUseGoogleRedirect() {
+  const standalone = window.matchMedia("(display-mode: standalone)").matches;
+  const iosStandalone = Boolean(
+    (window.navigator as Navigator & { standalone?: boolean }).standalone,
+  );
+  const mobileUserAgent = /android|iphone|ipad|ipod/i.test(
+    window.navigator.userAgent,
+  );
+  const ipadDesktopMode =
+    window.navigator.platform === "MacIntel" &&
+    window.navigator.maxTouchPoints > 1;
+  return standalone || iosStandalone || mobileUserAgent || ipadDesktopMode;
+}
+
+export function hasPendingGoogleRedirect() {
+  return (
+    typeof window !== "undefined" &&
+    window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING) === "true"
+  );
+}
+
+export async function completeGoogleRedirect() {
+  if (!hasPendingGoogleRedirect()) return null;
+  try {
+    const result = await getRedirectResult(getFirebaseAuth());
+    if (!result) {
+      throw new Error("Google sign-in did not return an account.");
+    }
+    return await exchangeSession(result.user);
+  } finally {
+    window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING);
+  }
+}
+
 export async function signInWithGoogle() {
-  return withTimeout(
+  const auth = getFirebaseAuth();
+  const provider = new GoogleAuthProvider();
+  if (
+    shouldUseGoogleRedirect() &&
+    auth.config.authDomain === window.location.host
+  ) {
+    window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING, "true");
+    try {
+      await signInWithRedirect(auth, provider);
+      return { kind: "redirect" as const };
+    } catch (error) {
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING);
+      throw error;
+    }
+  }
+
+  const session = await withTimeout(
     (async () => {
-      const result = await signInWithPopup(
-        getFirebaseAuth(),
-        new GoogleAuthProvider(),
-      );
+      const result = await signInWithPopup(auth, provider);
       return exchangeSession(result.user);
     })(),
     30_000,
     "Google sign-in timed out. Check that pop-ups are allowed and try again.",
   );
+  return { kind: "session" as const, session };
 }
 
 export async function startPhoneOtp(phone: string, containerId: string) {

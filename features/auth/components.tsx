@@ -23,8 +23,10 @@ import {
   UploadField,
 } from "@/components/forms";
 import {
+  completeGoogleRedirect,
   confirmEmailOtp,
   confirmPhoneOtp,
+  hasPendingGoogleRedirect,
   logoutSession,
   recordLegalAcceptance,
   signInWithGoogle,
@@ -142,7 +144,43 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
   const [channel, setChannel] = useState<Channel>("email");
   const [contact, setContact] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const loading = contactLoading || googleLoading;
+
+  const continueAfterGoogle = useCallback(
+    (session: { needsLegalAcceptance?: boolean }) => {
+      router.push(
+        session.needsLegalAcceptance
+          ? `/legal/accept?next=${encodeURIComponent(nextPath)}`
+          : nextPath,
+      );
+      router.refresh();
+    },
+    [nextPath, router],
+  );
+
+  useEffect(() => {
+    if (!hasPendingGoogleRedirect()) return;
+    let active = true;
+    void Promise.resolve()
+      .then(() => {
+        if (active) setGoogleLoading(true);
+        return completeGoogleRedirect();
+      })
+      .then((session) => {
+        if (active && session) continueAfterGoogle(session);
+      })
+      .catch((caught) => {
+        if (active) setError(friendlyError(caught));
+      })
+      .finally(() => {
+        if (active) setGoogleLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [continueAfterGoogle]);
 
   function changeChannel(nextChannel: Channel) {
     setChannel(nextChannel);
@@ -153,7 +191,7 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    setLoading(true);
+    setContactLoading(true);
     try {
       if (channel === "email") {
         const challenge = await requestEmailOtp({
@@ -172,25 +210,20 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
     } catch (caught) {
       setError(friendlyError(caught));
     } finally {
-      setLoading(false);
+      setContactLoading(false);
     }
   }
 
   async function google() {
     setError("");
-    setLoading(true);
+    setGoogleLoading(true);
     try {
-      const session = await signInWithGoogle();
-      router.push(
-        session.needsLegalAcceptance
-          ? `/legal/accept?next=${encodeURIComponent(nextPath)}`
-          : nextPath,
-      );
-      router.refresh();
+      const result = await signInWithGoogle();
+      if (result.kind === "session") continueAfterGoogle(result.session);
     } catch (caught) {
       setError(friendlyError(caught));
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   }
 
@@ -221,7 +254,7 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
             {error}
           </p>
         )}
-        <Button type="submit" loading={loading}>
+        <Button type="submit" loading={contactLoading} disabled={loading}>
           Continue
         </Button>
         <Link
@@ -240,6 +273,7 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
         className="bc-google-button"
         onClick={google}
         disabled={loading}
+        loading={googleLoading}
       >
         <b aria-hidden="true">G</b> Continue with Google
       </Button>
