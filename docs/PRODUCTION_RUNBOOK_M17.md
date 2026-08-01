@@ -16,6 +16,12 @@ Record the Git commit, Vercel deployment ID, release operator, verification
 time and previous known-good deployment in the private release ticket before
 promoting a deployment.
 
+The public, credential-free evidence for the current release is maintained in
+[the Milestones 17–18 closeout ledger](RELEASE_CLOSEOUT_M17_M18.md). It records
+the exact GitHub commit, deployment, Firebase resources, automated gates and
+remaining provider/owner acceptance items without exposing private operations
+data.
+
 ## Required production configuration
 
 The exact values remain in the provider secret stores. Verify the names and

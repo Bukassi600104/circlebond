@@ -99,3 +99,20 @@ test("Milestone 18 records live monitoring, critical defects and honest completi
   assert.match(postLaunch, /must not be marked complete/i);
   assert.match(postLaunch, /Version 1\.1/i);
 });
+
+test("Milestones 17 and 18 have a published release ledger with explicit external gates", async () => {
+  const [readme, ledger] = await Promise.all([
+    source("README.md"),
+    source("docs/RELEASE_CLOSEOUT_M17_M18.md"),
+  ]);
+
+  assert.match(readme, /Milestones 17–18 closeout ledger/);
+  assert.match(ledger, /87f6170da1504f38cc52fd53b839456fd8175e10/);
+  assert.match(ledger, /GR84PGhLeYHpK5UNyyHuiQoQeGyx/);
+  assert.match(ledger, /One Google billing dependency/);
+  assert.match(ledger, /owner acceptance still required/i);
+  assert.match(
+    ledger,
+    /Only then may the 18-milestone goal be marked achieved/i,
+  );
+});
