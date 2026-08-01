@@ -27,7 +27,10 @@ export async function findPersistedUserByEmail(email: string) {
   return response.data.users[0] ?? null;
 }
 
-export async function persistUserProfile(profile: UserProfile) {
+export async function persistUserProfile(
+  profile: UserProfile,
+  options: { strict?: boolean } = {},
+) {
   if (
     process.env.FIREBASE_AUTH_EMULATOR_HOST &&
     !process.env.DATA_CONNECT_EMULATOR_HOST
@@ -51,6 +54,7 @@ export async function persistUserProfile(profile: UserProfile) {
       userId: profile.id,
       error: error instanceof Error ? error.message : "unknown",
     });
+    if (options.strict) throw error;
   }
 }
 

@@ -94,3 +94,25 @@ test("dashboard has explicit empty, loading, and network-error states", async ()
   assert.match(error, /role="alert"/);
   assert.match(error, /reset/);
 });
+
+test("profile supports secure photo updates and sign out", async () => {
+  const sectionPage = await source("app/account/[section]/page.tsx");
+  const profile = await source("components/profile/ProfileSettings.tsx");
+  const uploadRoute = await source("app/api/profile/photo/route.ts");
+  const imageRoute = await source(
+    "app/api/users/[userId]/profile-image/route.ts",
+  );
+
+  assert.match(sectionPage, /ProfileSettings/);
+  assert.match(sectionPage, /LogoutButton/);
+  assert.match(profile, /type="file"/);
+  assert.match(profile, /accept="image\/jpeg,image\/png,image\/webp"/);
+  assert.match(profile, /router\.refresh/);
+  assert.match(uploadRoute, /assertTrustedMutation/);
+  assert.match(uploadRoute, /readSession/);
+  assert.match(uploadRoute, /enforceRateLimit/);
+  assert.match(uploadRoute, /sanitizeUploadedImage/);
+  assert.match(uploadRoute, /users\/\$\{session\.uid\}\/profile\/photo/);
+  assert.match(imageRoute, /readSession/);
+  assert.match(imageRoute, /X-Content-Type-Options/);
+});

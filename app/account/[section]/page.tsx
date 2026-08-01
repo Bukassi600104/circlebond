@@ -8,12 +8,14 @@ import { GiftCircleForm } from "@/components/gift-circles/GiftCircleForm";
 import { AsoEbiCircleForm } from "@/components/aso-ebi/AsoEbiCircleForm";
 import { SupportCircleForm } from "@/components/support-circles/SupportCircleForm";
 import { LogoutButton } from "@/features/auth/components";
+import { ProfileSettings } from "@/components/profile/ProfileSettings";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { requireSession } from "@/server/auth";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
 import { loadUserActivity } from "@/server/repositories/communication";
 import { loadNotificationWorkspace } from "@/server/repositories/notifications";
+import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 
 const collectionSections = {
   circles: {
@@ -147,6 +149,16 @@ export default async function AccountSectionPage({
     informationalSections[section as keyof typeof informationalSections];
   if (!information) notFound();
   const Icon = information.icon;
+  let profileImage = session.picture ?? null;
+  if (section === "profile") {
+    try {
+      profileImage =
+        (await getFirebaseAdminAuth().getUser(session.uid)).photoURL ??
+        profileImage;
+    } catch {
+      // The verified session still provides a safe fallback profile.
+    }
+  }
 
   return (
     <section className="bc-dashboard-info-page">
@@ -157,20 +169,21 @@ export default async function AccountSectionPage({
       <h1>{information.title}</h1>
       <p>{information.description}</p>
       {section === "profile" && (
-        <dl>
-          <div>
-            <dt>Display name</dt>
-            <dd>{session.name ?? "BondCircle member"}</dd>
+        <>
+          <ProfileSettings
+            displayName={session.name ?? "BondCircle member"}
+            email={session.email ?? null}
+            phone={session.phone_number ?? null}
+            profileImage={profileImage}
+          />
+          <div className="bc-profile-signout">
+            <div>
+              <strong>Sign out</strong>
+              <p>End your secure session on this device.</p>
+            </div>
+            <LogoutButton />
           </div>
-          <div>
-            <dt>Email</dt>
-            <dd>{session.email ?? "Not added"}</dd>
-          </div>
-          <div>
-            <dt>Phone</dt>
-            <dd>{session.phone_number ?? "Not added"}</dd>
-          </div>
-        </dl>
+        </>
       )}
       {section === "settings" && <LogoutButton />}
     </section>

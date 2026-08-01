@@ -713,6 +713,134 @@
   font-weight: 600;
 }
 
+.bc-profile-photo {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius-medium);
+  background: var(--color-cream);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.bc-profile-photo__avatar {
+  width: 7rem;
+  height: 7rem;
+  flex: 0 0 7rem;
+  overflow: hidden;
+  border: 3px solid var(--color-gold);
+  border-radius: var(--radius-circle);
+  background: var(--color-teal);
+  color: var(--color-white);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-brand);
+  font-size: var(--text-h2);
+  font-weight: 700;
+}
+
+.bc-profile-photo__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bc-profile-photo__controls {
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+}
+
+.bc-profile-photo__controls p,
+.bc-profile-signout p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-caption);
+}
+
+.bc-profile-photo__controls label {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-teal);
+  border-radius: var(--radius-small);
+  color: var(--color-teal);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bc-profile-photo__controls input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.bc-profile-photo__controls .bc-button {
+  min-height: 2.5rem;
+  width: auto;
+  padding-inline: var(--space-4);
+}
+
+.bc-profile-message {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-small);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+}
+
+.bc-profile-message--success {
+  background: var(--color-mint);
+  color: var(--color-teal);
+}
+
+.bc-profile-message--error {
+  background: var(--color-coral-light);
+  color: var(--color-coral);
+}
+
+.bc-profile-signout {
+  padding-top: var(--space-4);
+  border-top: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.bc-profile-signout .bc-button {
+  min-height: 2.5rem;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 32rem) {
+  .bc-dashboard-info-page {
+    margin: var(--space-3) auto;
+    padding: var(--space-4);
+  }
+
+  .bc-profile-photo {
+    align-items: flex-start;
+  }
+
+  .bc-profile-photo__avatar {
+    width: 5.5rem;
+    height: 5.5rem;
+    flex-basis: 5.5rem;
+  }
+}
+
 .bc-dashboard-error {
   text-align: center;
 }
