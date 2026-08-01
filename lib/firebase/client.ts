@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
-  inMemoryPersistence,
+  browserSessionPersistence,
   connectAuthEmulator,
   getAuth,
   setPersistence,
@@ -9,6 +9,7 @@ import { getStorage } from "firebase/storage";
 import { getFirebaseClientEnv } from "@/lib/env";
 
 let authInitialized = false;
+let authPersistenceReady: Promise<void> | null = null;
 
 function getFirebaseBrowserConfig() {
   const config = getFirebaseClientEnv();
@@ -31,7 +32,6 @@ export function getFirebaseAuth() {
   const auth = getAuth(getFirebaseClientApp());
   if (!authInitialized) {
     authInitialized = true;
-    void setPersistence(auth, inMemoryPersistence);
     if (
       process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true" &&
       typeof window !== "undefined"
@@ -40,7 +40,14 @@ export function getFirebaseAuth() {
         disableWarnings: true,
       });
     }
+    authPersistenceReady = setPersistence(auth, browserSessionPersistence);
   }
+  return auth;
+}
+
+export async function getPreparedFirebaseAuth() {
+  const auth = getFirebaseAuth();
+  await authPersistenceReady;
   return auth;
 }
 

@@ -139,25 +139,19 @@ async function requestEmailOtp(input: Record<string, unknown>) {
   };
 }
 
-export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
-  const router = useRouter();
-  const [channel, setChannel] = useState<Channel>("email");
-  const [contact, setContact] = useState("");
-  const [error, setError] = useState("");
-  const [contactLoading, setContactLoading] = useState(false);
+function useGoogleAuthentication(nextPath: string) {
   const [googleLoading, setGoogleLoading] = useState(false);
-  const loading = contactLoading || googleLoading;
+  const [googleError, setGoogleError] = useState("");
 
   const continueAfterGoogle = useCallback(
     (session: { needsLegalAcceptance?: boolean }) => {
-      router.push(
+      window.location.replace(
         session.needsLegalAcceptance
           ? `/legal/accept?next=${encodeURIComponent(nextPath)}`
           : nextPath,
       );
-      router.refresh();
     },
-    [nextPath, router],
+    [nextPath],
   );
 
   useEffect(() => {
@@ -172,7 +166,7 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
         if (active && session) continueAfterGoogle(session);
       })
       .catch((caught) => {
-        if (active) setError(friendlyError(caught));
+        if (active) setGoogleError(friendlyError(caught));
       })
       .finally(() => {
         if (active) setGoogleLoading(false);
@@ -182,15 +176,52 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
     };
   }, [continueAfterGoogle]);
 
+  async function google() {
+    setGoogleError("");
+    setGoogleLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      if (result.kind === "session") continueAfterGoogle(result.session);
+    } catch (caught) {
+      setGoogleError(friendlyError(caught));
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
+  return {
+    clearGoogleError: () => setGoogleError(""),
+    google,
+    googleError,
+    googleLoading,
+  };
+}
+
+export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
+  const router = useRouter();
+  const [channel, setChannel] = useState<Channel>("email");
+  const [contact, setContact] = useState("");
+  const [error, setError] = useState("");
+  const [contactLoading, setContactLoading] = useState(false);
+  const {
+    clearGoogleError,
+    google,
+    googleError,
+    googleLoading,
+  } = useGoogleAuthentication(nextPath);
+  const loading = contactLoading || googleLoading;
+
   function changeChannel(nextChannel: Channel) {
     setChannel(nextChannel);
     setContact("");
     setError("");
+    clearGoogleError();
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
+    clearGoogleError();
     setContactLoading(true);
     try {
       if (channel === "email") {
@@ -211,19 +242,6 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
       setError(friendlyError(caught));
     } finally {
       setContactLoading(false);
-    }
-  }
-
-  async function google() {
-    setError("");
-    setGoogleLoading(true);
-    try {
-      const result = await signInWithGoogle();
-      if (result.kind === "session") continueAfterGoogle(result.session);
-    } catch (caught) {
-      setError(friendlyError(caught));
-    } finally {
-      setGoogleLoading(false);
     }
   }
 
@@ -249,9 +267,9 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
             onChange={setContact}
           />
         )}
-        {error && (
+        {(error || googleError) && (
           <p className="bc-auth-error" role="alert">
-            {error}
+            {error || googleError}
           </p>
         )}
         <Button type="submit" loading={contactLoading} disabled={loading}>
@@ -303,23 +321,32 @@ export function RegistrationForm({
     null,
   );
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const {
+    clearGoogleError,
+    google,
+    googleError,
+    googleLoading,
+  } = useGoogleAuthentication(nextPath);
+  const loading = formLoading || googleLoading;
   const closeLegalDocument = useCallback(() => setLegalDocument(null), []);
 
   function changeChannel(nextChannel: Channel) {
     setChannel(nextChannel);
     setContact("");
     setError("");
+    clearGoogleError();
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
+    clearGoogleError();
     if (!termsAccepted || !privacyAccepted) {
       setError("Accept the Terms and Privacy Policy to continue.");
       return;
     }
-    setLoading(true);
+    setFormLoading(true);
     try {
       const registration = {
         displayName,
@@ -348,7 +375,7 @@ export function RegistrationForm({
     } catch (caught) {
       setError(friendlyError(caught));
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   }
 
@@ -427,13 +454,26 @@ export function RegistrationForm({
           .
         </span>
       </div>
-      {error && (
+      {(error || googleError) && (
         <p className="bc-auth-error" role="alert">
-          {error}
+          {error || googleError}
         </p>
       )}
-      <Button type="submit" loading={loading}>
+      <Button type="submit" loading={formLoading} disabled={loading}>
         Create account
+      </Button>
+      <div className="bc-auth-divider">
+        <span>or</span>
+      </div>
+      <Button
+        type="button"
+        variant="secondary"
+        className="bc-google-button"
+        onClick={google}
+        disabled={loading}
+        loading={googleLoading}
+      >
+        <b aria-hidden="true">G</b> Sign up with Google
       </Button>
       <p className="bc-auth-switch">
         Already have an account?{" "}

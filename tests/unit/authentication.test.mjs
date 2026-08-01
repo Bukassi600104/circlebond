@@ -248,6 +248,40 @@ test("mobile Google sign-in redirects through the production origin and reports 
   assert.match(components, /loading=\{googleLoading\}/);
 });
 
+test("Google redirects retain state, finish within a bound, and leave the Firebase helper frameable", async () => {
+  const client = await source("features/auth/client.ts");
+  const firebaseClient = await source("lib/firebase/client.ts");
+  const nextConfig = await source("next.config.ts");
+
+  assert.match(firebaseClient, /browserSessionPersistence/);
+  assert.match(firebaseClient, /getPreparedFirebaseAuth/);
+  assert.doesNotMatch(firebaseClient, /inMemoryPersistence/);
+  assert.match(
+    client,
+    /withTimeout\([\s\S]*getRedirectResult[\s\S]*Google sign-in timed out/,
+  );
+  assert.match(nextConfig, /\/__\/auth\/:path\*/);
+  assert.match(nextConfig, /\(\?!__\/auth\)/);
+  assert.match(nextConfig, /X-Frame-Options[\s\S]*DENY/);
+  assert.doesNotMatch(
+    nextConfig,
+    /source:\s*"\/__\/auth\/:path\*"[\s\S]{0,80}headers:/,
+  );
+});
+
+test("registration offers Google sign-up through the same secure completion flow", async () => {
+  const components = await source("features/auth/components.tsx");
+  const registration = components.slice(
+    components.indexOf("export function RegistrationForm"),
+    components.indexOf("export function OtpVerificationForm"),
+  );
+
+  assert.match(registration, /useGoogleAuthentication/);
+  assert.match(registration, /Sign up with Google/);
+  assert.match(registration, /googleLoading/);
+  assert.match(registration, /disabled=\{loading\}/);
+});
+
 test("email OTP inputs stay inside the mobile viewport without iOS focus zoom", async () => {
   const componentStyles = await source("app/components.css");
   const authStyles = await source("app/auth.css");

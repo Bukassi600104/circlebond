@@ -12,7 +12,7 @@ import {
   type ConfirmationResult,
   type User,
 } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getPreparedFirebaseAuth } from "@/lib/firebase/client";
 
 let phoneConfirmation: ConfirmationResult | null = null;
 const GOOGLE_REDIRECT_PENDING = "bondcircle-google-redirect-pending";
@@ -47,7 +47,7 @@ export async function exchangeSession(user: User) {
   });
   if (!response.ok) throw new Error("Unable to create a secure session.");
   const data = (await response.json()) as { needsLegalAcceptance?: boolean };
-  await signOut(getFirebaseAuth());
+  await signOut(await getPreparedFirebaseAuth());
   return data;
 }
 
@@ -75,18 +75,26 @@ export function hasPendingGoogleRedirect() {
 export async function completeGoogleRedirect() {
   if (!hasPendingGoogleRedirect()) return null;
   try {
-    const result = await getRedirectResult(getFirebaseAuth());
-    if (!result) {
-      throw new Error("Google sign-in did not return an account.");
-    }
-    return await exchangeSession(result.user);
+    return await withTimeout(
+      (async () => {
+        const result = await getRedirectResult(
+          await getPreparedFirebaseAuth(),
+        );
+        if (!result) {
+          throw new Error("Google sign-in did not return an account.");
+        }
+        return exchangeSession(result.user);
+      })(),
+      30_000,
+      "Google sign-in timed out. Check your connection and try again.",
+    );
   } finally {
     window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING);
   }
 }
 
 export async function signInWithGoogle() {
-  const auth = getFirebaseAuth();
+  const auth = await getPreparedFirebaseAuth();
   const provider = new GoogleAuthProvider();
   if (
     shouldUseGoogleRedirect() &&
@@ -114,7 +122,7 @@ export async function signInWithGoogle() {
 }
 
 export async function startPhoneOtp(phone: string, containerId: string) {
-  const auth = getFirebaseAuth();
+  const auth = await getPreparedFirebaseAuth();
   const verifier = new RecaptchaVerifier(auth, containerId, {
     size: "invisible",
   });
@@ -142,7 +150,7 @@ export async function confirmEmailOtp(challengeId: string, code: string) {
     throw new Error(data.error ?? "The code could not be verified.");
   }
   const credential = await signInWithCustomToken(
-    getFirebaseAuth(),
+    await getPreparedFirebaseAuth(),
     data.customToken,
   );
   return exchangeSession(credential.user);
