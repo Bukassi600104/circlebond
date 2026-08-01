@@ -32,20 +32,16 @@ function sanitizeEvent<T extends { url: string }>(event: T): T {
 }
 
 export function ProductionObservability() {
-  const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true";
-  const speedInsightsEnabled =
-    process.env.NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS === "true";
+  const productionTelemetryEnabled = process.env.NODE_ENV === "production";
+
+  if (!productionTelemetryEnabled) return null;
 
   return (
     <>
-      {analyticsEnabled ? (
-        <Analytics
-          beforeSend={(event: BeforeSendEvent) => sanitizeEvent(event)}
-        />
-      ) : null}
-      {speedInsightsEnabled ? (
-        <SpeedInsights beforeSend={(event) => sanitizeEvent(event)} />
-      ) : null}
+      <Analytics
+        beforeSend={(event: BeforeSendEvent) => sanitizeEvent(event)}
+      />
+      <SpeedInsights beforeSend={(event) => sanitizeEvent(event)} />
     </>
   );
 }

@@ -271,7 +271,7 @@ export const legalDocuments: Record<
       {
         title: "15. Cookies and local storage",
         paragraphs: [
-          "BondCircle uses strictly necessary cookies and browser storage for authentication, security, verification and continuity of the registration process. Any analytics or advertising technology introduced later will require an updated notice and, where required, consent controls.",
+          "BondCircle uses strictly necessary cookies and browser storage for authentication, security, verification and continuity of the registration process. We also use Vercel Web Analytics and Speed Insights to understand aggregate traffic and real-world performance. They may process page or route information, referrer, approximate country, device, browser, operating system and performance measurements. BondCircle removes query strings, URL fragments, invitation tokens and dynamic user or circle identifiers before telemetry is sent. These services are configured without advertising trackers, and BondCircle does not use them to build advertising profiles.",
         ],
       },
       {

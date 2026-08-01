@@ -23,12 +23,10 @@ Production scope against `.env.production.example`; never copy secret values
 into this document or a ticket. Preview must use separate credentials where a
 provider supports them. No Firebase emulator variables may be present.
 
-Web Analytics and Speed Insights are code-ready but explicitly disabled by
-default. Enable `NEXT_PUBLIC_ENABLE_ANALYTICS` or
-`NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS` only after the corresponding Vercel
-project feature is enabled and the final Privacy Notice has been reviewed.
-Telemetry strips query strings, fragments, invitation tokens and dynamic user
-or circle identifiers before transmission.
+Web Analytics and Speed Insights were approved by the owner on 1 August 2026
+and are enabled only in production builds. Telemetry strips query strings,
+fragments, invitation tokens and dynamic user or circle identifiers before
+transmission. Their data practices are disclosed in the Privacy Notice.
 
 ## Pre-release gate
 

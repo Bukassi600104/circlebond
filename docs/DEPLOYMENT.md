@@ -30,7 +30,6 @@ Required groups:
 - `AUTH_EMAIL_OTP_MODE=production`
 - `AUTH_EMAIL_SMTP_URL` and `AUTH_EMAIL_FROM`: transactional email delivery
 - `NEXT_PUBLIC_APP_URL`: canonical HTTPS origin used in notification email links
-- `NEXT_PUBLIC_ENABLE_ANALYTICS` and `NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS`: keep `false` until the matching Vercel feature and final Privacy Notice are approved
 - `CRON_SECRET`: required for the daily retention purge job configured in `vercel.json`
 
 When entering `FIREBASE_PRIVATE_KEY` in Vercel, preserve newline characters using the escaped `\n` form expected by the application.

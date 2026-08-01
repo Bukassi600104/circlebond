@@ -21,22 +21,23 @@ test("production exposes deliberate crawler metadata without indexing private ro
   assert.match(layout, /metadataBase/);
 });
 
-test("production telemetry is opt-in and strips sensitive URL data", async () => {
-  const [layout, observability, environment] = await Promise.all([
+test("approved production telemetry stays off locally and strips sensitive URL data", async () => {
+  const [layout, observability, privacy] = await Promise.all([
     source("app/layout.tsx"),
     source("components/observability/ProductionObservability.tsx"),
-    source(".env.production.example"),
+    source("components/legal/legalDocuments.ts"),
   ]);
 
   assert.match(layout, /<ProductionObservability\s*\/>/);
-  assert.match(observability, /NEXT_PUBLIC_ENABLE_ANALYTICS === "true"/);
-  assert.match(observability, /NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS === "true"/);
+  assert.match(observability, /NODE_ENV === "production"/);
+  assert.match(observability, /<Analytics/);
+  assert.match(observability, /<SpeedInsights/);
   assert.match(observability, /url\.search = ""/);
   assert.match(observability, /url\.hash = ""/);
   assert.match(observability, /\/invite\/\[token\]/);
   assert.match(observability, /\/account\/circles\/\[circleId\]/);
-  assert.match(environment, /NEXT_PUBLIC_ENABLE_ANALYTICS=false/);
-  assert.match(environment, /NEXT_PUBLIC_ENABLE_SPEED_INSIGHTS=false/);
+  assert.match(privacy, /Vercel Web Analytics and Speed Insights/);
+  assert.match(privacy, /removes query strings, URL fragments/);
 });
 
 test("unhandled server errors are logged without messages, stacks, or raw request paths", async () => {
