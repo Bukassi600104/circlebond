@@ -17,7 +17,11 @@ import { getPreparedFirebaseAuth } from "@/lib/firebase/client";
 let phoneConfirmation: ConfirmationResult | null = null;
 const GOOGLE_REDIRECT_PENDING = "bondcircle-google-redirect-pending";
 
-function withTimeout<T>(operation: Promise<T>, timeoutMs: number, message: string) {
+function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  message: string,
+) {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return Promise.race([
     operation,
@@ -77,9 +81,7 @@ export async function completeGoogleRedirect() {
   try {
     return await withTimeout(
       (async () => {
-        const result = await getRedirectResult(
-          await getPreparedFirebaseAuth(),
-        );
+        const result = await getRedirectResult(await getPreparedFirebaseAuth());
         if (!result) {
           throw new Error("Google sign-in did not return an account.");
         }

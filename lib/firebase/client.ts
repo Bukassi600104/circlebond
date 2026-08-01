@@ -25,7 +25,9 @@ function getFirebaseBrowserConfig() {
 }
 
 export function getFirebaseClientApp() {
-  return getApps().length ? getApp() : initializeApp(getFirebaseBrowserConfig());
+  return getApps().length
+    ? getApp()
+    : initializeApp(getFirebaseBrowserConfig());
 }
 
 export function getFirebaseAuth() {

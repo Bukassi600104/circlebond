@@ -19,19 +19,19 @@ redirects for the account and all three circle creation entry points.
 
 ## Local smoke matrix
 
-| Surface | Result |
-| --- | --- |
-| `/` | HTTP 200, non-empty BondCircle HTML |
-| `/onboarding` | HTTP 200, supplied onboarding artwork rendered |
-| `/sign-in` | HTTP 200, authentication screen rendered |
-| `/register` | HTTP 200, registration screen rendered |
-| `/verify` | HTTP 200, verification screen rendered |
-| `/account` | HTTP 307 to sign-in when unauthenticated |
-| `/account/create?type=gift` | HTTP 307 to sign-in when unauthenticated |
-| `/account/create?type=aso-ebi` | HTTP 307 to sign-in when unauthenticated |
-| `/account/create?type=support` | HTTP 307 to sign-in when unauthenticated |
-| `/manifest.webmanifest` | HTTP 200, standalone PWA manifest |
-| `/api/health` | HTTP 200, local Firebase/Data Connect health |
+| Surface                        | Result                                         |
+| ------------------------------ | ---------------------------------------------- |
+| `/`                            | HTTP 200, non-empty BondCircle HTML            |
+| `/onboarding`                  | HTTP 200, supplied onboarding artwork rendered |
+| `/sign-in`                     | HTTP 200, authentication screen rendered       |
+| `/register`                    | HTTP 200, registration screen rendered         |
+| `/verify`                      | HTTP 200, verification screen rendered         |
+| `/account`                     | HTTP 307 to sign-in when unauthenticated       |
+| `/account/create?type=gift`    | HTTP 307 to sign-in when unauthenticated       |
+| `/account/create?type=aso-ebi` | HTTP 307 to sign-in when unauthenticated       |
+| `/account/create?type=support` | HTTP 307 to sign-in when unauthenticated       |
+| `/manifest.webmanifest`        | HTTP 200, standalone PWA manifest              |
+| `/api/health`                  | HTTP 200, local Firebase/Data Connect health   |
 
 ## Required owner/device checks before Milestone 16 closes
 

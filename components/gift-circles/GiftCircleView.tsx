@@ -391,6 +391,7 @@ export function GiftCircleView({
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("announcements");
   const [selected, setSelected] = useState<GiftCircleMember | null>(null);
   const [inviting, setInviting] = useState(false);
+  const [inviteManagerOpen, setInviteManagerOpen] = useState(false);
   const confirmed = circle.members.reduce(
     (sum, member) => sum + member.confirmedAmount,
     0,
@@ -463,7 +464,9 @@ export function GiftCircleView({
                     type="button"
                     className="bc-gift-member bc-gift-member--open"
                     disabled={!creator || readOnly}
-                    aria-label={`Open member slot ${index + 1}`}
+                    aria-label={`Invite someone to member slot ${index + 1}`}
+                    aria-haspopup="dialog"
+                    onClick={() => setInviteManagerOpen(true)}
                   >
                     <span className="bc-gift-member__avatar">
                       <Plus size={15} aria-hidden="true" />
@@ -541,6 +544,8 @@ export function GiftCircleView({
                   circleId={circle.id}
                   contributionMode={circle.contributionMode}
                   openSlots={circle.memberLimit - circle.members.length}
+                  open={inviteManagerOpen}
+                  onOpenChange={setInviteManagerOpen}
                 />
               ) : (
                 creator && (

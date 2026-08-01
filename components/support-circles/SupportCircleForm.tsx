@@ -243,7 +243,7 @@ export function SupportCircleForm() {
               <ImagePlus size={25} aria-hidden="true" />
             )}
             <span>
-                <strong>Add supporting image (optional)</strong>
+              <strong>Add supporting image (optional)</strong>
               <small>JPG, PNG or WebP · up to 5 MB</small>
             </span>
             <input
@@ -281,7 +281,9 @@ export function SupportCircleForm() {
               onChange={() => setMode("custom")}
             />
             <strong>Custom amounts</strong>
-            <span>Set your amount now; add supporter amounts after creation.</span>
+            <span>
+              Set your amount now; add supporter amounts after creation.
+            </span>
           </label>
         </fieldset>
         {mode === "custom" ? (

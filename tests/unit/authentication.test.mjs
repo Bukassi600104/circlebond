@@ -96,6 +96,27 @@ test("desktop authentication layout stays aligned within one viewport", async ()
   assert.match(styles, /\.bc-auth-panel[\s\S]*overflow-y: auto/);
 });
 
+test("mobile authentication is centered inside an app-like bounded frame", async () => {
+  const styles = await source("app/auth.css");
+  const mobileRules = styles.slice(
+    styles.indexOf("@media (max-width: 55.99rem)"),
+    styles.indexOf("@media (min-width: 56rem)"),
+  );
+
+  assert.match(mobileRules, /\.bc-auth-panel[\s\S]*max-width:\s*34rem/);
+  assert.match(mobileRules, /\.bc-auth-panel[\s\S]*margin-inline:\s*auto/);
+  assert.match(
+    mobileRules,
+    /\.bc-auth-card[\s\S]*border-radius:[\s\S]*background:\s*var\(--color-white\)/,
+  );
+  assert.match(mobileRules, /\.bc-auth-card h2[\s\S]*clamp\(/);
+  assert.match(
+    mobileRules,
+    /\.bc-auth-card input:not\(\[type="checkbox"\]\):not\(\[type="file"\]\)[\s\S]*font-size:\s*16px/,
+  );
+  assert.match(mobileRules, /overflow-x:\s*clip/);
+});
+
 test("phone authentication supplies a country selector and normalized E.164 value", async () => {
   const registration = await source("features/auth/components.tsx");
   const forms = await source("components/forms/index.tsx");

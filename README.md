@@ -6,7 +6,7 @@ BondCircle is a responsive web application for creating trusted circles around g
 
 ## Delivery status
 
-The product is being delivered against an approved 18-milestone production plan. Milestones 1–16 are implemented and verified; Milestone 17 production deployment is in progress:
+The product is being delivered against an approved 18-milestone production plan. Milestones 1–16 are implemented and verified; Milestone 17 production deployment and Milestone 18 post-launch verification are in progress:
 
 - Firebase-only application foundation
 - Design system and responsive component library
@@ -24,7 +24,7 @@ The product is being delivered against an approved 18-milestone production plan.
 - Security hardening, dependency review, private-upload controls, CSRF/origin enforcement, durable abuse controls, and browser security headers
 - Automated production builds, unit/integration/rendered-page coverage, Firebase Auth and Data Connect emulator E2E, lint, formatting, strict TypeScript, and the documented device QA matrix
 
-The web application has a live Vercel deployment for production-environment testing. Formal production readiness still requires the provider-side and acceptance gates in Milestones 17–18; the live URL is not a substitute for those checks. The current Milestone 17 blockers are tracked in [the production runbook](docs/PRODUCTION_RUNBOOK_M17.md) and must not be marked complete until the production Storage bucket, final legal/incident details, provider monitoring configuration, backup/rollback exercise, and live authenticated smoke tests pass.
+The web application has a live Vercel deployment for production-environment testing. Formal production readiness still requires the provider-side and acceptance gates in Milestones 17–18; the live URL is not a substitute for those checks. The release blockers and operational procedures are tracked in [the production runbook](docs/PRODUCTION_RUNBOOK_M17.md), while the live checks and early-launch monitoring record are in [the post-launch verification plan](docs/POST_LAUNCH_VERIFICATION_M18.md). Neither milestone may be marked complete until production Storage, final legal/incident details, backup/rollback exercises and live authenticated smoke tests pass.
 
 ## Technology
 

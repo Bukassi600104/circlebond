@@ -3,13 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  Check,
-  ImagePlus,
-  X,
-} from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, ImagePlus, X } from "lucide-react";
 import {
   CIRCLE_PRICING_PLANS,
   planForMemberCount,

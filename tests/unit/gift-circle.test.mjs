@@ -117,13 +117,35 @@ test("gift creation and overview expose capacity, open slots, and creator invite
   assert.match(form, /including you/i);
   assert.match(route, /pricingFor\(pricingPlan\)/);
   assert.match(route, /calculateEqualSlotAllocations/);
-  assert.match(view, /Open member slot/);
+  assert.match(view, /Invite someone to member slot/);
   assert.match(view, /Send invites/);
+  assert.match(view, /onClick=\{\(\) => setInviteManagerOpen\(true\)\}/);
+  assert.match(view, /open=\{inviteManagerOpen\}/);
+  assert.match(view, /onOpenChange=\{setInviteManagerOpen\}/);
   assert.match(dashboardCard, /Add people/);
   assert.match(
     operations,
     /query GetDashboardCircles[\s\S]*memberCount[\s\S]*memberLimit/,
   );
+});
+
+test("empty Gift Circle profile slots open the same secure invitation manager", async () => {
+  const view = await readFile(
+    new URL("components/gift-circles/GiftCircleView.tsx", root),
+    "utf8",
+  );
+  const manager = await readFile(
+    new URL("components/invitations/InvitationManager.tsx", root),
+    "utf8",
+  );
+
+  assert.match(view, /aria-label=\{`Invite someone to member slot/);
+  assert.match(view, /aria-haspopup="dialog"/);
+  assert.match(manager, /open\?: boolean/);
+  assert.match(manager, /onOpenChange\?: \(open: boolean\) => void/);
+  assert.match(manager, /const isOpen = controlledOpen \?\? internalOpen/);
+  assert.match(manager, /useEffect\(\(\) => \{[\s\S]*if \(!isOpen\) return/);
+  assert.match(manager, /fetchInvitations\(circleId\)/);
 });
 
 test("Gift Circle capacity is tier-controlled and the editable field can be cleared", async () => {

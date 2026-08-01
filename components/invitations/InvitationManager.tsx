@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Check,
   Clipboard,
@@ -65,18 +65,37 @@ async function csrfToken() {
   return ((await response.json()) as { csrfToken: string }).csrfToken;
 }
 
+async function fetchInvitations(circleId: string) {
+  const response = await fetch(`/api/circles/${circleId}/invitations`, {
+    cache: "no-store",
+  });
+  const data = (await response.json()) as {
+    invitations?: InvitationSummary[];
+    error?: string;
+  };
+  if (!response.ok) {
+    throw new Error(data.error ?? "Unable to load invitations.");
+  }
+  return data.invitations ?? [];
+}
+
 export function InvitationManager({
   circleId,
   contributionMode,
   openSlots,
   requireApproval = false,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   circleId: string;
   contributionMode?: string | null;
   openSlots: number;
   requireApproval?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledOpen ?? internalOpen;
   const [mode, setMode] = useState<"named" | "open">("named");
   const [channel, setChannel] = useState<"email" | "phone">("email");
   const [recipientName, setRecipientName] = useState("");
@@ -90,26 +109,37 @@ export function InvitationManager({
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
 
-  async function loadInvitations() {
-    const response = await fetch(`/api/circles/${circleId}/invitations`, {
-      cache: "no-store",
-    });
-    const data = (await response.json()) as {
-      invitations?: InvitationSummary[];
-      error?: string;
-    };
-    if (!response.ok) {
-      throw new Error(data.error ?? "Unable to load invitations.");
-    }
-    setInvitations(data.invitations ?? []);
+  function setManagerOpen(nextOpen: boolean) {
+    if (!nextOpen) setError("");
+    if (controlledOpen === undefined) setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
   }
 
+  const loadInvitations = useCallback(async () => {
+    setInvitations(await fetchInvitations(circleId));
+  }, [circleId]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    void fetchInvitations(circleId)
+      .then((items) => {
+        if (active) setInvitations(items);
+      })
+      .catch((caught) => {
+        if (active) {
+          setError(
+            caught instanceof Error ? caught.message : "Please try again.",
+          );
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [circleId, isOpen]);
+
   function openManager() {
-    setOpen(true);
-    setError("");
-    void loadInvitations().catch((caught) =>
-      setError(caught instanceof Error ? caught.message : "Please try again."),
-    );
+    setManagerOpen(true);
   }
 
   async function createInvitation(event: React.FormEvent<HTMLFormElement>) {
@@ -266,11 +296,11 @@ export function InvitationManager({
         {openSlots > 0 ? "Invite people" : "Circle full"}
       </button>
 
-      {open ? (
+      {isOpen ? (
         <div
           className="bc-invite-backdrop"
           role="presentation"
-          onMouseDown={() => setOpen(false)}
+          onMouseDown={() => setManagerOpen(false)}
         >
           <section
             className="bc-invite-manager"
@@ -288,7 +318,7 @@ export function InvitationManager({
               <button
                 type="button"
                 aria-label="Close invitation manager"
-                onClick={() => setOpen(false)}
+                onClick={() => setManagerOpen(false)}
               >
                 <X size={17} aria-hidden="true" />
               </button>

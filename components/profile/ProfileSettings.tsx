@@ -133,13 +133,19 @@ export function ProfileSettings({
         </div>
       </form>
       {success && (
-        <p className="bc-profile-message bc-profile-message--success" role="status">
+        <p
+          className="bc-profile-message bc-profile-message--success"
+          role="status"
+        >
           <CheckCircle2 size={16} aria-hidden="true" />
           {success}
         </p>
       )}
       {error && (
-        <p className="bc-profile-message bc-profile-message--error" role="alert">
+        <p
+          className="bc-profile-message bc-profile-message--error"
+          role="alert"
+        >
           {error}
         </p>
       )}

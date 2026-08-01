@@ -78,3 +78,24 @@ test("Milestone 17 has a repeatable live verification command and incident runbo
   assert.match(runbook, /incident/i);
   assert.match(runbook, /must be supplied by the owner/i);
 });
+
+test("Milestone 18 records live monitoring, critical defects and honest completion gates", async () => {
+  const postLaunch = await source("docs/POST_LAUNCH_VERIFICATION_M18.md");
+
+  for (const signal of [
+    "Registration completion",
+    "Circle creation",
+    "Invitation acceptance",
+    "Receipt submission",
+    "Notification delivery",
+    "Page performance",
+    "Retention and backups",
+    "User-reported confusion",
+  ]) {
+    assert.match(postLaunch, new RegExp(signal, "i"));
+  }
+  assert.match(postLaunch, /empty Gift Circle profile slot/i);
+  assert.match(postLaunch, /Firebase production Storage bucket returns `404`/i);
+  assert.match(postLaunch, /must not be marked complete/i);
+  assert.match(postLaunch, /Version 1\.1/i);
+});

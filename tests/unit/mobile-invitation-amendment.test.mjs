@@ -63,7 +63,10 @@ test("every creation form opens its circle before invitations are offered", asyn
     "components/support-circles/SupportCircleForm.tsx",
   ]) {
     const contents = await source(form);
-    assert.match(contents, /router\.push\(`\/account\/circles\/\$\{data\.circleId\}`\)/);
+    assert.match(
+      contents,
+      /router\.push\(`\/account\/circles\/\$\{data\.circleId\}`\)/,
+    );
     assert.doesNotMatch(contents, /CircleCreationSuccess/);
     assert.doesNotMatch(contents, /Invite members|Invite supporters/);
     assert.doesNotMatch(contents, /form\.set\(\s*"invites"/);

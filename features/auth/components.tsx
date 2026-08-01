@@ -102,7 +102,9 @@ async function requestEmailOtp(input: Record<string, unknown>) {
     });
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("Email request timed out. Check your connection and try again.");
+      throw new Error(
+        "Email request timed out. Check your connection and try again.",
+      );
     }
     throw error;
   } finally {
@@ -203,12 +205,8 @@ export function SignInForm({ nextPath = "/account" }: { nextPath?: string }) {
   const [contact, setContact] = useState("");
   const [error, setError] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
-  const {
-    clearGoogleError,
-    google,
-    googleError,
-    googleLoading,
-  } = useGoogleAuthentication(nextPath);
+  const { clearGoogleError, google, googleError, googleLoading } =
+    useGoogleAuthentication(nextPath);
   const loading = contactLoading || googleLoading;
 
   function changeChannel(nextChannel: Channel) {
@@ -322,12 +320,8 @@ export function RegistrationForm({
   );
   const [error, setError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
-  const {
-    clearGoogleError,
-    google,
-    googleError,
-    googleLoading,
-  } = useGoogleAuthentication(nextPath);
+  const { clearGoogleError, google, googleError, googleLoading } =
+    useGoogleAuthentication(nextPath);
   const loading = formLoading || googleLoading;
   const closeLegalDocument = useCallback(() => setLegalDocument(null), []);
 

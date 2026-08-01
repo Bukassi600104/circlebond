@@ -11,7 +11,9 @@ function isMissingBucketError(error: unknown) {
   return (
     candidate.code === 404 ||
     candidate.code === "404" ||
-    /specified bucket does not exist|not found/i.test(candidate.message ?? "") ||
+    /specified bucket does not exist|not found/i.test(
+      candidate.message ?? "",
+    ) ||
     candidate.errors?.some((item) => item.reason === "notFound") === true
   );
 }

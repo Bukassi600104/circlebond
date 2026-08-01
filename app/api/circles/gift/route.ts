@@ -107,8 +107,7 @@ export async function POST(request: Request) {
     ) {
       throw new Error("Enter a valid contribution amount for yourself.");
     }
-    const imageFile =
-      image instanceof File && image.size > 0 ? image : null;
+    const imageFile = image instanceof File && image.size > 0 ? image : null;
     const storageAvailable = imageFile
       ? await circleImageStorageAvailable()
       : false;

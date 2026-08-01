@@ -867,6 +867,65 @@
   font-size: 0.8125rem;
 }
 
+@media (max-width: 55.99rem) {
+  .bc-auth-page {
+    place-items: start center;
+    overflow-x: clip;
+    background:
+      radial-gradient(
+        circle at 50% 0%,
+        color-mix(in srgb, var(--color-gold-light) 52%, transparent),
+        transparent 21rem
+      ),
+      var(--color-cream);
+  }
+
+  .bc-auth-panel {
+    width: 100%;
+    max-width: 34rem;
+    min-height: 100svh;
+    margin-inline: auto;
+    padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4)
+      max(var(--space-6), env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bc-auth-panel__top {
+    flex: 0 0 auto;
+  }
+
+  .bc-auth-card {
+    width: 100%;
+    margin: var(--space-4) auto;
+    padding: clamp(var(--space-4), 5vw, var(--space-6));
+    border: var(--border);
+    border-radius: var(--radius-large);
+    background: var(--color-white);
+    box-shadow: var(--shadow-2);
+  }
+
+  .bc-auth-card h2 {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+  }
+
+  .bc-auth-description {
+    margin-bottom: var(--space-4);
+    line-height: 1.5;
+  }
+
+  .bc-auth-card input:not([type="checkbox"]):not([type="file"]),
+  .bc-auth-card select,
+  .bc-auth-card textarea {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .bc-auth-page--registration .bc-auth-card {
+    margin-top: var(--space-3);
+  }
+}
+
 @media (min-width: 56rem) {
   .bc-auth-page {
     grid-template-columns: minmax(22rem, 0.8fr) minmax(32rem, 1.2fr);
