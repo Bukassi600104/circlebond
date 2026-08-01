@@ -217,6 +217,21 @@ test("email OTP verification resends in place, counts down, and submits on digit
   assert.match(styles, /\.bc-auth-story__copy\s*\{[\s\S]*text-align:\s*center/);
 });
 
+test("authentication provider requests cannot leave the sign-in form spinning forever", async () => {
+  const client = await source("features/auth/client.ts");
+  const components = await source("features/auth/components.tsx");
+  const email = await source("server/auth/email.ts");
+
+  assert.match(client, /signInWithPopup/);
+  assert.match(client, /Promise\.race/);
+  assert.match(client, /Google sign-in timed out/);
+  assert.match(components, /AbortController/);
+  assert.match(components, /Email request timed out/);
+  assert.match(email, /connectionTimeout/);
+  assert.match(email, /greetingTimeout/);
+  assert.match(email, /socketTimeout/);
+});
+
 test("email OTP inputs stay inside the mobile viewport without iOS focus zoom", async () => {
   const componentStyles = await source("app/components.css");
   const authStyles = await source("app/auth.css");

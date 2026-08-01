@@ -40,6 +40,15 @@ function safeNextPath(value: string | null) {
 function friendlyError(error: unknown) {
   const message = error instanceof Error ? error.message : "";
   if (message.includes("popup-closed")) return "Google sign-in was cancelled.";
+  if (message.includes("popup-blocked")) {
+    return "Google sign-in was blocked by the browser. Allow pop-ups and try again.";
+  }
+  if (message.includes("operation-not-allowed")) {
+    return "Google sign-in is not enabled for this BondCircle project yet.";
+  }
+  if (message.includes("Google sign-in timed out")) {
+    return "Google sign-in took too long. Check your connection and try again.";
+  }
   if (message.includes("too-many-requests")) {
     return "Too many attempts. Please wait and try again.";
   }
@@ -79,11 +88,24 @@ function ChannelTabs({
 }
 
 async function requestEmailOtp(input: Record<string, unknown>) {
-  const response = await fetch("/api/auth/email-otp/request", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 20_000);
+  let response: Response;
+  try {
+    response = await fetch("/api/auth/email-otp/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Email request timed out. Check your connection and try again.");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
   const data = (await response.json()) as {
     challengeId?: string;
     developmentCode?: string;

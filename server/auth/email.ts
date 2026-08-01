@@ -30,7 +30,11 @@ export async function sendEmailOtp({
     throw new Error("Email delivery is not configured.");
   }
 
-  const transport = nodemailer.createTransport(smtpUrl);
+  const transport = nodemailer.createTransport(smtpUrl, {
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
+  });
   await transport.sendMail({
     from,
     to: email,

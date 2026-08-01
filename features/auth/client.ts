@@ -14,6 +14,18 @@ import { getFirebaseAuth } from "@/lib/firebase/client";
 
 let phoneConfirmation: ConfirmationResult | null = null;
 
+function withTimeout<T>(operation: Promise<T>, timeoutMs: number, message: string) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    operation,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+    }),
+  ]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
 async function csrfToken() {
   const response = await fetch("/api/auth/csrf", { cache: "no-store" });
   if (!response.ok) throw new Error("Unable to start a secure session.");
@@ -37,11 +49,17 @@ export async function exchangeSession(user: User) {
 }
 
 export async function signInWithGoogle() {
-  const result = await signInWithPopup(
-    getFirebaseAuth(),
-    new GoogleAuthProvider(),
+  return withTimeout(
+    (async () => {
+      const result = await signInWithPopup(
+        getFirebaseAuth(),
+        new GoogleAuthProvider(),
+      );
+      return exchangeSession(result.user);
+    })(),
+    30_000,
+    "Google sign-in timed out. Check that pop-ups are allowed and try again.",
   );
-  return exchangeSession(result.user);
 }
 
 export async function startPhoneOtp(phone: string, containerId: string) {
