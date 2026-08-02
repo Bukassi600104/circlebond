@@ -170,6 +170,18 @@ export function createCircleDraft(dcOrVars, vars) {
   return executeMutation(createCircleDraftRef(dcInstance, inputVars));
 }
 
+export const createModelPricedCircleDraftRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateModelPricedCircleDraft', inputVars);
+}
+createModelPricedCircleDraftRef.operationName = 'CreateModelPricedCircleDraft';
+
+export function createModelPricedCircleDraft(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createModelPricedCircleDraftRef(dcInstance, inputVars));
+}
+
 export const getCreatorTrialUsageRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -266,6 +278,18 @@ updateCircleConfigurationWithAuditRef.operationName = 'UpdateCircleConfiguration
 export function updateCircleConfigurationWithAudit(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(updateCircleConfigurationWithAuditRef(dcInstance, inputVars));
+}
+
+export const updateModelPricedCircleConfigurationWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateModelPricedCircleConfigurationWithAudit', inputVars);
+}
+updateModelPricedCircleConfigurationWithAuditRef.operationName = 'UpdateModelPricedCircleConfigurationWithAudit';
+
+export function updateModelPricedCircleConfigurationWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateModelPricedCircleConfigurationWithAuditRef(dcInstance, inputVars));
 }
 
 export const transitionCircleWithAuditRef = (dcOrVars, vars) => {

@@ -262,6 +262,70 @@ mutation CreateCircleDraft(
   $targetAmount: Int!
   $pricingPlan: String!
   $memberLimit: Int!
+  $activationPrice: Int!
+  $deadline: Date
+  $eventDate: Date
+  $visibility: String!
+  $createdAt: Timestamp!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_insert(
+    data: {
+      creator: { id: $creatorId }
+      name: $name
+      type: $type
+      description: $description
+      targetAmount: $targetAmount
+      pricingPlan: $pricingPlan
+      memberLimit: $memberLimit
+      activationPrice: $activationPrice
+      deadline: $deadline
+      eventDate: $eventDate
+      status: "draft"
+      visibility: $visibility
+      createdAt: $createdAt
+      updatedAt: $updatedAt
+    }
+  )
+  circleMembership_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      user: { id: $creatorId }
+      role: "creator"
+      membershipStatus: "joined"
+      joinedAt: $createdAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      actor: { id: $creatorId }
+      action: "draft_created"
+      toStatus: "draft"
+      materialChanges: "{\"status\":\"draft\"}"
+      createdAt: $createdAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      circleId_expr: "response.circle_insert.id"
+      actor: { id: $creatorId }
+      eventType: "circle_created"
+      entityId: $creatorId
+      metadata: "{}"
+      createdAt: $createdAt
+    }
+  )
+}
+
+mutation CreateModelPricedCircleDraft(
+  $creatorId: String!
+  $name: String!
+  $type: String!
+  $description: String!
+  $targetAmount: Int!
+  $pricingPlan: String!
+  $memberLimit: Int!
   $planMemberLimit: Int!
   $activationPrice: Int!
   $activationPriceMinor: Int!
@@ -602,6 +666,51 @@ mutation CompleteCirclePlanUpgrade(
 }
 
 mutation UpdateCircleConfigurationWithAudit(
+  $circleId: UUID!
+  $actorId: String!
+  $action: String!
+  $status: String!
+  $name: String!
+  $description: String!
+  $targetAmount: Int!
+  $pricingPlan: String!
+  $memberLimit: Int!
+  $activationPrice: Int!
+  $deadline: Date
+  $eventDate: Date
+  $visibility: String!
+  $updatedAt: Timestamp!
+  $materialChanges: String!
+) @auth(level: NO_ACCESS) @transaction {
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      name: $name
+      description: $description
+      targetAmount: $targetAmount
+      pricingPlan: $pricingPlan
+      memberLimit: $memberLimit
+      activationPrice: $activationPrice
+      deadline: $deadline
+      eventDate: $eventDate
+      visibility: $visibility
+      updatedAt: $updatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $actorId }
+      action: $action
+      fromStatus: $status
+      toStatus: $status
+      materialChanges: $materialChanges
+      createdAt: $updatedAt
+    }
+  )
+}
+
+mutation UpdateModelPricedCircleConfigurationWithAudit(
   $circleId: UUID!
   $actorId: String!
   $action: String!

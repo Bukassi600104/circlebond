@@ -53,12 +53,14 @@ This README will guide you through the process of using the generated JavaScript
   - [*ConsumeAuthChallenge*](#consumeauthchallenge)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
+  - [*CreateModelPricedCircleDraft*](#createmodelpricedcircledraft)
   - [*ClaimTrialAndPublishCircle*](#claimtrialandpublishcircle)
   - [*CreateCircleActivationAttempt*](#createcircleactivationattempt)
   - [*FailCircleActivationAttempt*](#failcircleactivationattempt)
   - [*CompletePaidCircleActivation*](#completepaidcircleactivation)
   - [*CompleteCirclePlanUpgrade*](#completecircleplanupgrade)
   - [*UpdateCircleConfigurationWithAudit*](#updatecircleconfigurationwithaudit)
+  - [*UpdateModelPricedCircleConfigurationWithAudit*](#updatemodelpricedcircleconfigurationwithaudit)
   - [*TransitionCircleWithAudit*](#transitioncirclewithaudit)
   - [*SetCircleCompletionTypeWithAudit*](#setcirclecompletiontypewithaudit)
   - [*AddCircleMemberWithAudit*](#addcirclememberwithaudit)
@@ -5779,18 +5781,7 @@ export interface CreateCircleDraftVariables {
   targetAmount: number;
   pricingPlan: string;
   memberLimit: number;
-  planMemberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingModelVersion: string;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
-  coAdminLimit: number;
-  asoEbiTierLimit: number;
-  entitlements: string;
-  inclusions: string;
-  exclusions: string;
-  pricingEffectiveAt: TimestampString;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -5804,7 +5795,6 @@ Recall that executing the `CreateCircleDraft` mutation returns a `MutationPromis
 The `data` property is an object of type `CreateCircleDraftData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface CreateCircleDraftData {
-  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -5826,18 +5816,7 @@ const createCircleDraftVars: CreateCircleDraftVariables = {
   targetAmount: ..., 
   pricingPlan: ..., 
   memberLimit: ..., 
-  planMemberLimit: ..., 
   activationPrice: ..., 
-  activationPriceMinor: ..., 
-  pricingModelVersion: ..., 
-  pricingPlanDefinitionId: ..., 
-  activationStatus: ..., 
-  coAdminLimit: ..., 
-  asoEbiTierLimit: ..., 
-  entitlements: ..., 
-  inclusions: ..., 
-  exclusions: ..., 
-  pricingEffectiveAt: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
   visibility: ..., 
@@ -5849,13 +5828,12 @@ const createCircleDraftVars: CreateCircleDraftVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createCircleDraft(createCircleDraftVars);
 // Variables can be defined inline as well.
-const { data } = await createCircleDraft({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., planMemberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingModelVersion: ..., pricingPlanDefinitionId: ..., activationStatus: ..., coAdminLimit: ..., asoEbiTierLimit: ..., entitlements: ..., inclusions: ..., exclusions: ..., pricingEffectiveAt: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
+const { data } = await createCircleDraft({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await createCircleDraft(dataConnect, createCircleDraftVars);
 
-console.log(data.pricingPlanDefinition_upsert);
 console.log(data.circle_insert);
 console.log(data.circleMembership_insert);
 console.log(data.circleAuditEntry_insert);
@@ -5864,7 +5842,6 @@ console.log(data.activityLog_insert);
 // Or, you can use the `Promise` API.
 createCircleDraft(createCircleDraftVars).then((response) => {
   const data = response.data;
-  console.log(data.pricingPlanDefinition_upsert);
   console.log(data.circle_insert);
   console.log(data.circleMembership_insert);
   console.log(data.circleAuditEntry_insert);
@@ -5887,6 +5864,130 @@ const createCircleDraftVars: CreateCircleDraftVariables = {
   targetAmount: ..., 
   pricingPlan: ..., 
   memberLimit: ..., 
+  activationPrice: ..., 
+  deadline: ..., // optional
+  eventDate: ..., // optional
+  visibility: ..., 
+  createdAt: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `createCircleDraftRef()` function to get a reference to the mutation.
+const ref = createCircleDraftRef(createCircleDraftVars);
+// Variables can be defined inline as well.
+const ref = createCircleDraftRef({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createCircleDraftRef(dataConnect, createCircleDraftVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circle_insert);
+console.log(data.circleMembership_insert);
+console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle_insert);
+  console.log(data.circleMembership_insert);
+  console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
+});
+```
+
+## CreateModelPricedCircleDraft
+You can execute the `CreateModelPricedCircleDraft` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createModelPricedCircleDraft(vars: CreateModelPricedCircleDraftVariables): MutationPromise<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+
+interface CreateModelPricedCircleDraftRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateModelPricedCircleDraftVariables): MutationRef<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+}
+export const createModelPricedCircleDraftRef: CreateModelPricedCircleDraftRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createModelPricedCircleDraft(dc: DataConnect, vars: CreateModelPricedCircleDraftVariables): MutationPromise<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+
+interface CreateModelPricedCircleDraftRef {
+  ...
+  (dc: DataConnect, vars: CreateModelPricedCircleDraftVariables): MutationRef<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+}
+export const createModelPricedCircleDraftRef: CreateModelPricedCircleDraftRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createModelPricedCircleDraftRef:
+```typescript
+const name = createModelPricedCircleDraftRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateModelPricedCircleDraft` mutation requires an argument of type `CreateModelPricedCircleDraftVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateModelPricedCircleDraftVariables {
+  creatorId: string;
+  name: string;
+  type: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  planMemberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingModelVersion: string;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  coAdminLimit: number;
+  asoEbiTierLimit: number;
+  entitlements: string;
+  inclusions: string;
+  exclusions: string;
+  pricingEffectiveAt: TimestampString;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  createdAt: TimestampString;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `CreateModelPricedCircleDraft` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateModelPricedCircleDraftData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateModelPricedCircleDraftData {
+  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
+  circle_insert: Circle_Key;
+  circleMembership_insert: CircleMembership_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+```
+### Using `CreateModelPricedCircleDraft`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createModelPricedCircleDraft, CreateModelPricedCircleDraftVariables } from '@bondcircle/dataconnect';
+
+// The `CreateModelPricedCircleDraft` mutation requires an argument of type `CreateModelPricedCircleDraftVariables`:
+const createModelPricedCircleDraftVars: CreateModelPricedCircleDraftVariables = {
+  creatorId: ..., 
+  name: ..., 
+  type: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
   planMemberLimit: ..., 
   activationPrice: ..., 
   activationPriceMinor: ..., 
@@ -5906,14 +6007,75 @@ const createCircleDraftVars: CreateCircleDraftVariables = {
   updatedAt: ..., 
 };
 
-// Call the `createCircleDraftRef()` function to get a reference to the mutation.
-const ref = createCircleDraftRef(createCircleDraftVars);
+// Call the `createModelPricedCircleDraft()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createModelPricedCircleDraft(createModelPricedCircleDraftVars);
 // Variables can be defined inline as well.
-const ref = createCircleDraftRef({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., planMemberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingModelVersion: ..., pricingPlanDefinitionId: ..., activationStatus: ..., coAdminLimit: ..., asoEbiTierLimit: ..., entitlements: ..., inclusions: ..., exclusions: ..., pricingEffectiveAt: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
+const { data } = await createModelPricedCircleDraft({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., planMemberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingModelVersion: ..., pricingPlanDefinitionId: ..., activationStatus: ..., coAdminLimit: ..., asoEbiTierLimit: ..., entitlements: ..., inclusions: ..., exclusions: ..., pricingEffectiveAt: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createModelPricedCircleDraft(dataConnect, createModelPricedCircleDraftVars);
+
+console.log(data.pricingPlanDefinition_upsert);
+console.log(data.circle_insert);
+console.log(data.circleMembership_insert);
+console.log(data.circleAuditEntry_insert);
+console.log(data.activityLog_insert);
+
+// Or, you can use the `Promise` API.
+createModelPricedCircleDraft(createModelPricedCircleDraftVars).then((response) => {
+  const data = response.data;
+  console.log(data.pricingPlanDefinition_upsert);
+  console.log(data.circle_insert);
+  console.log(data.circleMembership_insert);
+  console.log(data.circleAuditEntry_insert);
+  console.log(data.activityLog_insert);
+});
+```
+
+### Using `CreateModelPricedCircleDraft`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createModelPricedCircleDraftRef, CreateModelPricedCircleDraftVariables } from '@bondcircle/dataconnect';
+
+// The `CreateModelPricedCircleDraft` mutation requires an argument of type `CreateModelPricedCircleDraftVariables`:
+const createModelPricedCircleDraftVars: CreateModelPricedCircleDraftVariables = {
+  creatorId: ..., 
+  name: ..., 
+  type: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  planMemberLimit: ..., 
+  activationPrice: ..., 
+  activationPriceMinor: ..., 
+  pricingModelVersion: ..., 
+  pricingPlanDefinitionId: ..., 
+  activationStatus: ..., 
+  coAdminLimit: ..., 
+  asoEbiTierLimit: ..., 
+  entitlements: ..., 
+  inclusions: ..., 
+  exclusions: ..., 
+  pricingEffectiveAt: ..., 
+  deadline: ..., // optional
+  eventDate: ..., // optional
+  visibility: ..., 
+  createdAt: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `createModelPricedCircleDraftRef()` function to get a reference to the mutation.
+const ref = createModelPricedCircleDraftRef(createModelPricedCircleDraftVars);
+// Variables can be defined inline as well.
+const ref = createModelPricedCircleDraftRef({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., planMemberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingModelVersion: ..., pricingPlanDefinitionId: ..., activationStatus: ..., coAdminLimit: ..., asoEbiTierLimit: ..., entitlements: ..., inclusions: ..., exclusions: ..., pricingEffectiveAt: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
-const ref = createCircleDraftRef(dataConnect, createCircleDraftVars);
+const ref = createModelPricedCircleDraftRef(dataConnect, createModelPricedCircleDraftVars);
 
 // Call `executeMutation()` on the reference to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
@@ -6677,9 +6839,6 @@ export interface UpdateCircleConfigurationWithAuditVariables {
   pricingPlan: string;
   memberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -6715,9 +6874,6 @@ const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAudit
   pricingPlan: ..., 
   memberLimit: ..., 
   activationPrice: ..., 
-  activationPriceMinor: ..., 
-  pricingPlanDefinitionId: ..., 
-  activationStatus: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
   visibility: ..., 
@@ -6729,7 +6885,7 @@ const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAudit
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateCircleConfigurationWithAudit(updateCircleConfigurationWithAuditVars);
 // Variables can be defined inline as well.
-const { data } = await updateCircleConfigurationWithAudit({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingPlanDefinitionId: ..., activationStatus: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
+const { data } = await updateCircleConfigurationWithAudit({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -6764,9 +6920,6 @@ const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAudit
   pricingPlan: ..., 
   memberLimit: ..., 
   activationPrice: ..., 
-  activationPriceMinor: ..., 
-  pricingPlanDefinitionId: ..., 
-  activationStatus: ..., 
   deadline: ..., // optional
   eventDate: ..., // optional
   visibility: ..., 
@@ -6777,11 +6930,176 @@ const updateCircleConfigurationWithAuditVars: UpdateCircleConfigurationWithAudit
 // Call the `updateCircleConfigurationWithAuditRef()` function to get a reference to the mutation.
 const ref = updateCircleConfigurationWithAuditRef(updateCircleConfigurationWithAuditVars);
 // Variables can be defined inline as well.
-const ref = updateCircleConfigurationWithAuditRef({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingPlanDefinitionId: ..., activationStatus: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
+const ref = updateCircleConfigurationWithAuditRef({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = updateCircleConfigurationWithAuditRef(dataConnect, updateCircleConfigurationWithAuditVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+## UpdateModelPricedCircleConfigurationWithAudit
+You can execute the `UpdateModelPricedCircleConfigurationWithAudit` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateModelPricedCircleConfigurationWithAudit(vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationPromise<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+
+interface UpdateModelPricedCircleConfigurationWithAuditRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationRef<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+}
+export const updateModelPricedCircleConfigurationWithAuditRef: UpdateModelPricedCircleConfigurationWithAuditRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateModelPricedCircleConfigurationWithAudit(dc: DataConnect, vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationPromise<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+
+interface UpdateModelPricedCircleConfigurationWithAuditRef {
+  ...
+  (dc: DataConnect, vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationRef<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+}
+export const updateModelPricedCircleConfigurationWithAuditRef: UpdateModelPricedCircleConfigurationWithAuditRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateModelPricedCircleConfigurationWithAuditRef:
+```typescript
+const name = updateModelPricedCircleConfigurationWithAuditRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateModelPricedCircleConfigurationWithAudit` mutation requires an argument of type `UpdateModelPricedCircleConfigurationWithAuditVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateModelPricedCircleConfigurationWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  action: string;
+  status: string;
+  name: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  updatedAt: TimestampString;
+  materialChanges: string;
+}
+```
+### Return Type
+Recall that executing the `UpdateModelPricedCircleConfigurationWithAudit` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateModelPricedCircleConfigurationWithAuditData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateModelPricedCircleConfigurationWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+### Using `UpdateModelPricedCircleConfigurationWithAudit`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateModelPricedCircleConfigurationWithAudit, UpdateModelPricedCircleConfigurationWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateModelPricedCircleConfigurationWithAudit` mutation requires an argument of type `UpdateModelPricedCircleConfigurationWithAuditVariables`:
+const updateModelPricedCircleConfigurationWithAuditVars: UpdateModelPricedCircleConfigurationWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  action: ..., 
+  status: ..., 
+  name: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
+  activationPriceMinor: ..., 
+  pricingPlanDefinitionId: ..., 
+  activationStatus: ..., 
+  deadline: ..., // optional
+  eventDate: ..., // optional
+  visibility: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
+};
+
+// Call the `updateModelPricedCircleConfigurationWithAudit()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateModelPricedCircleConfigurationWithAudit(updateModelPricedCircleConfigurationWithAuditVars);
+// Variables can be defined inline as well.
+const { data } = await updateModelPricedCircleConfigurationWithAudit({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingPlanDefinitionId: ..., activationStatus: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateModelPricedCircleConfigurationWithAudit(dataConnect, updateModelPricedCircleConfigurationWithAuditVars);
+
+console.log(data.circle_update);
+console.log(data.circleAuditEntry_insert);
+
+// Or, you can use the `Promise` API.
+updateModelPricedCircleConfigurationWithAudit(updateModelPricedCircleConfigurationWithAuditVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle_update);
+  console.log(data.circleAuditEntry_insert);
+});
+```
+
+### Using `UpdateModelPricedCircleConfigurationWithAudit`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateModelPricedCircleConfigurationWithAuditRef, UpdateModelPricedCircleConfigurationWithAuditVariables } from '@bondcircle/dataconnect';
+
+// The `UpdateModelPricedCircleConfigurationWithAudit` mutation requires an argument of type `UpdateModelPricedCircleConfigurationWithAuditVariables`:
+const updateModelPricedCircleConfigurationWithAuditVars: UpdateModelPricedCircleConfigurationWithAuditVariables = {
+  circleId: ..., 
+  actorId: ..., 
+  action: ..., 
+  status: ..., 
+  name: ..., 
+  description: ..., 
+  targetAmount: ..., 
+  pricingPlan: ..., 
+  memberLimit: ..., 
+  activationPrice: ..., 
+  activationPriceMinor: ..., 
+  pricingPlanDefinitionId: ..., 
+  activationStatus: ..., 
+  deadline: ..., // optional
+  eventDate: ..., // optional
+  visibility: ..., 
+  updatedAt: ..., 
+  materialChanges: ..., 
+};
+
+// Call the `updateModelPricedCircleConfigurationWithAuditRef()` function to get a reference to the mutation.
+const ref = updateModelPricedCircleConfigurationWithAuditRef(updateModelPricedCircleConfigurationWithAuditVars);
+// Variables can be defined inline as well.
+const ref = updateModelPricedCircleConfigurationWithAuditRef({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingPlanDefinitionId: ..., activationStatus: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateModelPricedCircleConfigurationWithAuditRef(dataConnect, updateModelPricedCircleConfigurationWithAuditVars);
 
 // Call `executeMutation()` on the reference to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.

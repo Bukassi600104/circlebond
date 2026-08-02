@@ -60,12 +60,14 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*ConsumeAuthChallenge*](#consumeauthchallenge)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
+  - [*CreateModelPricedCircleDraft*](#createmodelpricedcircledraft)
   - [*ClaimTrialAndPublishCircle*](#claimtrialandpublishcircle)
   - [*CreateCircleActivationAttempt*](#createcircleactivationattempt)
   - [*FailCircleActivationAttempt*](#failcircleactivationattempt)
   - [*CompletePaidCircleActivation*](#completepaidcircleactivation)
   - [*CompleteCirclePlanUpgrade*](#completecircleplanupgrade)
   - [*UpdateCircleConfigurationWithAudit*](#updatecircleconfigurationwithaudit)
+  - [*UpdateModelPricedCircleConfigurationWithAudit*](#updatemodelpricedcircleconfigurationwithaudit)
   - [*TransitionCircleWithAudit*](#transitioncirclewithaudit)
   - [*SetCircleCompletionTypeWithAudit*](#setcirclecompletiontypewithaudit)
   - [*AddCircleMemberWithAudit*](#addcirclememberwithaudit)
@@ -4604,18 +4606,7 @@ export interface CreateCircleDraftVariables {
   targetAmount: number;
   pricingPlan: string;
   memberLimit: number;
-  planMemberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingModelVersion: string;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
-  coAdminLimit: number;
-  asoEbiTierLimit: number;
-  entitlements: string;
-  inclusions: string;
-  exclusions: string;
-  pricingEffectiveAt: TimestampString;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -4633,7 +4624,6 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateCircleDraft` Mutation is of type `CreateCircleDraftData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface CreateCircleDraftData {
-  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -4681,6 +4671,142 @@ export default function CreateCircleDraftComponent() {
     targetAmount: ..., 
     pricingPlan: ..., 
     memberLimit: ..., 
+    activationPrice: ..., 
+    deadline: ..., // optional
+    eventDate: ..., // optional
+    visibility: ..., 
+    createdAt: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(createCircleDraftVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createCircleDraftVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_insert);
+    console.log(mutation.data.circleMembership_insert);
+    console.log(mutation.data.circleAuditEntry_insert);
+    console.log(mutation.data.activityLog_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateModelPricedCircleDraft
+You can execute the `CreateModelPricedCircleDraft` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateModelPricedCircleDraft(options?: useDataConnectMutationOptions<CreateModelPricedCircleDraftData, FirebaseError, CreateModelPricedCircleDraftVariables>): UseDataConnectMutationResult<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateModelPricedCircleDraft(dc: DataConnect, options?: useDataConnectMutationOptions<CreateModelPricedCircleDraftData, FirebaseError, CreateModelPricedCircleDraftVariables>): UseDataConnectMutationResult<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+```
+
+### Variables
+The `CreateModelPricedCircleDraft` Mutation requires an argument of type `CreateModelPricedCircleDraftVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateModelPricedCircleDraftVariables {
+  creatorId: string;
+  name: string;
+  type: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  planMemberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingModelVersion: string;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  coAdminLimit: number;
+  asoEbiTierLimit: number;
+  entitlements: string;
+  inclusions: string;
+  exclusions: string;
+  pricingEffectiveAt: TimestampString;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  createdAt: TimestampString;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `CreateModelPricedCircleDraft` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateModelPricedCircleDraft` Mutation is of type `CreateModelPricedCircleDraftData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateModelPricedCircleDraftData {
+  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
+  circle_insert: Circle_Key;
+  circleMembership_insert: CircleMembership_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateModelPricedCircleDraft`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateModelPricedCircleDraftVariables } from '@bondcircle/dataconnect';
+import { useCreateModelPricedCircleDraft } from '@bondcircle/dataconnect/react'
+
+export default function CreateModelPricedCircleDraftComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateModelPricedCircleDraft();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateModelPricedCircleDraft(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateModelPricedCircleDraft(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateModelPricedCircleDraft(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateModelPricedCircleDraft` Mutation requires an argument of type `CreateModelPricedCircleDraftVariables`:
+  const createModelPricedCircleDraftVars: CreateModelPricedCircleDraftVariables = {
+    creatorId: ..., 
+    name: ..., 
+    type: ..., 
+    description: ..., 
+    targetAmount: ..., 
+    pricingPlan: ..., 
+    memberLimit: ..., 
     planMemberLimit: ..., 
     activationPrice: ..., 
     activationPriceMinor: ..., 
@@ -4699,7 +4825,7 @@ export default function CreateCircleDraftComponent() {
     createdAt: ..., 
     updatedAt: ..., 
   };
-  mutation.mutate(createCircleDraftVars);
+  mutation.mutate(createModelPricedCircleDraftVars);
   // Variables can be defined inline as well.
   mutation.mutate({ creatorId: ..., name: ..., type: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., planMemberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingModelVersion: ..., pricingPlanDefinitionId: ..., activationStatus: ..., coAdminLimit: ..., asoEbiTierLimit: ..., entitlements: ..., inclusions: ..., exclusions: ..., pricingEffectiveAt: ..., deadline: ..., eventDate: ..., visibility: ..., createdAt: ..., updatedAt: ..., });
 
@@ -4707,7 +4833,7 @@ export default function CreateCircleDraftComponent() {
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(createCircleDraftVars, options);
+  mutation.mutate(createModelPricedCircleDraftVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {
@@ -5313,9 +5439,6 @@ export interface UpdateCircleConfigurationWithAuditVariables {
   pricingPlan: string;
   memberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -5381,6 +5504,133 @@ export default function UpdateCircleConfigurationWithAuditComponent() {
     pricingPlan: ..., 
     memberLimit: ..., 
     activationPrice: ..., 
+    deadline: ..., // optional
+    eventDate: ..., // optional
+    visibility: ..., 
+    updatedAt: ..., 
+    materialChanges: ..., 
+  };
+  mutation.mutate(updateCircleConfigurationWithAuditVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(updateCircleConfigurationWithAuditVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circleAuditEntry_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## UpdateModelPricedCircleConfigurationWithAudit
+You can execute the `UpdateModelPricedCircleConfigurationWithAudit` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useUpdateModelPricedCircleConfigurationWithAudit(options?: useDataConnectMutationOptions<UpdateModelPricedCircleConfigurationWithAuditData, FirebaseError, UpdateModelPricedCircleConfigurationWithAuditVariables>): UseDataConnectMutationResult<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useUpdateModelPricedCircleConfigurationWithAudit(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateModelPricedCircleConfigurationWithAuditData, FirebaseError, UpdateModelPricedCircleConfigurationWithAuditVariables>): UseDataConnectMutationResult<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+```
+
+### Variables
+The `UpdateModelPricedCircleConfigurationWithAudit` Mutation requires an argument of type `UpdateModelPricedCircleConfigurationWithAuditVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface UpdateModelPricedCircleConfigurationWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  action: string;
+  status: string;
+  name: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  updatedAt: TimestampString;
+  materialChanges: string;
+}
+```
+### Return Type
+Recall that calling the `UpdateModelPricedCircleConfigurationWithAudit` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `UpdateModelPricedCircleConfigurationWithAudit` Mutation is of type `UpdateModelPricedCircleConfigurationWithAuditData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface UpdateModelPricedCircleConfigurationWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `UpdateModelPricedCircleConfigurationWithAudit`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, UpdateModelPricedCircleConfigurationWithAuditVariables } from '@bondcircle/dataconnect';
+import { useUpdateModelPricedCircleConfigurationWithAudit } from '@bondcircle/dataconnect/react'
+
+export default function UpdateModelPricedCircleConfigurationWithAuditComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useUpdateModelPricedCircleConfigurationWithAudit();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useUpdateModelPricedCircleConfigurationWithAudit(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateModelPricedCircleConfigurationWithAudit(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useUpdateModelPricedCircleConfigurationWithAudit(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useUpdateModelPricedCircleConfigurationWithAudit` Mutation requires an argument of type `UpdateModelPricedCircleConfigurationWithAuditVariables`:
+  const updateModelPricedCircleConfigurationWithAuditVars: UpdateModelPricedCircleConfigurationWithAuditVariables = {
+    circleId: ..., 
+    actorId: ..., 
+    action: ..., 
+    status: ..., 
+    name: ..., 
+    description: ..., 
+    targetAmount: ..., 
+    pricingPlan: ..., 
+    memberLimit: ..., 
+    activationPrice: ..., 
     activationPriceMinor: ..., 
     pricingPlanDefinitionId: ..., 
     activationStatus: ..., 
@@ -5390,7 +5640,7 @@ export default function UpdateCircleConfigurationWithAuditComponent() {
     updatedAt: ..., 
     materialChanges: ..., 
   };
-  mutation.mutate(updateCircleConfigurationWithAuditVars);
+  mutation.mutate(updateModelPricedCircleConfigurationWithAuditVars);
   // Variables can be defined inline as well.
   mutation.mutate({ circleId: ..., actorId: ..., action: ..., status: ..., name: ..., description: ..., targetAmount: ..., pricingPlan: ..., memberLimit: ..., activationPrice: ..., activationPriceMinor: ..., pricingPlanDefinitionId: ..., activationStatus: ..., deadline: ..., eventDate: ..., visibility: ..., updatedAt: ..., materialChanges: ..., });
 
@@ -5398,7 +5648,7 @@ export default function UpdateCircleConfigurationWithAuditComponent() {
   const options = {
     onSuccess: () => { console.log('Mutation succeeded!'); }
   };
-  mutation.mutate(updateCircleConfigurationWithAuditVars, options);
+  mutation.mutate(updateModelPricedCircleConfigurationWithAuditVars, options);
 
   // Then, you can render your component dynamically based on the status of the Mutation.
   if (mutation.isPending) {

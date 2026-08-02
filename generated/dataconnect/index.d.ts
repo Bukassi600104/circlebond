@@ -326,7 +326,6 @@ export interface CreateCircleActivationAttemptVariables {
 }
 
 export interface CreateCircleDraftData {
-  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -341,18 +340,7 @@ export interface CreateCircleDraftVariables {
   targetAmount: number;
   pricingPlan: string;
   memberLimit: number;
-  planMemberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingModelVersion: string;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
-  coAdminLimit: number;
-  asoEbiTierLimit: number;
-  entitlements: string;
-  inclusions: string;
-  exclusions: string;
-  pricingEffectiveAt: TimestampString;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -412,6 +400,41 @@ export interface CreateInvitationVariables {
   maxUses: number;
   expiresAt: TimestampString;
   createdAt: TimestampString;
+}
+
+export interface CreateModelPricedCircleDraftData {
+  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
+  circle_insert: Circle_Key;
+  circleMembership_insert: CircleMembership_Key;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+
+export interface CreateModelPricedCircleDraftVariables {
+  creatorId: string;
+  name: string;
+  type: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  planMemberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingModelVersion: string;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  coAdminLimit: number;
+  asoEbiTierLimit: number;
+  entitlements: string;
+  inclusions: string;
+  exclusions: string;
+  pricingEffectiveAt: TimestampString;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  createdAt: TimestampString;
+  updatedAt: TimestampString;
 }
 
 export interface CreateNotificationData {
@@ -2236,9 +2259,6 @@ export interface UpdateCircleConfigurationWithAuditVariables {
   pricingPlan: string;
   memberLimit: number;
   activationPrice: number;
-  activationPriceMinor: number;
-  pricingPlanDefinitionId: string;
-  activationStatus: string;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -2259,6 +2279,32 @@ export interface UpdateInvitationStateVariables {
   openedAt?: TimestampString | null;
   revokedAt?: TimestampString | null;
   updatedAt: TimestampString;
+}
+
+export interface UpdateModelPricedCircleConfigurationWithAuditData {
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface UpdateModelPricedCircleConfigurationWithAuditVariables {
+  circleId: UUIDString;
+  actorId: string;
+  action: string;
+  status: string;
+  name: string;
+  description: string;
+  targetAmount: number;
+  pricingPlan: string;
+  memberLimit: number;
+  activationPrice: number;
+  activationPriceMinor: number;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  deadline?: DateString | null;
+  eventDate?: DateString | null;
+  visibility: string;
+  updatedAt: TimestampString;
+  materialChanges: string;
 }
 
 export interface UpdateNotificationPreferencesData {
@@ -2449,6 +2495,18 @@ export const createCircleDraftRef: CreateCircleDraftRef;
 export function createCircleDraft(vars: CreateCircleDraftVariables): MutationPromise<CreateCircleDraftData, CreateCircleDraftVariables>;
 export function createCircleDraft(dc: DataConnect, vars: CreateCircleDraftVariables): MutationPromise<CreateCircleDraftData, CreateCircleDraftVariables>;
 
+interface CreateModelPricedCircleDraftRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateModelPricedCircleDraftVariables): MutationRef<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateModelPricedCircleDraftVariables): MutationRef<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+  operationName: string;
+}
+export const createModelPricedCircleDraftRef: CreateModelPricedCircleDraftRef;
+
+export function createModelPricedCircleDraft(vars: CreateModelPricedCircleDraftVariables): MutationPromise<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+export function createModelPricedCircleDraft(dc: DataConnect, vars: CreateModelPricedCircleDraftVariables): MutationPromise<CreateModelPricedCircleDraftData, CreateModelPricedCircleDraftVariables>;
+
 interface GetCreatorTrialUsageRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetCreatorTrialUsageVariables): QueryRef<GetCreatorTrialUsageData, GetCreatorTrialUsageVariables>;
@@ -2544,6 +2602,18 @@ export const updateCircleConfigurationWithAuditRef: UpdateCircleConfigurationWit
 
 export function updateCircleConfigurationWithAudit(vars: UpdateCircleConfigurationWithAuditVariables): MutationPromise<UpdateCircleConfigurationWithAuditData, UpdateCircleConfigurationWithAuditVariables>;
 export function updateCircleConfigurationWithAudit(dc: DataConnect, vars: UpdateCircleConfigurationWithAuditVariables): MutationPromise<UpdateCircleConfigurationWithAuditData, UpdateCircleConfigurationWithAuditVariables>;
+
+interface UpdateModelPricedCircleConfigurationWithAuditRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationRef<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationRef<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+  operationName: string;
+}
+export const updateModelPricedCircleConfigurationWithAuditRef: UpdateModelPricedCircleConfigurationWithAuditRef;
+
+export function updateModelPricedCircleConfigurationWithAudit(vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationPromise<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
+export function updateModelPricedCircleConfigurationWithAudit(dc: DataConnect, vars: UpdateModelPricedCircleConfigurationWithAuditVariables): MutationPromise<UpdateModelPricedCircleConfigurationWithAuditData, UpdateModelPricedCircleConfigurationWithAuditVariables>;
 
 interface TransitionCircleWithAuditRef {
   /* Allow users to create refs without passing in DataConnect */

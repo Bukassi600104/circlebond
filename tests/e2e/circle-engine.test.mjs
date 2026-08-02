@@ -40,19 +40,22 @@ function pricingVariables(type, tier, memberLimit) {
 
 async function createPricedDraft(creatorId, name, type, tier, memberLimit) {
   const timestamp = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name,
-    type,
-    description: "Model-specific pricing E2E verification.",
-    targetAmount: 100000,
-    ...pricingVariables(type, tier, memberLimit),
-    deadline: "2026-12-31",
-    eventDate: null,
-    visibility: "private",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name,
+      type,
+      description: "Model-specific pricing E2E verification.",
+      targetAmount: 100000,
+      ...pricingVariables(type, tier, memberLimit),
+      deadline: "2026-12-31",
+      eventDate: null,
+      visibility: "private",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+  );
   return created.data.circle_insert.id;
 }
 
@@ -293,19 +296,22 @@ test("Firebase persists a draft, creator membership, transitions, and audit hist
   });
 
   const timestamp = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Firebase Engine Test",
-    type: "gift",
-    description: "Persistent Milestone 5 verification.",
-    targetAmount: 50000,
-    ...pricingVariables("gift", "trial", 3),
-    deadline: "2026-09-30",
-    eventDate: null,
-    visibility: "private",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Firebase Engine Test",
+      type: "gift",
+      description: "Persistent Milestone 5 verification.",
+      targetAmount: 50000,
+      ...pricingVariables("gift", "trial", 3),
+      deadline: "2026-09-30",
+      eventDate: null,
+      visibility: "private",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+  );
   const circleId = created.data.circle_insert.id;
 
   const draft = await dataConnect.executeQuery("GetCircleEngineRecord", {
@@ -357,19 +363,22 @@ test("Firebase persists an active Gift Circle, its allocation, image path, and m
   });
 
   const timestamp = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Ada's Birthday Gift",
-    type: "gift",
-    description: "A complete Gift Circle persistence check.",
-    targetAmount: 300000,
-    ...pricingVariables("gift", "trial", 3),
-    deadline: "2026-08-30",
-    eventDate: null,
-    visibility: "private",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Ada's Birthday Gift",
+      type: "gift",
+      description: "A complete Gift Circle persistence check.",
+      targetAmount: 300000,
+      ...pricingVariables("gift", "trial", 3),
+      deadline: "2026-08-30",
+      eventDate: null,
+      visibility: "private",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+  );
   const circleId = created.data.circle_insert.id;
   const imageStoragePath = `circles/${circleId}/gift/gift.png`;
 
@@ -443,19 +452,22 @@ test("Firebase persists an event-neutral Aso-Ebi Circle with custom tiers, selec
     email: `${creatorId}@example.test`,
   });
   const timestamp = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Thanksgiving Celebration",
-    type: "aso-ebi",
-    description: "Event-neutral Aso-Ebi persistence verification.",
-    targetAmount: 0,
-    ...pricingVariables("aso-ebi", "trial", 3),
-    deadline: null,
-    eventDate: "2026-11-22",
-    visibility: "private",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Thanksgiving Celebration",
+      type: "aso-ebi",
+      description: "Event-neutral Aso-Ebi persistence verification.",
+      targetAmount: 0,
+      ...pricingVariables("aso-ebi", "trial", 3),
+      deadline: null,
+      eventDate: "2026-11-22",
+      visibility: "private",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+  );
   const circleId = created.data.circle_insert.id;
   await dataConnect.executeMutation("ConfigureAsoEbiCircle", {
     circleId,
@@ -550,19 +562,22 @@ test("Firebase persists Support Circle privacy, pledges, updates and support-del
     email: `${creatorId}@example.test`,
   });
   const timestamp = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Community Care",
-    type: "support",
-    description: "A respectful community support persistence check.",
-    targetAmount: 150000,
-    ...pricingVariables("support", "trial", 3),
-    deadline: "2026-12-15",
-    eventDate: null,
-    visibility: "private",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Community Care",
+      type: "support",
+      description: "A respectful community support persistence check.",
+      targetAmount: 150000,
+      ...pricingVariables("support", "trial", 3),
+      deadline: "2026-12-15",
+      eventDate: null,
+      visibility: "private",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+  );
   const circleId = created.data.circle_insert.id;
   await dataConnect.executeMutation("ConfigureSupportCircle", {
     circleId,
@@ -647,19 +662,22 @@ test("Firebase completes, archives, and purges private circle data while retaini
     email: `${creatorId}@example.test`,
   });
   const createdAt = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Retention Verification Circle",
-    type: "support",
-    description: "Private content scheduled for deletion.",
-    targetAmount: 100000,
-    ...pricingVariables("support", "trial", 3),
-    deadline: "2026-09-30",
-    eventDate: null,
-    visibility: "private",
-    createdAt,
-    updatedAt: createdAt,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Retention Verification Circle",
+      type: "support",
+      description: "Private content scheduled for deletion.",
+      targetAmount: 100000,
+      ...pricingVariables("support", "trial", 3),
+      deadline: "2026-09-30",
+      eventDate: null,
+      visibility: "private",
+      createdAt,
+      updatedAt: createdAt,
+    },
+  );
   const circleId = created.data.circle_insert.id;
   await dataConnect.executeMutation("CreateSupportUpdate", {
     circleId,
@@ -757,19 +775,22 @@ test("Firebase persists secure invitations, approvals, revocation and multi-circ
 
   async function createCircle(name) {
     const createdAt = new Date().toISOString();
-    const created = await dataConnect.executeMutation("CreateCircleDraft", {
-      creatorId,
-      name,
-      type: "gift",
-      description: "Invitation workflow persistence verification.",
-      targetAmount: 90000,
-      ...pricingVariables("gift", "starter", 10),
-      deadline: "2026-12-30",
-      eventDate: null,
-      visibility: "private",
-      createdAt,
-      updatedAt: createdAt,
-    });
+    const created = await dataConnect.executeMutation(
+      "CreateModelPricedCircleDraft",
+      {
+        creatorId,
+        name,
+        type: "gift",
+        description: "Invitation workflow persistence verification.",
+        targetAmount: 90000,
+        ...pricingVariables("gift", "starter", 10),
+        deadline: "2026-12-30",
+        eventDate: null,
+        visibility: "private",
+        createdAt,
+        updatedAt: createdAt,
+      },
+    );
     return created.data.circle_insert.id;
   }
 
@@ -915,19 +936,22 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
     }),
   ]);
   const now = new Date().toISOString();
-  const created = await dataConnect.executeMutation("CreateCircleDraft", {
-    creatorId,
-    name: "Receipt Review Circle",
-    type: "gift",
-    description: "Milestone 10 receipt verification.",
-    targetAmount: 100000,
-    ...pricingVariables("gift", "trial", 3),
-    deadline: "2026-10-31",
-    eventDate: null,
-    visibility: "private",
-    createdAt: now,
-    updatedAt: now,
-  });
+  const created = await dataConnect.executeMutation(
+    "CreateModelPricedCircleDraft",
+    {
+      creatorId,
+      name: "Receipt Review Circle",
+      type: "gift",
+      description: "Milestone 10 receipt verification.",
+      targetAmount: 100000,
+      ...pricingVariables("gift", "trial", 3),
+      deadline: "2026-10-31",
+      eventDate: null,
+      visibility: "private",
+      createdAt: now,
+      updatedAt: now,
+    },
+  );
   const circleId = created.data.circle_insert.id;
   await dataConnect.executeMutation("AddCircleMemberWithAudit", {
     circleId,

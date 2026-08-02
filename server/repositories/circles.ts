@@ -126,7 +126,7 @@ export class FirebaseCircleStore implements CircleStore {
         createdAt: string;
         updatedAt: string;
       }
-    >("CreateCircleDraft", {
+    >("CreateModelPricedCircleDraft", {
       creatorId,
       name: circle.title,
       type: circle.type,
@@ -192,7 +192,7 @@ export class FirebaseCircleStore implements CircleStore {
   ) {
     const updated = { ...circle, ...changes };
     await getBondCircleDataConnect().executeMutation(
-      "UpdateCircleConfigurationWithAudit",
+      "UpdateModelPricedCircleConfigurationWithAudit",
       {
         circleId: circle.id,
         actorId,

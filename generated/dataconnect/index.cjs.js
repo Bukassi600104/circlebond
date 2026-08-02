@@ -198,6 +198,20 @@ exports.createCircleDraft = function createCircleDraft(dcOrVars, vars) {
 }
 ;
 
+const createModelPricedCircleDraftRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateModelPricedCircleDraft', inputVars);
+}
+createModelPricedCircleDraftRef.operationName = 'CreateModelPricedCircleDraft';
+exports.createModelPricedCircleDraftRef = createModelPricedCircleDraftRef;
+
+exports.createModelPricedCircleDraft = function createModelPricedCircleDraft(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createModelPricedCircleDraftRef(dcInstance, inputVars));
+}
+;
+
 const getCreatorTrialUsageRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -309,6 +323,20 @@ exports.updateCircleConfigurationWithAuditRef = updateCircleConfigurationWithAud
 exports.updateCircleConfigurationWithAudit = function updateCircleConfigurationWithAudit(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(updateCircleConfigurationWithAuditRef(dcInstance, inputVars));
+}
+;
+
+const updateModelPricedCircleConfigurationWithAuditRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateModelPricedCircleConfigurationWithAudit', inputVars);
+}
+updateModelPricedCircleConfigurationWithAuditRef.operationName = 'UpdateModelPricedCircleConfigurationWithAudit';
+exports.updateModelPricedCircleConfigurationWithAuditRef = updateModelPricedCircleConfigurationWithAuditRef;
+
+exports.updateModelPricedCircleConfigurationWithAudit = function updateModelPricedCircleConfigurationWithAudit(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateModelPricedCircleConfigurationWithAuditRef(dcInstance, inputVars));
 }
 ;
 
