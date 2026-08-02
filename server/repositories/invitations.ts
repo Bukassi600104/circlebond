@@ -15,6 +15,11 @@ import {
   type InvitationState,
 } from "@/server/invitations/rules";
 import { safelyEmitNotification } from "@/server/repositories/notifications";
+import {
+  assertEntitlement,
+  assertMemberCapacity,
+  entitlementContextForStoredCircle,
+} from "@/server/pricing";
 
 type InvitationRow = {
   id: string;
@@ -176,6 +181,12 @@ export async function createCircleInvitation(
       "A named invitation needs an email address or phone number.",
     );
   }
+  if (circle.type === "support" && input.requireApproval) {
+    assertEntitlement(
+      entitlementContextForStoredCircle(circle),
+      "support_approval_required_membership",
+    );
+  }
 
   const maxUses = mode === "named" ? 1 : Number(input.maxUses ?? 1);
   if (!Number.isInteger(maxUses) || maxUses < 1) {
@@ -192,6 +203,11 @@ export async function createCircleInvitation(
         sum + Math.max(0, invitation.maxUses - invitation.useCount),
       0,
     );
+  assertMemberCapacity(
+    entitlementContextForStoredCircle(circle),
+    currentMembers + reservedSeats,
+    maxUses,
+  );
   assertInvitationCapacity(
     currentMembers + reservedSeats,
     circle.memberLimit,

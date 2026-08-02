@@ -70,23 +70,38 @@ test("creator-only state controls and limited co-admin permissions are enforced"
 });
 
 test("pricing and member limits match the approved tiers", () => {
-  assert.deepEqual(PRICING_PLANS, {
-    free: { activationPrice: 0, memberLimit: 3 },
-    starter: { activationPrice: 1000, memberLimit: 10 },
-    standard: { activationPrice: 2000, memberLimit: 30 },
-    premium: { activationPrice: 3500, memberLimit: 100 },
-  });
+  const expectedPrices = {
+    gift: { trial: 0, starter: 150_000, standard: 350_000, premium: 750_000 },
+    "aso-ebi": {
+      trial: 0,
+      starter: 350_000,
+      standard: 750_000,
+      premium: 1_500_000,
+    },
+    support: {
+      trial: 0,
+      starter: 100_000,
+      standard: 250_000,
+      premium: 500_000,
+    },
+  };
 
-  for (const [plan, rules] of Object.entries(PRICING_PLANS)) {
-    assert.equal(getActivationCharge(plan, "creator"), rules.activationPrice);
-    assert.equal(getActivationCharge(plan, "member"), 0);
-    assert.doesNotThrow(() =>
-      assertMemberLimit(plan, rules.memberLimit - 1, 1),
-    );
-    assert.throws(
-      () => assertMemberLimit(plan, rules.memberLimit, 1),
-      /member limit/i,
-    );
+  for (const [mode, plans] of Object.entries(PRICING_PLANS)) {
+    for (const [plan, rules] of Object.entries(plans)) {
+      assert.equal(rules.priceMinor, expectedPrices[mode][plan]);
+      assert.equal(
+        getActivationCharge(mode, plan, "creator"),
+        rules.priceMinor,
+      );
+      assert.equal(getActivationCharge(mode, plan, "member"), 0);
+      assert.doesNotThrow(() =>
+        assertMemberLimit(mode, plan, rules.memberLimit - 1, 1),
+      );
+      assert.throws(
+        () => assertMemberLimit(mode, plan, rules.memberLimit, 1),
+        /member limit/i,
+      );
+    }
   }
 });
 
@@ -105,6 +120,9 @@ test("Firebase persistence includes shared fields and transactional audits", asy
     "pricingPlan",
     "memberLimit",
     "activationPrice",
+    "activationPriceMinor",
+    "pricingModelVersion",
+    "activationStatus",
     "visibility",
     "completedAt",
     "archiveAt",
@@ -113,6 +131,9 @@ test("Firebase persistence includes shared fields and transactional audits", asy
     assert.match(schema, new RegExp(`${field}:`));
   }
   assert.match(schema, /type CircleAuditEntry @table/);
+  assert.match(schema, /type PricingPlanDefinition @table/);
+  assert.match(schema, /type CircleActivation @table/);
+  assert.match(schema, /type CreatorTrialUsage @table/);
   assert.match(operations, /mutation CreateCircleDraft[\s\S]*@transaction/);
   assert.match(
     operations,

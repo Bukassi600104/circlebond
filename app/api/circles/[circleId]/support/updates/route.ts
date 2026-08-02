@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { createSupportUpdate } from "@/server/repositories/support-circles";
+import { pricingErrorResponse } from "@/server/pricing/http";
 
 export async function POST(
   request: Request,
@@ -22,12 +23,6 @@ export async function POST(
     });
     return NextResponse.json({ ok: true });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "Unable to publish update.",
-      },
-      { status: 400 },
-    );
+    return pricingErrorResponse(error, "Unable to publish update.");
   }
 }

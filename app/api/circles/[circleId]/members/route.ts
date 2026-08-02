@@ -5,6 +5,7 @@ import { validateEmailAddress } from "@/server/auth/security";
 import { addCircleMember } from "@/server/circles/service";
 import { calculateEqualSlotAllocations } from "@/server/circles/gift";
 import { firebaseCircleStore } from "@/server/repositories/circles";
+import { pricingErrorResponse } from "@/server/pricing/http";
 import {
   findUserByEmail,
   loadGiftCircle,
@@ -108,12 +109,6 @@ export async function POST(
 
     return NextResponse.json({ added: resolved.length });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "Unable to invite members.",
-      },
-      { status: 400 },
-    );
+    return pricingErrorResponse(error, "Unable to invite members.");
   }
 }

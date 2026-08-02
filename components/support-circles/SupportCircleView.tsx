@@ -332,7 +332,10 @@ export function SupportCircleView({
                 <h2>Updates</h2>
               </div>
             </header>
-            {circle.viewerCanManage && !completed ? (
+            {circle.viewerCanManage &&
+            !completed &&
+            (circle.updates.length === 0 ||
+              circle.canPublishMultipleUpdates) ? (
               <form onSubmit={publishUpdate}>
                 <label>
                   Share an official update
@@ -343,6 +346,15 @@ export function SupportCircleView({
                   {busy === "update" ? "Publishing…" : "Publish update"}
                 </button>
               </form>
+            ) : null}
+            {circle.viewerCanManage &&
+            !completed &&
+            circle.updates.length > 0 &&
+            !circle.canPublishMultipleUpdates ? (
+              <p className="bc-pricing-note">
+                Multiple beneficiary or expense updates require the Support
+                Premium plan.
+              </p>
             ) : null}
             {circle.updates.length ? (
               <div>

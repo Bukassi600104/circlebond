@@ -5,16 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, ImagePlus, X } from "lucide-react";
 import {
-  CIRCLE_PRICING_PLANS,
+  formatMinorNaira,
   planForMemberCount,
+  plansForCircle,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
-const naira = new Intl.NumberFormat("en-NG", {
-  style: "currency",
-  currency: "NGN",
-  maximumFractionDigits: 0,
-});
-
 function planLabel(plan: CirclePricingPlan) {
   return plan.charAt(0).toUpperCase() + plan.slice(1);
 }
@@ -28,13 +23,17 @@ async function csrfToken() {
 export function GiftCircleForm() {
   const router = useRouter();
   const [mode, setMode] = useState<"equal" | "custom">("equal");
-  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
+  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("trial");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const selectedTier = CIRCLE_PRICING_PLANS[pricingPlan];
+  const plans = plansForCircle("gift");
+  const selectedTier = plans[pricingPlan];
+  const customAmountsIncluded = selectedTier.entitlements.has(
+    "custom_contributions",
+  );
   const capacityNumber = Number(memberCapacity);
   const validCapacity =
     Number.isInteger(capacityNumber) &&
@@ -44,7 +43,10 @@ export function GiftCircleForm() {
 
   function selectPlan(plan: CirclePricingPlan) {
     setPricingPlan(plan);
-    const limit = CIRCLE_PRICING_PLANS[plan].memberLimit;
+    if (!plans[plan].entitlements.has("custom_contributions")) {
+      setMode("equal");
+    }
+    const limit = plans[plan].memberLimit;
     if (capacityNumber > limit) {
       setMemberCapacity(String(limit));
     }
@@ -97,11 +99,8 @@ export function GiftCircleForm() {
           <p>The selected tier sets the maximum circle size.</p>
           <div>
             {(
-              Object.entries(CIRCLE_PRICING_PLANS) as Array<
-                [
-                  CirclePricingPlan,
-                  (typeof CIRCLE_PRICING_PLANS)[CirclePricingPlan],
-                ]
+              Object.entries(plans) as Array<
+                [CirclePricingPlan, (typeof plans)[CirclePricingPlan]]
               >
             ).map(([plan, details]) => (
               <label
@@ -122,11 +121,20 @@ export function GiftCircleForm() {
                   )}
                 </span>
                 <b>
-                  {details.activationPrice
-                    ? naira.format(details.activationPrice)
+                  {details.priceMinor
+                    ? formatMinorNaira(details.priceMinor)
                     : "Free"}
                 </b>
                 <small>Up to {details.memberLimit} members</small>
+                <small>{details.coAdminLimit} co-admins</small>
+                <ul>
+                  {details.inclusions.slice(0, 3).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                {details.exclusions[0] ? (
+                  <em>Not included: {details.exclusions[0]}</em>
+                ) : null}
               </label>
             ))}
           </div>
@@ -216,10 +224,15 @@ export function GiftCircleForm() {
               name="contributionMode"
               value="custom"
               checked={mode === "custom"}
+              disabled={!customAmountsIncluded}
               onChange={() => setMode("custom")}
             />
             <strong>Custom amounts</strong>
-            <span>Set your amount now; add member amounts after creation.</span>
+            <span>
+              {customAmountsIncluded
+                ? "Set your amount now; add member amounts after creation."
+                : "Available on Gift Standard and Premium."}
+            </span>
           </label>
         </fieldset>
         {mode === "custom" ? (
@@ -356,12 +369,13 @@ export function GiftCircleForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    const nextPlan = planForMemberCount(capacityIssue);
+                    const nextPlan = planForMemberCount("gift", capacityIssue);
                     setPricingPlan(nextPlan);
                     setCapacityIssue(null);
                   }}
                 >
-                  Upgrade to {planLabel(planForMemberCount(capacityIssue))}
+                  Upgrade to{" "}
+                  {planLabel(planForMemberCount("gift", capacityIssue))}
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </button>
               )}

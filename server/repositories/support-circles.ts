@@ -4,6 +4,11 @@ import {
   supportAmountVisibility,
   validateSupportPledge,
 } from "@/server/circles/support";
+import {
+  assertEntitlement,
+  entitlementContextForStoredCircle,
+  hasEntitlement,
+} from "@/server/pricing";
 
 export type SupportCircleMember = {
   id: string;
@@ -53,6 +58,7 @@ export type SupportCircleDetail = {
   status: string;
   creatorId: string;
   viewerCanManage: boolean;
+  canPublishMultipleUpdates: boolean;
   members: SupportCircleMember[];
   updates: SupportCircleUpdate[];
 };
@@ -81,6 +87,8 @@ type SupportQuery = {
     targetAmount: number;
     contributedAmount: number;
     memberLimit: number;
+    pricingPlan: string;
+    pricingModelVersion: string;
     deadline?: string | null;
     status: string;
     creator: { id: string };
@@ -165,6 +173,7 @@ export async function loadSupportCircle(
   if (!viewerMembership) return null;
   const viewerCanManage =
     circle.creator.id === viewerId || viewerMembership.role === "co_admin";
+  const pricingContext = entitlementContextForStoredCircle(circle);
   return {
     ...circle,
     imageUrl: circle.imageUrl ?? null,
@@ -194,6 +203,10 @@ export async function loadSupportCircle(
     deadline: circle.deadline ?? null,
     creatorId: circle.creator.id,
     viewerCanManage,
+    canPublishMultipleUpdates: hasEntitlement(
+      pricingContext,
+      "support_multiple_beneficiary_updates",
+    ),
     members: response.data.circleMemberships
       .filter((membership) => membership.membershipStatus === "joined")
       .map((membership) => {
@@ -280,6 +293,12 @@ export async function createSupportUpdate(input: {
   }
   if (["completed", "cancelled", "archived"].includes(circle.status)) {
     throw new Error("Updates are read-only for this circle.");
+  }
+  if (response.data.supportUpdates.length > 0) {
+    assertEntitlement(
+      entitlementContextForStoredCircle(circle),
+      "support_multiple_beneficiary_updates",
+    );
   }
   await getBondCircleDataConnect().executeMutation("CreateSupportUpdate", {
     circleId: input.circleId,

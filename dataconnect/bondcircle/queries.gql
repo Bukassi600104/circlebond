@@ -108,6 +108,11 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     pricingPlan
     memberLimit
     activationPrice
+    activationPriceMinor
+    pricingModelVersion
+    pricingPlanDefinitionId
+    activationStatus
+    activatedAt
     deadline
     eventDate
     status
@@ -200,6 +205,7 @@ query GetGiftCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     memberCount
     memberLimit
     pricingPlan
+    pricingModelVersion
     deadline
     status
     completionType
@@ -256,13 +262,42 @@ mutation CreateCircleDraft(
   $targetAmount: Int!
   $pricingPlan: String!
   $memberLimit: Int!
+  $planMemberLimit: Int!
   $activationPrice: Int!
+  $activationPriceMinor: Int!
+  $pricingModelVersion: String!
+  $pricingPlanDefinitionId: String!
+  $activationStatus: String!
+  $coAdminLimit: Int!
+  $asoEbiTierLimit: Int!
+  $entitlements: String!
+  $inclusions: String!
+  $exclusions: String!
+  $pricingEffectiveAt: Timestamp!
   $deadline: Date
   $eventDate: Date
   $visibility: String!
   $createdAt: Timestamp!
   $updatedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  pricingPlanDefinition_upsert(
+    data: {
+      id: $pricingPlanDefinitionId
+      circleType: $type
+      tier: $pricingPlan
+      version: 1
+      currency: "NGN"
+      priceMinor: $activationPriceMinor
+      memberLimit: $planMemberLimit
+      coAdminLimit: $coAdminLimit
+      asoEbiTierLimit: $asoEbiTierLimit
+      entitlements: $entitlements
+      inclusions: $inclusions
+      exclusions: $exclusions
+      effectiveAt: $pricingEffectiveAt
+      updatedAt: $updatedAt
+    }
+  )
   circle_insert(
     data: {
       creator: { id: $creatorId }
@@ -273,6 +308,10 @@ mutation CreateCircleDraft(
       pricingPlan: $pricingPlan
       memberLimit: $memberLimit
       activationPrice: $activationPrice
+      activationPriceMinor: $activationPriceMinor
+      pricingModelVersion: $pricingModelVersion
+      pricingPlanDefinitionId: $pricingPlanDefinitionId
+      activationStatus: $activationStatus
       deadline: $deadline
       eventDate: $eventDate
       status: "draft"
@@ -312,6 +351,256 @@ mutation CreateCircleDraft(
   )
 }
 
+query GetCreatorTrialUsage($creatorId: String!) @auth(level: NO_ACCESS) {
+  creatorTrialUsage(key: { creatorId: $creatorId }) {
+    usedAt
+    circle {
+      id
+    }
+  }
+}
+
+mutation ClaimTrialAndPublishCircle(
+  $activationId: UUID!
+  $creatorId: String!
+  $circleId: UUID!
+  $circleEntityId: String!
+  $planDefinitionId: String!
+  $circleType: String!
+  $activatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  creatorTrialUsage_insert(
+    data: {
+      creator: { id: $creatorId }
+      circle: { id: $circleId }
+      usedAt: $activatedAt
+    }
+  )
+  circleActivation_insert(
+    data: {
+      id: $activationId
+      circle: { id: $circleId }
+      creator: { id: $creatorId }
+      planDefinition: { id: $planDefinitionId }
+      activationType: "trial"
+      circleType: $circleType
+      tier: "trial"
+      currency: "NGN"
+      listPriceMinor: 0
+      amountDueMinor: 0
+      pricePaidMinor: 0
+      status: "succeeded"
+      provider: "trial"
+      createdAt: $activatedAt
+      paidAt: $activatedAt
+      activatedAt: $activatedAt
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      status: "published"
+      activationStatus: "active"
+      activatedAt: $activatedAt
+      updatedAt: $activatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $creatorId }
+      action: "trial_activated"
+      fromStatus: "draft"
+      toStatus: "published"
+      materialChanges: "{\"activationType\":\"trial\",\"pricePaidMinor\":0}"
+      createdAt: $activatedAt
+    }
+  )
+  activityLog_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $creatorId }
+      eventType: "circle_trial_activated"
+      entityId: $circleEntityId
+      metadata: "{\"tier\":\"trial\"}"
+      createdAt: $activatedAt
+    }
+  )
+}
+
+query GetCirclePricingState($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    creator {
+      id
+    }
+    type
+    pricingPlan
+    pricingModelVersion
+    pricingPlanDefinitionId
+    memberLimit
+    activationStatus
+    activationPriceMinor
+    activatedAt
+    status
+  }
+  circleActivations(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { createdAt: DESC }
+  ) {
+    id
+    activationType
+    tier
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    provider
+    providerReference
+    createdAt
+    paidAt
+    activatedAt
+  }
+}
+
+mutation CreateCircleActivationAttempt(
+  $activationId: UUID!
+  $circleId: UUID!
+  $creatorId: String!
+  $planDefinitionId: String!
+  $activationType: String!
+  $circleType: String!
+  $tier: String!
+  $listPriceMinor: Int!
+  $amountDueMinor: Int!
+  $provider: String!
+  $providerReference: String!
+  $previousActivationId: UUID
+  $createdAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleActivation_insert(
+    data: {
+      id: $activationId
+      circle: { id: $circleId }
+      creator: { id: $creatorId }
+      planDefinition: { id: $planDefinitionId }
+      activationType: $activationType
+      circleType: $circleType
+      tier: $tier
+      currency: "NGN"
+      listPriceMinor: $listPriceMinor
+      amountDueMinor: $amountDueMinor
+      status: "pending"
+      provider: $provider
+      providerReference: $providerReference
+      previousActivationId: $previousActivationId
+      createdAt: $createdAt
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: { activationStatus: "pending_payment", updatedAt: $createdAt }
+  )
+}
+
+mutation FailCircleActivationAttempt(
+  $activationId: UUID!
+  $circleId: UUID!
+  $failureCode: String!
+  $failedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleActivation_update(
+    key: { id: $activationId }
+    data: { status: "failed", failureCode: $failureCode }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: { activationStatus: "payment_failed", updatedAt: $failedAt }
+  )
+}
+
+mutation CompletePaidCircleActivation(
+  $activationId: UUID!
+  $circleId: UUID!
+  $creatorId: String!
+  $pricePaidMinor: Int!
+  $activatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleActivation_update(
+    key: { id: $activationId }
+    data: {
+      status: "succeeded"
+      pricePaidMinor: $pricePaidMinor
+      paidAt: $activatedAt
+      activatedAt: $activatedAt
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      status: "published"
+      activationStatus: "active"
+      activatedAt: $activatedAt
+      updatedAt: $activatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $creatorId }
+      action: "paid_activation_succeeded"
+      fromStatus: "draft"
+      toStatus: "published"
+      materialChanges: "{\"activationType\":\"paid\"}"
+      createdAt: $activatedAt
+    }
+  )
+}
+
+mutation CompleteCirclePlanUpgrade(
+  $activationId: UUID!
+  $circleId: UUID!
+  $creatorId: String!
+  $targetPlan: String!
+  $targetPlanDefinitionId: String!
+  $targetMemberLimit: Int!
+  $targetActivationPrice: Int!
+  $targetActivationPriceMinor: Int!
+  $pricePaidMinor: Int!
+  $activatedAt: Timestamp!
+) @auth(level: NO_ACCESS) @transaction {
+  circleActivation_update(
+    key: { id: $activationId }
+    data: {
+      status: "succeeded"
+      pricePaidMinor: $pricePaidMinor
+      paidAt: $activatedAt
+      activatedAt: $activatedAt
+    }
+  )
+  circle_update(
+    key: { id: $circleId }
+    data: {
+      pricingPlan: $targetPlan
+      pricingPlanDefinitionId: $targetPlanDefinitionId
+      memberLimit: $targetMemberLimit
+      activationPrice: $targetActivationPrice
+      activationPriceMinor: $targetActivationPriceMinor
+      activationStatus: "active"
+      updatedAt: $activatedAt
+    }
+  )
+  circleAuditEntry_insert(
+    data: {
+      circle: { id: $circleId }
+      actor: { id: $creatorId }
+      action: "plan_upgrade_succeeded"
+      materialChanges: $targetPlanDefinitionId
+      createdAt: $activatedAt
+    }
+  )
+}
+
 mutation UpdateCircleConfigurationWithAudit(
   $circleId: UUID!
   $actorId: String!
@@ -323,6 +612,9 @@ mutation UpdateCircleConfigurationWithAudit(
   $pricingPlan: String!
   $memberLimit: Int!
   $activationPrice: Int!
+  $activationPriceMinor: Int!
+  $pricingPlanDefinitionId: String!
+  $activationStatus: String!
   $deadline: Date
   $eventDate: Date
   $visibility: String!
@@ -338,6 +630,9 @@ mutation UpdateCircleConfigurationWithAudit(
       pricingPlan: $pricingPlan
       memberLimit: $memberLimit
       activationPrice: $activationPrice
+      activationPriceMinor: $activationPriceMinor
+      pricingPlanDefinitionId: $pricingPlanDefinitionId
+      activationStatus: $activationStatus
       deadline: $deadline
       eventDate: $eventDate
       visibility: $visibility
@@ -751,6 +1046,7 @@ query GetSupportCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     memberCount
     memberLimit
     pricingPlan
+    pricingModelVersion
     deadline
     status
     completedAt
@@ -1539,6 +1835,9 @@ query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
     type
     status
     commentsEnabled
+    memberLimit
+    pricingPlan
+    pricingModelVersion
     creator {
       id
     }
@@ -2004,6 +2303,9 @@ query GetNotificationContext($circleId: UUID!) @auth(level: NO_ACCESS) {
     name
     type
     status
+    pricingPlan
+    pricingModelVersion
+    memberLimit
     deadline
     creator {
       id
@@ -2450,6 +2752,55 @@ query GetOwnerPlatformOverview @auth(level: NO_ACCESS) {
   circlesByPlan: circles {
     pricingPlan
     _count
+  }
+  trialUsageTotals: creatorTrialUsages {
+    _count
+  }
+  pricingDefinitions: pricingPlanDefinitions(
+    orderBy: { effectiveAt: DESC }
+    limit: 100
+  ) {
+    id
+    circleType
+    tier
+    version
+    currency
+    priceMinor
+    memberLimit
+    coAdminLimit
+    asoEbiTierLimit
+    effectiveAt
+    retiredAt
+  }
+  circleActivations(orderBy: { createdAt: DESC }, limit: 10000) {
+    id
+    activationType
+    circleType
+    tier
+    currency
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    provider
+    createdAt
+    paidAt
+  }
+  pricingChangeAudits(orderBy: { createdAt: DESC }, limit: 50) {
+    id
+    action
+    effectiveAt
+    createdAt
+    planDefinition {
+      id
+      circleType
+      tier
+      priceMinor
+    }
+    actor {
+      id
+      displayName
+    }
   }
   invitationTotals: invitations {
     _count

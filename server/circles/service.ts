@@ -1,7 +1,6 @@
 import {
   assertActivityAllowed,
   assertCircleType,
-  assertMemberLimit,
   assertPermission,
   pricingFor,
   transitionCircle,
@@ -12,6 +11,14 @@ import {
   type PricingPlan,
 } from "./engine.ts";
 import { retentionDueAt } from "../retention/rules.ts";
+import { PRICING_MODEL_VERSION } from "../../lib/circle-pricing.ts";
+import {
+  PricingRuleError,
+  assertCoAdminCapacity,
+  assertMemberCapacity,
+  entitlementContextForStoredCircle,
+  type CircleEntitlementContext,
+} from "../pricing/entitlements.ts";
 
 export type CircleRecord = {
   id: string;
@@ -19,9 +26,14 @@ export type CircleRecord = {
   type: CircleType;
   title: string;
   description: string;
-  pricingPlan: PricingPlan;
+  pricingPlan: PricingPlan | "free" | "legacy";
   memberLimit: number;
   activationPrice: number;
+  activationPriceMinor: number;
+  pricingModelVersion: string;
+  pricingPlanDefinitionId: string | null;
+  activationStatus: string;
+  activatedAt: string | null;
   deadline: string | null;
   eventDate: string | null;
   status: CircleState;
@@ -71,7 +83,15 @@ export interface CircleStore {
     circle: CircleRecord,
     actorId: string,
     changes: UpdateCircleDraftInput &
-      Pick<CircleRecord, "memberLimit" | "activationPrice" | "updatedAt">,
+      Pick<
+        CircleRecord,
+        | "memberLimit"
+        | "activationPrice"
+        | "activationPriceMinor"
+        | "pricingPlanDefinitionId"
+        | "activationStatus"
+        | "updatedAt"
+      >,
     auditAction: "draft_updated" | "configuration_updated",
   ): Promise<CircleRecord>;
   transition(
@@ -84,6 +104,7 @@ export interface CircleStore {
     >,
   ): Promise<CircleRecord>;
   memberCount(circleId: string): Promise<number>;
+  coAdminCount(circleId: string): Promise<number>;
   addMember(
     circle: CircleRecord,
     actorId: string,
@@ -99,6 +120,10 @@ function now() {
 function requireCircle(circle: CircleRecord | null): CircleRecord {
   if (!circle) throw new Error("Circle not found.");
   return circle;
+}
+
+function entitlementContextFor(circle: CircleRecord): CircleEntitlementContext {
+  return entitlementContextForStoredCircle(circle);
 }
 
 async function roleForActor(
@@ -118,7 +143,7 @@ export async function createCircleDraft(
   store: CircleStore,
 ) {
   assertCircleType(input.type);
-  const pricing = pricingFor(input.pricingPlan);
+  const pricing = pricingFor(input.type, input.pricingPlan);
   const requestedMemberLimit = input.memberLimit ?? pricing.memberLimit;
   const timestamp = now();
   const title = input.title.trim();
@@ -143,7 +168,17 @@ export async function createCircleDraft(
       title,
       status: "draft",
       memberLimit: requestedMemberLimit,
-      activationPrice: pricing.activationPrice,
+      // Keep the old whole-Naira field during migration for existing readers.
+      // New activation and historical records use integer minor units.
+      activationPrice: pricing.priceMinor / 100,
+      activationPriceMinor: pricing.priceMinor,
+      pricingModelVersion: PRICING_MODEL_VERSION,
+      pricingPlanDefinitionId: pricing.id,
+      activationStatus:
+        input.pricingPlan === "trial"
+          ? "pending_trial_claim"
+          : "pending_payment",
+      activatedAt: null,
       createdAt: timestamp,
       updatedAt: timestamp,
       completedAt: null,
@@ -168,14 +203,23 @@ export async function updateCircleDraft(
     throw new Error("Only a draft circle can be resumed and edited.");
   }
 
-  const pricing = pricingFor(changes.pricingPlan ?? circle.pricingPlan);
+  const pricing = pricingFor(
+    circle.type,
+    changes.pricingPlan ?? circle.pricingPlan,
+  );
   return store.updateConfiguration(
     circle,
     actorId,
     {
       ...changes,
       memberLimit: pricing.memberLimit,
-      activationPrice: pricing.activationPrice,
+      activationPrice: pricing.priceMinor / 100,
+      activationPriceMinor: pricing.priceMinor,
+      pricingPlanDefinitionId: pricing.id,
+      activationStatus:
+        (changes.pricingPlan ?? circle.pricingPlan) === "trial"
+          ? "pending_trial_claim"
+          : "pending_payment",
       updatedAt: now(),
     },
     "draft_updated",
@@ -195,17 +239,43 @@ export async function updateCircleConfiguration(
   if (circle.status === "archived" || circle.status === "completed") {
     throw new Error(`A ${circle.status} circle configuration is locked.`);
   }
+  if (changes.pricingPlan && changes.pricingPlan !== circle.pricingPlan) {
+    throw new PricingRuleError(
+      "Use the secured upgrade flow to change an active circle plan.",
+      "ACTIVATION_REQUIRED",
+    );
+  }
 
-  const pricing = pricingFor(changes.pricingPlan ?? circle.pricingPlan);
+  if (circle.pricingModelVersion !== PRICING_MODEL_VERSION) {
+    return store.updateConfiguration(
+      circle,
+      actorId,
+      {
+        ...changes,
+        memberLimit: circle.memberLimit,
+        activationPrice: circle.activationPrice,
+        activationPriceMinor: circle.activationPriceMinor,
+        pricingPlanDefinitionId: circle.pricingPlanDefinitionId,
+        activationStatus: circle.activationStatus,
+        updatedAt: now(),
+      },
+      circle.status === "draft" ? "draft_updated" : "configuration_updated",
+    );
+  }
+
+  const pricing = pricingFor(circle.type, circle.pricingPlan);
   const memberCount = await store.memberCount(circle.id);
-  assertMemberLimit(changes.pricingPlan ?? circle.pricingPlan, memberCount, 0);
+  assertMemberCapacity(entitlementContextFor(circle), memberCount, 0);
   return store.updateConfiguration(
     circle,
     actorId,
     {
       ...changes,
       memberLimit: pricing.memberLimit,
-      activationPrice: pricing.activationPrice,
+      activationPrice: pricing.priceMinor / 100,
+      activationPriceMinor: pricing.priceMinor,
+      pricingPlanDefinitionId: pricing.id,
+      activationStatus: circle.activationStatus,
       updatedAt: now(),
     },
     circle.status === "draft" ? "draft_updated" : "configuration_updated",
@@ -257,11 +327,11 @@ export async function addCircleMember(
   assertPermission(actorRole, "manage_members");
   assertActivityAllowed(circle.status);
   const currentMembers = await store.memberCount(circle.id);
-  assertMemberLimit(circle.pricingPlan, currentMembers, 1);
-  if (currentMembers + 1 > circle.memberLimit) {
-    throw new Error(
-      `This circle has filled its ${circle.memberLimit} planned member slots.`,
-    );
+  const entitlementContext = entitlementContextFor(circle);
+  assertMemberCapacity(entitlementContext, currentMembers, 1);
+  if (role === "co_admin") {
+    const currentCoAdmins = await store.coAdminCount(circle.id);
+    assertCoAdminCapacity(entitlementContext, currentCoAdmins, 1);
   }
   await store.addMember(circle, actorId, memberId, role);
 }

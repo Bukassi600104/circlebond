@@ -413,3 +413,15 @@ Do not remove approved features.
 If implementation requires a decision not covered by the approved documentation, stop implementation and request clarification rather than making assumptions.
 
 This document, together with the PRD, UX Workflow Specification, Master Screen Specification, Design System & Component Library, and Technical Architecture & Engineering Blueprint, constitutes the complete implementation authority for BondCircle Version 1.
+
+MODEL-SPECIFIC PRICING ENGINEERING ADDENDUM
+
+`lib/circle-pricing.ts` is the versioned catalogue. All prices are NGN minor
+units. `server/pricing/entitlements.ts` is the authorization boundary for
+capacity and features. `CircleActivation`, `CreatorTrialUsage`,
+`PricingPlanDefinition` and `PricingChangeAudit` preserve trial, payment,
+upgrade and historical-price facts. New paid circles stay draft until a signed
+provider callback completes the activation transaction. Never use a
+contribution receipt as activation evidence. Existing records remain on the
+legacy/grandfathered path. Operational details and migration rules are in
+docs/MODEL_SPECIFIC_PRICING.md.

@@ -20,13 +20,13 @@ export const legalDocuments: Record<
     eyebrow: "Terms of Service",
     title: "BondCircle Terms of Service",
     summary:
-      "Draft dated 26 July 2026. These terms are written for the current coordination-only product and require Nigerian legal counsel review before public launch.",
+      "Updated 2 August 2026. These terms describe the current coordination and one-time circle-activation product and remain subject to Nigerian legal counsel review.",
     action: "I agree to the Terms",
     sections: [
       {
         title: "1. About BondCircle",
         paragraphs: [
-          "BondCircle helps people create and join circles, coordinate gifts or events, record contribution status, exchange invitations and updates, and upload payment evidence. The legal company name, registration number, registered address and support contact must be inserted here before public launch.",
+          "Bond Circle provides BondCircle, a service that helps people create and join circles, coordinate gifts or events, record contribution status, exchange invitations and updates, and upload payment evidence. Its supplied contact address is 6 Jehova Elohim, Gowon Estate, and its supplied telephone contact is +234 906 228 4074. A registration number and official support email must still be confirmed before public launch.",
         ],
       },
       {
@@ -39,7 +39,7 @@ export const legalDocuments: Record<
       {
         title: "3. What the service does",
         paragraphs: [
-          "BondCircle is a coordination platform. The current product does not hold user money, operate a wallet, process card payments, or act as a bank, escrow provider, gift seller or delivery company. Contributors pay recipients through arrangements made outside BondCircle.",
+          "BondCircle is a coordination platform. It does not hold contribution money, operate a contribution wallet, act as a bank or escrow provider, or deduct a percentage from contributions. Contributors pay recipients through arrangements made outside BondCircle. A separate third-party checkout may process the creator's disclosed one-time BondCircle circle-activation fee.",
           "A payment-proof upload or status shown in the app is a coordination record, not a bank confirmation, guarantee, or independent verification of payment.",
         ],
       },
@@ -95,7 +95,9 @@ export const legalDocuments: Record<
       {
         title: "11. Fees, cancellations and refunds",
         paragraphs: [
-          "The current development build does not charge an in-app service fee. Any future price, fee, tax, renewal, cancellation or refund term must be shown clearly before a user commits. Nothing in these Terms removes rights that cannot lawfully be excluded.",
+          "Creating and saving a draft is free. A creator may use one basic three-member first-circle trial per account. Publishing another circle requires the one-time activation price shown for the selected circle type and tier before checkout. One activation applies to one circle; this is not recurring billing. Contributors and invitees are not charged a BondCircle platform fee.",
+          "An active circle may be upgraded only within the same circle type. The creator is shown the price difference before checkout. Active downgrades are not offered. A closed circle cannot be reused; a duplicated circle is a new draft requiring separate activation.",
+          "Cancellation and refund eligibility for a creator activation payment, including any non-refundable service already supplied, must be displayed at checkout and finalized with Nigerian counsel and the selected payment provider before paid production activation is enabled. Nothing in these Terms removes rights that cannot lawfully be excluded.",
         ],
       },
       {
@@ -152,7 +154,7 @@ export const legalDocuments: Record<
         title: "20. General and contact",
         paragraphs: [
           "If a provision is unenforceable, the remaining provisions continue. Delay in enforcing a provision is not a waiver. Transfer and notice rules must be finalised before launch.",
-          "Pre-launch details required: legal entity, RC number, registered address, support email, effective date, minimum age, complaint timetable and dispute venue.",
+          "Bond Circle contact: 6 Jehova Elohim, Gowon Estate; telephone +234 906 228 4074. Pre-launch details still required: RC number, official support email, effective date, minimum age, complaint timetable and dispute venue.",
         ],
       },
       {
@@ -171,19 +173,19 @@ export const legalDocuments: Record<
     eyebrow: "Privacy Policy",
     title: "BondCircle Privacy Notice",
     summary:
-      "Draft dated 26 July 2026. This notice explains the current product’s data practices and requires Nigerian privacy counsel review and operational details before public launch.",
+      "Updated 2 August 2026. This notice explains the current product's data practices, including one-time circle activation, and remains subject to Nigerian privacy counsel review.",
     action: "I acknowledge the Privacy Policy",
     sections: [
       {
         title: "1. Who controls your information",
         paragraphs: [
-          "BondCircle’s legal entity, registered address, privacy contact and Data Protection Officer details must be inserted before public launch. That entity will be the data controller for the activities described here. Google acts as a processor for configured Firebase services.",
+          "Bond Circle is the supplied service identity and data controller for the activities described here. Its supplied contact address is 6 Jehova Elohim, Gowon Estate, and telephone contact is +234 906 228 4074. Its RC number, official privacy email and Data Protection Officer details must still be confirmed before public launch. Google acts as a processor for configured Firebase services.",
         ],
       },
       {
         title: "2. Scope",
         paragraphs: [
-          "This notice applies to BondCircle registration, authentication, profiles, circles, invitations, contribution records, receipts, announcements, activity and support interactions. A separate notice may be required for any future payment, commerce or delivery service.",
+          "This notice applies to BondCircle registration, authentication, profiles, circles, invitations, contribution records, receipts, announcements, activity, one-time circle activation and support interactions. A selected activation-payment provider will publish its own privacy notice and will process checkout information independently or as otherwise stated at checkout.",
         ],
       },
       {

@@ -8,6 +8,9 @@ import {
 } from "@/server/circles/service";
 import { calculateEqualSlotAllocations } from "@/server/circles/gift";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
+import { assertEntitlement } from "@/server/pricing";
+import { pricingErrorResponse } from "@/server/pricing/http";
+import { claimTrialAndPublishCircle } from "@/server/repositories/pricing";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
   configureGiftCircle,
@@ -77,8 +80,14 @@ export async function POST(request: Request) {
     if (!["equal", "custom"].includes(contributionMode)) {
       throw new Error("Choose a contribution mode.");
     }
-    const pricing = pricingFor(pricingPlan);
+    const pricing = pricingFor("gift", pricingPlan);
     const selectedPricingPlan = pricingPlan as PricingPlan;
+    if (contributionMode === "custom") {
+      assertEntitlement(
+        { mode: "gift", plan: selectedPricingPlan },
+        "custom_contributions",
+      );
+    }
     if (
       !Number.isInteger(memberCapacity) ||
       memberCapacity < 2 ||
@@ -174,18 +183,20 @@ export async function POST(request: Request) {
       });
     }
 
-    await transitionCircleState(
-      session.uid,
-      circle.id,
-      "published",
-      firebaseCircleStore,
-    );
-    await transitionCircleState(
-      session.uid,
-      circle.id,
-      "active",
-      firebaseCircleStore,
-    );
+    if (selectedPricingPlan === "trial") {
+      await claimTrialAndPublishCircle({
+        creatorId: session.uid,
+        circleId: circle.id,
+        circleType: "gift",
+        planDefinitionId: pricing.id,
+      });
+      await transitionCircleState(
+        session.uid,
+        circle.id,
+        "active",
+        firebaseCircleStore,
+      );
+    }
     if (uploadAttempted) {
       await recordUploadOutcome({
         kind: "gift_image",
@@ -196,6 +207,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         circleId: circle.id,
+        activationStatus:
+          selectedPricingPlan === "trial" ? "active" : "pending_payment",
         warning:
           imageFile && !storageAvailable
             ? CIRCLE_IMAGE_STORAGE_WARNING
@@ -212,9 +225,6 @@ export async function POST(request: Request) {
         error,
       });
     }
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to create." },
-      { status: 400 },
-    );
+    return pricingErrorResponse(error, "Unable to create the Gift Circle.");
   }
 }

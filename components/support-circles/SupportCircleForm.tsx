@@ -13,8 +13,9 @@ import {
   X,
 } from "lucide-react";
 import {
-  CIRCLE_PRICING_PLANS,
+  formatMinorNaira,
   planForMemberCount,
+  plansForCircle,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
 const supportTypes = [
@@ -26,12 +27,6 @@ const supportTypes = [
   ["family_support", "Family support"],
   ["other", "Other"],
 ] as const;
-
-const naira = new Intl.NumberFormat("en-NG", {
-  style: "currency",
-  currency: "NGN",
-  maximumFractionDigits: 0,
-});
 
 function planLabel(plan: CirclePricingPlan) {
   return plan.charAt(0).toUpperCase() + plan.slice(1);
@@ -46,18 +41,39 @@ async function csrfToken() {
 export function SupportCircleForm() {
   const router = useRouter();
   const [mode, setMode] = useState<"equal" | "custom">("equal");
-  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
+  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("trial");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
+  const [hideIndividualAmounts, setHideIndividualAmounts] = useState(false);
+  const [requireCreatorApproval, setRequireCreatorApproval] = useState(false);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const selectedPlan = CIRCLE_PRICING_PLANS[pricingPlan];
+  const plans = plansForCircle("support");
+  const selectedPlan = plans[pricingPlan];
+  const customAmountsIncluded = selectedPlan.entitlements.has(
+    "custom_contributions",
+  );
+  const hiddenAmountsIncluded = selectedPlan.entitlements.has(
+    "support_hidden_individual_amounts",
+  );
+  const approvalIncluded = selectedPlan.entitlements.has(
+    "support_approval_required_membership",
+  );
   const capacityNumber = Number(memberCapacity);
 
   function selectPlan(plan: CirclePricingPlan) {
     setPricingPlan(plan);
-    const limit = CIRCLE_PRICING_PLANS[plan].memberLimit;
+    if (!plans[plan].entitlements.has("custom_contributions")) {
+      setMode("equal");
+    }
+    if (!plans[plan].entitlements.has("support_hidden_individual_amounts")) {
+      setHideIndividualAmounts(false);
+    }
+    if (!plans[plan].entitlements.has("support_approval_required_membership")) {
+      setRequireCreatorApproval(false);
+    }
+    const limit = plans[plan].memberLimit;
     if (capacityNumber > limit) {
       setMemberCapacity(String(limit));
     }
@@ -110,11 +126,8 @@ export function SupportCircleForm() {
           <p>The selected plan sets the maximum number of supporters.</p>
           <div>
             {(
-              Object.entries(CIRCLE_PRICING_PLANS) as Array<
-                [
-                  CirclePricingPlan,
-                  (typeof CIRCLE_PRICING_PLANS)[CirclePricingPlan],
-                ]
+              Object.entries(plans) as Array<
+                [CirclePricingPlan, (typeof plans)[CirclePricingPlan]]
               >
             ).map(([plan, details]) => (
               <label
@@ -135,11 +148,20 @@ export function SupportCircleForm() {
                   ) : null}
                 </span>
                 <b>
-                  {details.activationPrice
-                    ? naira.format(details.activationPrice)
+                  {details.priceMinor
+                    ? formatMinorNaira(details.priceMinor)
                     : "Free"}
                 </b>
                 <small>Up to {details.memberLimit} members</small>
+                <small>{details.coAdminLimit} co-admins</small>
+                <ul>
+                  {details.inclusions.slice(0, 3).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                {details.exclusions[0] ? (
+                  <em>Not included: {details.exclusions[0]}</em>
+                ) : null}
               </label>
             ))}
           </div>
@@ -278,11 +300,14 @@ export function SupportCircleForm() {
               name="contributionMode"
               value="custom"
               checked={mode === "custom"}
+              disabled={!customAmountsIncluded}
               onChange={() => setMode("custom")}
             />
             <strong>Custom amounts</strong>
             <span>
-              Set your amount now; add supporter amounts after creation.
+              {customAmountsIncluded
+                ? "Set your amount now; add supporter amounts after creation."
+                : "Available on Support Standard and Premium."}
             </span>
           </label>
         </fieldset>
@@ -343,18 +368,38 @@ export function SupportCircleForm() {
               <input
                 type="checkbox"
                 name="hideIndividualAmounts"
-                defaultChecked
+                checked={hideIndividualAmounts}
+                disabled={!hiddenAmountsIncluded}
+                onChange={(event) =>
+                  setHideIndividualAmounts(event.target.checked)
+                }
               />
               <span>
                 <strong>Hide individual amounts</strong>
-                <small>Each member still sees their own records.</small>
+                <small>
+                  {hiddenAmountsIncluded
+                    ? "Each member still sees their own records."
+                    : "Available on Support Standard and Premium."}
+                </small>
               </span>
             </label>
             <label>
-              <input type="checkbox" name="requireCreatorApproval" />
+              <input
+                type="checkbox"
+                name="requireCreatorApproval"
+                checked={requireCreatorApproval}
+                disabled={!approvalIncluded}
+                onChange={(event) =>
+                  setRequireCreatorApproval(event.target.checked)
+                }
+              />
               <span>
                 <strong>Require creator approval</strong>
-                <small>New membership requests wait for approval.</small>
+                <small>
+                  {approvalIncluded
+                    ? "New membership requests wait for approval."
+                    : "Available on Support Standard and Premium."}
+                </small>
               </span>
             </label>
           </div>
@@ -448,11 +493,14 @@ export function SupportCircleForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    setPricingPlan(planForMemberCount(capacityIssue));
+                    setPricingPlan(
+                      planForMemberCount("support", capacityIssue),
+                    );
                     setCapacityIssue(null);
                   }}
                 >
-                  Upgrade to {planLabel(planForMemberCount(capacityIssue))}
+                  Upgrade to{" "}
+                  {planLabel(planForMemberCount("support", capacityIssue))}
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </button>
               ) : null}

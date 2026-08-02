@@ -21,6 +21,7 @@ The product is being delivered against an approved 18-milestone production plan.
 - In-app notifications, critical transactional email, preferences, muted circles, protected reminders, and deadline scheduling
 - Creator-controlled completion and cancellation, read-only archives, visible 30-day retention countdowns, reference-aware private file deletion, retryable scheduled purges, and minimal audit-safe historical records
 - Separate owner administration with aggregate platform health, purpose-limited abuse review, account suspension, compromised-invite revocation, approved operational exports, upload telemetry, and an immutable administrative audit trail
+- Model-specific one-time circle pricing for Gift, Aso-Ebi and Support, a server-enforced one-time three-member trial, versioned entitlements, historical activation prices, safe same-mode upgrade quotes, and a private owner pricing ledger
 - Security hardening, dependency review, private-upload controls, CSRF/origin enforcement, durable abuse controls, and browser security headers
 - Automated production builds, unit/integration/rendered-page coverage, Firebase Auth and Data Connect emulator E2E, lint, formatting, strict TypeScript, and the documented device QA matrix
 
@@ -91,8 +92,11 @@ Production requires:
 - A strong `AUTH_CHALLENGE_SECRET`
 - Production SMTP configuration for email OTP delivery
 - A strong `CRON_SECRET` for the authenticated retention purge job
+- An explicitly approved activation-payment provider and signed webhook configuration before paid circles can publish. Without it, activation fails closed and drafts remain safe.
 
 See [Firebase setup](docs/FIREBASE_SETUP.md) and [deployment guidance](docs/DEPLOYMENT.md).
+The pricing catalogue, trial, migration, payment and upgrade boundaries are documented in [model-specific pricing](docs/MODEL_SPECIFIC_PRICING.md).
+User-facing answers are maintained in [pricing and trial help](docs/PRICING_HELP.md).
 
 ## Verification
 

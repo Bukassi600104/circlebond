@@ -56,6 +56,8 @@ const child = (await portIsOpen(9399))
         "dataconnect",
         "--project",
         "bond-circle",
+        "--config",
+        "firebase.test.json",
         testCommand,
       ],
       { cwd: root, env, stdio: "inherit", windowsHide: true },

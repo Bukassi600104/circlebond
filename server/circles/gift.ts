@@ -14,7 +14,7 @@ export const GIFT_MEMBER_STATUSES = [
 ] as const;
 
 export function pricingPlanForCapacity(capacity: number) {
-  return planForMemberCount(capacity);
+  return planForMemberCount("gift", capacity);
 }
 
 export function calculateEqualSlotAllocations(

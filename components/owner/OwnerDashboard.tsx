@@ -10,6 +10,7 @@ import {
   Download,
   ExternalLink,
   FileWarning,
+  BadgeDollarSign,
   HeartPulse,
   Link2Off,
   Search,
@@ -19,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import type { loadOwnerOverview } from "@/server/repositories/owner";
+import { formatMinorNaira } from "@/lib/circle-pricing";
 import type {
   AdminPurpose,
   OperationalReport,
@@ -28,6 +30,7 @@ import type {
 type Overview = NonNullable<Awaited<ReturnType<typeof loadOwnerOverview>>>;
 type Section =
   | "overview"
+  | "pricing"
   | "abuse"
   | "invitations"
   | "retention"
@@ -40,6 +43,7 @@ const sections: Array<{
   icon: typeof BarChart3;
 }> = [
   { id: "overview", label: "Overview", icon: BarChart3 },
+  { id: "pricing", label: "Pricing", icon: BadgeDollarSign },
   { id: "abuse", label: "Abuse reports", icon: ShieldAlert },
   { id: "invitations", label: "Invite safety", icon: Link2Off },
   { id: "retention", label: "Retention", icon: ArchiveRestore },
@@ -435,6 +439,128 @@ export function OwnerDashboard({ overview }: { overview: Overview }) {
               </article>
             </div>
           </>
+        ) : null}
+
+        {section === "pricing" ? (
+          <div className="bc-owner-stack">
+            <div className="bc-owner-metrics">
+              <Metric
+                icon={BadgeDollarSign}
+                label="Recorded revenue"
+                value={formatMinorNaira(overview.pricing.revenueMinor)}
+                detail="Verified activation and upgrade payments only"
+              />
+              <Metric
+                icon={CheckCircle2}
+                label="Activations"
+                value={overview.pricing.activationCount}
+                detail={`${overview.pricing.upgradeCount} upgrades`}
+              />
+              <Metric
+                icon={Users}
+                label="Trial creators"
+                value={overview.pricing.trialCreators}
+                detail="One-time trial usage records"
+              />
+            </div>
+
+            <article className="bc-owner-panel">
+              <header>
+                <div>
+                  <h3>Active model-specific catalogue</h3>
+                  <p>
+                    Prices are shown in NGN. Contributors are never charged a
+                    BondCircle platform fee.
+                  </p>
+                </div>
+              </header>
+              <div className="bc-owner-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Mode and tier</th>
+                      <th>Price</th>
+                      <th>Members</th>
+                      <th>Co-admins</th>
+                      <th>Mode limit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {overview.pricing.current.map((plan) => (
+                      <tr key={plan.id}>
+                        <td>
+                          <strong>{label(plan.mode)}</strong>
+                          <small>{label(plan.tier)}</small>
+                        </td>
+                        <td>{formatMinorNaira(plan.priceMinor)}</td>
+                        <td>{plan.memberLimit}</td>
+                        <td>{plan.coAdminLimit}</td>
+                        <td>
+                          {plan.mode === "aso-ebi"
+                            ? `${plan.asoEbiTierLimit} tiers`
+                            : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article className="bc-owner-panel">
+              <header>
+                <div>
+                  <h3>Historical activation ledger</h3>
+                  <p>
+                    Each row retains the exact historical amount. Later price
+                    edits cannot reprice these records.
+                  </p>
+                </div>
+              </header>
+              <div className="bc-owner-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Activation</th>
+                      <th>Mode and tier</th>
+                      <th>Type</th>
+                      <th>Paid</th>
+                      <th>Status</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {overview.pricing.recentActivations.map((activation) => (
+                      <tr key={activation.id}>
+                        <td>{activation.id.slice(0, 10)}</td>
+                        <td>
+                          <strong>{label(activation.circleType)}</strong>
+                          <small>{label(activation.tier)}</small>
+                        </td>
+                        <td>{label(activation.activationType)}</td>
+                        <td>{formatMinorNaira(activation.pricePaidMinor)}</td>
+                        <td>
+                          <span
+                            className={`bc-owner-status is-${activation.status}`}
+                          >
+                            {label(activation.status)}
+                          </span>
+                        </td>
+                        <td>
+                          {compactDate.format(new Date(activation.createdAt))}
+                        </td>
+                      </tr>
+                    ))}
+                    {!overview.pricing.recentActivations.length ? (
+                      <tr>
+                        <td colSpan={6}>No activations recorded yet.</td>
+                      </tr>
+                    ) : null}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
         ) : null}
 
         {section === "abuse" ? (

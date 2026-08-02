@@ -92,6 +92,11 @@ export interface AuthAuditEvent_Key {
   __typename?: 'AuthAuditEvent_Key';
 }
 
+export interface CircleActivation_Key {
+  id: UUIDString;
+  __typename?: 'CircleActivation_Key';
+}
+
 export interface CircleAuditEntry_Key {
   id: UUIDString;
   __typename?: 'CircleAuditEntry_Key';
@@ -108,6 +113,24 @@ export interface Circle_Key {
   __typename?: 'Circle_Key';
 }
 
+export interface ClaimTrialAndPublishCircleData {
+  creatorTrialUsage_insert: CreatorTrialUsage_Key;
+  circleActivation_insert: CircleActivation_Key;
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+  activityLog_insert: ActivityLog_Key;
+}
+
+export interface ClaimTrialAndPublishCircleVariables {
+  activationId: UUIDString;
+  creatorId: string;
+  circleId: UUIDString;
+  circleEntityId: string;
+  planDefinitionId: string;
+  circleType: string;
+  activatedAt: TimestampString;
+}
+
 export interface CommentReport_Key {
   id: UUIDString;
   __typename?: 'CommentReport_Key';
@@ -116,6 +139,39 @@ export interface CommentReport_Key {
 export interface Comment_Key {
   id: UUIDString;
   __typename?: 'Comment_Key';
+}
+
+export interface CompleteCirclePlanUpgradeData {
+  circleActivation_update?: CircleActivation_Key | null;
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface CompleteCirclePlanUpgradeVariables {
+  activationId: UUIDString;
+  circleId: UUIDString;
+  creatorId: string;
+  targetPlan: string;
+  targetPlanDefinitionId: string;
+  targetMemberLimit: number;
+  targetActivationPrice: number;
+  targetActivationPriceMinor: number;
+  pricePaidMinor: number;
+  activatedAt: TimestampString;
+}
+
+export interface CompletePaidCircleActivationData {
+  circleActivation_update?: CircleActivation_Key | null;
+  circle_update?: Circle_Key | null;
+  circleAuditEntry_insert: CircleAuditEntry_Key;
+}
+
+export interface CompletePaidCircleActivationVariables {
+  activationId: UUIDString;
+  circleId: UUIDString;
+  creatorId: string;
+  pricePaidMinor: number;
+  activatedAt: TimestampString;
 }
 
 export interface CompleteRetentionPurgeAttemptData {
@@ -248,7 +304,29 @@ export interface CreateAsoEbiTierVariables {
   createdAt: TimestampString;
 }
 
+export interface CreateCircleActivationAttemptData {
+  circleActivation_insert: CircleActivation_Key;
+  circle_update?: Circle_Key | null;
+}
+
+export interface CreateCircleActivationAttemptVariables {
+  activationId: UUIDString;
+  circleId: UUIDString;
+  creatorId: string;
+  planDefinitionId: string;
+  activationType: string;
+  circleType: string;
+  tier: string;
+  listPriceMinor: number;
+  amountDueMinor: number;
+  provider: string;
+  providerReference: string;
+  previousActivationId?: UUIDString | null;
+  createdAt: TimestampString;
+}
+
 export interface CreateCircleDraftData {
+  pricingPlanDefinition_upsert: PricingPlanDefinition_Key;
   circle_insert: Circle_Key;
   circleMembership_insert: CircleMembership_Key;
   circleAuditEntry_insert: CircleAuditEntry_Key;
@@ -263,7 +341,18 @@ export interface CreateCircleDraftVariables {
   targetAmount: number;
   pricingPlan: string;
   memberLimit: number;
+  planMemberLimit: number;
   activationPrice: number;
+  activationPriceMinor: number;
+  pricingModelVersion: string;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
+  coAdminLimit: number;
+  asoEbiTierLimit: number;
+  entitlements: string;
+  inclusions: string;
+  exclusions: string;
+  pricingEffectiveAt: TimestampString;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -364,6 +453,11 @@ export interface CreateSupportUpdateVariables {
   createdAt: TimestampString;
 }
 
+export interface CreatorTrialUsage_Key {
+  creatorId: string;
+  __typename?: 'CreatorTrialUsage_Key';
+}
+
 export interface DeclineInvitationData {
   invitationAcceptance_insert: InvitationAcceptance_Key;
   invitation_update?: Invitation_Key | null;
@@ -427,6 +521,18 @@ export interface EmailDelivery_Key {
   __typename?: 'EmailDelivery_Key';
 }
 
+export interface FailCircleActivationAttemptData {
+  circleActivation_update?: CircleActivation_Key | null;
+  circle_update?: Circle_Key | null;
+}
+
+export interface FailCircleActivationAttemptVariables {
+  activationId: UUIDString;
+  circleId: UUIDString;
+  failureCode: string;
+  failedAt: TimestampString;
+}
+
 export interface FindNotificationRecipientByEmailData {
   users: ({
     id: string;
@@ -470,10 +576,10 @@ export interface GetActivityLogsForCirclesData {
       name: string;
       type: string;
     } & Circle_Key;
-      actor?: {
-        id: string;
-        displayName: string;
-      } & User_Key;
+    actor?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
   } & ActivityLog_Key)[];
 }
 
@@ -509,39 +615,39 @@ export interface GetAsoEbiCircleDetailData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    asoEbiTiers: ({
+  asoEbiTiers: ({
+    id: UUIDString;
+    name: string;
+    price: number;
+    fabricDescription: string;
+    fabricImageUrl?: string | null;
+    fabricImageStoragePath?: string | null;
+    appreciationGiftName?: string | null;
+    appreciationGiftImageUrl?: string | null;
+    appreciationGiftImageStoragePath?: string | null;
+    availabilityNote?: string | null;
+    deliveryDetails?: string | null;
+    sortOrder: number;
+  } & AsoEbiTier_Key)[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    fulfilmentStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    selectedAsoEbiTier?: {
       id: UUIDString;
       name: string;
       price: number;
-      fabricDescription: string;
-      fabricImageUrl?: string | null;
-      fabricImageStoragePath?: string | null;
-      appreciationGiftName?: string | null;
-      appreciationGiftImageUrl?: string | null;
-      appreciationGiftImageStoragePath?: string | null;
-      availabilityNote?: string | null;
-      deliveryDetails?: string | null;
-      sortOrder: number;
-    } & AsoEbiTier_Key)[];
-      circleMemberships: ({
-        role: string;
-        membershipStatus: string;
-        contributionStatus: string;
-        fulfilmentStatus: string;
-        expectedAmount: number;
-        confirmedAmount: number;
-        selectedAsoEbiTier?: {
-          id: UUIDString;
-          name: string;
-          price: number;
-        } & AsoEbiTier_Key;
-          user: {
-            id: string;
-            displayName: string;
-            email?: string | null;
-            profileImage?: string | null;
-          } & User_Key;
-      })[];
+    } & AsoEbiTier_Key;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
 }
 
 export interface GetAsoEbiCircleDetailVariables {
@@ -573,75 +679,78 @@ export interface GetCircleCommunicationData {
     type: string;
     status: string;
     commentsEnabled: boolean;
+    memberLimit: number;
+    pricingPlan: string;
+    pricingModelVersion: string;
     creator: {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      membershipStatus: string;
-      expectedAmount: number;
-      confirmedAmount: number;
-      user: {
-        id: string;
-        displayName: string;
-        profileImage?: string | null;
-      } & User_Key;
-    })[];
-      announcements: ({
-        id: UUIDString;
-        title: string;
-        body: string;
-        pinned: boolean;
-        important: boolean;
-        commentsEnabled: boolean;
-        createdAt: TimestampString;
-        updatedAt: TimestampString;
-        author: {
-          id: string;
-          displayName: string;
-        } & User_Key;
-      } & Announcement_Key)[];
-        comments: ({
-          id: UUIDString;
-          announcementId?: UUIDString | null;
-          parentCommentId?: UUIDString | null;
-          body: string;
-          status: string;
-          deletionReason?: string | null;
-          createdAt: TimestampString;
-          updatedAt: TimestampString;
-          deletedAt?: TimestampString | null;
-          author: {
-            id: string;
-            displayName: string;
-            profileImage?: string | null;
-          } & User_Key;
-        } & Comment_Key)[];
-          commentReports: ({
-            id: UUIDString;
-            reason: string;
-            status: string;
-            createdAt: TimestampString;
-            comment: {
-              id: UUIDString;
-            } & Comment_Key;
-              reporter: {
-                id: string;
-                displayName: string;
-              } & User_Key;
-          } & CommentReport_Key)[];
-            activityLogs: ({
-              id: UUIDString;
-              eventType: string;
-              entityId: string;
-              metadata: string;
-              createdAt: TimestampString;
-              actor?: {
-                id: string;
-                displayName: string;
-              } & User_Key;
-            } & ActivityLog_Key)[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+  announcements: ({
+    id: UUIDString;
+    title: string;
+    body: string;
+    pinned: boolean;
+    important: boolean;
+    commentsEnabled: boolean;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Announcement_Key)[];
+  comments: ({
+    id: UUIDString;
+    announcementId?: UUIDString | null;
+    parentCommentId?: UUIDString | null;
+    body: string;
+    status: string;
+    deletionReason?: string | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    author: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  } & Comment_Key)[];
+  commentReports: ({
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    comment: {
+      id: UUIDString;
+    } & Comment_Key;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & CommentReport_Key)[];
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    entityId: string;
+    metadata: string;
+    createdAt: TimestampString;
+    actor?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & ActivityLog_Key)[];
 }
 
 export interface GetCircleCommunicationVariables {
@@ -658,6 +767,11 @@ export interface GetCircleEngineRecordData {
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
+    activationPriceMinor: number;
+    pricingModelVersion: string;
+    pricingPlanDefinitionId?: string | null;
+    activationStatus: string;
+    activatedAt?: TimestampString | null;
     deadline?: DateString | null;
     eventDate?: DateString | null;
     status: string;
@@ -672,13 +786,13 @@ export interface GetCircleEngineRecordData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      membershipStatus: string;
-      user: {
-        id: string;
-      } & User_Key;
-    })[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    user: {
+      id: string;
+    } & User_Key;
+  })[];
 }
 
 export interface GetCircleEngineRecordVariables {
@@ -725,23 +839,59 @@ export interface GetCircleLifecycleSummaryData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      user: {
-        id: string;
-      } & User_Key;
-    })[];
-      activityLogs: ({
-        id: UUIDString;
-        eventType: string;
-        createdAt: TimestampString;
-        actor?: {
-          id: string;
-          displayName: string;
-        } & User_Key;
-      } & ActivityLog_Key)[];
+  circleMemberships: ({
+    user: {
+      id: string;
+    } & User_Key;
+  })[];
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    createdAt: TimestampString;
+    actor?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & ActivityLog_Key)[];
 }
 
 export interface GetCircleLifecycleSummaryVariables {
+  circleId: UUIDString;
+}
+
+export interface GetCirclePricingStateData {
+  circle?: {
+    id: UUIDString;
+    creator: {
+      id: string;
+    } & User_Key;
+    type: string;
+    pricingPlan: string;
+    pricingModelVersion: string;
+    pricingPlanDefinitionId?: string | null;
+    memberLimit: number;
+    activationStatus: string;
+    activationPriceMinor: number;
+    activatedAt?: TimestampString | null;
+    status: string;
+  } & Circle_Key;
+  circleActivations: ({
+    id: UUIDString;
+    activationType: string;
+    tier: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    providerReference?: string | null;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+    activatedAt?: TimestampString | null;
+  } & CircleActivation_Key)[];
+}
+
+export interface GetCirclePricingStateVariables {
   circleId: UUIDString;
 }
 
@@ -754,26 +904,26 @@ export interface GetCircleRetentionPayloadData {
     purgeAt?: TimestampString | null;
     imageStoragePath?: string | null;
   } & Circle_Key;
-    receipts: ({
-      id: UUIDString;
-      imageStoragePath: string;
-    } & Receipt_Key)[];
-      circleMemberships: ({
-        receiptStoragePath?: string | null;
-      })[];
-        asoEbiTiers: ({
-          fabricImageStoragePath?: string | null;
-          appreciationGiftImageStoragePath?: string | null;
-        })[];
-          retentionPurgeAttempts: ({
-            attemptNumber: number;
-            status: string;
-            startedAt: TimestampString;
-            nextRetryAt?: TimestampString | null;
-          })[];
-            invitations: ({
-              id: UUIDString;
-            } & Invitation_Key)[];
+  receipts: ({
+    id: UUIDString;
+    imageStoragePath: string;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    receiptStoragePath?: string | null;
+  })[];
+  asoEbiTiers: ({
+    fabricImageStoragePath?: string | null;
+    appreciationGiftImageStoragePath?: string | null;
+  })[];
+  retentionPurgeAttempts: ({
+    attemptNumber: number;
+    status: string;
+    startedAt: TimestampString;
+    nextRetryAt?: TimestampString | null;
+  })[];
+  invitations: ({
+    id: UUIDString;
+  } & Invitation_Key)[];
 }
 
 export interface GetCircleRetentionPayloadVariables {
@@ -802,44 +952,57 @@ export interface GetContributionWorkspaceData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      membershipStatus: string;
-      contributionStatus: string;
-      expectedAmount: number;
-      confirmedAmount: number;
-      user: {
-        id: string;
-        displayName: string;
-        profileImage?: string | null;
-      } & User_Key;
-    })[];
-      receipts: ({
-        id: UUIDString;
-        amount: number;
-        note?: string | null;
-        imageUrl: string;
-        imageStoragePath: string;
-        contentType: string;
-        status: string;
-        overpaymentAmount: number;
-        replacementOfId?: UUIDString | null;
-        rejectionReason?: string | null;
-        submittedAt: TimestampString;
-        reviewedAt?: TimestampString | null;
-        uploadedBy: {
-          id: string;
-          displayName: string;
-        } & User_Key;
-          reviewedBy?: {
-            id: string;
-            displayName: string;
-          } & User_Key;
-      } & Receipt_Key)[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+  receipts: ({
+    id: UUIDString;
+    amount: number;
+    note?: string | null;
+    imageUrl: string;
+    imageStoragePath: string;
+    contentType: string;
+    status: string;
+    overpaymentAmount: number;
+    replacementOfId?: UUIDString | null;
+    rejectionReason?: string | null;
+    submittedAt: TimestampString;
+    reviewedAt?: TimestampString | null;
+    uploadedBy: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+    reviewedBy?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Receipt_Key)[];
 }
 
 export interface GetContributionWorkspaceVariables {
   circleId: UUIDString;
+}
+
+export interface GetCreatorTrialUsageData {
+  creatorTrialUsage?: {
+    usedAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  };
+}
+
+export interface GetCreatorTrialUsageVariables {
+  creatorId: string;
 }
 
 export interface GetCurrentUserData {
@@ -862,26 +1025,26 @@ export interface GetDashboardCirclesData {
     user: {
       id: string;
     } & User_Key;
-      circle: {
-        id: UUIDString;
-        name: string;
-        type: string;
-        imageUrl?: string | null;
-        targetAmount: number;
-        contributedAmount: number;
-        showTargetToMembers: boolean;
-        showConfirmedTotalToMembers: boolean;
-        memberCount: number;
-        memberLimit: number;
-        deadline?: DateString | null;
-        eventDate?: DateString | null;
-        status: string;
-        createdAt: TimestampString;
-        updatedAt: TimestampString;
-        creator: {
-          id: string;
-        } & User_Key;
-      } & Circle_Key;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      imageUrl?: string | null;
+      targetAmount: number;
+      contributedAmount: number;
+      showTargetToMembers: boolean;
+      showConfirmedTotalToMembers: boolean;
+      memberCount: number;
+      memberLimit: number;
+      deadline?: DateString | null;
+      eventDate?: DateString | null;
+      status: string;
+      createdAt: TimestampString;
+      updatedAt: TimestampString;
+      creator: {
+        id: string;
+      } & User_Key;
+    } & Circle_Key;
   })[];
 }
 
@@ -917,6 +1080,7 @@ export interface GetGiftCircleDetailData {
     memberCount: number;
     memberLimit: number;
     pricingPlan: string;
+    pricingModelVersion: string;
     deadline?: DateString | null;
     status: string;
     completionType?: string | null;
@@ -928,21 +1092,21 @@ export interface GetGiftCircleDetailData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      membershipStatus: string;
-      contributionStatus: string;
-      expectedAmount: number;
-      pledgedAmount: number;
-      confirmedAmount: number;
-      receiptSubmittedAt?: TimestampString | null;
-      user: {
-        id: string;
-        displayName: string;
-        email?: string | null;
-        profileImage?: string | null;
-      } & User_Key;
-    })[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    pledgedAmount: number;
+    confirmedAmount: number;
+    receiptSubmittedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
 }
 
 export interface GetGiftCircleDetailVariables {
@@ -1004,13 +1168,13 @@ export interface GetInvitationByTokenHashData {
         displayName: string;
       } & User_Key;
     } & Circle_Key;
-      invitedBy: {
-        id: string;
-        displayName: string;
-      } & User_Key;
-        acceptedBy?: {
-          id: string;
-        } & User_Key;
+    invitedBy: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+    acceptedBy?: {
+      id: string;
+    } & User_Key;
   } & Invitation_Key)[];
 }
 
@@ -1024,6 +1188,9 @@ export interface GetNotificationContextData {
     name: string;
     type: string;
     status: string;
+    pricingPlan: string;
+    pricingModelVersion: string;
+    memberLimit: number;
     deadline?: DateString | null;
     creator: {
       id: string;
@@ -1035,21 +1202,21 @@ export interface GetNotificationContextData {
       circleUpdateNotifications: boolean;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      notificationsMuted: boolean;
-      expectedAmount: number;
-      confirmedAmount: number;
-      user: {
-        id: string;
-        displayName: string;
-        email?: string | null;
-        emailNotifications: boolean;
-        commentNotifications: boolean;
-        contributionReminders: boolean;
-        circleUpdateNotifications: boolean;
-      } & User_Key;
-    })[];
+  circleMemberships: ({
+    role: string;
+    notificationsMuted: boolean;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      emailNotifications: boolean;
+      commentNotifications: boolean;
+      contributionReminders: boolean;
+      circleUpdateNotifications: boolean;
+    } & User_Key;
+  })[];
 }
 
 export interface GetNotificationContextVariables {
@@ -1122,151 +1289,197 @@ export interface GetOwnerOperationalExportData {
     retentionDueAt?: TimestampString | null;
     purgeAt?: TimestampString | null;
   } & Circle_Key)[];
-    commentReports: ({
+  commentReports: ({
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    circle: {
       id: UUIDString;
-      reason: string;
-      status: string;
-      createdAt: TimestampString;
-      circle: {
-        id: UUIDString;
-        type: string;
-      } & Circle_Key;
-    } & CommentReport_Key)[];
-      retentionPurgeAttempts: ({
-        id: UUIDString;
-        status: string;
-        attemptNumber: number;
-        deletedFileCount: number;
-        skippedSharedFileCount: number;
-        failureReason?: string | null;
-        startedAt: TimestampString;
-        completedAt?: TimestampString | null;
-        circle: {
-          id: UUIDString;
-          type: string;
-        } & Circle_Key;
-      } & RetentionPurgeAttempt_Key)[];
+      type: string;
+    } & Circle_Key;
+  } & CommentReport_Key)[];
+  retentionPurgeAttempts: ({
+    id: UUIDString;
+    status: string;
+    attemptNumber: number;
+    deletedFileCount: number;
+    skippedSharedFileCount: number;
+    failureReason?: string | null;
+    startedAt: TimestampString;
+    completedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+      type: string;
+    } & Circle_Key;
+  } & RetentionPurgeAttempt_Key)[];
 }
 
 export interface GetOwnerPlatformOverviewData {
   totalUsers: ({
     _count: number;
   })[];
-    usersByStatus: ({
-      accountStatus: string;
-      _count: number;
-    })[];
-      totalCircles: ({
-        _count: number;
-      })[];
-        circlesByType: ({
-          type: string;
-          _count: number;
-        })[];
-          circlesByStatus: ({
-            status: string;
-            _count: number;
-          })[];
-            circlesByPlan: ({
-              pricingPlan: string;
-              _count: number;
-            })[];
-              invitationTotals: ({
-                _count: number;
-                acceptedAt_count: number;
-              })[];
-                uploadOutcomes: ({
-                  outcome: string;
-                  _count: number;
-                })[];
-                  reportStatuses: ({
-                    status: string;
-                    _count: number;
-                  })[];
-                    authOutcomes: ({
-                      outcome: string;
-                      _count: number;
-                    })[];
-                      emailOutcomes: ({
-                        status: string;
-                        _count: number;
-                      })[];
-                        retentionCandidates: ({
-                          _count: number;
-                        })[];
-                          retentionAttempts: ({
-                            id: UUIDString;
-                            status: string;
-                            attemptNumber: number;
-                            deletedFileCount: number;
-                            skippedSharedFileCount: number;
-                            failureReason?: string | null;
-                            nextRetryAt?: TimestampString | null;
-                            startedAt: TimestampString;
-                            completedAt?: TimestampString | null;
-                            circle: {
-                              id: UUIDString;
-                              type: string;
-                              status: string;
-                              retentionDueAt?: TimestampString | null;
-                            } & Circle_Key;
-                          } & RetentionPurgeAttempt_Key)[];
-                            reportedComments: ({
-                              id: UUIDString;
-                              reason: string;
-                              status: string;
-                              createdAt: TimestampString;
-                              reporter: {
-                                id: string;
-                                displayName: string;
-                              } & User_Key;
-                                comment: {
-                                  id: UUIDString;
-                                  status: string;
-                                  author: {
-                                    id: string;
-                                    displayName: string;
-                                    accountStatus: string;
-                                  } & User_Key;
-                                } & Comment_Key;
-                                  circle: {
-                                    id: UUIDString;
-                                    name: string;
-                                    type: string;
-                                  } & Circle_Key;
-                            } & CommentReport_Key)[];
-                              activeInvitations: ({
-                                id: UUIDString;
-                                mode: string;
-                                state: string;
-                                useCount: number;
-                                maxUses: number;
-                                expiresAt: TimestampString;
-                                createdAt: TimestampString;
-                                circle: {
-                                  id: UUIDString;
-                                  name: string;
-                                  type: string;
-                                } & Circle_Key;
-                                  invitedBy: {
-                                    id: string;
-                                    displayName: string;
-                                  } & User_Key;
-                              } & Invitation_Key)[];
-                                recentAdminActions: ({
-                                  id: UUIDString;
-                                  action: string;
-                                  targetType: string;
-                                  targetId: string;
-                                  purpose: string;
-                                  outcome: string;
-                                  metadata: string;
-                                  createdAt: TimestampString;
-                                  actor: {
-                                    id: string;
-                                    displayName: string;
-                                  } & User_Key;
-                                } & OwnerAdminAuditEvent_Key)[];
+  usersByStatus: ({
+    accountStatus: string;
+    _count: number;
+  })[];
+  totalCircles: ({
+    _count: number;
+  })[];
+  circlesByType: ({
+    type: string;
+    _count: number;
+  })[];
+  circlesByStatus: ({
+    status: string;
+    _count: number;
+  })[];
+  circlesByPlan: ({
+    pricingPlan: string;
+    _count: number;
+  })[];
+  trialUsageTotals: ({
+    _count: number;
+  })[];
+  pricingDefinitions: ({
+    id: string;
+    circleType: string;
+    tier: string;
+    version: number;
+    currency: string;
+    priceMinor: number;
+    memberLimit: number;
+    coAdminLimit: number;
+    asoEbiTierLimit: number;
+    effectiveAt: TimestampString;
+    retiredAt?: TimestampString | null;
+  } & PricingPlanDefinition_Key)[];
+  circleActivations: ({
+    id: UUIDString;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+  } & CircleActivation_Key)[];
+  pricingChangeAudits: ({
+    id: UUIDString;
+    action: string;
+    effectiveAt: TimestampString;
+    createdAt: TimestampString;
+    planDefinition: {
+      id: string;
+      circleType: string;
+      tier: string;
+      priceMinor: number;
+    } & PricingPlanDefinition_Key;
+    actor: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & PricingChangeAudit_Key)[];
+  invitationTotals: ({
+    _count: number;
+    acceptedAt_count: number;
+  })[];
+  uploadOutcomes: ({
+    outcome: string;
+    _count: number;
+  })[];
+  reportStatuses: ({
+    status: string;
+    _count: number;
+  })[];
+  authOutcomes: ({
+    outcome: string;
+    _count: number;
+  })[];
+  emailOutcomes: ({
+    status: string;
+    _count: number;
+  })[];
+  retentionCandidates: ({
+    _count: number;
+  })[];
+  retentionAttempts: ({
+    id: UUIDString;
+    status: string;
+    attemptNumber: number;
+    deletedFileCount: number;
+    skippedSharedFileCount: number;
+    failureReason?: string | null;
+    nextRetryAt?: TimestampString | null;
+    startedAt: TimestampString;
+    completedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+      type: string;
+      status: string;
+      retentionDueAt?: TimestampString | null;
+    } & Circle_Key;
+  } & RetentionPurgeAttempt_Key)[];
+  reportedComments: ({
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+    comment: {
+      id: UUIDString;
+      status: string;
+      author: {
+        id: string;
+        displayName: string;
+        accountStatus: string;
+      } & User_Key;
+    } & Comment_Key;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
+  } & CommentReport_Key)[];
+  activeInvitations: ({
+    id: UUIDString;
+    mode: string;
+    state: string;
+    useCount: number;
+    maxUses: number;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
+    invitedBy: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Invitation_Key)[];
+  recentAdminActions: ({
+    id: UUIDString;
+    action: string;
+    targetType: string;
+    targetId: string;
+    purpose: string;
+    outcome: string;
+    metadata: string;
+    createdAt: TimestampString;
+    actor: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & OwnerAdminAuditEvent_Key)[];
 }
 
 export interface GetOwnerReportReviewData {
@@ -1279,22 +1492,22 @@ export interface GetOwnerReportReviewData {
       id: string;
       displayName: string;
     } & User_Key;
-      comment: {
-        id: UUIDString;
-        body: string;
-        status: string;
-        createdAt: TimestampString;
-        author: {
-          id: string;
-          displayName: string;
-          accountStatus: string;
-        } & User_Key;
-      } & Comment_Key;
-        circle: {
-          id: UUIDString;
-          name: string;
-          type: string;
-        } & Circle_Key;
+    comment: {
+      id: UUIDString;
+      body: string;
+      status: string;
+      createdAt: TimestampString;
+      author: {
+        id: string;
+        displayName: string;
+        accountStatus: string;
+      } & User_Key;
+    } & Comment_Key;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
   } & CommentReport_Key;
 }
 
@@ -1310,13 +1523,13 @@ export interface GetOwnerUserByIdentifierData {
     accountStatus: string;
     suspendedAt?: TimestampString | null;
   } & User_Key;
-    usersByEmail: ({
-      id: string;
-      displayName: string;
-      email?: string | null;
-      accountStatus: string;
-      suspendedAt?: TimestampString | null;
-    } & User_Key)[];
+  usersByEmail: ({
+    id: string;
+    displayName: string;
+    email?: string | null;
+    accountStatus: string;
+    suspendedAt?: TimestampString | null;
+  } & User_Key)[];
 }
 
 export interface GetOwnerUserByIdentifierVariables {
@@ -1375,29 +1588,29 @@ export interface GetStoragePathReferencesData {
   circles: ({
     id: UUIDString;
   } & Circle_Key)[];
-    receipts: ({
+  receipts: ({
+    id: UUIDString;
+    circle: {
       id: UUIDString;
-      circle: {
-        id: UUIDString;
-      } & Circle_Key;
-    } & Receipt_Key)[];
-      circleMemberships: ({
-        circle: {
-          id: UUIDString;
-        } & Circle_Key;
-      })[];
-        fabricReferences: ({
-          id: UUIDString;
-          circle: {
-            id: UUIDString;
-          } & Circle_Key;
-        } & AsoEbiTier_Key)[];
-          giftReferences: ({
-            id: UUIDString;
-            circle: {
-              id: UUIDString;
-            } & Circle_Key;
-          } & AsoEbiTier_Key)[];
+    } & Circle_Key;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  })[];
+  fabricReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
+  giftReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
 }
 
 export interface GetStoragePathReferencesVariables {
@@ -1430,6 +1643,7 @@ export interface GetSupportCircleDetailData {
     memberCount: number;
     memberLimit: number;
     pricingPlan: string;
+    pricingModelVersion: string;
     deadline?: DateString | null;
     status: string;
     completedAt?: TimestampString | null;
@@ -1440,29 +1654,29 @@ export interface GetSupportCircleDetailData {
       id: string;
     } & User_Key;
   } & Circle_Key;
-    circleMemberships: ({
-      role: string;
-      membershipStatus: string;
-      contributionStatus: string;
-      expectedAmount: number;
-      pledgedAmount: number;
-      confirmedAmount: number;
-      user: {
-        id: string;
-        displayName: string;
-        email?: string | null;
-        profileImage?: string | null;
-      } & User_Key;
-    })[];
-      supportUpdates: ({
-        id: UUIDString;
-        body: string;
-        createdAt: TimestampString;
-        author: {
-          id: string;
-          displayName: string;
-        } & User_Key;
-      } & SupportUpdate_Key)[];
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    pledgedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+  supportUpdates: ({
+    id: UUIDString;
+    body: string;
+    createdAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & SupportUpdate_Key)[];
 }
 
 export interface GetSupportCircleDetailVariables {
@@ -1505,29 +1719,29 @@ export interface GetUserNotificationsData {
     circleUpdateNotifications: boolean;
     marketingCommunication: boolean;
   } & User_Key;
-    notifications: ({
+  notifications: ({
+    id: UUIDString;
+    type: string;
+    title: string;
+    body: string;
+    deepLink: string;
+    readAt?: TimestampString | null;
+    createdAt: TimestampString;
+    circle?: {
       id: UUIDString;
+      name: string;
       type: string;
-      title: string;
-      body: string;
-      deepLink: string;
-      readAt?: TimestampString | null;
-      createdAt: TimestampString;
-      circle?: {
-        id: UUIDString;
-        name: string;
-        type: string;
-      } & Circle_Key;
-    } & Notification_Key)[];
-      circleMemberships: ({
-        notificationsMuted: boolean;
-        membershipStatus: string;
-        circle: {
-          id: UUIDString;
-          name: string;
-          type: string;
-        } & Circle_Key;
-      })[];
+    } & Circle_Key;
+  } & Notification_Key)[];
+  circleMemberships: ({
+    notificationsMuted: boolean;
+    membershipStatus: string;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+    } & Circle_Key;
+  })[];
 }
 
 export interface GetUserNotificationsVariables {
@@ -1596,6 +1810,16 @@ export interface OwnerAdminAuditEvent_Key {
 export interface OwnerAdministrator_Key {
   userId: string;
   __typename?: 'OwnerAdministrator_Key';
+}
+
+export interface PricingChangeAudit_Key {
+  id: UUIDString;
+  __typename?: 'PricingChangeAudit_Key';
+}
+
+export interface PricingPlanDefinition_Key {
+  id: string;
+  __typename?: 'PricingPlanDefinition_Key';
 }
 
 export interface ProvisionOwnerAccountData {
@@ -2012,6 +2236,9 @@ export interface UpdateCircleConfigurationWithAuditVariables {
   pricingPlan: string;
   memberLimit: number;
   activationPrice: number;
+  activationPriceMinor: number;
+  pricingPlanDefinitionId: string;
+  activationStatus: string;
   deadline?: DateString | null;
   eventDate?: DateString | null;
   visibility: string;
@@ -2221,6 +2448,90 @@ export const createCircleDraftRef: CreateCircleDraftRef;
 
 export function createCircleDraft(vars: CreateCircleDraftVariables): MutationPromise<CreateCircleDraftData, CreateCircleDraftVariables>;
 export function createCircleDraft(dc: DataConnect, vars: CreateCircleDraftVariables): MutationPromise<CreateCircleDraftData, CreateCircleDraftVariables>;
+
+interface GetCreatorTrialUsageRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCreatorTrialUsageVariables): QueryRef<GetCreatorTrialUsageData, GetCreatorTrialUsageVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCreatorTrialUsageVariables): QueryRef<GetCreatorTrialUsageData, GetCreatorTrialUsageVariables>;
+  operationName: string;
+}
+export const getCreatorTrialUsageRef: GetCreatorTrialUsageRef;
+
+export function getCreatorTrialUsage(vars: GetCreatorTrialUsageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCreatorTrialUsageData, GetCreatorTrialUsageVariables>;
+export function getCreatorTrialUsage(dc: DataConnect, vars: GetCreatorTrialUsageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCreatorTrialUsageData, GetCreatorTrialUsageVariables>;
+
+interface ClaimTrialAndPublishCircleRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ClaimTrialAndPublishCircleVariables): MutationRef<ClaimTrialAndPublishCircleData, ClaimTrialAndPublishCircleVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ClaimTrialAndPublishCircleVariables): MutationRef<ClaimTrialAndPublishCircleData, ClaimTrialAndPublishCircleVariables>;
+  operationName: string;
+}
+export const claimTrialAndPublishCircleRef: ClaimTrialAndPublishCircleRef;
+
+export function claimTrialAndPublishCircle(vars: ClaimTrialAndPublishCircleVariables): MutationPromise<ClaimTrialAndPublishCircleData, ClaimTrialAndPublishCircleVariables>;
+export function claimTrialAndPublishCircle(dc: DataConnect, vars: ClaimTrialAndPublishCircleVariables): MutationPromise<ClaimTrialAndPublishCircleData, ClaimTrialAndPublishCircleVariables>;
+
+interface GetCirclePricingStateRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCirclePricingStateVariables): QueryRef<GetCirclePricingStateData, GetCirclePricingStateVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetCirclePricingStateVariables): QueryRef<GetCirclePricingStateData, GetCirclePricingStateVariables>;
+  operationName: string;
+}
+export const getCirclePricingStateRef: GetCirclePricingStateRef;
+
+export function getCirclePricingState(vars: GetCirclePricingStateVariables, options?: ExecuteQueryOptions): QueryPromise<GetCirclePricingStateData, GetCirclePricingStateVariables>;
+export function getCirclePricingState(dc: DataConnect, vars: GetCirclePricingStateVariables, options?: ExecuteQueryOptions): QueryPromise<GetCirclePricingStateData, GetCirclePricingStateVariables>;
+
+interface CreateCircleActivationAttemptRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateCircleActivationAttemptVariables): MutationRef<CreateCircleActivationAttemptData, CreateCircleActivationAttemptVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateCircleActivationAttemptVariables): MutationRef<CreateCircleActivationAttemptData, CreateCircleActivationAttemptVariables>;
+  operationName: string;
+}
+export const createCircleActivationAttemptRef: CreateCircleActivationAttemptRef;
+
+export function createCircleActivationAttempt(vars: CreateCircleActivationAttemptVariables): MutationPromise<CreateCircleActivationAttemptData, CreateCircleActivationAttemptVariables>;
+export function createCircleActivationAttempt(dc: DataConnect, vars: CreateCircleActivationAttemptVariables): MutationPromise<CreateCircleActivationAttemptData, CreateCircleActivationAttemptVariables>;
+
+interface FailCircleActivationAttemptRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: FailCircleActivationAttemptVariables): MutationRef<FailCircleActivationAttemptData, FailCircleActivationAttemptVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: FailCircleActivationAttemptVariables): MutationRef<FailCircleActivationAttemptData, FailCircleActivationAttemptVariables>;
+  operationName: string;
+}
+export const failCircleActivationAttemptRef: FailCircleActivationAttemptRef;
+
+export function failCircleActivationAttempt(vars: FailCircleActivationAttemptVariables): MutationPromise<FailCircleActivationAttemptData, FailCircleActivationAttemptVariables>;
+export function failCircleActivationAttempt(dc: DataConnect, vars: FailCircleActivationAttemptVariables): MutationPromise<FailCircleActivationAttemptData, FailCircleActivationAttemptVariables>;
+
+interface CompletePaidCircleActivationRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CompletePaidCircleActivationVariables): MutationRef<CompletePaidCircleActivationData, CompletePaidCircleActivationVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CompletePaidCircleActivationVariables): MutationRef<CompletePaidCircleActivationData, CompletePaidCircleActivationVariables>;
+  operationName: string;
+}
+export const completePaidCircleActivationRef: CompletePaidCircleActivationRef;
+
+export function completePaidCircleActivation(vars: CompletePaidCircleActivationVariables): MutationPromise<CompletePaidCircleActivationData, CompletePaidCircleActivationVariables>;
+export function completePaidCircleActivation(dc: DataConnect, vars: CompletePaidCircleActivationVariables): MutationPromise<CompletePaidCircleActivationData, CompletePaidCircleActivationVariables>;
+
+interface CompleteCirclePlanUpgradeRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CompleteCirclePlanUpgradeVariables): MutationRef<CompleteCirclePlanUpgradeData, CompleteCirclePlanUpgradeVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CompleteCirclePlanUpgradeVariables): MutationRef<CompleteCirclePlanUpgradeData, CompleteCirclePlanUpgradeVariables>;
+  operationName: string;
+}
+export const completeCirclePlanUpgradeRef: CompleteCirclePlanUpgradeRef;
+
+export function completeCirclePlanUpgrade(vars: CompleteCirclePlanUpgradeVariables): MutationPromise<CompleteCirclePlanUpgradeData, CompleteCirclePlanUpgradeVariables>;
+export function completeCirclePlanUpgrade(dc: DataConnect, vars: CompleteCirclePlanUpgradeVariables): MutationPromise<CompleteCirclePlanUpgradeData, CompleteCirclePlanUpgradeVariables>;
 
 interface UpdateCircleConfigurationWithAuditRef {
   /* Allow users to create refs without passing in DataConnect */

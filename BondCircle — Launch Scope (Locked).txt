@@ -233,3 +233,12 @@ Error States
 Offline State
 
 Loading States
+
+MODEL-SPECIFIC PRICING LAUNCH ADDENDUM
+
+Launch scope includes mode-specific pricing cards, one-time trial eligibility,
+free draft saving, activation-required publication, safe payment pending and
+failure states, same-mode upgrades without data loss, historical activation
+pricing, server-side feature gates, a grandfathered legacy path, and a private
+owner pricing/activation ledger. A paid activation provider is a hard launch
+gate; production must fail closed rather than simulate success when absent.

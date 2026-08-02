@@ -10,6 +10,7 @@ import {
   type OperationalReport,
   type SuspensionReason,
 } from "@/server/owner/rules";
+import { MODEL_SPECIFIC_PRICING } from "@/lib/circle-pricing";
 
 type CountRow = { _count: number };
 type GroupedCount = CountRow & Record<string, string>;
@@ -88,6 +89,47 @@ type OverviewQuery = {
   circlesByType: GroupedCount[];
   circlesByStatus: GroupedCount[];
   circlesByPlan: GroupedCount[];
+  trialUsageTotals: CountRow[];
+  pricingDefinitions: Array<{
+    id: string;
+    circleType: string;
+    tier: string;
+    version: number;
+    currency: string;
+    priceMinor: number;
+    memberLimit: number;
+    coAdminLimit: number;
+    asoEbiTierLimit: number;
+    effectiveAt: string;
+    retiredAt?: string | null;
+  }>;
+  circleActivations: Array<{
+    id: string;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    createdAt: string;
+    paidAt?: string | null;
+  }>;
+  pricingChangeAudits: Array<{
+    id: string;
+    action: string;
+    effectiveAt: string;
+    createdAt: string;
+    planDefinition: {
+      id: string;
+      circleType: string;
+      tier: string;
+      priceMinor: number;
+    };
+    actor: { id: string; displayName: string };
+  }>;
   invitationTotals: Array<CountRow & { acceptedAt_count: number }>;
   uploadOutcomes: GroupedCount[];
   reportStatuses: GroupedCount[];
@@ -177,6 +219,32 @@ export async function loadOwnerOverview(actorId: string) {
   );
   const { firebaseConfigured, sqlConnectConfigured } =
     getFoundationConfigStatus();
+  const successfulActivations = data.circleActivations.filter(
+    ({ status }) => status === "succeeded",
+  );
+  const revenueByModeTier = successfulActivations.reduce<
+    Record<string, number>
+  >((summary, activation) => {
+    const key = `${activation.circleType}:${activation.tier}`;
+    summary[key] = (summary[key] ?? 0) + activation.pricePaidMinor;
+    return summary;
+  }, {});
+  const currentPricing = Object.values(MODEL_SPECIFIC_PRICING).flatMap(
+    (plans) =>
+      Object.values(plans).map((plan) => ({
+        id: plan.id,
+        mode: plan.mode,
+        tier: plan.tier,
+        currency: plan.currency,
+        priceMinor: plan.priceMinor,
+        memberLimit: plan.memberLimit,
+        coAdminLimit: plan.coAdminLimit,
+        asoEbiTierLimit: plan.asoEbiTierLimit,
+        entitlements: [...plan.entitlements],
+        inclusions: [...plan.inclusions],
+        exclusions: [...plan.exclusions],
+      })),
+  );
 
   return {
     owner: {
@@ -206,6 +274,22 @@ export async function loadOwnerOverview(actorId: string) {
       emailOutcomes: grouped(data.emailOutcomes, "status"),
       retentionPending: firstCount(data.retentionCandidates),
       latestRetentionStatus: data.retentionAttempts[0]?.status ?? "not_run_yet",
+    },
+    pricing: {
+      current: currentPricing,
+      definitions: data.pricingDefinitions,
+      recentActivations: data.circleActivations.slice(0, 50),
+      recentChanges: data.pricingChangeAudits,
+      trialCreators: firstCount(data.trialUsageTotals),
+      activationCount: successfulActivations.length,
+      upgradeCount: successfulActivations.filter(
+        ({ activationType }) => activationType === "upgrade",
+      ).length,
+      revenueMinor: successfulActivations.reduce(
+        (sum, activation) => sum + activation.pricePaidMinor,
+        0,
+      ),
+      revenueByModeTier,
     },
     retentionAttempts: data.retentionAttempts,
     reports: data.reportedComments,

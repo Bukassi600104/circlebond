@@ -357,3 +357,21 @@ Archive it.
 Return to create another circle from the same account.
 
 If those ten tasks work end-to-end without manual intervention or broken flows, BondCircle V1 is considered production-ready.
+
+MODEL-SPECIFIC PRICING ADDENDUM — 2 AUGUST 2026
+
+The retired universal plan is replaced for new circles by one-time,
+creator-paid Gift, Aso-Ebi and Support plans. Approved prices are:
+
+Gift: Starter ₦1,500; Standard ₦3,500; Premium ₦7,500.
+Aso-Ebi: Starter ₦3,500; Standard ₦7,500; Premium ₦15,000.
+Support: Starter ₦1,000; Standard ₦2,500; Premium ₦5,000.
+
+Starter, Standard and Premium allow 10, 30 and 100 total members. One basic
+three-member first-circle trial is available once per creator account across
+all modes. Drafting is free; paid publication requires a verified activation.
+Contributors and invitees are never charged a platform fee, and BondCircle
+does not hold or deduct from contribution funds. Feature gates, co-admin limits
+and Aso-Ebi tier limits are server-authorized. Existing circles are
+grandfathered without capacity or feature loss. Full rules are maintained in
+docs/MODEL_SPECIFIC_PRICING.md.

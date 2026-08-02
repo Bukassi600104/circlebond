@@ -1,5 +1,10 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import {
+  isCirclePricingPlan,
+  PRICING_EFFECTIVE_AT,
+  pricingForCircle,
+} from "@/lib/circle-pricing";
 import type {
   CircleRecord,
   CircleStore,
@@ -22,6 +27,11 @@ type CircleEngineQuery = {
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
+    activationPriceMinor: number;
+    pricingModelVersion: string;
+    pricingPlanDefinitionId?: string | null;
+    activationStatus: string;
+    activatedAt?: string | null;
     deadline?: string | null;
     eventDate?: string | null;
     status: string;
@@ -50,9 +60,14 @@ function mapCircle(
     type: circle.type as CircleType,
     title: circle.name,
     description: circle.description,
-    pricingPlan: circle.pricingPlan as PricingPlan,
+    pricingPlan: circle.pricingPlan as PricingPlan | "free" | "legacy",
     memberLimit: circle.memberLimit,
     activationPrice: circle.activationPrice,
+    activationPriceMinor: circle.activationPriceMinor,
+    pricingModelVersion: circle.pricingModelVersion,
+    pricingPlanDefinitionId: circle.pricingPlanDefinitionId ?? null,
+    activationStatus: circle.activationStatus,
+    activatedAt: circle.activatedAt ?? null,
     deadline: circle.deadline ?? null,
     eventDate: circle.eventDate ?? null,
     status: circle.status as CircleState,
@@ -79,6 +94,10 @@ export class FirebaseCircleStore implements CircleStore {
     circle: Omit<CircleRecord, "id" | "creatorId">,
     creatorId: string,
   ) {
+    if (!isCirclePricingPlan(circle.pricingPlan)) {
+      throw new Error("New circles require a model-specific pricing plan.");
+    }
+    const plan = pricingForCircle(circle.type, circle.pricingPlan);
     const response = await getBondCircleDataConnect().executeMutation<
       { circle_insert: { id: string } },
       {
@@ -89,7 +108,18 @@ export class FirebaseCircleStore implements CircleStore {
         targetAmount: number;
         pricingPlan: string;
         memberLimit: number;
+        planMemberLimit: number;
         activationPrice: number;
+        activationPriceMinor: number;
+        pricingModelVersion: string;
+        pricingPlanDefinitionId: string;
+        activationStatus: string;
+        coAdminLimit: number;
+        asoEbiTierLimit: number;
+        entitlements: string;
+        inclusions: string;
+        exclusions: string;
+        pricingEffectiveAt: string;
         deadline: string | null;
         eventDate: string | null;
         visibility: string;
@@ -104,7 +134,18 @@ export class FirebaseCircleStore implements CircleStore {
       targetAmount: circle.targetAmount,
       pricingPlan: circle.pricingPlan,
       memberLimit: circle.memberLimit,
+      planMemberLimit: plan.memberLimit,
       activationPrice: circle.activationPrice,
+      activationPriceMinor: circle.activationPriceMinor,
+      pricingModelVersion: circle.pricingModelVersion,
+      pricingPlanDefinitionId: circle.pricingPlanDefinitionId as string,
+      activationStatus: circle.activationStatus,
+      coAdminLimit: plan.coAdminLimit,
+      asoEbiTierLimit: plan.asoEbiTierLimit,
+      entitlements: JSON.stringify([...plan.entitlements]),
+      inclusions: JSON.stringify(plan.inclusions),
+      exclusions: JSON.stringify(plan.exclusions),
+      pricingEffectiveAt: PRICING_EFFECTIVE_AT,
       deadline: circle.deadline,
       eventDate: circle.eventDate,
       visibility: circle.visibility,
@@ -138,7 +179,15 @@ export class FirebaseCircleStore implements CircleStore {
     circle: CircleRecord,
     actorId: string,
     changes: UpdateCircleDraftInput &
-      Pick<CircleRecord, "memberLimit" | "activationPrice" | "updatedAt">,
+      Pick<
+        CircleRecord,
+        | "memberLimit"
+        | "activationPrice"
+        | "activationPriceMinor"
+        | "pricingPlanDefinitionId"
+        | "activationStatus"
+        | "updatedAt"
+      >,
     auditAction: "draft_updated" | "configuration_updated",
   ) {
     const updated = { ...circle, ...changes };
@@ -155,6 +204,9 @@ export class FirebaseCircleStore implements CircleStore {
         pricingPlan: updated.pricingPlan,
         memberLimit: updated.memberLimit,
         activationPrice: updated.activationPrice,
+        activationPriceMinor: updated.activationPriceMinor,
+        pricingPlanDefinitionId: updated.pricingPlanDefinitionId,
+        activationStatus: updated.activationStatus,
         deadline: updated.deadline,
         eventDate: updated.eventDate,
         visibility: updated.visibility,
@@ -191,6 +243,15 @@ export class FirebaseCircleStore implements CircleStore {
     const response = await loadRecord(circleId);
     return response.data.circleMemberships.filter(
       (membership) => membership.membershipStatus === "joined",
+    ).length;
+  }
+
+  async coAdminCount(circleId: string) {
+    const response = await loadRecord(circleId);
+    return response.data.circleMemberships.filter(
+      (membership) =>
+        membership.membershipStatus === "joined" &&
+        membership.role === "co_admin",
     ).length;
   }
 

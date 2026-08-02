@@ -13,6 +13,9 @@ import {
   transitionCircleState,
 } from "@/server/circles/service";
 import { pricingFor, type PricingPlan } from "@/server/circles/engine";
+import { assertAsoEbiTierCapacity } from "@/server/pricing";
+import { pricingErrorResponse } from "@/server/pricing/http";
+import { claimTrialAndPublishCircle } from "@/server/repositories/pricing";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
   configureAsoEbiCircle,
@@ -94,7 +97,12 @@ export async function POST(request: Request) {
       throw new Error("Complete every required Aso-Ebi event field.");
     }
     assertAsoEbiEventType(eventType);
-    const pricing = pricingFor(pricingPlan);
+    const pricing = pricingFor("aso-ebi", pricingPlan);
+    const selectedPricingPlan = pricingPlan as PricingPlan;
+    assertAsoEbiTierCapacity(
+      { mode: "aso-ebi", plan: selectedPricingPlan },
+      tiers.length,
+    );
     if (
       !Number.isInteger(memberCapacity) ||
       memberCapacity < 2 ||
@@ -155,7 +163,7 @@ export async function POST(request: Request) {
         type: "aso-ebi",
         title: eventTitle,
         description,
-        pricingPlan: pricingPlan as PricingPlan,
+        pricingPlan: selectedPricingPlan,
         memberLimit: memberCapacity,
         deadline: null,
         eventDate,
@@ -233,18 +241,20 @@ export async function POST(request: Request) {
       });
     }
 
-    await transitionCircleState(
-      session.uid,
-      circle.id,
-      "published",
-      firebaseCircleStore,
-    );
-    await transitionCircleState(
-      session.uid,
-      circle.id,
-      "active",
-      firebaseCircleStore,
-    );
+    if (selectedPricingPlan === "trial") {
+      await claimTrialAndPublishCircle({
+        creatorId: session.uid,
+        circleId: circle.id,
+        circleType: "aso-ebi",
+        planDefinitionId: pricing.id,
+      });
+      await transitionCircleState(
+        session.uid,
+        circle.id,
+        "active",
+        firebaseCircleStore,
+      );
+    }
     if (uploadAttempted) {
       await recordUploadOutcome({
         kind: "aso_ebi_image",
@@ -255,6 +265,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         circleId: circle.id,
+        activationStatus:
+          selectedPricingPlan === "trial" ? "active" : "pending_payment",
         warning:
           hasAnyImage && !storageAvailable
             ? CIRCLE_IMAGE_STORAGE_WARNING
@@ -271,9 +283,6 @@ export async function POST(request: Request) {
         error,
       });
     }
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to create." },
-      { status: 400 },
-    );
+    return pricingErrorResponse(error, "Unable to create the Aso-Ebi Circle.");
   }
 }

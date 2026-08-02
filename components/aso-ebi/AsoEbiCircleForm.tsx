@@ -14,8 +14,9 @@ import {
   X,
 } from "lucide-react";
 import {
-  CIRCLE_PRICING_PLANS,
+  formatMinorNaira,
   planForMemberCount,
+  plansForCircle,
   type CirclePricingPlan,
 } from "@/lib/circle-pricing";
 type TierDraft = {
@@ -27,12 +28,6 @@ type TierDraft = {
   availabilityNote: string;
   deliveryDetails: string;
 };
-
-const naira = new Intl.NumberFormat("en-NG", {
-  style: "currency",
-  currency: "NGN",
-  maximumFractionDigits: 0,
-});
 
 const eventTypes = [
   ["wedding", "Wedding"],
@@ -69,14 +64,15 @@ async function csrfToken() {
 
 export function AsoEbiCircleForm() {
   const router = useRouter();
-  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("free");
+  const [pricingPlan, setPricingPlan] = useState<CirclePricingPlan>("trial");
   const [memberCapacity, setMemberCapacity] = useState("");
   const [capacityIssue, setCapacityIssue] = useState<number | null>(null);
   const [tiers, setTiers] = useState<TierDraft[]>(() => [newTier()]);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const selectedPlan = CIRCLE_PRICING_PLANS[pricingPlan];
+  const plans = plansForCircle("aso-ebi");
+  const selectedPlan = plans[pricingPlan];
   const capacityNumber = Number(memberCapacity);
 
   function updateTier(id: string, changes: Partial<TierDraft>) {
@@ -86,8 +82,15 @@ export function AsoEbiCircleForm() {
   }
 
   function selectPlan(plan: CirclePricingPlan) {
+    if (tiers.length > plans[plan].asoEbiTierLimit) {
+      setError(
+        `${planLabel(plan)} supports ${plans[plan].asoEbiTierLimit} Aso-Ebi ${plans[plan].asoEbiTierLimit === 1 ? "tier" : "tiers"}. Remove extra tiers before changing plan.`,
+      );
+      return;
+    }
+    setError("");
     setPricingPlan(plan);
-    const limit = CIRCLE_PRICING_PLANS[plan].memberLimit;
+    const limit = plans[plan].memberLimit;
     if (capacityNumber > limit) {
       setMemberCapacity(String(limit));
     }
@@ -149,11 +152,8 @@ export function AsoEbiCircleForm() {
           <p>The selected plan sets the maximum number of members.</p>
           <div>
             {(
-              Object.entries(CIRCLE_PRICING_PLANS) as Array<
-                [
-                  CirclePricingPlan,
-                  (typeof CIRCLE_PRICING_PLANS)[CirclePricingPlan],
-                ]
+              Object.entries(plans) as Array<
+                [CirclePricingPlan, (typeof plans)[CirclePricingPlan]]
               >
             ).map(([plan, details]) => (
               <label
@@ -174,11 +174,24 @@ export function AsoEbiCircleForm() {
                   ) : null}
                 </span>
                 <b>
-                  {details.activationPrice
-                    ? naira.format(details.activationPrice)
+                  {details.priceMinor
+                    ? formatMinorNaira(details.priceMinor)
                     : "Free"}
                 </b>
                 <small>Up to {details.memberLimit} members</small>
+                <small>
+                  {details.asoEbiTierLimit} Aso-Ebi{" "}
+                  {details.asoEbiTierLimit === 1 ? "tier" : "tiers"} ·{" "}
+                  {details.coAdminLimit} co-admins
+                </small>
+                <ul>
+                  {details.inclusions.slice(0, 3).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                {details.exclusions[0] ? (
+                  <em>Not included: {details.exclusions[0]}</em>
+                ) : null}
               </label>
             ))}
           </div>
@@ -284,18 +297,20 @@ export function AsoEbiCircleForm() {
             <div>
               <h2>Tier configuration</h2>
               <p>
-                At least one tier is required. Add as many custom options as
-                this event needs.
+                At least one tier is required. {planLabel(pricingPlan)} allows
+                up to {selectedPlan.asoEbiTierLimit}.
               </p>
             </div>
             <button
               type="button"
               onClick={() =>
                 setTiers((current) =>
-                  current.length < 20 ? [...current, newTier()] : current,
+                  current.length < selectedPlan.asoEbiTierLimit
+                    ? [...current, newTier()]
+                    : current,
                 )
               }
-              disabled={tiers.length >= 20}
+              disabled={tiers.length >= selectedPlan.asoEbiTierLimit}
             >
               <Plus size={15} aria-hidden="true" />
               Add another tier
@@ -505,11 +520,14 @@ export function AsoEbiCircleForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    setPricingPlan(planForMemberCount(capacityIssue));
+                    setPricingPlan(
+                      planForMemberCount("aso-ebi", capacityIssue),
+                    );
                     setCapacityIssue(null);
                   }}
                 >
-                  Upgrade to {planLabel(planForMemberCount(capacityIssue))}
+                  Upgrade to{" "}
+                  {planLabel(planForMemberCount("aso-ebi", capacityIssue))}
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </button>
               ) : null}

@@ -24,7 +24,7 @@ test("equal split uses planned circle capacity before every member joins", () =>
     calculateEqualSlotAllocations(350, 10),
     [35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
   );
-  assert.equal(pricingPlanForCapacity(3), "free");
+  assert.equal(pricingPlanForCapacity(3), "trial");
   assert.equal(pricingPlanForCapacity(10), "starter");
   assert.equal(pricingPlanForCapacity(30), "standard");
   assert.equal(pricingPlanForCapacity(100), "premium");
@@ -115,7 +115,7 @@ test("gift creation and overview expose capacity, open slots, and creator invite
 
   assert.match(form, /name="memberCapacity"/);
   assert.match(form, /including you/i);
-  assert.match(route, /pricingFor\(pricingPlan\)/);
+  assert.match(route, /pricingFor\("gift", pricingPlan\)/);
   assert.match(route, /calculateEqualSlotAllocations/);
   assert.match(view, /Invite someone to member slot/);
   assert.match(view, /Send invites/);
@@ -158,12 +158,12 @@ test("Gift Circle capacity is tier-controlled and the editable field can be clea
     "utf8",
   );
 
-  assert.match(form, /CIRCLE_PRICING_PLANS/);
+  assert.match(form, /plansForCircle\("gift"\)/);
   assert.match(form, /name="pricingPlan"/);
   assert.match(form, /setMemberCapacity\(event\.target\.value\)/);
   assert.doesNotMatch(form, /Math\.max\(\s*2/);
   assert.match(form, /Upgrade to/);
-  assert.match(route, /pricingFor\(pricingPlan\)/);
+  assert.match(route, /pricingFor\("gift", pricingPlan\)/);
   assert.doesNotMatch(route, /pricingPlanForCapacity\(memberCapacity\)/);
 });
 

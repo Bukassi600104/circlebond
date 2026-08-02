@@ -79,3 +79,23 @@ Code completion, a successful deployment, or an empty error dashboard alone is
 not Milestone 18 completion. The gate closes only when all live checks above are
 recorded, production Storage works, final legal/incident details are published,
 backup and rollback rehearsals are recorded, and no critical defect remains.
+
+# Pricing and activation verification
+
+- Confirm every Gift, Aso-Ebi and Support pricing card shows the approved
+  mode-specific prices, capacity, co-admin count, inclusions and exclusions.
+- Claim one free three-member trial, then confirm a second trial fails with
+  `TRIAL_ALREADY_USED`, including concurrent attempts.
+- Confirm a paid circle stays a draft until a verified activation transaction.
+- Confirm an absent provider returns `PAYMENT_PROVIDER_UNAVAILABLE` and does
+  not create a success, charge, or publish action.
+- Confirm Starter/Standard/Premium member, co-admin and Aso-Ebi tier limits at
+  the API boundary, not only in the browser.
+- Confirm Support approval/hidden-amount/public-progress gates and Gift custom
+  contribution gates reject tampered requests.
+- Confirm same-mode upgrade difference uses the historical successful
+  activation as credit, preserves data, and rejects downgrades.
+- Confirm owner pricing totals contain only verified activation/upgrade
+  payments and never contribution receipts.
+- Confirm a grandfathered circle retains its prior capacity and functionality.
+- Confirm no contributor or invitee sees an activation charge.

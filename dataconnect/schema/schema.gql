@@ -48,6 +48,26 @@ type OperationalEvent @table {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
+type PricingPlanDefinition @table(key: ["id"]) {
+  id: String!
+  circleType: String!
+  tier: String!
+  version: Int!
+  currency: String! @default(value: "NGN")
+  priceMinor: Int!
+  memberLimit: Int!
+  coAdminLimit: Int!
+  asoEbiTierLimit: Int! @default(value: 0)
+  entitlements: String! @default(value: "[]")
+  inclusions: String! @default(value: "[]")
+  exclusions: String! @default(value: "[]")
+  effectiveAt: Timestamp!
+  retiredAt: Timestamp
+  createdBy: User
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
 type AuthAuditEvent @table {
   id: UUID! @default(expr: "uuidV4()")
   userId: String
@@ -99,6 +119,11 @@ type Circle @table {
   pricingPlan: String! @default(value: "free")
   memberLimit: Int! @default(value: 3)
   activationPrice: Int! @default(value: 0)
+  pricingModelVersion: String! @default(value: "legacy_universal_v1")
+  pricingPlanDefinitionId: String
+  activationStatus: String! @default(value: "grandfathered")
+  activationPriceMinor: Int! @default(value: 0)
+  activatedAt: Timestamp
   deadline: Date
   eventDate: Date
   status: String! @default(value: "draft")
@@ -109,6 +134,45 @@ type Circle @table {
   retentionDueAt: Timestamp
   archiveAt: Timestamp
   purgeAt: Timestamp
+}
+
+type CreatorTrialUsage @table(key: ["creator"]) {
+  creator: User!
+  circle: Circle!
+  usedAt: Timestamp! @default(expr: "request.time")
+}
+
+type CircleActivation @table {
+  id: UUID! @default(expr: "uuidV4()")
+  circle: Circle!
+  creator: User!
+  planDefinition: PricingPlanDefinition
+  activationType: String!
+  circleType: String!
+  tier: String!
+  currency: String! @default(value: "NGN")
+  listPriceMinor: Int!
+  amountDueMinor: Int!
+  pricePaidMinor: Int! @default(value: 0)
+  status: String!
+  provider: String
+  providerReference: String
+  previousActivationId: UUID
+  failureCode: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  paidAt: Timestamp
+  activatedAt: Timestamp
+}
+
+type PricingChangeAudit @table {
+  id: UUID! @default(expr: "uuidV4()")
+  actor: User!
+  planDefinition: PricingPlanDefinition!
+  action: String!
+  previousDefinition: String! @default(value: "{}")
+  nextDefinition: String!
+  effectiveAt: Timestamp!
+  createdAt: Timestamp! @default(expr: "request.time")
 }
 
 type CircleMembership @table(key: ["circle", "user"]) {

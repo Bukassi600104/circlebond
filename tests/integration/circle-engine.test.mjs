@@ -93,7 +93,7 @@ test("drafts resume, critical changes audit, limits hold, and cancellation locks
       type: "gift",
       title: "Ada's Birthday Gift",
       description: "Shared birthday gift.",
-      pricingPlan: "free",
+      pricingPlan: "trial",
       visibility: "private",
       targetAmount: 300000,
       deadline: "2026-08-30",
@@ -119,7 +119,7 @@ test("drafts resume, critical changes audit, limits hold, and cancellation locks
   await addCircleMember("creator-1", draft.id, "member-2", "member", store);
   await assert.rejects(
     addCircleMember("creator-1", draft.id, "member-3", "member", store),
-    /member limit/i,
+    /up to 3 total members/i,
   );
 
   const published = await transitionCircleState(

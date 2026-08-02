@@ -2030,3 +2030,14 @@ Monitoring and backups are operational.
 There are no dead screens, fake controls, or prototype-only behaviours.
 
 This milestone plan is the approved execution order for BondCircle Version 1.
+
+MODEL-SPECIFIC PRICING ACCEPTANCE TRACK
+
+This production update is not accepted until all three modes show the approved
+prices; the one-time trial is transactionally enforced; all member, co-admin,
+Aso-Ebi tier and feature limits reject tampered server requests; paid drafts
+cannot publish without verified activation; same-mode upgrades preserve data
+and use historical credit; existing circles remain operational; owner pricing
+and revenue views use verified activations only; contributors never receive a
+platform charge; documentation is current; and format, lint, typecheck, unit,
+integration, E2E, build and live production checks pass.

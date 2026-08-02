@@ -3,6 +3,7 @@ import { readSession } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { assertReminderRecipients } from "@/server/notifications/rules";
 import { sendContributionReminders } from "@/server/repositories/notifications";
+import { pricingErrorResponse } from "@/server/pricing/http";
 
 export async function POST(
   request: Request,
@@ -23,12 +24,6 @@ export async function POST(
     });
     return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "Unable to send reminders.",
-      },
-      { status: 400 },
-    );
+    return pricingErrorResponse(error, "Unable to send reminders.");
   }
 }

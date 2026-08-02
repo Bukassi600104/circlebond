@@ -677,6 +677,126 @@
   font-size: var(--text-caption);
 }
 
+.bc-activation-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(214, 158, 45, 0.42);
+  border-radius: 1.1rem;
+  background: linear-gradient(135deg, #fffaf0, #f3faf7);
+  box-shadow: 0 0.75rem 2rem rgba(14, 76, 68, 0.08);
+}
+
+.bc-activation-panel span {
+  color: #c47b16;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.bc-activation-panel h2 {
+  margin: 0.2rem 0;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+
+.bc-activation-panel p {
+  margin: 0;
+  color: #53625e;
+  font-size: 0.9rem;
+}
+
+.bc-activation-panel button {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 0.8rem;
+  background: #075c50;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bc-activation-panel button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.bc-activation-panel .bc-activation-panel__error {
+  margin-top: 0.5rem;
+  color: #9c2f27;
+}
+
+@media (max-width: 640px) {
+  .bc-activation-panel {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 0.9rem;
+  }
+
+  .bc-activation-panel button {
+    width: 100%;
+  }
+}
+
+.bc-upgrade-panel {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(7, 92, 80, 0.2);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.bc-upgrade-panel summary {
+  color: #075c50;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bc-upgrade-panel > p {
+  margin: 0.55rem 0;
+  color: #64716e;
+  font-size: 0.86rem;
+}
+
+.bc-upgrade-panel > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.6rem;
+}
+
+.bc-upgrade-panel button {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(7, 92, 80, 0.22);
+  border-radius: 0.8rem;
+  background: #f7fbf9;
+  color: #173d38;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bc-upgrade-panel button span,
+.bc-upgrade-panel button em {
+  color: #075c50;
+  font-size: 0.74rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.bc-upgrade-panel button small {
+  color: #66736f;
+}
+
+.bc-upgrade-panel .bc-upgrade-panel__error {
+  color: #9c2f27;
+}
+
 .bc-dashboard-info-page,
 .bc-dashboard-error {
   max-width: 34rem;
@@ -2420,6 +2540,24 @@
   font-weight: 400;
 }
 
+.bc-gift-pricing label > ul {
+  display: grid;
+  gap: 0.2rem;
+  margin: var(--space-2) 0 0;
+  padding-left: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.bc-gift-pricing label > em {
+  margin-top: var(--space-2);
+  color: var(--color-coral);
+  font-size: 0.67rem;
+  font-style: normal;
+  line-height: 1.35;
+}
+
 .bc-gift-create__fields {
   display: grid;
   gap: var(--space-3);
@@ -3647,7 +3785,7 @@
   }
 
   .bc-gift-pricing > div {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .bc-gift-payment-setup > div {

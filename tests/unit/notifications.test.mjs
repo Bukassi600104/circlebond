@@ -29,6 +29,14 @@ test("Milestone 12 supports every prescribed in-app notification event", () => {
     "delivery_updated",
     "circle_completed",
     "circle_cancelled",
+    "circle_trial_activated",
+    "circle_activation_pending",
+    "circle_activation_succeeded",
+    "circle_activation_failed",
+    "circle_upgraded",
+    "circle_limit_approaching",
+    "circle_limit_reached",
+    "circle_tier_limit_reached",
   ]);
 });
 

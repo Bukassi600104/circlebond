@@ -28,3 +28,36 @@ export async function recordUploadOutcome(input: {
     });
   }
 }
+
+export async function recordPricingOutcome(input: {
+  eventType:
+    | "trial_activation"
+    | "activation_checkout"
+    | "activation_completed"
+    | "upgrade_checkout"
+    | "upgrade_completed"
+    | "member_limit"
+    | "co_admin_limit"
+    | "aso_ebi_tier_limit"
+    | "feature_gate";
+  outcome: "started" | "succeeded" | "failed" | "blocked";
+  circleId?: string | null;
+  reasonCode?: string | null;
+}) {
+  try {
+    await getBondCircleDataConnect().executeMutation("RecordOperationalEvent", {
+      category: "pricing",
+      eventType: input.eventType,
+      outcome: input.outcome,
+      reasonCode: input.reasonCode?.slice(0, 80) ?? null,
+      circleId: input.circleId ?? null,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error("operational_event_write_failed", {
+      category: "pricing",
+      eventType: input.eventType,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+  }
+}

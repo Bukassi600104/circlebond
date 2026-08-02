@@ -12,6 +12,14 @@ export const NOTIFICATION_TYPES = [
   "delivery_updated",
   "circle_completed",
   "circle_cancelled",
+  "circle_trial_activated",
+  "circle_activation_pending",
+  "circle_activation_succeeded",
+  "circle_activation_failed",
+  "circle_upgraded",
+  "circle_limit_approaching",
+  "circle_limit_reached",
+  "circle_tier_limit_reached",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
@@ -39,6 +47,7 @@ export const CRITICAL_EMAIL_TYPES = new Set<NotificationType>([
   "receipt_rejected",
   "deadline_approaching",
   "circle_completed",
+  "circle_activation_failed",
 ]);
 
 export const REMINDER_COOLDOWN_MS = 24 * 60 * 60 * 1000;
@@ -59,6 +68,14 @@ export function isNotificationAllowed(
       "delivery_updated",
       "circle_completed",
       "circle_cancelled",
+      "circle_trial_activated",
+      "circle_activation_pending",
+      "circle_activation_succeeded",
+      "circle_activation_failed",
+      "circle_upgraded",
+      "circle_limit_approaching",
+      "circle_limit_reached",
+      "circle_tier_limit_reached",
     ].includes(type)
   ) {
     return preferences.circleUpdateNotifications;
@@ -142,6 +159,38 @@ export function notificationCopy(type: NotificationType, circleName: string) {
     circle_cancelled: {
       title: "Circle cancelled",
       body: `${circleName} has been cancelled.`,
+    },
+    circle_trial_activated: {
+      title: "Trial circle activated",
+      body: `${circleName} is using this account's one-time trial.`,
+    },
+    circle_activation_pending: {
+      title: "Activation payment pending",
+      body: `The activation payment for ${circleName} is still pending.`,
+    },
+    circle_activation_succeeded: {
+      title: "Circle activated",
+      body: `${circleName} has been activated and published.`,
+    },
+    circle_activation_failed: {
+      title: "Activation payment failed",
+      body: `${circleName} was not charged or published. Open the draft to try again.`,
+    },
+    circle_upgraded: {
+      title: "Circle plan upgraded",
+      body: `${circleName} now has its upgraded limits and features.`,
+    },
+    circle_limit_approaching: {
+      title: "Circle limit approaching",
+      body: `${circleName} is close to its current plan limit.`,
+    },
+    circle_limit_reached: {
+      title: "Circle limit reached",
+      body: `${circleName} has reached its current member limit.`,
+    },
+    circle_tier_limit_reached: {
+      title: "Aso-Ebi tier limit reached",
+      body: `${circleName} has reached its current Aso-Ebi tier limit.`,
     },
   };
   return copies[type];

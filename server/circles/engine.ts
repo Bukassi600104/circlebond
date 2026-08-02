@@ -1,3 +1,10 @@
+import {
+  MODEL_SPECIFIC_PRICING,
+  isCirclePricingPlan,
+  pricingForCircle,
+  type CirclePricingPlan,
+} from "../../lib/circle-pricing.ts";
+
 export const CIRCLE_TYPES = ["gift", "aso-ebi", "support"] as const;
 export type CircleType = (typeof CIRCLE_TYPES)[number];
 
@@ -14,7 +21,7 @@ export const CIRCLE_STATES = [
 ] as const;
 export type CircleState = (typeof CIRCLE_STATES)[number];
 
-export const PRICING_PLANS = CIRCLE_PRICING_PLANS;
+export const PRICING_PLANS = MODEL_SPECIFIC_PRICING;
 export type PricingPlan = CirclePricingPlan;
 
 export type CircleRole = "creator" | "co_admin" | "member";
@@ -89,14 +96,14 @@ export function assertCircleType(value: string): asserts value is CircleType {
   }
 }
 
-export function pricingFor(plan: string) {
-  if (!(plan in PRICING_PLANS)) {
+export function pricingFor(type: CircleType, plan: string) {
+  if (!isCirclePricingPlan(plan)) {
     throw new CircleRuleError(
       "Unsupported pricing plan.",
       "INVALID_PRICING_PLAN",
     );
   }
-  return PRICING_PLANS[plan as PricingPlan];
+  return pricingForCircle(type, plan);
 }
 
 export function transitionCircle(
@@ -125,11 +132,12 @@ export function assertPermission(
 }
 
 export function assertMemberLimit(
+  type: CircleType,
   plan: PricingPlan,
   currentMembers: number,
   additions = 1,
 ) {
-  const { memberLimit } = pricingFor(plan);
+  const { memberLimit } = pricingFor(type, plan);
   if (additions < 0 || currentMembers + additions > memberLimit) {
     throw new CircleRuleError(
       `The ${plan} pricing plan member limit is ${memberLimit}.`,
@@ -138,9 +146,13 @@ export function assertMemberLimit(
   }
 }
 
-export function getActivationCharge(plan: PricingPlan, payer: CircleRole) {
+export function getActivationCharge(
+  type: CircleType,
+  plan: PricingPlan,
+  payer: CircleRole,
+) {
   if (payer !== "creator") return 0;
-  return pricingFor(plan).activationPrice;
+  return pricingFor(type, plan).priceMinor;
 }
 
 export function assertActivityAllowed(status: CircleState) {
@@ -151,7 +163,3 @@ export function assertActivityAllowed(status: CircleState) {
     );
   }
 }
-import {
-  CIRCLE_PRICING_PLANS,
-  type CirclePricingPlan,
-} from "../../lib/circle-pricing.ts";

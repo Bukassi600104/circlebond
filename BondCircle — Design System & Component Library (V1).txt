@@ -617,3 +617,13 @@ Do not change spacing rules.
 Do not create one-off components when an existing component can be reused.
 
 This design system is the foundation for all current and future BondCircle interfaces.
+
+MODEL-SPECIFIC PRICING COMPONENT ADDENDUM
+
+Pricing cards reuse the standard compact card, typography, button and status
+tokens. Trial, Starter, Standard and Premium may not rely on colour alone.
+Every card shows price, capacity, co-admin allowance, inclusions and exclusions
+at readable mobile sizes. Activation and upgrade panels use restrained cream,
+teal and gold surfaces and remain single-column on narrow screens. Pending,
+failed, active, grandfathered and upgrade states use the shared status language
+and preserve the application frame without horizontal overflow.

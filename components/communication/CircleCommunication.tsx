@@ -145,9 +145,15 @@ export function CircleCommunication({
       {
         title: String(form.get("title") ?? ""),
         body: String(form.get("body") ?? ""),
-        pinned: form.get("pinned") === "on",
-        important: form.get("important") === "on",
-        commentsEnabled: form.get("commentsEnabled") === "on",
+        pinned: workspace.canUseExpandedAnnouncementControls
+          ? form.get("pinned") === "on"
+          : false,
+        important: workspace.canUseExpandedAnnouncementControls
+          ? form.get("important") === "on"
+          : false,
+        commentsEnabled: workspace.canUseExpandedAnnouncementControls
+          ? form.get("commentsEnabled") === "on"
+          : true,
       },
       editing ? `announcement:${editing.id}` : "announcement:new",
     );
@@ -506,32 +512,39 @@ export function CircleCommunication({
                         required
                       />
                     </label>
-                    <div className="bc-announcement-options">
-                      <label>
-                        <input
-                          name="pinned"
-                          type="checkbox"
-                          defaultChecked={editing?.pinned ?? false}
-                        />
-                        Pin announcement
-                      </label>
-                      <label>
-                        <input
-                          name="important"
-                          type="checkbox"
-                          defaultChecked={editing?.important ?? false}
-                        />
-                        Important update
-                      </label>
-                      <label>
-                        <input
-                          name="commentsEnabled"
-                          type="checkbox"
-                          defaultChecked={editing?.commentsEnabled ?? true}
-                        />
-                        Allow comments
-                      </label>
-                    </div>
+                    {workspace.canUseExpandedAnnouncementControls ? (
+                      <div className="bc-announcement-options">
+                        <label>
+                          <input
+                            name="pinned"
+                            type="checkbox"
+                            defaultChecked={editing?.pinned ?? false}
+                          />
+                          Pin announcement
+                        </label>
+                        <label>
+                          <input
+                            name="important"
+                            type="checkbox"
+                            defaultChecked={editing?.important ?? false}
+                          />
+                          Important update
+                        </label>
+                        <label>
+                          <input
+                            name="commentsEnabled"
+                            type="checkbox"
+                            defaultChecked={editing?.commentsEnabled ?? true}
+                          />
+                          Allow comments
+                        </label>
+                      </div>
+                    ) : (
+                      <p className="bc-pricing-note">
+                        Pinning, priority flags and comment controls are not
+                        included in this circle&apos;s current plan.
+                      </p>
+                    )}
                     <footer>
                       <button
                         type="button"
@@ -594,42 +607,46 @@ export function CircleCommunication({
                         </button>
                         {workspace.viewerCanManage && !readOnly ? (
                           <>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                void mutate(
-                                  `/api/circles/${workspace.circleId}/announcements/${announcement.id}`,
-                                  "PATCH",
-                                  { pinned: !announcement.pinned },
-                                  `pin:${announcement.id}`,
-                                )
-                              }
-                            >
-                              {announcement.pinned ? (
-                                <PinOff size={13} aria-hidden="true" />
-                              ) : (
-                                <Pin size={13} aria-hidden="true" />
-                              )}
-                              {announcement.pinned ? "Unpin" : "Pin"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                void mutate(
-                                  `/api/circles/${workspace.circleId}/announcements/${announcement.id}`,
-                                  "PATCH",
-                                  {
-                                    commentsEnabled:
-                                      !announcement.commentsEnabled,
-                                  },
-                                  `comments:${announcement.id}`,
-                                )
-                              }
-                            >
-                              {announcement.commentsEnabled
-                                ? "Close comments"
-                                : "Open comments"}
-                            </button>
+                            {workspace.canUseExpandedAnnouncementControls ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    void mutate(
+                                      `/api/circles/${workspace.circleId}/announcements/${announcement.id}`,
+                                      "PATCH",
+                                      { pinned: !announcement.pinned },
+                                      `pin:${announcement.id}`,
+                                    )
+                                  }
+                                >
+                                  {announcement.pinned ? (
+                                    <PinOff size={13} aria-hidden="true" />
+                                  ) : (
+                                    <Pin size={13} aria-hidden="true" />
+                                  )}
+                                  {announcement.pinned ? "Unpin" : "Pin"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    void mutate(
+                                      `/api/circles/${workspace.circleId}/announcements/${announcement.id}`,
+                                      "PATCH",
+                                      {
+                                        commentsEnabled:
+                                          !announcement.commentsEnabled,
+                                      },
+                                      `comments:${announcement.id}`,
+                                    )
+                                  }
+                                >
+                                  {announcement.commentsEnabled
+                                    ? "Close comments"
+                                    : "Open comments"}
+                                </button>
+                              </>
+                            ) : null}
                             <button
                               type="button"
                               onClick={() =>

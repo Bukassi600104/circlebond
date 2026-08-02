@@ -18,6 +18,11 @@ import {
   type ActivityType,
 } from "@/server/communication/rules";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import {
+  assertEntitlement,
+  entitlementContextForStoredCircle,
+  hasEntitlement,
+} from "@/server/pricing";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
 import { safelyEmitNotification } from "@/server/repositories/notifications";
 
@@ -28,6 +33,9 @@ type CommunicationQuery = {
     type: string;
     status: string;
     commentsEnabled: boolean;
+    memberLimit: number;
+    pricingPlan: string;
+    pricingModelVersion: string;
     creator: { id: string };
   };
   circleMemberships: Array<{
@@ -113,6 +121,10 @@ export type CircleCommunication = {
   circleType: string;
   circleStatus: CircleState;
   commentsEnabled: boolean;
+  pricingPlan: string;
+  pricingModelVersion: string;
+  memberLimit: number;
+  canUseExpandedAnnouncementControls: boolean;
   viewerId: string;
   viewerRole: CircleRole;
   viewerCanManage: boolean;
@@ -212,12 +224,20 @@ export async function loadCircleCommunication(
 
   const viewerRole = viewer.role as CircleRole;
   const viewerCanManage = canManageCommunication(viewerRole);
+  const pricingContext = entitlementContextForStoredCircle(circle);
   return {
     circleId: circle.id,
     circleName: circle.name,
     circleType: circle.type,
     circleStatus: circle.status as CircleState,
     commentsEnabled: circle.commentsEnabled,
+    pricingPlan: circle.pricingPlan,
+    pricingModelVersion: circle.pricingModelVersion,
+    memberLimit: circle.memberLimit,
+    canUseExpandedAnnouncementControls: hasEntitlement(
+      pricingContext,
+      "expanded_announcement_controls",
+    ),
     viewerId,
     viewerRole,
     viewerCanManage,
@@ -297,6 +317,17 @@ export async function createAnnouncement(input: {
   );
   assertCommunicationManager(workspace.viewerRole);
   assertCommunicationWritable(workspace.circleStatus);
+  if (input.pinned || input.important || !input.commentsEnabled) {
+    assertEntitlement(
+      entitlementContextForStoredCircle({
+        type: workspace.circleType,
+        pricingPlan: workspace.pricingPlan,
+        pricingModelVersion: workspace.pricingModelVersion,
+        memberLimit: workspace.memberLimit,
+      }),
+      "expanded_announcement_controls",
+    );
+  }
   const content = validateAnnouncement(input);
   const announcementId = randomUUID();
   const createdAt = new Date().toISOString();
@@ -352,6 +383,17 @@ export async function updateAnnouncement(input: {
   const pinned = input.pinned ?? announcement.pinned;
   const important = input.important ?? announcement.important;
   const commentsEnabled = input.commentsEnabled ?? announcement.commentsEnabled;
+  if (pinned || important || !commentsEnabled) {
+    assertEntitlement(
+      entitlementContextForStoredCircle({
+        type: workspace.circleType,
+        pricingPlan: workspace.pricingPlan,
+        pricingModelVersion: workspace.pricingModelVersion,
+        memberLimit: workspace.memberLimit,
+      }),
+      "expanded_announcement_controls",
+    );
+  }
   const updatedAt = new Date().toISOString();
   await getBondCircleDataConnect().executeMutation(
     "UpdateAnnouncementWithAudit",

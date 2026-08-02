@@ -9,6 +9,11 @@ import { logger } from "@/lib/logger";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { sendCriticalNotificationEmail } from "@/server/notifications/email";
 import {
+  PRICING_MODEL_VERSION,
+  isCirclePricingPlan,
+} from "@/lib/circle-pricing";
+import { assertEntitlement } from "@/server/pricing";
+import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   REMINDER_COOLDOWN_MS,
   isNotificationAllowed,
@@ -36,6 +41,9 @@ type NotificationContext = {
     name: string;
     type: string;
     status: string;
+    pricingPlan: string;
+    pricingModelVersion: string;
+    memberLimit: number;
     deadline?: string | null;
     creator: Recipient;
   };
@@ -485,6 +493,21 @@ export async function sendContributionReminders(input: {
   );
   if (selected.length !== new Set(input.recipientIds).size) {
     throw new Error("Select joined members who still have a contribution due.");
+  }
+  if (selected.length > 1) {
+    const plan =
+      circle.pricingModelVersion === PRICING_MODEL_VERSION &&
+      isCirclePricingPlan(circle.pricingPlan)
+        ? circle.pricingPlan
+        : "legacy";
+    assertEntitlement(
+      {
+        mode: circle.type as "gift" | "aso-ebi" | "support",
+        plan,
+        memberLimit: circle.memberLimit,
+      },
+      "bulk_reminders",
+    );
   }
   const since = new Date(Date.now() - REMINDER_COOLDOWN_MS).toISOString();
   for (const membership of selected) {

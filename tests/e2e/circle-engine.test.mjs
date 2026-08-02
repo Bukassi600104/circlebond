@@ -3,6 +3,7 @@ import test from "node:test";
 import { randomUUID } from "node:crypto";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getDataConnect } from "firebase-admin/data-connect";
+import { pricingForCircle } from "../../lib/circle-pricing.ts";
 
 const app =
   getApps().find((candidate) => candidate.name === "circle-engine-e2e") ??
@@ -15,6 +16,201 @@ const dataConnect = getDataConnect(
   },
   app,
 );
+
+function pricingVariables(type, tier, memberLimit) {
+  const plan = pricingForCircle(type, tier);
+  return {
+    pricingPlan: tier,
+    memberLimit,
+    planMemberLimit: plan.memberLimit,
+    activationPrice: plan.priceMinor / 100,
+    activationPriceMinor: plan.priceMinor,
+    pricingModelVersion: "model_specific_v1",
+    pricingPlanDefinitionId: plan.id,
+    activationStatus:
+      tier === "trial" ? "pending_trial_claim" : "pending_payment",
+    coAdminLimit: plan.coAdminLimit,
+    asoEbiTierLimit: plan.asoEbiTierLimit,
+    entitlements: JSON.stringify([...plan.entitlements]),
+    inclusions: JSON.stringify(plan.inclusions),
+    exclusions: JSON.stringify(plan.exclusions),
+    pricingEffectiveAt: "2026-08-02T00:00:00.000Z",
+  };
+}
+
+async function createPricedDraft(creatorId, name, type, tier, memberLimit) {
+  const timestamp = new Date().toISOString();
+  const created = await dataConnect.executeMutation("CreateCircleDraft", {
+    creatorId,
+    name,
+    type,
+    description: "Model-specific pricing E2E verification.",
+    targetAmount: 100000,
+    ...pricingVariables(type, tier, memberLimit),
+    deadline: "2026-12-31",
+    eventDate: null,
+    visibility: "private",
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  });
+  return created.data.circle_insert.id;
+}
+
+test("one concurrent first-circle trial succeeds and the other remains a draft", async () => {
+  const creatorId = `pricing-trial-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Pricing Trial Creator",
+    email: `${creatorId}@example.test`,
+  });
+  const firstCircleId = await createPricedDraft(
+    creatorId,
+    "First trial candidate",
+    "gift",
+    "trial",
+    3,
+  );
+  const secondCircleId = await createPricedDraft(
+    creatorId,
+    "Second trial candidate",
+    "support",
+    "trial",
+    3,
+  );
+  const claims = await Promise.allSettled(
+    [
+      [firstCircleId, "gift", "gift_trial_v1_2026_08_02"],
+      [secondCircleId, "support", "support_trial_v1_2026_08_02"],
+    ].map(([circleId, circleType, planDefinitionId]) =>
+      dataConnect.executeMutation("ClaimTrialAndPublishCircle", {
+        activationId: randomUUID(),
+        creatorId,
+        circleId,
+        circleEntityId: circleId,
+        planDefinitionId,
+        circleType,
+        activatedAt: new Date().toISOString(),
+      }),
+    ),
+  );
+  assert.equal(claims.filter(({ status }) => status === "fulfilled").length, 1);
+  assert.equal(claims.filter(({ status }) => status === "rejected").length, 1);
+  const states = await Promise.all(
+    [firstCircleId, secondCircleId].map((circleId) =>
+      dataConnect.executeQuery("GetCirclePricingState", { circleId }),
+    ),
+  );
+  assert.deepEqual(states.map(({ data }) => data.circle.status).sort(), [
+    "draft",
+    "published",
+  ]);
+});
+
+test("paid activation and upgrade preserve exact historical prices", async () => {
+  const creatorId = `pricing-paid-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Pricing Paid Creator",
+    email: `${creatorId}@example.test`,
+  });
+  const circleId = await createPricedDraft(
+    creatorId,
+    "Paid activation circle",
+    "gift",
+    "starter",
+    10,
+  );
+  // Seed the target definition through the same versioned catalogue upsert
+  // used by normal draft creation.
+  await createPricedDraft(
+    creatorId,
+    "Standard catalogue seed",
+    "gift",
+    "standard",
+    30,
+  );
+
+  const paidActivationId = randomUUID();
+  await dataConnect.executeMutation("CreateCircleActivationAttempt", {
+    activationId: paidActivationId,
+    circleId,
+    creatorId,
+    planDefinitionId: "gift_starter_v1_2026_08_02",
+    activationType: "paid",
+    circleType: "gift",
+    tier: "starter",
+    listPriceMinor: 150000,
+    amountDueMinor: 150000,
+    provider: "e2e_verified_provider",
+    providerReference: `e2e-${paidActivationId}`,
+    previousActivationId: null,
+    createdAt: new Date().toISOString(),
+  });
+  await dataConnect.executeMutation("CompletePaidCircleActivation", {
+    activationId: paidActivationId,
+    circleId,
+    creatorId,
+    pricePaidMinor: 150000,
+    activatedAt: new Date().toISOString(),
+  });
+
+  const upgradeActivationId = randomUUID();
+  await dataConnect.executeMutation("CreateCircleActivationAttempt", {
+    activationId: upgradeActivationId,
+    circleId,
+    creatorId,
+    planDefinitionId: "gift_standard_v1_2026_08_02",
+    activationType: "upgrade",
+    circleType: "gift",
+    tier: "standard",
+    listPriceMinor: 350000,
+    amountDueMinor: 200000,
+    provider: "e2e_verified_provider",
+    providerReference: `e2e-${upgradeActivationId}`,
+    previousActivationId: paidActivationId,
+    createdAt: new Date().toISOString(),
+  });
+  await dataConnect.executeMutation("CompleteCirclePlanUpgrade", {
+    activationId: upgradeActivationId,
+    circleId,
+    creatorId,
+    targetPlan: "standard",
+    targetPlanDefinitionId: "gift_standard_v1_2026_08_02",
+    targetMemberLimit: 30,
+    targetActivationPrice: 3500,
+    targetActivationPriceMinor: 350000,
+    pricePaidMinor: 200000,
+    activatedAt: new Date().toISOString(),
+  });
+
+  const state = await dataConnect.executeQuery("GetCirclePricingState", {
+    circleId,
+  });
+  assert.equal(state.data.circle.pricingPlan, "standard");
+  assert.equal(state.data.circle.memberLimit, 30);
+  assert.equal(state.data.circle.activationStatus, "active");
+  assert.deepEqual(
+    state.data.circleActivations
+      .map(({ listPriceMinor, amountDueMinor, pricePaidMinor }) => ({
+        listPriceMinor,
+        amountDueMinor,
+        pricePaidMinor,
+      }))
+      .sort((a, b) => a.listPriceMinor - b.listPriceMinor),
+    [
+      {
+        listPriceMinor: 150000,
+        amountDueMinor: 150000,
+        pricePaidMinor: 150000,
+      },
+      {
+        listPriceMinor: 350000,
+        amountDueMinor: 200000,
+        pricePaidMinor: 200000,
+      },
+    ],
+  );
+});
 
 test("Firebase persists owner access, operational telemetry and immutable admin audit", async () => {
   const ownerId = `owner-test-${randomUUID()}`;
@@ -103,9 +299,7 @@ test("Firebase persists a draft, creator membership, transitions, and audit hist
     type: "gift",
     description: "Persistent Milestone 5 verification.",
     targetAmount: 50000,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("gift", "trial", 3),
     deadline: "2026-09-30",
     eventDate: null,
     visibility: "private",
@@ -118,7 +312,7 @@ test("Firebase persists a draft, creator membership, transitions, and audit hist
     circleId,
   });
   assert.equal(draft.data.circle.status, "draft");
-  assert.equal(draft.data.circle.pricingPlan, "free");
+  assert.equal(draft.data.circle.pricingPlan, "trial");
   assert.equal(draft.data.circle.memberLimit, 3);
   assert.deepEqual(
     draft.data.circleMemberships.map(({ role, user }) => ({
@@ -169,9 +363,7 @@ test("Firebase persists an active Gift Circle, its allocation, image path, and m
     type: "gift",
     description: "A complete Gift Circle persistence check.",
     targetAmount: 300000,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("gift", "trial", 3),
     deadline: "2026-08-30",
     eventDate: null,
     visibility: "private",
@@ -257,9 +449,7 @@ test("Firebase persists an event-neutral Aso-Ebi Circle with custom tiers, selec
     type: "aso-ebi",
     description: "Event-neutral Aso-Ebi persistence verification.",
     targetAmount: 0,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("aso-ebi", "trial", 3),
     deadline: null,
     eventDate: "2026-11-22",
     visibility: "private",
@@ -366,9 +556,7 @@ test("Firebase persists Support Circle privacy, pledges, updates and support-del
     type: "support",
     description: "A respectful community support persistence check.",
     targetAmount: 150000,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("support", "trial", 3),
     deadline: "2026-12-15",
     eventDate: null,
     visibility: "private",
@@ -465,9 +653,7 @@ test("Firebase completes, archives, and purges private circle data while retaini
     type: "support",
     description: "Private content scheduled for deletion.",
     targetAmount: 100000,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("support", "trial", 3),
     deadline: "2026-09-30",
     eventDate: null,
     visibility: "private",
@@ -577,9 +763,7 @@ test("Firebase persists secure invitations, approvals, revocation and multi-circ
       type: "gift",
       description: "Invitation workflow persistence verification.",
       targetAmount: 90000,
-      pricingPlan: "premium",
-      memberLimit: 10,
-      activationPrice: 5000,
+      ...pricingVariables("gift", "starter", 10),
       deadline: "2026-12-30",
       eventDate: null,
       visibility: "private",
@@ -737,9 +921,7 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
     type: "gift",
     description: "Milestone 10 receipt verification.",
     targetAmount: 100000,
-    pricingPlan: "free",
-    memberLimit: 3,
-    activationPrice: 0,
+    ...pricingVariables("gift", "trial", 3),
     deadline: "2026-10-31",
     eventDate: null,
     visibility: "private",

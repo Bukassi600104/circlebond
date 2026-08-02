@@ -85,3 +85,21 @@ The automated verifier does not replace authenticated browser/device checks, a r
 - Treat Data Connect schema changes as forward migrations; do not destructively roll back production data.
 - Revoke compromised Firebase credentials immediately and rotate the corresponding Vercel secrets.
 - Pause new invitations or uploads at the application layer if an incident affects those subsystems.
+
+# Model-specific pricing deployment gate
+
+Before deploying the model-specific pricing schema:
+
+1. Back up the production Data Connect PostgreSQL database.
+2. Generate and review the Data Connect migration; confirm existing circles
+   receive `legacy_universal_v1` and `grandfathered` without capacity changes.
+3. Deploy the schema and connector before the application build that writes
+   `model_specific_v1` circles.
+4. Verify the one-time trial transaction with two concurrent requests.
+5. Verify paid drafts remain unpublished when the activation provider is not
+   configured.
+6. Do not enable a payment provider until signed webhook, amount/currency,
+   idempotency, failure, refund and reconciliation tests pass.
+7. Compare production circle counts and exercise one grandfathered circle.
+
+See `docs/MODEL_SPECIFIC_PRICING.md` for the authoritative operating boundary.

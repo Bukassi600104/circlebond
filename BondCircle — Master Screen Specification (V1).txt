@@ -625,3 +625,15 @@ Development Rule
 No screen may be redesigned without updating this specification first.
 
 This document is the single source of truth for the BondCircle interface.
+
+MODEL-SPECIFIC PRICING SCREEN ADDENDUM
+
+Each circle creation flow must show cards specific to its selected mode. A
+card contains tier, one-time price, total-member capacity, co-admin count,
+mode-specific limits, principal inclusions, meaningful exclusions and upgrade
+availability. The sequence is type, details, plan, review, save draft,
+configure/invite, activate and publish. Draft and payment states are explicit.
+An unavailable provider shows a compact error and never a success state. Active
+creators may open same-mode higher-plan options showing the exact difference.
+Owner administration includes a private Pricing section for catalogue,
+trial, activation, upgrade, historical-price and verified revenue data.
