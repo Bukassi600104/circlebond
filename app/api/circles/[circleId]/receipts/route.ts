@@ -23,7 +23,7 @@ function publicReceipt<T extends { imageStoragePath: string }>(
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ circleId: string }> },
 ) {
   const session = await readSession();

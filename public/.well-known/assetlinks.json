@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bondcircle.android",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7D:0F:52:AB:E9:AE:E4:E2:F6:4E:94:E0:9F:63:F8:77:45:52:3C:A9:72:48:88:B3:7B:64:1D:9F:8B"
+      ]
+    }
+  }
+]

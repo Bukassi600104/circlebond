@@ -112,7 +112,7 @@ test("completion, archive, read-only UI and retention countdown are connected", 
   assert.match(lifecycle, /Only the circle creator can complete/);
   assert.match(lifecycle, /assertCompletionType/);
   assert.match(lifecycle, /Only the circle creator can archive/);
-  assert.match(route, /readSession/);
+  assert.match(route, /authenticatePrincipal/);
   assert.match(route, /assertTrustedMutation/);
   assert.match(panel, /30-day retention countdown/);
   assert.match(panel, /Create new circle/);

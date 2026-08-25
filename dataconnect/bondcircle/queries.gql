@@ -2839,6 +2839,25 @@ query GetUserAccountStatus($userId: String!) @auth(level: NO_ACCESS) {
   }
 }
 
+query GetUserBootstrapProfile($userId: String!) @auth(level: NO_ACCESS) {
+  user(key: { id: $userId }) {
+    id
+    displayName
+    phone
+    email
+    profileImage
+    termsAcceptedAt
+    privacyAcceptedAt
+    accountStatus
+    emailNotifications
+    browserPushNotifications
+    commentNotifications
+    contributionReminders
+    circleUpdateNotifications
+    marketingCommunication
+  }
+}
+
 query GetOwnerPlatformOverview @auth(level: NO_ACCESS) {
   totalUsers: users {
     _count

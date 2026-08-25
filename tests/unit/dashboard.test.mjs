@@ -109,12 +109,12 @@ test("profile supports secure photo updates and sign out", async () => {
   assert.match(profile, /accept="image\/jpeg,image\/png,image\/webp"/);
   assert.match(profile, /router\.refresh/);
   assert.match(uploadRoute, /assertTrustedMutation/);
-  assert.match(uploadRoute, /readSession/);
+  assert.match(uploadRoute, /authenticatePrincipal/);
   assert.match(uploadRoute, /enforceRateLimit/);
   assert.match(uploadRoute, /sanitizeUploadedImage/);
   assert.match(uploadRoute, /profilePhotoStorageAvailable/);
   assert.match(uploadRoute, /status: 503/);
   assert.match(uploadRoute, /users\/\$\{session\.uid\}\/profile\/photo/);
-  assert.match(imageRoute, /readSession/);
+  assert.match(imageRoute, /authenticatePrincipal/);
   assert.match(imageRoute, /X-Content-Type-Options/);
 });

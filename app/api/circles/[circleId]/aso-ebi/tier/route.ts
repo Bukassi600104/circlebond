@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { selectAsoEbiTier } from "@/server/repositories/aso-ebi-circles";
 
@@ -8,11 +8,11 @@ export async function POST(
   context: { params: Promise<{ circleId: string }> },
 ) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const { circleId } = await context.params;
     const { tierId } = (await request.json()) as { tierId?: string };
     if (!tierId) throw new Error("Choose a tier.");

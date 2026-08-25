@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { markAllNotificationsRead } from "@/server/repositories/notifications";
 
 export async function POST(request: Request) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     await markAllNotificationsRead(session.uid);
     return NextResponse.json({ ok: true });
   } catch (error) {

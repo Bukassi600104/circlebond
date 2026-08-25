@@ -1717,6 +1717,29 @@ export interface GetUserAccountStatusVariables {
   userId: string;
 }
 
+export interface GetUserBootstrapProfileData {
+  user?: {
+    id: string;
+    displayName: string;
+    phone?: string | null;
+    email?: string | null;
+    profileImage?: string | null;
+    termsAcceptedAt?: TimestampString | null;
+    privacyAcceptedAt?: TimestampString | null;
+    accountStatus: string;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+  } & User_Key;
+}
+
+export interface GetUserBootstrapProfileVariables {
+  userId: string;
+}
+
 export interface GetUserDeadlineNotificationCandidatesData {
   circleMemberships: ({
     circle: {
@@ -3406,6 +3429,18 @@ export const getUserAccountStatusRef: GetUserAccountStatusRef;
 
 export function getUserAccountStatus(vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
 export function getUserAccountStatus(dc: DataConnect, vars: GetUserAccountStatusVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserAccountStatusData, GetUserAccountStatusVariables>;
+
+interface GetUserBootstrapProfileRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserBootstrapProfileVariables): QueryRef<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserBootstrapProfileVariables): QueryRef<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
+  operationName: string;
+}
+export const getUserBootstrapProfileRef: GetUserBootstrapProfileRef;
+
+export function getUserBootstrapProfile(vars: GetUserBootstrapProfileVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
+export function getUserBootstrapProfile(dc: DataConnect, vars: GetUserBootstrapProfileVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
 
 interface GetOwnerPlatformOverviewRef {
   /* Allow users to create refs without passing in DataConnect */

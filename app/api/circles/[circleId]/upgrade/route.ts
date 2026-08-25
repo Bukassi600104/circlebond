@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { pricingErrorResponse } from "@/server/pricing/http";
 import { requireActivationPaymentProvider } from "@/server/pricing/provider";
@@ -29,11 +29,11 @@ export async function POST(
 ) {
   let metricCircleId: string | null = null;
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const { circleId } = await context.params;
     metricCircleId = circleId;
     const circle = await loadCirclePricingState(circleId);

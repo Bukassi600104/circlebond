@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
 import {
   assertCanManageInvitations,
@@ -14,11 +14,11 @@ import { buildInvitationShareMessage } from "@/server/invitations/rules";
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ circleId: string }> },
 ) {
   try {
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
@@ -44,11 +44,11 @@ export async function POST(
   context: { params: Promise<{ circleId: string }> },
 ) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const { circleId } = await context.params;
     if (
       !(await enforceRateLimit(

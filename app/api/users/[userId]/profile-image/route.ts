@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ userId: string }> },
 ) {
-  const session = await readSession();
+  const session = await authenticatePrincipal(request);
   if (!session) return new NextResponse(null, { status: 401 });
   const { userId } = await context.params;
   if (!/^[A-Za-z0-9:_-]{1,128}$/.test(userId)) {

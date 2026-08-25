@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { communicationErrorResponse } from "@/server/communication/http";
 import { setCircleComments } from "@/server/repositories/communication";
@@ -9,11 +9,11 @@ export async function PATCH(
   context: { params: Promise<{ circleId: string }> },
 ) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const { circleId } = await context.params;
     const body = (await request.json()) as { commentsEnabled?: boolean };
     if (typeof body.commentsEnabled !== "boolean") {

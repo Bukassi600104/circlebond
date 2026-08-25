@@ -85,3 +85,69 @@ export async function persistAuthAudit(input: {
     });
   }
 }
+
+export async function fetchUserBootstrapProfile(userId: string) {
+  if (
+    process.env.FIREBASE_AUTH_EMULATOR_HOST &&
+    !process.env.DATA_CONNECT_EMULATOR_HOST
+  ) {
+    return null;
+  }
+  try {
+    const dataConnect = getBondCircleDataConnect();
+    const response = await dataConnect.executeQuery<
+      {
+        user?: {
+          id: string;
+          displayName: string;
+          email?: string | null;
+          phone?: string | null;
+          profileImage?: string | null;
+          termsAcceptedAt?: string | null;
+          privacyAcceptedAt?: string | null;
+          accountStatus?: string;
+          emailNotifications: boolean;
+          browserPushNotifications: boolean;
+          commentNotifications: boolean;
+          contributionReminders: boolean;
+          circleUpdateNotifications: boolean;
+          marketingCommunication: boolean;
+        };
+      },
+      { userId: string }
+    >("GetUserBootstrapProfile", { userId });
+    return response.data.user ?? null;
+  } catch (error) {
+    logger.warn("bootstrap_profile_fetch_failed", {
+      userId,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+    return null;
+  }
+}
+
+export async function updatePersistedDisplayName(
+  userId: string,
+  displayName: string,
+) {
+  if (
+    process.env.FIREBASE_AUTH_EMULATOR_HOST &&
+    !process.env.DATA_CONNECT_EMULATOR_HOST
+  ) {
+    logger.info("emulator_display_name_updated", { userId, displayName });
+    return;
+  }
+  try {
+    const dataConnect = getBondCircleDataConnect();
+    await dataConnect.upsert("User", {
+      id: userId,
+      displayName,
+    });
+  } catch (error) {
+    logger.warn("display_name_update_failed", {
+      userId,
+      error: error instanceof Error ? error.message : "unknown",
+    });
+  }
+}
+

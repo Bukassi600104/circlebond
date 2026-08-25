@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { assertTrustedMutation } from "@/server/auth/request";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { persistUserProfile } from "@/server/repositories/users";
 
 export async function POST(request: Request) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
+    await assertTrustedMutation(request, session);
     if (!session) throw new Error("Authentication required.");
     const input = (await request.json()) as {
       termsAccepted?: boolean;
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const acceptedAt = new Date().toISOString();
     const displayName =
       input.displayName?.trim().replace(/\s+/g, " ") ||
-      session.name ||
+      session.decoded.name ||
       session.email?.split("@")[0] ||
       "BondCircle member";
     if (displayName.length < 2 || displayName.length > 80) {
@@ -35,8 +35,8 @@ export async function POST(request: Request) {
       id: session.uid,
       displayName,
       email: session.email ?? null,
-      phone: session.phone_number ?? null,
-      profileImage: session.picture ?? null,
+      phone: session.decoded.phone_number ?? null,
+      profileImage: session.decoded.picture ?? null,
       termsAcceptedAt: acceptedAt,
       privacyAcceptedAt: acceptedAt,
     });

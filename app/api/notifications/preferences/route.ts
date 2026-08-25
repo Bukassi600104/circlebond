@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { updateNotificationPreferences } from "@/server/repositories/notifications";
 
@@ -14,11 +14,11 @@ const preferenceKeys = [
 
 export async function PATCH(request: Request) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const body = (await request.json()) as Record<string, unknown>;
     if (preferenceKeys.some((key) => typeof body[key] !== "boolean")) {
       throw new Error("Every notification preference must be true or false.");

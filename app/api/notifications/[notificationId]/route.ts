@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
 import {
   dismissNotification,
@@ -11,11 +11,11 @@ export async function PATCH(
   context: { params: Promise<{ notificationId: string }> },
 ) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     const { notificationId } = await context.params;
     const body = (await request.json()) as { action?: string };
     if (body.action === "read") {

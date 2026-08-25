@@ -50,6 +50,7 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetStoragePathReferences*](#getstoragepathreferences)
   - [*GetOwnerAdministrator*](#getowneradministrator)
   - [*GetUserAccountStatus*](#getuseraccountstatus)
+  - [*GetUserBootstrapProfile*](#getuserbootstrapprofile)
   - [*GetOwnerPlatformOverview*](#getownerplatformoverview)
   - [*GetOwnerReportReview*](#getownerreportreview)
   - [*GetOwnerUserByIdentifier*](#getowneruserbyidentifier)
@@ -3593,6 +3594,103 @@ export default function GetUserAccountStatusComponent() {
   const dataConnect = getDataConnect(connectorConfig);
   const options = { staleTime: 5 * 1000 };
   const query = useGetUserAccountStatus(dataConnect, getUserAccountStatusVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserBootstrapProfile
+You can execute the `GetUserBootstrapProfile` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserBootstrapProfile(dc: DataConnect, vars: GetUserBootstrapProfileVariables, options?: useDataConnectQueryOptions<GetUserBootstrapProfileData>): UseDataConnectQueryResult<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserBootstrapProfile(vars: GetUserBootstrapProfileVariables, options?: useDataConnectQueryOptions<GetUserBootstrapProfileData>): UseDataConnectQueryResult<GetUserBootstrapProfileData, GetUserBootstrapProfileVariables>;
+```
+
+### Variables
+The `GetUserBootstrapProfile` Query requires an argument of type `GetUserBootstrapProfileVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserBootstrapProfileVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserBootstrapProfile` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserBootstrapProfile` Query is of type `GetUserBootstrapProfileData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserBootstrapProfileData {
+  user?: {
+    id: string;
+    displayName: string;
+    phone?: string | null;
+    email?: string | null;
+    profileImage?: string | null;
+    termsAcceptedAt?: TimestampString | null;
+    privacyAcceptedAt?: TimestampString | null;
+    accountStatus: string;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+  } & User_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserBootstrapProfile`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserBootstrapProfileVariables } from '@bondcircle/dataconnect';
+import { useGetUserBootstrapProfile } from '@bondcircle/dataconnect/react'
+
+export default function GetUserBootstrapProfileComponent() {
+  // The `useGetUserBootstrapProfile` Query hook requires an argument of type `GetUserBootstrapProfileVariables`:
+  const getUserBootstrapProfileVars: GetUserBootstrapProfileVariables = {
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserBootstrapProfile(getUserBootstrapProfileVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserBootstrapProfile({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserBootstrapProfile(dataConnect, getUserBootstrapProfileVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserBootstrapProfile(getUserBootstrapProfileVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserBootstrapProfile(dataConnect, getUserBootstrapProfileVars, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {

@@ -1286,6 +1286,21 @@ exports.getUserAccountStatus = function getUserAccountStatus(dcOrVars, varsOrOpt
 }
 ;
 
+const getUserBootstrapProfileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserBootstrapProfile', inputVars);
+}
+getUserBootstrapProfileRef.operationName = 'GetUserBootstrapProfile';
+exports.getUserBootstrapProfileRef = getUserBootstrapProfileRef;
+
+exports.getUserBootstrapProfile = function getUserBootstrapProfile(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getUserBootstrapProfileRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
 const getOwnerPlatformOverviewRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();

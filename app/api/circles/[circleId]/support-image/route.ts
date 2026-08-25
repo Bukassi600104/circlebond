@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import { loadSupportCircle } from "@/server/repositories/support-circles";
 
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ circleId: string }> },
 ) {
-  const session = await readSession();
+  const session = await authenticatePrincipal(request);
   if (!session) return new NextResponse(null, { status: 401 });
   const { circleId } = await context.params;
   const circle = await loadSupportCircle(circleId, session.uid);

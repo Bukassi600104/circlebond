@@ -178,7 +178,7 @@ test("notification persistence, protected APIs, deep links, preferences and emai
   assert.match(center, /Mark all read/);
   assert.match(center, /Notification previews never include private/);
   for (const route of [notificationRoute, preferencesRoute]) {
-    assert.match(route, /readSession/);
+    assert.match(route, /authenticatePrincipal/);
     assert.match(route, /assertTrustedMutation/);
   }
   assert.match(cronRoute, /CRON_SECRET/);

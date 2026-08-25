@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
 import { enforceRateLimit } from "@/server/auth/security";
 import {
@@ -33,11 +33,11 @@ async function profilePhotoStorageAvailable() {
 
 export async function POST(request: Request) {
   try {
-    await assertTrustedMutation(request);
-    const session = await readSession();
+    const session = await authenticatePrincipal(request);
     if (!session) {
       return NextResponse.json({ error: "Sign in required." }, { status: 401 });
     }
+    await assertTrustedMutation(request, session);
     if (
       !(await enforceRateLimit(
         clientKey(request, `profile-photo:${session.uid}`),
