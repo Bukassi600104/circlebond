@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, ImagePlus, X } from "lucide-react";
+import { prepareImageUpload } from "@/lib/image-upload";
 import {
   formatMinorNaira,
   planForMemberCount,
@@ -58,11 +59,12 @@ export function GiftCircleForm() {
     setBusy(true);
     try {
       const form = new FormData(event.currentTarget);
+      const prepared = await prepareImageUpload(form);
       const csrf = await csrfToken();
       const response = await fetch("/api/circles/gift", {
         method: "POST",
-        headers: { "X-CSRF-Token": csrf },
-        body: form,
+        headers: { "X-CSRF-Token": csrf, "Content-Type": prepared.contentType },
+        body: prepared.body,
       });
       const data = (await response.json()) as {
         circleId?: string;

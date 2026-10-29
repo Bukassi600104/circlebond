@@ -262,3 +262,16 @@ test("manifest icon files match their declared dimensions", async () => {
   assert.equal(maskable.readUInt32BE(16), 512);
   assert.equal(maskable.readUInt32BE(20), 512);
 });
+
+test("manifest allows both orientations instead of locking an installed app to portrait", async () => {
+  const manifestSource = await readFile(
+    new URL("../../app/manifest.ts", import.meta.url),
+    "utf8",
+  );
+  const exports = {};
+  const compiled = ts.transpileModule(manifestSource, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  });
+  runInNewContext(compiled.outputText, { exports });
+  assert.equal(exports.default().orientation, "any");
+});

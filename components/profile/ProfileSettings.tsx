@@ -6,6 +6,7 @@ import { Camera, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui";
 import { TextInput } from "@/components/forms";
+import { prepareImageUpload } from "@/lib/image-upload";
 
 async function csrfToken() {
   const response = await fetch("/api/auth/csrf", { cache: "no-store" });
@@ -90,13 +91,14 @@ export function ProfileSettings({
     setError("");
     setSuccess("");
     try {
-      const csrf = await csrfToken();
       const form = new FormData();
       form.set("photo", selectedFile);
+      const prepared = await prepareImageUpload(form);
+      const csrf = await csrfToken();
       const response = await fetch("/api/profile/photo", {
         method: "POST",
-        headers: { "X-CSRF-Token": csrf },
-        body: form,
+        headers: { "X-CSRF-Token": csrf, "Content-Type": prepared.contentType },
+        body: prepared.body,
       });
       const data = (await response.json()) as {
         error?: string;
