@@ -102,6 +102,59 @@ test("export fails closed on unavailable, cross-account or oversized records", a
   }
 });
 
+for (const [scenario, counts] of [
+  ["exactly 10,000 related records", { receipts: 10_000 }],
+  [
+    "10,400 records across collections",
+    {
+      memberships: 1300,
+      receipts: 1300,
+      comments: 1300,
+      announcements: 1300,
+      supportUpdates: 1300,
+      notifications: 1300,
+      activations: 1300,
+      authEvents: 1300,
+    },
+  ],
+]) {
+  test(`export enforces the aggregate boundary for ${scenario}`, async () => {
+    const offsets = [];
+    const privacy = await load("server/repositories/account-privacy.ts", {
+      "server-only": {},
+      "@/server/firebase/data-connect": {
+        getBondCircleDataConnect: () => ({
+          executeQuery: async (operation, { offset }) => {
+            if (operation === "GetAccountPrivacyRequests")
+              return { data: { accountPrivacyRequests: [] } };
+            offsets.push(offset);
+            const page = emptyPage();
+            for (const [name, count] of Object.entries(counts)) {
+              page[name] = Array.from(
+                { length: Math.min(100, Math.max(0, count - offset)) },
+                (_, index) => ({ id: `${name}-${offset + index}` }),
+              );
+            }
+            return { data: page };
+          },
+        }),
+      },
+    });
+    if (counts.receipts === 10_000) {
+      assert.equal(
+        (await privacy.exportAccountData("self")).receipts.length,
+        10_000,
+      );
+      assert.equal(offsets.at(-1), 10_000);
+    } else {
+      await assert.rejects(
+        privacy.exportAccountData("self"),
+        privacy.AccountExportLimitError,
+      );
+    }
+  });
+}
+
 test("privacy requests are persisted idempotently and do not delete accounts or circle data", async () => {
   let stored;
   const writes = [];

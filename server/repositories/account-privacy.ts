@@ -34,7 +34,7 @@ export class AccountExportLimitError extends Error {
 }
 
 export async function exportAccountData(userId: string) {
-  // shortcut: exports above 4 MB or 10,000 records need assistance; stream files if larger exports become common.
+  // shortcut: exports above 4 MB or 10,000 related records need assistance; stream files if larger exports become common.
   const records: Record<Collection, Array<Record<string, unknown>>> = {
     memberships: [],
     receipts: [],
@@ -46,9 +46,10 @@ export async function exportAccountData(userId: string) {
     authEvents: [],
   };
   let profile: Record<string, unknown> | undefined;
+  let recordCount = 0;
   const requests = await loadPrivacyRequests(userId);
   const generatedAt = new Date().toISOString();
-  for (let offset = 0; offset < 10_000; offset += 100) {
+  for (let offset = 0; offset <= 10_000; offset += 100) {
     const response = await getBondCircleDataConnect().executeQuery<
       ExportPage,
       { userId: string; offset: number }
@@ -60,6 +61,8 @@ export async function exportAccountData(userId: string) {
     for (const name of collections) {
       const page = response.data[name];
       if (!Array.isArray(page)) throw new Error("Account export unavailable.");
+      recordCount += page.length;
+      if (recordCount > 10_000) throw new AccountExportLimitError();
       records[name].push(...page);
       more ||= page.length === 100;
     }
