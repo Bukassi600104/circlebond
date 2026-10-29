@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import test from "node:test";
+import { startSmtpSink } from "../helpers/smtp-sink.mjs";
 
 const port = 3101;
 const baseUrl = `http://127.0.0.1:${port}`;
@@ -43,6 +44,7 @@ async function csrf() {
 }
 
 test("Firebase email OTP creates a revocable protected session", async () => {
+  const smtp = await startSmtpSink();
   const server = spawn(
     process.execPath,
     ["node_modules/next/dist/bin/next", "start", "-p", String(port)],
@@ -53,7 +55,9 @@ test("Firebase email OTP creates a revocable protected session", async () => {
         ...process.env,
         NODE_ENV: "production",
         FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:9099",
-        AUTH_EMAIL_OTP_MODE: "development",
+        AUTH_EMAIL_OTP_MODE: "production",
+        AUTH_EMAIL_SMTP_URL: smtp.url,
+        AUTH_EMAIL_FROM: "BondCircle Test <no-reply@example.test>",
         AUTH_CHALLENGE_SECRET:
           "bondcircle-e2e-only-secret-with-more-than-thirty-two-bytes",
       },
@@ -80,7 +84,8 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     absorbCookies(requestCode);
     assert.equal(requestCode.status, 202);
     const challenge = await requestCode.json();
-    assert.match(challenge.developmentCode, /^\d{6}$/);
+    assert.equal(challenge.developmentCode, undefined);
+    const code = smtp.takeCode(email);
 
     const verify = await fetch(`${baseUrl}/api/auth/email-otp/verify`, {
       method: "POST",
@@ -90,7 +95,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
       },
       body: JSON.stringify({
         challengeId: challenge.challengeId,
-        code: challenge.developmentCode,
+        code,
       }),
     });
     absorbCookies(verify);
@@ -166,7 +171,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
         },
         body: JSON.stringify({
           challengeId: recoveryChallenge.challengeId,
-          code: recoveryChallenge.developmentCode,
+          code: smtp.takeCode(email),
         }),
       },
     );
@@ -198,7 +203,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
         },
         body: JSON.stringify({
           challengeId: unknownChallenge.challengeId,
-          code: unknownChallenge.developmentCode,
+          code: smtp.takeCode(unknownEmail),
         }),
       },
     );
@@ -255,5 +260,6 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     assert.match(rejected.headers.get("location") ?? "", /\/sign-in/);
   } finally {
     server.kill();
+    await smtp.close();
   }
 });
