@@ -7,6 +7,7 @@ import {
 } from "@/components/invitations/InvitationDetails";
 import { invitationMatchesUser } from "@/server/invitations/rules";
 import { readSession } from "@/server/auth";
+import { loadAcceptedLegalProfile } from "@/server/auth/legal";
 import { loadInvitationByToken } from "@/server/repositories/invitations";
 
 export const metadata: Metadata = {
@@ -24,6 +25,9 @@ export default async function InvitationPage({
   const session = await readSession();
   if (!session) {
     redirect(`/register?next=${encodeURIComponent(nextPath)}`);
+  }
+  if (!(await loadAcceptedLegalProfile(session.uid))) {
+    redirect(`/legal/accept?next=${encodeURIComponent(nextPath)}`);
   }
   const invitation = await loadInvitationByToken(token);
   if (!invitation) return <InvalidInvitation />;

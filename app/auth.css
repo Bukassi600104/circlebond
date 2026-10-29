@@ -862,7 +862,7 @@
 
 .bc-legal-modal .bc-button {
   width: auto;
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: var(--space-1) var(--space-3);
   font-size: 0.8125rem;
 }

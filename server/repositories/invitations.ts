@@ -1,5 +1,6 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import { assertLegalAcceptance } from "@/server/auth/legal";
 import { assertPermission, type CircleRole } from "@/server/circles/engine";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
@@ -348,6 +349,7 @@ export async function respondToInvitation(
   const currentMembers = await firebaseCircleStore.memberCount(
     invitation.circle.id,
   );
+  await assertLegalAcceptance(user.id);
   assertInvitationCapacity(
     currentMembers,
     invitation.circle.memberLimit,
@@ -404,6 +406,7 @@ export async function approveInvitationMembership(
   actorId: string,
 ) {
   await assertCanManageInvitations(circleId, actorId);
+  await assertLegalAcceptance(userId);
   const invitation = (await listCircleInvitations(circleId)).find(
     (item) => item.id === invitationId,
   );

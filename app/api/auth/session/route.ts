@@ -12,6 +12,7 @@ import { enforceRateLimit } from "@/server/auth/security";
 import { recordAuthAudit } from "@/server/audit";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { persistUserProfile } from "@/server/repositories/users";
+import { loadLegalAcceptance } from "@/server/auth/legal";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,17 @@ export async function POST(request: Request) {
 
     const sessionCookie = await createSessionCookie(idToken);
     const decoded = await getFirebaseAdminAuth().verifyIdToken(idToken);
+    const existingAcceptance = await loadLegalAcceptance(decoded.uid);
+    const termsAcceptedAt =
+      existingAcceptance?.termsAcceptedAt ??
+      (typeof decoded.termsAcceptedAt === "string"
+        ? decoded.termsAcceptedAt
+        : null);
+    const privacyAcceptedAt =
+      existingAcceptance?.privacyAcceptedAt ??
+      (typeof decoded.privacyAcceptedAt === "string"
+        ? decoded.privacyAcceptedAt
+        : null);
     await persistUserProfile({
       id: decoded.uid,
       displayName:
@@ -58,20 +70,11 @@ export async function POST(request: Request) {
       email: decoded.email ?? null,
       phone: decoded.phone_number ?? null,
       profileImage: decoded.picture ?? null,
-      termsAcceptedAt:
-        typeof decoded.termsAcceptedAt === "string"
-          ? decoded.termsAcceptedAt
-          : null,
-      privacyAcceptedAt:
-        typeof decoded.privacyAcceptedAt === "string"
-          ? decoded.privacyAcceptedAt
-          : null,
+      termsAcceptedAt,
+      privacyAcceptedAt,
     });
 
-    const needsLegalAcceptance = !(
-      typeof decoded.termsAcceptedAt === "string" &&
-      typeof decoded.privacyAcceptedAt === "string"
-    );
+    const needsLegalAcceptance = !(termsAcceptedAt && privacyAcceptedAt);
     const response = NextResponse.json({
       authenticated: true,
       needsLegalAcceptance,

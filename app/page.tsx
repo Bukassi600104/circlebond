@@ -9,11 +9,18 @@ export default function SplashPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const target =
-      localStorage.getItem("bc-onboarding-complete") === "true"
-        ? "/account"
-        : "/onboarding";
-    const timer = window.setTimeout(() => router.replace(target), 3200);
+    let returning = false;
+    try {
+      returning = localStorage.getItem("bc-onboarding-complete") === "true";
+    } catch {
+      // Browsers may disable storage; first-use navigation must still work.
+    }
+    const target = returning ? "/account" : "/onboarding";
+    const delay =
+      returning || window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? 0
+        : 3200;
+    const timer = window.setTimeout(() => router.replace(target), delay);
     return () => window.clearTimeout(timer);
   }, [router]);
 

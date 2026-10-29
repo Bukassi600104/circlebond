@@ -1120,3 +1120,20 @@
     display: none;
   }
 }
+.bc-dialog-overlay {
+  border: 0;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
+.bc-dialog-overlay:not([open]) {
+  display: none;
+}
+
+.bc-dialog-overlay::backdrop {
+  background: transparent;
+}

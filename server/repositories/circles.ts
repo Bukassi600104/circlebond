@@ -1,5 +1,6 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import { assertLegalAcceptance } from "@/server/auth/legal";
 import {
   isCirclePricingPlan,
   PRICING_EFFECTIVE_AT,
@@ -94,6 +95,7 @@ export class FirebaseCircleStore implements CircleStore {
     circle: Omit<CircleRecord, "id" | "creatorId">,
     creatorId: string,
   ) {
+    await assertLegalAcceptance(creatorId);
     if (!isCirclePricingPlan(circle.pricingPlan)) {
       throw new Error("New circles require a model-specific pricing plan.");
     }
@@ -261,6 +263,7 @@ export class FirebaseCircleStore implements CircleStore {
     memberId: string,
     role: "co_admin" | "member",
   ) {
+    await assertLegalAcceptance(memberId);
     await getBondCircleDataConnect().executeMutation(
       "AddCircleMemberWithAudit",
       {

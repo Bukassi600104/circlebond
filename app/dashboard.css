@@ -5092,3 +5092,34 @@
     grid-column: 1 / -1;
   }
 }
+.bc-account-settings {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.bc-account-settings .bc-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.bc-account-settings h2,
+.bc-account-settings p {
+  margin: 0;
+}
+
+.bc-account-settings nav {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.bc-account-settings nav a,
+.bc-account-settings__confirmation {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -33,7 +33,11 @@ export default function OnboardingPage() {
   const item = pages[page];
 
   function finish() {
-    localStorage.setItem("bc-onboarding-complete", "true");
+    try {
+      localStorage.setItem("bc-onboarding-complete", "true");
+    } catch {
+      // Completing onboarding must work when the browser disables storage.
+    }
     router.push("/sign-in");
   }
 

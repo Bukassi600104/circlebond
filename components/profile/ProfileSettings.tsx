@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Camera, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui";
+import { TextInput } from "@/components/forms";
 
 async function csrfToken() {
   const response = await fetch("/api/auth/csrf", { cache: "no-store" });
@@ -31,6 +32,41 @@ export function ProfileSettings({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [name, setName] = useState(displayName);
+  const [currentName, setCurrentName] = useState(displayName);
+
+  async function saveName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": await csrfToken(),
+        },
+        body: JSON.stringify({ displayName: name }),
+      });
+      const result = await response.json();
+      if (!response.ok || typeof result.displayName !== "string")
+        throw new Error(result.error ?? "Unable to update your display name.");
+      setName(result.displayName);
+      setCurrentName(result.displayName);
+      setSuccess("Display name updated.");
+      router.refresh();
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to update your display name.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     return () => {
@@ -84,7 +120,7 @@ export function ProfileSettings({
     }
   }
 
-  const initials = displayName
+  const initials = currentName
     .split(/\s+/)
     .slice(0, 2)
     .map((part) => part[0])
@@ -99,14 +135,14 @@ export function ProfileSettings({
           {visibleImage ? (
             <Image
               src={visibleImage}
-              alt={`${displayName}'s profile photo`}
+              alt={`${currentName}'s profile photo`}
               width={112}
               height={112}
               sizes="112px"
               unoptimized
             />
           ) : (
-            <span aria-label={`${displayName}'s initials`}>{initials}</span>
+            <span aria-label={`${currentName}'s initials`}>{initials}</span>
           )}
         </div>
         <div className="bc-profile-photo__controls">
@@ -150,10 +186,28 @@ export function ProfileSettings({
         </p>
       )}
 
+      <form className="bc-auth-form" onSubmit={saveName}>
+        <TextInput
+          id="profile-display-name"
+          label="Display name"
+          required
+          minLength={2}
+          maxLength={80}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+        <Button
+          type="submit"
+          loading={loading}
+          disabled={loading || name.trim() === currentName}
+        >
+          Save display name
+        </Button>
+      </form>
       <dl>
         <div>
           <dt>Display name</dt>
-          <dd>{displayName}</dd>
+          <dd>{currentName}</dd>
         </div>
         <div>
           <dt>Email</dt>
