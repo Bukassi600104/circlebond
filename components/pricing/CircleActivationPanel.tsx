@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { csrfToken } from "@/features/auth/client";
 import { VerifyActivationPayment } from "./VerifyActivationPayment";
 
 type Props = {
@@ -28,11 +29,12 @@ export function CircleActivationPanel({
     setBusy(true);
     setMessage("");
     try {
+      const csrf = await csrfToken();
       const response = await fetch(
         `/api/circles/${encodeURIComponent(circleId)}/activation`,
         {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", "X-CSRF-Token": csrf },
           body: JSON.stringify({ billingEmail }),
         },
       );

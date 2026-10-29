@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { VerifyActivationPayment } from "./VerifyActivationPayment";
+import { csrfToken } from "@/features/auth/client";
 
 type UpgradeOption = {
   plan: "starter" | "standard" | "premium";
@@ -26,11 +27,12 @@ export function CircleUpgradePanel({
     setBusy(option.plan);
     setMessage("");
     try {
+      const csrf = await csrfToken();
       const response = await fetch(
         `/api/circles/${encodeURIComponent(circleId)}/upgrade`,
         {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", "X-CSRF-Token": csrf },
           body: JSON.stringify({ targetPlan: option.plan, billingEmail }),
         },
       );

@@ -33,7 +33,7 @@ function withTimeout<T>(
   });
 }
 
-async function csrfToken() {
+export async function csrfToken() {
   const response = await fetch("/api/auth/csrf", { cache: "no-store" });
   if (!response.ok) throw new Error("Unable to start a secure session.");
   return ((await response.json()) as { csrfToken: string }).csrfToken;

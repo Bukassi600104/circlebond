@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { csrfToken } from "@/features/auth/client";
 
 export function VerifyActivationPayment({ circleId }: { circleId: string }) {
   const router = useRouter();
@@ -10,9 +11,10 @@ export function VerifyActivationPayment({ circleId }: { circleId: string }) {
   async function verify() {
     setBusy(true);
     try {
+      const csrf = await csrfToken();
       const response = await fetch(
         `/api/circles/${encodeURIComponent(circleId)}/activation/verify`,
-        { method: "POST" },
+        { method: "POST", headers: { "X-CSRF-Token": csrf } },
       );
       const payload = await response.json();
       if (!response.ok)
