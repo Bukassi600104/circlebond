@@ -187,9 +187,8 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
       deletedFileCount,
       skippedSharedFileCount,
     };
-  } catch (error) {
-    const failureReason =
-      error instanceof Error ? error.message : "Unknown retention failure";
+  } catch {
+    const failureReason = "RETENTION_PURGE_FAILED";
     await finishAttempt({
       attemptId,
       status: "failed",
@@ -197,10 +196,10 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
       skippedSharedFileCount,
       failureReason,
       nextRetryAt: new Date(now.getTime() + RETENTION_RETRY_MS).toISOString(),
-    }).catch((loggingError) => {
+    }).catch(() => {
       logger.error("retention_attempt_log_failed", {
         circleId,
-        error: loggingError instanceof Error ? loggingError.message : "unknown",
+        reasonCode: "RETENTION_ATTEMPT_LOG_FAILED",
       });
     });
     logger.error("retention_purge_alert", {

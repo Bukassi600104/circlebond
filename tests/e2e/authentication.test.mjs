@@ -6,6 +6,11 @@ import { startSmtpSink } from "../helpers/smtp-sink.mjs";
 const port = 3101;
 const baseUrl = `http://127.0.0.1:${port}`;
 const cookies = new Map();
+assert.match(
+  process.env.DATA_CONNECT_EMULATOR_HOST ?? "",
+  /^(127\.0\.0\.1|localhost):\d+$/,
+  "Authentication E2E may only access a loopback database emulator",
+);
 
 function absorbCookies(response) {
   for (const header of response.headers.getSetCookie()) {
@@ -66,7 +71,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
 
   try {
     await waitForServer();
-    const email = `e2e-${Date.now()}@example.test`;
+    const email = `e2e-${Date.now()}@example.com`;
     const requestCode = await fetch(`${baseUrl}/api/auth/email-otp/request`, {
       method: "POST",
       headers: {
@@ -114,6 +119,27 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     assert.equal(firebaseSignIn.status, 200);
     const { idToken } = await firebaseSignIn.json();
     assert.ok(idToken);
+
+    const directProfileWrite = await fetch(
+      `http://${process.env.DATA_CONNECT_EMULATOR_HOST}/v1/projects/bond-circle/locations/europe-west2/services/bondcircle-service/connectors/bondcircle:executeMutation`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          operationName: "UpsertCurrentUser",
+          variables: {
+            displayName: "Untrusted direct writer",
+            email: "another@example.com",
+            termsAcceptedAt: new Date().toISOString(),
+            privacyAcceptedAt: new Date().toISOString(),
+          },
+        }),
+      },
+    );
+    assert.equal(directProfileWrite.status, 403);
 
     const csrfToken = await csrf();
     const session = await fetch(`${baseUrl}/api/auth/session`, {
@@ -178,7 +204,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     assert.equal(restoreEmulatorUser.status, 200);
     assert.ok((await restoreEmulatorUser.json()).customToken);
 
-    const unknownEmail = `new-sign-in-${Date.now()}@example.test`;
+    const unknownEmail = `new-sign-in-${Date.now()}@example.com`;
     const requestUnknownCode = await fetch(
       `${baseUrl}/api/auth/email-otp/request`,
       {

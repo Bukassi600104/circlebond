@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
@@ -30,7 +31,7 @@ export async function GET(
     return NextResponse.json(
       {
         error:
-          error instanceof Error
+          isPublicError(error)
             ? error.message
             : "Unable to load invitations.",
       },
@@ -109,7 +110,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          error instanceof Error
+          isPublicError(error)
             ? error.message
             : "Unable to create invitation.",
       },

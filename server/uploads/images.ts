@@ -1,5 +1,6 @@
 import "server-only";
 import sharp from "sharp";
+import { RequestValidationError } from "@/server/public-errors";
 
 const APPROVED_IMAGE_TYPES = new Map([
   ["image/jpeg", { format: "jpeg", extension: "jpg" }],
@@ -24,7 +25,7 @@ export async function sanitizeUploadedImage(
     file.type as "image/jpeg" | "image/png" | "image/webp",
   );
   if (file.size < 1 || file.size > MAX_IMAGE_UPLOAD_BYTES || !approved) {
-    throw new Error(message);
+    throw new RequestValidationError(message);
   }
 
   try {
@@ -61,6 +62,6 @@ export async function sanitizeUploadedImage(
       extension: approved.extension,
     };
   } catch {
-    throw new Error(message);
+    throw new RequestValidationError(message);
   }
 }

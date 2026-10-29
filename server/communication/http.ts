@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { CommunicationRuleError } from "@/server/communication/rules";
 import { PricingRuleError } from "@/server/pricing";
+import { isPublicError } from "@/server/public-errors";
 
 export function communicationErrorResponse(error: unknown, fallback: string) {
   if (error instanceof PricingRuleError) {
@@ -9,7 +10,7 @@ export function communicationErrorResponse(error: unknown, fallback: string) {
       { status: error.status },
     );
   }
-  const message = error instanceof Error ? error.message : fallback;
+  const message = isPublicError(error) ? error.message : fallback;
   let status = 400;
   if (error instanceof CommunicationRuleError) {
     if (error.code === "PERMISSION_DENIED") status = 403;

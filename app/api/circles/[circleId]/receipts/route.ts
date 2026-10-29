@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
@@ -135,7 +136,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          error instanceof Error
+          isPublicError(error)
             ? error.message
             : "Unable to submit this receipt.",
       },

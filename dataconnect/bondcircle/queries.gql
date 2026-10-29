@@ -16,7 +16,7 @@ query GetRecentAbuseAttempts($bucketKey: String!, $since: Timestamp!)
   abuseAttempts(
     where: { bucketKey: { eq: $bucketKey }, occurredAt: { ge: $since } }
     orderBy: { occurredAt: DESC }
-    limit: 100
+    limit: 1000
   ) {
     id
     occurredAt
@@ -54,7 +54,7 @@ mutation UpsertCurrentUser(
   $profileImage: String
   $termsAcceptedAt: Timestamp
   $privacyAcceptedAt: Timestamp
-) @auth(level: USER) {
+) @auth(level: NO_ACCESS) {
   user_upsert(
     data: {
       id_expr: "auth.uid"

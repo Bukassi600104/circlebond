@@ -70,10 +70,12 @@ function shouldUseGoogleRedirect() {
 }
 
 export function hasPendingGoogleRedirect() {
-  return (
-    typeof window !== "undefined" &&
-    window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING) === "true"
-  );
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export async function completeGoogleRedirect() {

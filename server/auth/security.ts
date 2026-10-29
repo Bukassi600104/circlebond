@@ -172,25 +172,85 @@ export async function enforceRateLimit(
   limit = 6,
   windowMs = 60_000,
 ) {
-  const now = Date.now();
   const bucketKey = hash(key);
   const dataConnect = getBondCircleDataConnect();
-  const response = await dataConnect.executeQuery<
-    { abuseAttempts: Array<{ id: string; occurredAt: string }> },
-    { bucketKey: string; since: string }
-  >("GetRecentAbuseAttempts", {
-    bucketKey,
-    since: new Date(now - windowMs).toISOString(),
-  });
-  if (response.data.abuseAttempts.length >= limit) {
-    return false;
+  // shortcut: eight CAS retries fail closed under contention; use a database reservation if normal traffic exhausts them.
+  for (let retry = 0; retry < 8; retry++) {
+    const now = Date.now();
+    const response = await dataConnect.executeQuery<
+      {
+        rateLimitBucket?: { attemptsJson: string; revision: number } | null;
+      },
+      { bucketKey: string }
+    >("GetRateLimitBucket", { bucketKey });
+    const bucket = response.data.rateLimitBucket;
+    if (!bucket) {
+      const recent = await dataConnect.executeQuery<
+        {
+          abuseAttempts: Array<{ occurredAt: string }>;
+        },
+        { bucketKey: string; since: string }
+      >("GetRecentAbuseAttempts", {
+        bucketKey,
+        since: new Date(now - windowMs).toISOString(),
+      });
+      try {
+        await dataConnect.executeMutation("CreateRateLimitBucket", {
+          bucketKey,
+          attemptsJson: JSON.stringify(
+            recent.data.abuseAttempts.map((attempt) =>
+              Date.parse(attempt.occurredAt),
+            ),
+          ),
+        });
+      } catch (error) {
+        const existing = await dataConnect.executeQuery<
+          {
+            rateLimitBucket?: { revision: number } | null;
+          },
+          { bucketKey: string }
+        >("GetRateLimitBucket", { bucketKey });
+        if (!existing.data.rateLimitBucket) throw error;
+      }
+      continue;
+    }
+    const recorded: unknown = JSON.parse(bucket.attemptsJson);
+    if (
+      !Array.isArray(recorded) ||
+      !recorded.every((value) => Number.isSafeInteger(value)) ||
+      !Number.isSafeInteger(bucket.revision)
+    ) {
+      throw new Error("Rate limit state is unavailable.");
+    }
+    const attempts = (recorded as number[]).filter(
+      (time) => time > now - windowMs,
+    );
+    if (attempts.length >= limit) return false;
+    const reserved = await dataConnect.executeMutation<
+      {
+        updated: number;
+      },
+      {
+        bucketKey: string;
+        revision: number;
+        nextRevision: number;
+        attemptsJson: string;
+      }
+    >("CompareAndSetRateLimitBucket", {
+      bucketKey,
+      revision: bucket.revision,
+      nextRevision: bucket.revision + 1,
+      attemptsJson: JSON.stringify([...attempts, now]),
+    });
+    if (reserved.data.updated !== 1) continue;
+    await dataConnect.executeMutation("RecordAbuseAttempt", {
+      id: randomUUID(),
+      bucketKey,
+      occurredAt: new Date(now).toISOString(),
+    });
+    return true;
   }
-  await dataConnect.executeMutation("RecordAbuseAttempt", {
-    id: randomUUID(),
-    bucketKey,
-    occurredAt: new Date(now).toISOString(),
-  });
-  return true;
+  return false;
 }
 
 export function authChallengeFingerprint(challengeToken: string) {

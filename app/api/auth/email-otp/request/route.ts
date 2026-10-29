@@ -13,6 +13,18 @@ import { recordAuthAudit } from "@/server/audit";
 
 export async function POST(request: Request) {
   try {
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, "otp-request"),
+        120,
+        15 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again shortly." },
+        { status: 429, headers: { "Retry-After": "900" } },
+      );
+    }
     const input = (await request.json()) as {
       email?: string;
       purpose?: "register" | "sign-in" | "recovery";
@@ -20,13 +32,14 @@ export async function POST(request: Request) {
       termsAccepted?: boolean;
       privacyAccepted?: boolean;
     };
+    if (!["register", "sign-in", "recovery"].includes(input.purpose ?? ""))
+      throw new Error("Invalid purpose.");
     const developmentMode = process.env.NODE_ENV !== "production";
     const email = await validateEmailAddress(input.email ?? "", {
       allowTestDomains: developmentMode,
       checkDomain: !developmentMode,
     });
-    if (!input.purpose) throw new Error("Invalid purpose.");
-    if (!(await enforceRateLimit(clientKey(request, email), 5, 15 * 60_000))) {
+    if (!(await enforceRateLimit(`otp-address:${email}`, 5, 15 * 60_000))) {
       return NextResponse.json(
         { message: "If the address can be used, a code will arrive shortly." },
         { status: 202 },
@@ -40,17 +53,23 @@ export async function POST(request: Request) {
         : undefined;
     if (
       input.purpose === "register" &&
-      (!input.termsAccepted || !input.privacyAccepted)
+      (input.termsAccepted !== true || input.privacyAccepted !== true)
     ) {
       throw new Error("Legal acceptance required.");
     }
 
     const { challenge, challengeToken, code } = createEmailOtpChallenge({
       email,
-      purpose: input.purpose,
+      purpose: input.purpose!,
       displayName,
-      termsAcceptedAt: input.termsAccepted ? now : undefined,
-      privacyAcceptedAt: input.privacyAccepted ? now : undefined,
+      termsAcceptedAt:
+        input.purpose === "register" && input.termsAccepted === true
+          ? now
+          : undefined,
+      privacyAcceptedAt:
+        input.purpose === "register" && input.privacyAccepted === true
+          ? now
+          : undefined,
     });
 
     const delivery = await sendEmailOtp({ code, email });

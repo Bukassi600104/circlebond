@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { assertTrustedMutation } from "@/server/auth/request";
 import {
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          error instanceof Error
+          isPublicError(error)
             ? error.message
             : "Unable to complete this administrative action.",
       },

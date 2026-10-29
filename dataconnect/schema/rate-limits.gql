@@ -1,0 +1,5 @@
+type RateLimitBucket @table(key: ["bucketKey"]) {
+  bucketKey: String!
+  attemptsJson: String! @default(value: "[]")
+  revision: Int! @default(value: 0)
+}

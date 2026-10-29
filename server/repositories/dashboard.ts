@@ -113,10 +113,10 @@ export async function loadDashboardCircles(
           createdByCurrentUser: circle.creator.id === userId,
         };
       });
-  } catch (error) {
+  } catch {
     logger.error("dashboard_data_load_failed", {
       userId,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "DASHBOARD_DATA_UNAVAILABLE",
     });
     throw new DashboardDataError();
   }

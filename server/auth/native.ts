@@ -2,6 +2,7 @@ import "server-only";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import { withVerifiedContact } from "./verified-contact";
 import { authenticatePrincipal, type AuthenticatedPrincipal } from "./index";
 
 /**
@@ -52,7 +53,11 @@ export async function authenticateNativeRequest(
 
     let decoded: DecodedIdToken;
     try {
-      decoded = await getFirebaseAdminAuth().verifyIdToken(idToken, true);
+      const verified = withVerifiedContact(
+        await getFirebaseAdminAuth().verifyIdToken(idToken, true),
+      );
+      if (!verified) return { state: "unauthenticated" };
+      decoded = verified;
     } catch {
       return { state: "unauthenticated" };
     }

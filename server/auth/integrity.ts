@@ -14,12 +14,11 @@ export interface PlayIntegrityVerdict {
 export async function evaluatePlayIntegrity(
   integrityToken?: string | null,
 ): Promise<{ passed: boolean; verdict?: string }> {
-  // If not configured or in development mode, pass non-intrusively
-  if (
-    process.env.NODE_ENV !== "production" ||
-    !process.env.PLAY_INTEGRITY_ENABLED
-  ) {
+  if (process.env.NODE_ENV !== "production") {
     return { passed: true, verdict: "DEVELOPMENT_BYPASS" };
+  }
+  if (process.env.PLAY_INTEGRITY_ENABLED !== "true") {
+    return { passed: false, verdict: "NOT_CONFIGURED" };
   }
 
   if (!integrityToken || typeof integrityToken !== "string") {
@@ -27,16 +26,6 @@ export async function evaluatePlayIntegrity(
     return { passed: false, verdict: "MISSING_TOKEN" };
   }
 
-  try {
-    // In production with Google API credentials, verify token against Google Play Developer API
-    logger.info("play_integrity_evaluated", {
-      tokenLength: integrityToken.length,
-    });
-    return { passed: true, verdict: "PLAY_RECOGNIZED" };
-  } catch (error) {
-    logger.error("play_integrity_verification_failed", {
-      error: error instanceof Error ? error.message : "unknown",
-    });
-    return { passed: false, verdict: "VERIFICATION_ERROR" };
-  }
+  logger.warn("play_integrity_verification_unavailable");
+  return { passed: false, verdict: "VERIFICATION_UNAVAILABLE" };
 }

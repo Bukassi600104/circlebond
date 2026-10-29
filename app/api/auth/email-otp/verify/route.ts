@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import {
   OTP_ATTEMPTS_COOKIE,
+  OTP_MAX_ATTEMPTS,
+  OTP_TTL_MS,
   authChallengeFingerprint,
   consumeAuthChallenge,
   enforceRateLimit,
@@ -19,6 +21,18 @@ import {
 
 export async function POST(request: Request) {
   try {
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, "otp-verify"),
+        300,
+        15 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Too many verification requests. Try again shortly." },
+        { status: 429, headers: { "Retry-After": "900" } },
+      );
+    }
     const { challengeId, code } = (await request.json()) as {
       challengeId?: string;
       code?: string;
@@ -39,6 +53,18 @@ export async function POST(request: Request) {
       throw new Error("Verification attempts exhausted.");
     }
     const attemptsCookie = (await cookies()).get(OTP_ATTEMPTS_COOKIE)?.value;
+    if (
+      !(await enforceRateLimit(
+        `otp-challenge:${authChallengeFingerprint(challengeId)}`,
+        OTP_MAX_ATTEMPTS,
+        OTP_TTL_MS,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Verification attempts exhausted. Request a new code." },
+        { status: 429, headers: { "Retry-After": String(OTP_TTL_MS / 1000) } },
+      );
+    }
     const attempts = readOtpAttempts(attemptsCookie, challengeId);
     const result = verifyEmailOtp(challengeId, code!, attempts);
     if (!result.ok) {
@@ -110,6 +136,7 @@ export async function POST(request: Request) {
         });
         if (persisted?.termsAcceptedAt && persisted.privacyAcceptedAt) {
           await auth.setCustomUserClaims(user.uid, {
+            ...user.customClaims,
             termsAcceptedAt: persisted.termsAcceptedAt,
             privacyAcceptedAt: persisted.privacyAcceptedAt,
           });
@@ -122,6 +149,7 @@ export async function POST(request: Request) {
           emailVerified: true,
         });
         await auth.setCustomUserClaims(user.uid, {
+          ...user.customClaims,
           termsAcceptedAt: result.challenge.termsAcceptedAt,
           privacyAcceptedAt: result.challenge.privacyAcceptedAt,
         });
@@ -132,6 +160,8 @@ export async function POST(request: Request) {
           termsAcceptedAt: result.challenge.termsAcceptedAt,
           privacyAcceptedAt: result.challenge.privacyAcceptedAt,
         });
+      } else if (!user.emailVerified) {
+        await auth.updateUser(user.uid, { emailVerified: true });
       }
 
       const customToken = await auth.createCustomToken(user.uid);

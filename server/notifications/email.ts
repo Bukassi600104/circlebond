@@ -11,11 +11,11 @@ export async function sendCriticalNotificationEmail(input: {
   deepLink: string;
   idempotencyKey: string;
 }) {
-  if (
-    process.env.AUTH_EMAIL_OTP_MODE === "development" ||
-    process.env.NODE_ENV !== "production"
-  ) {
+  if (process.env.NODE_ENV !== "production") {
     return { messageId: `development:${input.idempotencyKey}` };
+  }
+  if (process.env.AUTH_EMAIL_OTP_MODE !== "production") {
+    throw new Error("Production email delivery is not configured.");
   }
   const smtpUrl = process.env.AUTH_EMAIL_SMTP_URL;
   const from = process.env.AUTH_EMAIL_FROM;
@@ -25,7 +25,12 @@ export async function sendCriticalNotificationEmail(input: {
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "https://www.bondcircles.com";
   const url = new URL(input.deepLink, origin).toString();
-  const transport = nodemailer.createTransport(smtpUrl);
+  const transport = nodemailer.createTransport({
+    url: smtpUrl,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
+  });
   const result = await transport.sendMail({
     from,
     to: input.to,

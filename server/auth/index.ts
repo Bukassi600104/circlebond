@@ -4,6 +4,7 @@ import type { DecodedIdToken } from "firebase-admin/auth";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { SESSION_MAX_AGE_MS } from "./security";
+import { withVerifiedContact } from "./verified-contact";
 
 export const SESSION_COOKIE = "__session";
 export const CSRF_COOKIE = "bc_csrf";
@@ -21,7 +22,8 @@ export interface AuthenticatedPrincipal {
 
 export async function createSessionCookie(idToken: string) {
   const auth = getFirebaseAdminAuth();
-  const decoded = await auth.verifyIdToken(idToken);
+  const decoded = withVerifiedContact(await auth.verifyIdToken(idToken));
+  if (!decoded) throw new Error("Verified contact required.");
   const signedInAt = Number(decoded.auth_time) * 1000;
   if (!signedInAt || Date.now() - signedInAt > 5 * 60 * 1000) {
     throw new Error("Recent sign-in required.");
@@ -35,7 +37,8 @@ export async function readSession(): Promise<DecodedIdToken | null> {
   try {
     // Keep revocation checking explicit: suspended/disabled Firebase sessions must fail.
     // prettier-ignore
-    const decoded = await getFirebaseAdminAuth().verifySessionCookie(session, true);
+    const decoded = withVerifiedContact(await getFirebaseAdminAuth().verifySessionCookie(session, true));
+    if (!decoded) return null;
     const response = await getBondCircleDataConnect().executeQuery<
       { user?: { accountStatus: string } },
       { userId: string }
@@ -68,7 +71,10 @@ export async function authenticatePrincipal(
     if (!idToken) return null;
     try {
       const auth = getFirebaseAdminAuth();
-      const decoded = await auth.verifyIdToken(idToken, true);
+      const decoded = withVerifiedContact(
+        await auth.verifyIdToken(idToken, true),
+      );
+      if (!decoded) return null;
       // Check account status
       const response = await getBondCircleDataConnect().executeQuery<
         { user?: { accountStatus: string } },
@@ -104,7 +110,9 @@ export async function authenticatePrincipal(
 export async function requireSession(nextPath = "/account") {
   const session = await readSession();
   const safeNext =
-    nextPath.startsWith("/") && !nextPath.startsWith("//")
+    nextPath.startsWith("/") &&
+    !nextPath.startsWith("//") &&
+    !/[\\\u0000-\u001f\u007f]/.test(nextPath)
       ? nextPath
       : "/account";
   if (!session) redirect(`/sign-in?next=${encodeURIComponent(safeNext)}`);

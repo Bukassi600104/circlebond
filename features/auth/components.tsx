@@ -35,8 +35,36 @@ import {
 
 type Channel = "email" | "phone";
 
+function sessionValue(key: string) {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storeSessionValue(key: string, value: string) {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    return;
+  }
+}
+
+function removeSessionValue(key: string) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch {
+    return;
+  }
+}
+
 function safeNextPath(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/account";
+  return value?.startsWith("/") &&
+    !value.startsWith("//") &&
+    !/[\\\u0000-\u001f\u007f]/.test(value)
+    ? value
+    : "/account";
 }
 
 function friendlyError(error: unknown) {
@@ -120,20 +148,17 @@ async function requestEmailOtp(input: Record<string, unknown>) {
     throw new Error(data.error ?? "Unable to send a verification code.");
   }
   if (data.developmentCode) {
-    sessionStorage.setItem(
+    storeSessionValue(
       `bc-development-code:${data.challengeId}`,
       data.developmentCode,
     );
   }
   const expiresAt = data.expiresAt ?? Date.now() + 10 * 60 * 1000;
-  sessionStorage.setItem(
+  storeSessionValue(
     `bc-otp-request:${data.challengeId}`,
     JSON.stringify(input),
   );
-  sessionStorage.setItem(
-    `bc-otp-expiry:${data.challengeId}`,
-    String(expiresAt),
-  );
+  storeSessionValue(`bc-otp-expiry:${data.challengeId}`, String(expiresAt));
   return {
     challengeId: data.challengeId,
     developmentCode: data.developmentCode ?? "",
@@ -357,7 +382,7 @@ export function RegistrationForm({
           `/verify?channel=email&purpose=register&challenge=${encodeURIComponent(challenge.challengeId)}&destination=${encodeURIComponent(contact)}&next=${encodeURIComponent(nextPath)}`,
         );
       } else {
-        sessionStorage.setItem(
+        storeSessionValue(
           "bc-phone-registration",
           JSON.stringify(registration),
         );
@@ -516,11 +541,10 @@ export function OtpVerificationForm() {
     if (activeChallengeId) {
       const timer = window.setTimeout(() => {
         setDevelopmentCode(
-          sessionStorage.getItem(`bc-development-code:${activeChallengeId}`) ??
-            "",
+          sessionValue(`bc-development-code:${activeChallengeId}`) ?? "",
         );
         const storedExpiry = Number(
-          sessionStorage.getItem(`bc-otp-expiry:${activeChallengeId}`),
+          sessionValue(`bc-otp-expiry:${activeChallengeId}`),
         );
         const nextExpiry =
           storedExpiry > Date.now()
@@ -594,10 +618,10 @@ export function OtpVerificationForm() {
         session = await confirmPhoneOtp(code);
         if (purpose === "register") {
           const registration = JSON.parse(
-            sessionStorage.getItem("bc-phone-registration") ?? "{}",
+            sessionValue("bc-phone-registration") ?? "{}",
           ) as { displayName?: string };
           await recordLegalAcceptance(registration.displayName);
-          sessionStorage.removeItem("bc-phone-registration");
+          removeSessionValue("bc-phone-registration");
           session = { needsLegalAcceptance: false };
         }
       } else {
@@ -632,9 +656,7 @@ export function OtpVerificationForm() {
     setLoading(true);
     setError("");
     try {
-      const stored = sessionStorage.getItem(
-        `bc-otp-request:${activeChallengeId}`,
-      );
+      const stored = sessionValue(`bc-otp-request:${activeChallengeId}`);
       const requestInput = stored
         ? (JSON.parse(stored) as Record<string, unknown>)
         : { email: destination, purpose };
@@ -738,6 +760,7 @@ export function OtpVerificationForm() {
 
 export function RecoveryForm() {
   const router = useRouter();
+  const nextPath = safeNextPath(useSearchParams().get("next"));
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -752,7 +775,7 @@ export function RecoveryForm() {
         purpose: "recovery",
       });
       router.push(
-        `/verify?channel=email&purpose=recovery&challenge=${encodeURIComponent(challenge.challengeId)}&destination=${encodeURIComponent(email)}`,
+        `/verify?channel=email&purpose=recovery&challenge=${encodeURIComponent(challenge.challengeId)}&destination=${encodeURIComponent(email)}&next=${encodeURIComponent(nextPath)}`,
       );
     } catch (caught) {
       setError(friendlyError(caught));
@@ -779,7 +802,10 @@ export function RecoveryForm() {
       <Button type="submit" loading={loading}>
         Send recovery code
       </Button>
-      <Link className="bc-auth-text-link" href="/sign-in">
+      <Link
+        className="bc-auth-text-link"
+        href={`/sign-in?next=${encodeURIComponent(nextPath)}`}
+      >
         Back to sign in
       </Link>
     </form>

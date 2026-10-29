@@ -1,0 +1,23 @@
+query GetRateLimitBucket($bucketKey: String!) @auth(level: NO_ACCESS) {
+  rateLimitBucket(key: { bucketKey: $bucketKey }) {
+    attemptsJson
+    revision
+  }
+}
+
+mutation CreateRateLimitBucket($bucketKey: String!, $attemptsJson: String!)
+@auth(level: NO_ACCESS) {
+  rateLimitBucket_insert(data: { bucketKey: $bucketKey, attemptsJson: $attemptsJson })
+}
+
+mutation CompareAndSetRateLimitBucket(
+  $bucketKey: String!
+  $revision: Int!
+  $nextRevision: Int!
+  $attemptsJson: String!
+) @auth(level: NO_ACCESS) {
+  updated: rateLimitBucket_updateMany(
+    where: { bucketKey: { eq: $bucketKey }, revision: { eq: $revision } }
+    data: { revision: $nextRevision, attemptsJson: $attemptsJson }
+  )
+}

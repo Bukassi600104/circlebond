@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { readOwnerSession } from "@/server/owner/auth";
 import {
   assertAdminPurpose,
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          error instanceof Error
+          isPublicError(error)
             ? error.message
             : "Unable to export this report.",
       },

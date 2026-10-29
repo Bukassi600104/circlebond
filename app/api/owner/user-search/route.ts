@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { assertTrustedMutation } from "@/server/auth/request";
 import { readOwnerSession } from "@/server/owner/auth";
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          error instanceof Error ? error.message : "Unable to search users.",
+          isPublicError(error) ? error.message : "Unable to search users.",
       },
       { status: 400 },
     );

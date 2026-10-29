@@ -1,5 +1,6 @@
+import { isPublicError, RequestValidationError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
-import { authenticatePrincipal, readSession } from "@/server/auth";
+import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
 import { enforceRateLimit } from "@/server/auth/security";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
@@ -28,14 +29,17 @@ export async function PATCH(request: Request) {
       );
     }
     const input = (await request.json()) as { displayName?: string };
-    const displayName = String(input.displayName ?? "")
-      .trim()
-      .replace(/\s+/g, " ");
+    if (typeof input.displayName !== "string") {
+      throw new RequestValidationError("Enter a valid display name.");
+    }
+    const displayName = input.displayName.trim().replace(/\s+/g, " ");
     if (displayName.length < 2 || displayName.length > 80) {
-      throw new Error("Display name must be between 2 and 80 characters.");
+      throw new RequestValidationError(
+        "Display name must be between 2 and 80 characters.",
+      );
     }
     if (!/[\p{L}\p{N}]/u.test(displayName)) {
-      throw new Error("Enter a valid display name.");
+      throw new RequestValidationError("Enter a valid display name.");
     }
     await getFirebaseAdminAuth().updateUser(session.uid, { displayName });
     await updatePersistedDisplayName(session.uid, displayName);
@@ -43,10 +47,14 @@ export async function PATCH(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Unable to update profile.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update profile.",
       },
-      { status: 400 },
+      {
+        status:
+          isPublicError(error) || error instanceof SyntaxError ? 400 : 500,
+      },
     );
   }
 }

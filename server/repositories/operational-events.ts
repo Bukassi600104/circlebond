@@ -20,11 +20,11 @@ export async function recordUploadOutcome(input: {
       circleId: input.circleId ?? null,
       createdAt: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     logger.error("operational_event_write_failed", {
       category: "upload",
       eventType: input.kind,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "OPERATIONAL_EVENT_WRITE_FAILED",
     });
   }
 }
@@ -53,11 +53,11 @@ export async function recordPricingOutcome(input: {
       circleId: input.circleId ?? null,
       createdAt: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     logger.error("operational_event_write_failed", {
       category: "pricing",
       eventType: input.eventType,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "OPERATIONAL_EVENT_WRITE_FAILED",
     });
   }
 }
