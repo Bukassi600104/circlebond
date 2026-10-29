@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { VerifyActivationPayment } from "./VerifyActivationPayment";
 
 type Props = {
   circleId: string;
@@ -19,6 +20,7 @@ export function CircleActivationPanel({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
 
   if (status === "active" || status === "grandfathered") return null;
 
@@ -31,7 +33,7 @@ export function CircleActivationPanel({
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: "{}",
+          body: JSON.stringify({ billingEmail }),
         },
       );
       const payload = (await response.json()) as {
@@ -66,12 +68,25 @@ export function CircleActivationPanel({
           circle. Members and invitees are never charged by BondCircle.
         </p>
         {message ? (
-          <p className="bc-activation-panel__error">{message}</p>
+          <p className="bc-activation-panel__error" role="alert">
+            {message}
+          </p>
         ) : null}
       </div>
+      <label>
+        Checkout email (if you registered by phone)
+        <input
+          type="email"
+          autoComplete="email"
+          maxLength={254}
+          value={billingEmail}
+          onChange={(event) => setBillingEmail(event.target.value)}
+        />
+      </label>
       <button type="button" onClick={activate} disabled={busy}>
         {busy ? "Preparing secure checkout…" : `Activate for ${priceLabel}`}
       </button>
+      <VerifyActivationPayment circleId={circleId} />
     </aside>
   );
 }

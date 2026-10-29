@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { VerifyActivationPayment } from "./VerifyActivationPayment";
 
 type UpgradeOption = {
   plan: "starter" | "standard" | "premium";
@@ -18,6 +19,7 @@ export function CircleUpgradePanel({
 }) {
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
   if (!options.length) return null;
 
   async function upgrade(option: UpgradeOption) {
@@ -29,7 +31,7 @@ export function CircleUpgradePanel({
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ targetPlan: option.plan }),
+          body: JSON.stringify({ targetPlan: option.plan, billingEmail }),
         },
       );
       const payload = (await response.json()) as {
@@ -55,6 +57,16 @@ export function CircleUpgradePanel({
         Upgrade only within this circle type. Your existing members, activity
         and records remain unchanged.
       </p>
+      <label>
+        Checkout email (if you registered by phone)
+        <input
+          type="email"
+          autoComplete="email"
+          maxLength={254}
+          value={billingEmail}
+          onChange={(event) => setBillingEmail(event.target.value)}
+        />
+      </label>
       <div>
         {options.map((option) => (
           <button
@@ -72,7 +84,12 @@ export function CircleUpgradePanel({
           </button>
         ))}
       </div>
-      {message ? <p className="bc-upgrade-panel__error">{message}</p> : null}
+      {message ? (
+        <p className="bc-upgrade-panel__error" role="alert">
+          {message}
+        </p>
+      ) : null}
+      <VerifyActivationPayment circleId={circleId} />
     </details>
   );
 }

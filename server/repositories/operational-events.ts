@@ -36,6 +36,7 @@ export async function recordPricingOutcome(input: {
     | "activation_completed"
     | "upgrade_checkout"
     | "upgrade_completed"
+    | "payment_reconciliation"
     | "member_limit"
     | "co_admin_limit"
     | "aso_ebi_tier_limit"
@@ -53,11 +54,13 @@ export async function recordPricingOutcome(input: {
       circleId: input.circleId ?? null,
       createdAt: new Date().toISOString(),
     });
+    return true;
   } catch {
     logger.error("operational_event_write_failed", {
       category: "pricing",
       eventType: input.eventType,
       reasonCode: "OPERATIONAL_EVENT_WRITE_FAILED",
     });
+    return false;
   }
 }

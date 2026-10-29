@@ -527,6 +527,54 @@ query GetCirclePricingState($circleId: UUID!) @auth(level: NO_ACCESS) {
   }
 }
 
+query GetCirclePaymentCheckout($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circlePaymentCheckout(key: { circleId: $circleId }) {
+    checkoutUrl
+    activation {
+      id
+    }
+  }
+}
+
+query GetCircleActivationAttempt($activationId: UUID!) @auth(level: NO_ACCESS) {
+  circleActivation(key: { id: $activationId }) {
+    id
+    circle {
+      id
+    }
+    creator {
+      id
+    }
+    planDefinition {
+      id
+      memberLimit
+      priceMinor
+    }
+    activationType
+    circleType
+    tier
+    currency
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    provider
+    providerReference
+    previousActivationId
+  }
+}
+
+mutation SaveCirclePaymentCheckout(
+  $circleId: UUID!
+  $activationId: UUID!
+  $checkoutUrl: String!
+) @auth(level: NO_ACCESS) @transaction {
+  circlePaymentCheckout_updateMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+    data: { checkoutUrl: $checkoutUrl }
+  ) @check(expr: "this == 1", message: "Checkout no longer pending")
+}
+
 mutation CreateCircleActivationAttempt(
   $activationId: UUID!
   $circleId: UUID!
@@ -542,6 +590,35 @@ mutation CreateCircleActivationAttempt(
   $previousActivationId: UUID
   $createdAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  query @redact {
+    circle(key: { id: $circleId })
+      @check(
+        expr: "this.creator.id == vars.creatorId && this.pricingModelVersion == 'model_specific_v1' && ((vars.activationType == 'paid' && this.status == 'draft' && this.activationStatus != 'active' && this.pricingPlanDefinitionId == vars.planDefinitionId) || (vars.activationType == 'upgrade' && this.activationStatus == 'active' && !(this.status in ['completed', 'cancelled', 'archived', 'purged'])))"
+        message: "Circle is not eligible for this checkout"
+      ) {
+      creator {
+        id
+      }
+      pricingModelVersion
+      status
+      activationStatus
+      pricingPlanDefinitionId
+    }
+  }
+  previous: query @redact {
+    circleActivations(where: { id: { eq: $previousActivationId } }, limit: 1)
+      @check(
+        expr: "vars.activationType == 'paid' || (this.size() == 1 && this[0].status == 'succeeded' && this[0].circleId == vars.circleId && this[0].creatorId == vars.creatorId && this[0].planDefinition != null)"
+        message: "Upgrade requires this circle's preceding verified activation"
+      ) {
+      status
+      circleId
+      creatorId
+      planDefinition {
+        id
+      }
+    }
+  }
   circleActivation_insert(
     data: {
       id: $activationId
@@ -561,10 +638,29 @@ mutation CreateCircleActivationAttempt(
       createdAt: $createdAt
     }
   )
-  circle_update(
-    key: { id: $circleId }
-    data: { activationStatus: "pending_payment", updatedAt: $createdAt }
+  circlePaymentCheckout_insert(
+    data: { circle: { id: $circleId }, activation: { id: $activationId } }
   )
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      pricingModelVersion: { eq: "model_specific_v1" }
+      pricingPlanDefinitionId: {
+        eq_expr: "vars.activationType == 'paid' ? vars.planDefinitionId : response.previous.circleActivations[0].planDefinition.id"
+      }
+      status: {
+        eq_expr: "vars.activationType == 'paid' ? 'draft' : response.query.circle.status"
+      }
+      activationStatus: {
+        eq_expr: "vars.activationType == 'upgrade' ? 'active' : response.query.circle.activationStatus"
+      }
+    }
+    data: {
+      activationStatus_expr: "vars.activationType == 'upgrade' ? 'active' : 'pending_payment'"
+      updatedAt: $createdAt
+    }
+  ) @check(expr: "this == 1", message: "Circle changed while starting checkout")
 }
 
 mutation FailCircleActivationAttempt(
@@ -573,13 +669,28 @@ mutation FailCircleActivationAttempt(
   $failureCode: String!
   $failedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) {
+      activationType
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      status: { eq: "pending" }
+    }
     data: { status: "failed", failureCode: $failureCode }
-  )
+  ) @check(expr: "this == 1", message: "Activation already settled")
   circle_update(
     key: { id: $circleId }
-    data: { activationStatus: "payment_failed", updatedAt: $failedAt }
+    data: {
+      activationStatus_expr: "response.query.circleActivation.activationType == 'upgrade' ? 'active' : 'payment_failed'"
+      updatedAt: $failedAt
+    }
   )
 }
 
@@ -590,8 +701,26 @@ mutation CompletePaidCircleActivation(
   $pricePaidMinor: Int!
   $activatedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) @check {
+      planDefinition {
+        id
+      }
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationType: { eq: "paid" }
+      status: { eq: "pending" }
+      currency: { eq: "NGN" }
+      amountDueMinor: { eq: $pricePaidMinor }
+    }
     data: {
       status: "succeeded"
       pricePaidMinor: $pricePaidMinor
@@ -599,8 +728,21 @@ mutation CompletePaidCircleActivation(
       activatedAt: $activatedAt
     }
   )
-  circle_update(
-    key: { id: $circleId }
+    @check(
+      expr: "this == 1"
+      message: "Payment does not match pending activation"
+    )
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      status: { eq: "draft" }
+      pricingModelVersion: { eq: "model_specific_v1" }
+      pricingPlanDefinitionId: {
+        eq_expr: "response.query.circleActivation.planDefinition.id"
+      }
+      activationStatus: { ne: "active" }
+    }
     data: {
       status: "published"
       activationStatus: "active"
@@ -608,6 +750,10 @@ mutation CompletePaidCircleActivation(
       updatedAt: $activatedAt
     }
   )
+    @check(
+      expr: "this == 1"
+      message: "Circle no longer eligible for activation"
+    )
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }
@@ -633,17 +779,55 @@ mutation CompleteCirclePlanUpgrade(
   $pricePaidMinor: Int!
   $activatedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) @check {
+      previousActivationId
+    }
+  }
+  previous: query @redact {
+    circleActivation(
+      key: { id_expr: "response.query.circleActivation.previousActivationId" }
+    ) @check {
+      status @check(expr: "this == 'succeeded'")
+      planDefinition {
+        id
+      }
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationType: { eq: "upgrade" }
+      status: { eq: "pending" }
+      currency: { eq: "NGN" }
+      amountDueMinor: { eq: $pricePaidMinor }
+      tier: { eq: $targetPlan }
+      planDefinitionId: { eq: $targetPlanDefinitionId }
+      listPriceMinor: { eq: $targetActivationPriceMinor }
+    }
     data: {
       status: "succeeded"
       pricePaidMinor: $pricePaidMinor
       paidAt: $activatedAt
       activatedAt: $activatedAt
     }
-  )
-  circle_update(
-    key: { id: $circleId }
+  ) @check(expr: "this == 1", message: "Payment does not match pending upgrade")
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationStatus: { eq: "active" }
+      status: { nin: ["completed", "cancelled", "archived", "purged"] }
+      pricingPlanDefinitionId: {
+        eq_expr: "response.previous.circleActivation.planDefinition.id"
+      }
+      memberLimit: { lt: $targetMemberLimit }
+    }
     data: {
       pricingPlan: $targetPlan
       pricingPlanDefinitionId: $targetPlanDefinitionId
@@ -653,7 +837,7 @@ mutation CompleteCirclePlanUpgrade(
       activationStatus: "active"
       updatedAt: $activatedAt
     }
-  )
+  ) @check(expr: "this == 1", message: "Upgrade is stale or circle is closed")
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }

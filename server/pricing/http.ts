@@ -8,8 +8,5 @@ export function pricingErrorResponse(error: unknown, fallback: string) {
       { status: error.status },
     );
   }
-  return NextResponse.json(
-    { error: error instanceof Error ? error.message : fallback },
-    { status: 400 },
-  );
+  return NextResponse.json({ error: fallback }, { status: 400 });
 }

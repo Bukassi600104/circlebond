@@ -59,6 +59,11 @@ business and operational decision. Until configured, requests return
 `PAYMENT_PROVIDER_UNAVAILABLE`, keep the circle as a safe draft, charge
 nothing, and never present success.
 
+An isolated Paystack test adapter is available for emulator/staging verification.
+It cannot enable live keys, the production Firebase project or Vercel production.
+Configuration, verification evidence and remaining provider approvals are tracked
+in `docs/launch/BONDCIRCLE_PAYMENT_INTEGRATION_REPORT.md`.
+
 A provider integration must:
 
 - use the generated activation UUID as its idempotency/metadata key;

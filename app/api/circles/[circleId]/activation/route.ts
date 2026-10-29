@@ -2,10 +2,11 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
+import { enforceRateLimit } from "@/server/auth/security";
 import { requireActivationPaymentProvider } from "@/server/pricing/provider";
 import { pricingErrorResponse } from "@/server/pricing/http";
 import {
-  createCircleActivationAttempt,
+  startCirclePaymentCheckout,
   loadCirclePricingState,
 } from "@/server/repositories/pricing";
 import { formatMinorNaira, isCirclePricingPlan } from "@/lib/circle-pricing";
@@ -63,30 +64,49 @@ export async function POST(
     }
 
     const provider = requireActivationPaymentProvider();
+    if (
+      !(await enforceRateLimit(
+        `payment:checkout:${session.uid}:${circleId}`,
+        5,
+        15 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Too many checkout attempts. Try again shortly." },
+        { status: 429 },
+      );
+    }
+    const body = (await request.json()) as { billingEmail?: unknown };
     const activationId = randomUUID();
     const origin = new URL(request.url).origin;
-    const checkout = await provider.createCheckout({
-      activationId,
-      circleId,
-      creatorId: session.uid,
-      amountMinor: circle.activationPriceMinor,
-      currency: "NGN",
-      description: `${circle.type} circle activation (${formatMinorNaira(circle.activationPriceMinor)})`,
-      returnUrl: `${origin}/account/circles/${encodeURIComponent(circleId)}?activation=return`,
-    });
-    await createCircleActivationAttempt({
-      activationId,
-      circleId,
-      creatorId: session.uid,
-      planDefinitionId: circle.pricingPlanDefinitionId,
-      activationType: "paid",
-      circleType: circle.type,
-      tier: circle.pricingPlan,
-      listPriceMinor: circle.activationPriceMinor,
-      amountDueMinor: circle.activationPriceMinor,
-      provider: checkout.provider,
-      providerReference: checkout.providerReference,
-    });
+    const checkout = await startCirclePaymentCheckout(
+      provider,
+      {
+        activationId,
+        circleId,
+        creatorId: session.uid,
+        email:
+          session.email ??
+          (typeof body.billingEmail === "string"
+            ? body.billingEmail.trim()
+            : undefined),
+        amountMinor: circle.activationPriceMinor,
+        currency: "NGN",
+        description: `${circle.type} circle activation (${formatMinorNaira(circle.activationPriceMinor)})`,
+        returnUrl: `${origin}/account/circles/${encodeURIComponent(circleId)}?activation=return`,
+      },
+      {
+        activationId,
+        circleId,
+        creatorId: session.uid,
+        planDefinitionId: circle.pricingPlanDefinitionId,
+        activationType: "paid",
+        circleType: circle.type,
+        tier: circle.pricingPlan,
+        listPriceMinor: circle.activationPriceMinor,
+        amountDueMinor: circle.activationPriceMinor,
+      },
+    );
     await recordPricingOutcome({
       eventType: "activation_checkout",
       outcome: "started",
