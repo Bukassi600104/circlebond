@@ -36,8 +36,13 @@ function hash(value: string) {
 
 function challengeKey() {
   const configured = process.env.AUTH_CHALLENGE_SECRET;
-  if (process.env.NODE_ENV === "production" && !configured) {
-    throw new Error("AUTH_CHALLENGE_SECRET is required in production.");
+  if (
+    process.env.NODE_ENV === "production" &&
+    (!configured || Buffer.byteLength(configured, "utf8") < 32)
+  ) {
+    throw new Error(
+      "AUTH_CHALLENGE_SECRET must contain at least 32 bytes in production.",
+    );
   }
   return createHash("sha256")
     .update(

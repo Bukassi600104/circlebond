@@ -21,9 +21,7 @@ export async function POST(request: Request) {
       privacyAccepted?: boolean;
     };
 
-    const developmentMode =
-      process.env.AUTH_EMAIL_OTP_MODE === "development" ||
-      process.env.NODE_ENV !== "production";
+    const developmentMode = process.env.NODE_ENV !== "production";
 
     const email = await validateEmailAddress(input.email ?? "", {
       allowTestDomains: developmentMode,
@@ -73,11 +71,13 @@ export async function POST(request: Request) {
         expiresAt: challenge.expiresAt,
         message: "If the address can be used, a code will arrive shortly.",
         delivery,
-        ...(delivery === "development" ? { developmentCode: code } : {}),
+        ...(developmentMode && delivery === "development"
+          ? { developmentCode: code }
+          : {}),
       },
       { status: 202 },
     );
-  } catch (error) {
+  } catch {
     recordAuthAudit({
       event: "verification",
       outcome: "failure",
@@ -85,10 +85,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to send a code. Check the details and try again.",
+        error: "Unable to send a code. Check the details and try again.",
       },
       { status: 400 },
     );

@@ -9,24 +9,11 @@ export async function sendEmailOtp({
   code: string;
   email: string;
 }): Promise<EmailOtpDelivery> {
-  if (
-    process.env.AUTH_EMAIL_OTP_MODE === "development" ||
-    process.env.NODE_ENV !== "production"
-  ) {
-    console.info(
-      JSON.stringify({
-        level: "info",
-        message: "development_email_otp",
-        email,
-        code,
-      }),
-    );
-    return "development";
-  }
+  if (process.env.NODE_ENV !== "production") return "development";
 
   const smtpUrl = process.env.AUTH_EMAIL_SMTP_URL;
   const from = process.env.AUTH_EMAIL_FROM;
-  if (!smtpUrl || !from) {
+  if (process.env.AUTH_EMAIL_OTP_MODE !== "production" || !smtpUrl || !from) {
     throw new Error("Email delivery is not configured.");
   }
 

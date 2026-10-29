@@ -14,8 +14,13 @@ type PrivateAccessPayload = {
 function signingKey() {
   const configured =
     process.env.PRIVATE_FILE_ACCESS_SECRET ?? process.env.AUTH_CHALLENGE_SECRET;
-  if (process.env.NODE_ENV === "production" && !configured) {
-    throw new Error("A private file access secret is required in production.");
+  if (
+    process.env.NODE_ENV === "production" &&
+    (!configured || Buffer.byteLength(configured, "utf8") < 32)
+  ) {
+    throw new Error(
+      "A private file access secret of at least 32 bytes is required in production.",
+    );
   }
   return createHash("sha256")
     .update(`bondcircle-private-files:${configured ?? "local-development"}`)

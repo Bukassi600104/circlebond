@@ -14,8 +14,6 @@ function safeEqual(left: string, right: string) {
  *
  * - If the principal authenticated via Bearer token (mobile), CSRF and origin
  *   checks are skipped since native clients don't use cookies.
- * - If the request carries an Authorization: Bearer header (even without a
- *   resolved principal), CSRF checks are also skipped.
  * - Otherwise, full CSRF cookie + origin validation is enforced for web sessions.
  */
 export async function assertTrustedMutation(
@@ -24,9 +22,6 @@ export async function assertTrustedMutation(
 ) {
   // Bearer-authenticated clients bypass CSRF entirely
   if (principal?.scheme === "bearer") return;
-
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.toLowerCase().startsWith("bearer ")) return;
 
   // Cookie-based session: enforce origin + CSRF
   const origin = request.headers.get("origin");

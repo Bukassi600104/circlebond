@@ -20,9 +20,7 @@ export async function POST(request: Request) {
       termsAccepted?: boolean;
       privacyAccepted?: boolean;
     };
-    const developmentMode =
-      process.env.AUTH_EMAIL_OTP_MODE === "development" ||
-      process.env.NODE_ENV !== "production";
+    const developmentMode = process.env.NODE_ENV !== "production";
     const email = await validateEmailAddress(input.email ?? "", {
       allowTestDomains: developmentMode,
       checkDomain: !developmentMode,
@@ -63,7 +61,9 @@ export async function POST(request: Request) {
         expiresAt: challenge.expiresAt,
         message: "If the address can be used, a code will arrive shortly.",
         delivery,
-        ...(delivery === "development" ? { developmentCode: code } : {}),
+        ...(developmentMode && delivery === "development"
+          ? { developmentCode: code }
+          : {}),
       },
       { status: 202 },
     );

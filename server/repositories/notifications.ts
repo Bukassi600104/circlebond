@@ -130,9 +130,8 @@ async function sendAndLogEmail(input: {
       status: "sent",
       providerMessageId: delivery.messageId,
     });
-  } catch (error) {
-    const failureReason =
-      error instanceof Error ? error.message : "Unknown email delivery error";
+  } catch {
+    const failureReason = "EMAIL_DELIVERY_FAILED";
     logger.error("notification_email_failed", {
       type: input.type,
       recipientId: input.recipientId,
@@ -143,10 +142,9 @@ async function sendAndLogEmail(input: {
       eventType: input.type,
       status: "failed",
       failureReason,
-    }).catch((loggingError) => {
+    }).catch(() => {
       logger.error("notification_delivery_log_failed", {
         type: input.type,
-        error: loggingError instanceof Error ? loggingError.message : "unknown",
       });
     });
   }
@@ -409,10 +407,9 @@ async function processUserDeadlineNotifications(userId: string) {
         });
       }
     }
-  } catch (error) {
+  } catch {
     logger.error("user_deadline_notification_failed", {
       userId,
-      error: error instanceof Error ? error.message : "unknown",
     });
   }
 }
@@ -576,11 +573,10 @@ export async function safelyEmitNotification(
 ) {
   try {
     await emitCircleNotification(input);
-  } catch (error) {
+  } catch {
     logger.error("notification_emit_failed", {
       circleId: input.circleId,
       type: input.type,
-      error: error instanceof Error ? error.message : "unknown",
     });
   }
 }

@@ -29,10 +29,7 @@ test("BC-MOB-001: mutation assertions differentiate web sessions from mobile bea
   const requestAuth = await source("server/auth/request.ts");
 
   assert.match(requestAuth, /principal\?\.scheme === "bearer"/);
-  assert.match(
-    requestAuth,
-    /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/,
-  );
+  assert.doesNotMatch(requestAuth, /headers\.get\("authorization"\)/);
   assert.match(requestAuth, /assertTrustedMutation/);
   assert.match(requestAuth, /x-csrf-token/);
 });
