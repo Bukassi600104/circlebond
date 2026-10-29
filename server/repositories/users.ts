@@ -118,11 +118,8 @@ export async function fetchUserBootstrapProfile(userId: string) {
     >("GetUserBootstrapProfile", { userId });
     return response.data.user ?? null;
   } catch (error) {
-    logger.warn("bootstrap_profile_fetch_failed", {
-      userId,
-      error: error instanceof Error ? error.message : "unknown",
-    });
-    return null;
+    logger.warn("bootstrap_profile_fetch_failed", { userId });
+    throw error;
   }
 }
 

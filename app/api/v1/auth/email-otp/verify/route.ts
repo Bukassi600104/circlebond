@@ -1,9 +1,11 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import {
   authChallengeFingerprint,
   consumeAuthChallenge,
   enforceRateLimit,
+  OTP_MAX_ATTEMPTS,
+  OTP_TTL_MS,
   verifyEmailOtp,
 } from "@/server/auth/security";
 import { clientKey } from "@/server/auth/request";
@@ -17,13 +19,17 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const { challengeId, code } = (await request.json()) as {
-      challengeId?: string;
-      code?: string;
-    };
+    const body: unknown = await request.json().catch(() => null);
+    const { challengeId, code } = (body ?? {}) as Record<string, unknown>;
 
-    if (!challengeId || !/^\d{6}$/.test(code ?? "")) {
-      return NextResponse.json(
+    if (
+      typeof challengeId !== "string" ||
+      !challengeId ||
+      challengeId.length > 16384 ||
+      typeof code !== "string" ||
+      !/^\d{6}$/.test(code)
+    ) {
+      return apiJson(
         { error: "Invalid verification request." },
         { status: 400 },
       );
@@ -39,16 +45,29 @@ export async function POST(request: Request) {
         15 * 60_000,
       ))
     ) {
-      return NextResponse.json(
+      return apiJson(
         { error: "Verification attempts exhausted. Try again later." },
         { status: 429 },
       );
     }
 
-    // For mobile requests, verify without relying on browser cookies
-    const result = verifyEmailOtp(challengeId, code!, 0);
+    if (
+      !(await enforceRateLimit(
+        `otp-challenge:${authChallengeFingerprint(challengeId)}`,
+        OTP_MAX_ATTEMPTS,
+        OTP_TTL_MS,
+      ))
+    ) {
+      return apiJson(
+        { error: "Verification attempts exhausted. Request a new code." },
+        { status: 429 },
+      );
+    }
+
+    // The shared challenge budget survives IP changes and cookie replay.
+    const result = verifyEmailOtp(challengeId, code, 0);
     if (!result.ok) {
-      return NextResponse.json(
+      return apiJson(
         {
           error:
             result.reason === "expired"
@@ -82,7 +101,7 @@ export async function POST(request: Request) {
         !persisted &&
         !process.env.FIREBASE_AUTH_EMULATOR_HOST
       ) {
-        return NextResponse.json(
+        return apiJson(
           { error: "User account not found. Please register." },
           { status: 404 },
         );
@@ -126,7 +145,7 @@ export async function POST(request: Request) {
 
     const customToken = await auth.createCustomToken(user.uid);
     if (!(await consumeAuthChallenge(challengeId))) {
-      return NextResponse.json(
+      return apiJson(
         { error: "That code has already been used. Request a new one." },
         { status: 409 },
       );
@@ -139,20 +158,15 @@ export async function POST(request: Request) {
       channel: "email",
     });
 
-    return NextResponse.json({ customToken, uid: user.uid }, { status: 200 });
-  } catch (error) {
+    return apiJson({ customToken, uid: user.uid }, { status: 200 });
+  } catch {
     recordAuthAudit({
       event: "verification",
       outcome: "failure",
       channel: "email",
     });
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Authentication service is temporarily unavailable.",
-      },
+    return apiJson(
+      { error: "Authentication service is temporarily unavailable." },
       { status: 500 },
     );
   }

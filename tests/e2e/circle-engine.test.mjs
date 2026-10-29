@@ -1265,3 +1265,66 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
     ],
   );
 });
+
+test("device registrations persist, reassign shared-device ownership and delete only owned tokens", async () => {
+  assert.ok(
+    /^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(
+      process.env.DATA_CONNECT_EMULATOR_HOST ?? "",
+    ),
+    "Device persistence acceptance must use the local Data Connect emulator.",
+  );
+  const firstUser = `device-first-${randomUUID()}`;
+  const secondUser = `device-second-${randomUUID()}`;
+  for (const id of [firstUser, secondUser]) {
+    await dataConnect.upsert("user", {
+      id,
+      displayName: "Device acceptance user",
+    });
+  }
+  const tokenId = randomUUID();
+  const variables = {
+    tokenId,
+    userId: firstUser,
+    token: "test-device-token",
+    platform: "android",
+    updatedAt: new Date().toISOString(),
+  };
+  const metadata = async (userId) =>
+    (await dataConnect.executeQuery("GetUserDeviceRegistrations", { userId }))
+      .data.deviceRegistrations;
+  await dataConnect.executeMutation("RegisterDeviceRegistration", variables);
+  await dataConnect.executeMutation("RegisterDeviceRegistration", variables);
+  const firstRows = await metadata(firstUser);
+  assert.equal(firstRows.length, 1);
+  assert.equal(firstRows[0].platform, "android");
+  assert.equal(
+    firstRows[0].token,
+    undefined,
+    "Account metadata must not expose raw push credentials.",
+  );
+  await dataConnect.executeMutation("RegisterDeviceRegistration", {
+    ...variables,
+    userId: secondUser,
+    platform: "ios",
+  });
+  assert.equal((await metadata(firstUser)).length, 0);
+  assert.equal((await metadata(secondUser)).length, 1);
+  await dataConnect.executeMutation("DeleteDeviceRegistration", {
+    userId: firstUser,
+    tokenId,
+  });
+  assert.equal(
+    (await metadata(secondUser)).length,
+    1,
+    "Previous owner cannot remove the reassigned registration.",
+  );
+  await dataConnect.executeMutation("DeleteUserDeviceRegistrations", {
+    userId: firstUser,
+  });
+  assert.equal((await metadata(secondUser)).length, 1);
+  await dataConnect.executeMutation("DeleteDeviceRegistration", {
+    userId: secondUser,
+    tokenId,
+  });
+  assert.equal((await metadata(secondUser)).length, 0);
+});

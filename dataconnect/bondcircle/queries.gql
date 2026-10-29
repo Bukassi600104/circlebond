@@ -1,3 +1,40 @@
+query GetUserDeviceRegistrations($userId: String!) @auth(level: NO_ACCESS) {
+  deviceRegistrations(where: { userId: { eq: $userId } }) {
+    platform
+    updatedAt
+  }
+}
+
+mutation RegisterDeviceRegistration(
+  $tokenId: String!
+  $userId: String!
+  $token: String!
+  $platform: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  deviceRegistration_upsert(
+    data: {
+      id: $tokenId
+      userId: $userId
+      token: $token
+      platform: $platform
+      updatedAt: $updatedAt
+    }
+  )
+}
+
+mutation DeleteDeviceRegistration($tokenId: String!, $userId: String!)
+@auth(level: NO_ACCESS) {
+  deviceRegistration_deleteMany(
+    where: { id: { eq: $tokenId }, userId: { eq: $userId } }
+  )
+}
+
+mutation DeleteUserDeviceRegistrations($userId: String!)
+@auth(level: NO_ACCESS) {
+  deviceRegistration_deleteMany(where: { userId: { eq: $userId } })
+}
+
 query GetCurrentUser @auth(level: USER) {
   user(key: { id_expr: "auth.uid" }) {
     id

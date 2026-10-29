@@ -18,6 +18,14 @@ type User @table {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
+type DeviceRegistration @table(key: ["id"]) {
+  id: String!
+  user: User!
+  token: String!
+  platform: String!
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
 type OwnerAdministrator @table(key: ["user"]) {
   user: User!
   role: String! @default(value: "owner")

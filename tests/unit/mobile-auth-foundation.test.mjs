@@ -1,49 +1,170 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { timingSafeEqual } from "node:crypto";
 import test from "node:test";
+import { loadTypescriptModule } from "../helpers/typescript-module.mjs";
 
-const root = new URL("../../", import.meta.url);
-
-async function source(path) {
-  return readFile(new URL(path, root), "utf8");
-}
-
-test("BC-MOB-001: authenticatePrincipal supports Bearer ID tokens and session cookies", async () => {
-  const authIndex = await source("server/auth/index.ts");
-
-  assert.match(authIndex, /export type AuthScheme = "session" \| "bearer"/);
-  assert.match(authIndex, /export interface AuthenticatedPrincipal/);
-  assert.match(authIndex, /export async function authenticatePrincipal/);
-  assert.match(
-    authIndex,
-    /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/,
+test("native authentication verifies revocation and takes identity only from the verified token", async () => {
+  const auth = await loadTypescriptModule("server/auth/native.ts", {
+    "server-only": {},
+    "@/server/firebase/admin": {
+      getFirebaseAdminAuth: () => ({
+        verifyIdToken: async (token, revoked) => {
+          assert.equal(token, "signed-token");
+          assert.equal(revoked, true);
+          return { uid: "verified-user" };
+        },
+      }),
+    },
+    "@/server/firebase/data-connect": {
+      getBondCircleDataConnect: () => ({
+        executeQuery: async (operation, variables) => {
+          assert.equal(operation, "GetUserAccountStatus");
+          assert.equal(variables.userId, "verified-user");
+          return { data: { user: { accountStatus: "active" } } };
+        },
+      }),
+    },
+    "./index": {
+      authenticatePrincipal: () => {
+        throw new Error("Bearer must not fall back to cookies");
+      },
+    },
+  });
+  const result = await auth.authenticateNativeRequest(
+    new Request("https://example.test/api/v1/me?uid=other-user", {
+      headers: { authorization: "Bearer signed-token" },
+    }),
   );
-  assert.match(authIndex, /verifyIdToken\(idToken, true\)/);
-  assert.match(authIndex, /GetUserAccountStatus/);
-  assert.match(authIndex, /accountStatus !== "active"/);
-  assert.match(authIndex, /scheme:\s*"bearer"/);
-  assert.match(authIndex, /scheme:\s*"session"/);
+  assert.equal(result.state, "authenticated");
+  assert.equal(result.principal.uid, "verified-user");
+  assert.equal(result.principal.scheme, "bearer");
 });
 
-test("BC-MOB-001: mutation assertions differentiate web sessions from mobile bearer requests", async () => {
-  const requestAuth = await source("server/auth/request.ts");
-
-  assert.match(requestAuth, /principal\?\.scheme === "bearer"/);
-  assert.doesNotMatch(requestAuth, /headers\.get\("authorization"\)/);
-  assert.match(requestAuth, /assertTrustedMutation/);
-  assert.match(requestAuth, /x-csrf-token/);
+test("invalid bearer tokens cannot fall back to a valid browser session", async () => {
+  const auth = await loadTypescriptModule("server/auth/native.ts", {
+    "server-only": {},
+    "@/server/firebase/admin": {
+      getFirebaseAdminAuth: () => ({
+        verifyIdToken: async () => {
+          throw new Error("revoked");
+        },
+      }),
+    },
+    "@/server/firebase/data-connect": {},
+    "./index": {
+      authenticatePrincipal: () => {
+        throw new Error("must not use browser session");
+      },
+    },
+  });
+  const result = await auth.authenticateNativeRequest(
+    new Request("https://example.test/api/v1/me", {
+      headers: { authorization: "Bearer invalid" },
+    }),
+  );
+  assert.equal(result.state, "unauthenticated");
 });
 
-test("BC-MOB-001: /api/v1/me route is exposed and returns user profile & preferences", async () => {
-  const meRoute = await source("app/api/v1/me/route.ts");
-  const usersRepo = await source("server/repositories/users.ts");
-  const queries = await source("dataconnect/bondcircle/queries.gql");
+test("native authentication denies suspended users and propagates database outages", async () => {
+  let outage = false;
+  const auth = await loadTypescriptModule("server/auth/native.ts", {
+    "server-only": {},
+    "@/server/firebase/admin": {
+      getFirebaseAdminAuth: () => ({
+        verifyIdToken: async () => ({ uid: "user" }),
+      }),
+    },
+    "@/server/firebase/data-connect": {
+      getBondCircleDataConnect: () => ({
+        executeQuery: async () => {
+          if (outage) throw new Error("database offline");
+          return { data: { user: { accountStatus: "suspended" } } };
+        },
+      }),
+    },
+    "./index": {},
+  });
+  const request = new Request("https://example.test", {
+    headers: { authorization: "Bearer token" },
+  });
+  assert.equal(
+    (await auth.authenticateNativeRequest(request)).state,
+    "suspended",
+  );
+  outage = true;
+  await assert.rejects(
+    auth.authenticateNativeRequest(request),
+    /database offline/,
+  );
+});
 
-  assert.match(meRoute, /authenticatePrincipal/);
-  assert.match(meRoute, /fetchUserBootstrapProfile/);
-  assert.match(meRoute, /status: 401/);
-  assert.match(usersRepo, /fetchUserBootstrapProfile/);
-  assert.match(queries, /query GetUserBootstrapProfile/);
-  assert.match(queries, /emailNotifications/);
-  assert.match(queries, /accountStatus/);
+test("native authentication can restore a verified web session", async () => {
+  const principal = { uid: "session-user", scheme: "session" };
+  const auth = await loadTypescriptModule("server/auth/native.ts", {
+    "server-only": {},
+    "@/server/firebase/admin": {},
+    "@/server/firebase/data-connect": {},
+    "./index": { authenticatePrincipal: async () => principal },
+  });
+  assert.equal(
+    (await auth.authenticateNativeRequest(new Request("https://example.test")))
+      .principal,
+    principal,
+  );
+});
+
+test("session mutation rejects an unverified Bearer header but accepts verified bearer principals", async () => {
+  const { assertTrustedMutation } = await loadTypescriptModule(
+    "server/auth/request.ts",
+    {
+      "node:crypto": { timingSafeEqual },
+      "next/headers": {
+        cookies: async () => ({ get: () => ({ value: "csrf" }) }),
+      },
+      "@/server/auth": { CSRF_COOKIE: "bc_csrf" },
+    },
+  );
+  const untrusted = new Request("https://example.test", {
+    method: "POST",
+    headers: {
+      authorization: "Bearer unverified",
+      origin: "https://other.test",
+      host: "example.test",
+      "sec-fetch-site": "cross-site",
+    },
+  });
+  await assert.rejects(assertTrustedMutation(untrusted));
+  await assertTrustedMutation(untrusted, { uid: "user", scheme: "bearer" });
+  await assertTrustedMutation(
+    new Request("https://example.test", {
+      method: "POST",
+      headers: {
+        origin: "https://example.test",
+        host: "example.test",
+        "x-csrf-token": "csrf",
+      },
+    }),
+    { uid: "user", scheme: "session" },
+  );
+});
+
+test("profile bootstrap repository does not turn a persistence outage into a synthetic account", async () => {
+  const { fetchUserBootstrapProfile } = await loadTypescriptModule(
+    "server/repositories/users.ts",
+    {
+      "@/lib/logger": { logger: { warn() {} } },
+      "@/server/firebase/data-connect": {
+        getBondCircleDataConnect: () => ({
+          executeQuery: async () => {
+            throw new Error("database unavailable");
+          },
+        }),
+      },
+    },
+    { process: { env: {} } },
+  );
+  await assert.rejects(
+    fetchUserBootstrapProfile("user"),
+    /database unavailable/,
+  );
 });
