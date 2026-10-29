@@ -30,7 +30,7 @@ Required groups:
 - `AUTH_EMAIL_OTP_MODE=production`
 - `AUTH_EMAIL_SMTP_URL` and `AUTH_EMAIL_FROM`: transactional email delivery
 - `NEXT_PUBLIC_APP_URL`: canonical HTTPS origin used in notification email links
-- `CRON_SECRET`: required for the daily retention purge job configured in `vercel.json`
+- `CRON_SECRET`: required for the daily retention purge and deadline-notification jobs configured in `vercel.json`
 
 When entering `FIREBASE_PRIVATE_KEY` in Vercel, preserve newline characters using the escaped `\n` form expected by the application.
 
@@ -71,6 +71,7 @@ npm run verify:production -- --base-url https://www.bondcircles.com --storage-bu
 - Production OTP messages are delivered and development codes are never displayed.
 - Notification deep links open the correct circle and never expose receipt details in email previews.
 - Upcoming deadlines appear when an authenticated member opens the application.
+- The deadline-notification job runs daily at 08:00 UTC (09:00 Africa/Lagos), including for members who do not open the application. Verify its production invocation and delivery records after the approved deployment. Daily scheduling also supports Vercel Hobby; its invocation can occur within the scheduled hour.
 - The daily retention job succeeds only with the configured `CRON_SECRET`.
 - Completed and cancelled circles become read-only immediately and show the correct 30-day purge date.
 - Eligible private receipt and temporary circle files are removed, shared files are retained, and purge failures create retryable alert logs.

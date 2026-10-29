@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { processDeadlineNotifications } from "@/server/repositories/notifications";
 
 export const runtime = "nodejs";
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
   try {
     return NextResponse.json(await processDeadlineNotifications());
   } catch {
+    logger.error("deadline_notification_job_failed");
     return NextResponse.json(
       { error: "Deadline notifications could not be processed." },
       { status: 500 },
