@@ -11,7 +11,12 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
 type ApiCircleType = "GIFT" | "ASO_EBI" | "SUPPORT";
-type ApiCircleStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "ARCHIVED";
+type ApiCircleStatus =
+  | "DRAFT"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "ARCHIVED";
 type ApiCircleRole = "creator" | "co_admin" | "member";
 
 // Stored circle types are lowercase ("gift" | "aso-ebi" | "support").
@@ -98,7 +103,10 @@ export async function GET(request: Request) {
       );
     }
     if (outcome.state === "suspended") {
-      return NextResponse.json({ error: "Account suspended." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Account suspended." },
+        { status: 403 },
+      );
     }
 
     const url = new URL(request.url);

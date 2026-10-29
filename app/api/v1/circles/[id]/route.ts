@@ -5,7 +5,12 @@ import { loadDashboardCircles } from "@/server/repositories/dashboard";
 export const runtime = "nodejs";
 
 type ApiCircleType = "GIFT" | "ASO_EBI" | "SUPPORT";
-type ApiCircleStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "ARCHIVED";
+type ApiCircleStatus =
+  | "DRAFT"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "ARCHIVED";
 type ApiCircleRole = "creator" | "co_admin" | "member";
 
 // Stored circle types are lowercase ("gift" | "aso-ebi" | "support").
@@ -69,7 +74,10 @@ export async function GET(
       );
     }
     if (outcome.state === "suspended") {
-      return NextResponse.json({ error: "Account suspended." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Account suspended." },
+        { status: 403 },
+      );
     }
 
     const { id } = await context.params;
@@ -103,9 +111,7 @@ export async function GET(
     return NextResponse.json(
       {
         error:
-          error instanceof Error
-            ? error.message
-            : "Unable to retrieve circle.",
+          error instanceof Error ? error.message : "Unable to retrieve circle.",
       },
       { status: 500 },
     );

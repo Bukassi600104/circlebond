@@ -59,4 +59,3 @@ export function clientKey(request: Request, identifier = "") {
   const address = forwarded?.split(",")[0]?.trim() || "local";
   return `${address.slice(0, 64)}:${identifier.slice(0, 254)}`;
 }
-

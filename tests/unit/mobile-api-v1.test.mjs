@@ -12,8 +12,12 @@ test("Phase 1: /api/v1 endpoints provide mobile parity with authorization & reda
   const circlesRoute = await source("app/api/v1/circles/route.ts");
   const meRoute = await source("app/api/v1/me/route.ts");
   const pushRoute = await source("app/api/v1/devices/push-token/route.ts");
-  const otpRequestRoute = await source("app/api/v1/auth/email-otp/request/route.ts");
-  const otpVerifyRoute = await source("app/api/v1/auth/email-otp/verify/route.ts");
+  const otpRequestRoute = await source(
+    "app/api/v1/auth/email-otp/request/route.ts",
+  );
+  const otpVerifyRoute = await source(
+    "app/api/v1/auth/email-otp/verify/route.ts",
+  );
 
   assert.match(circlesRoute, /authenticatePrincipal/);
   assert.match(circlesRoute, /loadDashboardCircles/);

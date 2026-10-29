@@ -14,7 +14,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as { token?: string; platform?: string };
+    const body = (await request.json()) as {
+      token?: string;
+      platform?: string;
+    };
     const token = body.token?.trim();
     if (!token || token.length < 10 || token.length > 500) {
       return NextResponse.json(

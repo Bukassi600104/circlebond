@@ -120,4 +120,3 @@ export function sessionCookieOptions() {
     maxAge: SESSION_MAX_AGE_MS / 1000,
   };
 }
-

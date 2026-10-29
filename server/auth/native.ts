@@ -2,10 +2,7 @@ import "server-only";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
-import {
-  authenticatePrincipal,
-  type AuthenticatedPrincipal,
-} from "./index";
+import { authenticatePrincipal, type AuthenticatedPrincipal } from "./index";
 
 /**
  * Outcome of authenticating a native-client API request.

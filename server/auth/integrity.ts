@@ -1,7 +1,10 @@
 import { logger } from "@/lib/logger";
 
 export interface PlayIntegrityVerdict {
-  appRecognitionVerdict: "PLAY_RECOGNIZED" | "UNRECOGNIZED_VERSION" | "UNEVALUATED";
+  appRecognitionVerdict:
+    | "PLAY_RECOGNIZED"
+    | "UNRECOGNIZED_VERSION"
+    | "UNEVALUATED";
   deviceRecognitionVerdict: string[];
   accountDetails?: {
     appLicensingVerdict: "LICENSED" | "UNLICENSED" | "UNEVALUATED";
@@ -26,7 +29,9 @@ export async function evaluatePlayIntegrity(
 
   try {
     // In production with Google API credentials, verify token against Google Play Developer API
-    logger.info("play_integrity_evaluated", { tokenLength: integrityToken.length });
+    logger.info("play_integrity_evaluated", {
+      tokenLength: integrityToken.length,
+    });
     return { passed: true, verdict: "PLAY_RECOGNIZED" };
   } catch (error) {
     logger.error("play_integrity_verification_failed", {

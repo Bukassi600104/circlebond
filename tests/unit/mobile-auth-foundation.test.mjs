@@ -14,7 +14,10 @@ test("BC-MOB-001: authenticatePrincipal supports Bearer ID tokens and session co
   assert.match(authIndex, /export type AuthScheme = "session" \| "bearer"/);
   assert.match(authIndex, /export interface AuthenticatedPrincipal/);
   assert.match(authIndex, /export async function authenticatePrincipal/);
-  assert.match(authIndex, /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/);
+  assert.match(
+    authIndex,
+    /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/,
+  );
   assert.match(authIndex, /verifyIdToken\(idToken, true\)/);
   assert.match(authIndex, /GetUserAccountStatus/);
   assert.match(authIndex, /accountStatus !== "active"/);
@@ -26,7 +29,10 @@ test("BC-MOB-001: mutation assertions differentiate web sessions from mobile bea
   const requestAuth = await source("server/auth/request.ts");
 
   assert.match(requestAuth, /principal\?\.scheme === "bearer"/);
-  assert.match(requestAuth, /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/);
+  assert.match(
+    requestAuth,
+    /authHeader\?\.toLowerCase\(\)\.startsWith\("bearer "\)/,
+  );
   assert.match(requestAuth, /assertTrustedMutation/);
   assert.match(requestAuth, /x-csrf-token/);
 });
