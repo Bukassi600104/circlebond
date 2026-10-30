@@ -5,6 +5,7 @@ import { loadTypescriptModule } from "../helpers/typescript-module.mjs";
 import { PricingRuleError } from "../../server/pricing/entitlements.ts";
 import {
   PaystackTestProvider,
+  parsePaystackActivationReference,
   assertVerifiedPaystackTransaction,
   validPaystackSignature,
 } from "../../server/pricing/paystack.ts";
@@ -15,11 +16,13 @@ async function settlementHarness(
   overrides = {},
   transactionOverrides = {},
   concurrent = false,
+  compactIds = false,
 ) {
   const id = randomUUID();
+  const circleId = randomUUID();
   const attempt = {
-    id,
-    circle: { id: randomUUID() },
+    id: compactIds ? id.replaceAll("-", "") : id,
+    circle: { id: compactIds ? circleId.replaceAll("-", "") : circleId },
     creator: { id: "payment-test-creator" },
     planDefinition: {
       id: "gift_starter_v1_2026_08_02",
@@ -46,15 +49,19 @@ async function settlementHarness(
     amount: attempt.amountDueMinor,
     metadata: {
       activationId: id,
-      circleId: attempt.circle.id,
+      circleId: compactIds ? circleId : attempt.circle.id,
       creatorId: attempt.creator.id,
     },
     ...transactionOverrides,
   };
   const writes = [];
+  const verifiedReferences = [];
   const provider = {
     name: "paystack_test",
-    verifyTransaction: async () => transaction,
+    verifyTransaction: async (reference) => {
+      verifiedReferences.push(reference);
+      return transaction;
+    },
   };
   const complete = (kind) => async (input) => {
     writes.push({ kind, input });
@@ -81,6 +88,7 @@ async function settlementHarness(
   return {
     attempt,
     writes,
+    verifiedReferences,
     settle: () => loadedModule.settlePaystackActivation(provider, id),
   };
 }
@@ -186,6 +194,7 @@ async function webhookHarness(recorded = true) {
       },
       "@/server/pricing/paystack": {
         PaystackTestProvider,
+        parsePaystackActivationReference,
         paystackTestConfiguration: () => secret,
         validPaystackSignature,
       },
@@ -261,4 +270,43 @@ test("refund notifications require a durable reconciliation signal before acknow
   assert.equal(healthy.settlements.length, 0);
   const failed = await webhookHarness(false);
   assert.equal((await failed.post(webhookRequest(body))).status, 503);
+});
+
+test("actual compact-record settlement verifies the persisted reference and remains idempotent", async () => {
+  const h = await settlementHarness({}, {}, false, true);
+  assert.equal((await h.settle()).status, "active");
+  assert.equal(h.verifiedReferences[0], h.attempt.providerReference);
+  assert.notEqual(h.verifiedReferences[0], "bc-" + h.attempt.id);
+  assert.equal(h.writes.length, 1);
+  assert.equal((await h.settle()).status, "active");
+  assert.equal(h.writes.length, 1);
+});
+
+test("signed webhook accepts compact references and rejects malformed UUIDs before settlement", async () => {
+  const h = await webhookHarness();
+  const id = randomUUID().replaceAll("-", "");
+  const accepted = await h.post(
+    webhookRequest(
+      JSON.stringify({
+        event: "charge.success",
+        data: { reference: "bc-" + id },
+      }),
+    ),
+  );
+  assert.equal(accepted.status, 200);
+  assert.equal(h.settlements.length, 1);
+  assert.equal(h.settlements[0][1], id);
+  for (const reference of [
+    "bc-" + "-".repeat(36),
+    "bc-not-a-uuid",
+    "bc-" + id + "extra",
+  ]) {
+    const denied = await h.post(
+      webhookRequest(
+        JSON.stringify({ event: "charge.success", data: { reference } }),
+      ),
+    );
+    assert.equal(denied.status, 400);
+  }
+  assert.equal(h.settlements.length, 1);
 });

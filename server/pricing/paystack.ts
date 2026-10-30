@@ -44,6 +44,25 @@ export function validPaystackSignature(
   return timingSafeEqual(expected, Buffer.from(signature, "hex"));
 }
 
+// SQL Connect emits compact UUIDs; checkout references and metadata may retain Node UUID dashes.
+function uuidIdentity(value: unknown): string | null {
+  return typeof value === "string" &&
+    /^(?:[a-f0-9]{32}|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/i.test(
+      value,
+    )
+    ? value.replaceAll("-", "").toLowerCase()
+    : null;
+}
+
+export function parsePaystackActivationReference(
+  reference: unknown,
+): string | null {
+  if (typeof reference !== "string" || !reference.startsWith("bc-"))
+    return null;
+  const activationId = reference.slice(3);
+  return uuidIdentity(activationId) ? activationId : null;
+}
+
 export function assertVerifiedPaystackTransaction(
   transaction: PaystackTransaction,
   attempt: {
@@ -55,16 +74,21 @@ export function assertVerifiedPaystackTransaction(
     providerReference: string | null;
   },
 ) {
+  const activationId = uuidIdentity(attempt.id);
+  const circleId = uuidIdentity(attempt.circleId);
   if (
+    !activationId ||
+    !circleId ||
     transaction.domain !== "test" ||
     transaction.reference !== attempt.providerReference ||
-    transaction.reference !== `bc-${attempt.id}` ||
+    uuidIdentity(parsePaystackActivationReference(transaction.reference)) !==
+      activationId ||
     !Number.isSafeInteger(transaction.amount) ||
     transaction.amount !== attempt.amountDueMinor ||
     transaction.currency !== "NGN" ||
     transaction.currency !== attempt.currency ||
-    transaction.metadata?.activationId !== attempt.id ||
-    transaction.metadata?.circleId !== attempt.circleId ||
+    uuidIdentity(transaction.metadata?.activationId) !== activationId ||
+    uuidIdentity(transaction.metadata?.circleId) !== circleId ||
     transaction.metadata?.creatorId !== attempt.creatorId
   ) {
     throw new PricingRuleError(
@@ -87,6 +111,13 @@ export class PaystackTestProvider implements ActivationPaymentProvider {
   }
 
   referenceForActivation(activationId: string) {
+    if (!uuidIdentity(activationId)) {
+      throw new PricingRuleError(
+        "Invalid activation payment reference.",
+        "PAYMENT_VERIFICATION_FAILED",
+        400,
+      );
+    }
     return `bc-${activationId}`;
   }
 
@@ -131,6 +162,8 @@ export class PaystackTestProvider implements ActivationPaymentProvider {
       );
     }
     if (
+      !uuidIdentity(input.activationId) ||
+      !uuidIdentity(input.circleId) ||
       !Number.isSafeInteger(input.amountMinor) ||
       input.amountMinor <= 0 ||
       input.currency !== "NGN" ||
@@ -183,7 +216,7 @@ export class PaystackTestProvider implements ActivationPaymentProvider {
   }
 
   async verifyTransaction(reference: string): Promise<PaystackTransaction> {
-    if (!/^bc-[a-f0-9-]{36}$/i.test(reference)) {
+    if (!parsePaystackActivationReference(reference)) {
       throw new PricingRuleError(
         "Invalid activation payment reference.",
         "PAYMENT_VERIFICATION_FAILED",

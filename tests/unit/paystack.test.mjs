@@ -232,3 +232,106 @@ test("server verification returns provider status without manufacturing success"
     t.mock.restoreAll();
   }
 });
+
+test("verification preserves the persisted dashed reference across compact database UUIDs", () => {
+  const compactAttempt = {
+    ...attempt,
+    id: id.replaceAll("-", ""),
+    circleId: input.circleId.replaceAll("-", ""),
+  };
+  assert.doesNotThrow(() =>
+    assertVerifiedPaystackTransaction(transaction, compactAttempt),
+  );
+  assert.throws(
+    () =>
+      assertVerifiedPaystackTransaction(
+        { ...transaction, reference: "bc-" + compactAttempt.id },
+        compactAttempt,
+      ),
+    { code: "PAYMENT_VERIFICATION_FAILED" },
+  );
+  const otherReference = "bc-" + randomUUID();
+  assert.throws(
+    () =>
+      assertVerifiedPaystackTransaction(
+        { ...transaction, reference: otherReference },
+        { ...compactAttempt, providerReference: otherReference },
+      ),
+    { code: "PAYMENT_VERIFICATION_FAILED" },
+  );
+  for (const metadata of [
+    { ...transaction.metadata, activationId: randomUUID().replaceAll("-", "") },
+    { ...transaction.metadata, circleId: randomUUID().replaceAll("-", "") },
+    { ...transaction.metadata, activationId: "invalid" },
+  ])
+    assert.throws(
+      () =>
+        assertVerifiedPaystackTransaction(
+          { ...transaction, metadata },
+          compactAttempt,
+        ),
+      { code: "PAYMENT_VERIFICATION_FAILED" },
+    );
+});
+
+test("verification rejects arbitrary identifiers even when reference and metadata agree", () => {
+  const invalid = {
+    ...attempt,
+    id: "not-a-uuid",
+    providerReference: "bc-not-a-uuid",
+  };
+  assert.throws(
+    () =>
+      assertVerifiedPaystackTransaction(
+        {
+          ...transaction,
+          reference: invalid.providerReference,
+          metadata: { ...transaction.metadata, activationId: invalid.id },
+        },
+        invalid,
+      ),
+    { code: "PAYMENT_VERIFICATION_FAILED" },
+  );
+  assert.throws(
+    () =>
+      assertVerifiedPaystackTransaction(
+        {
+          ...transaction,
+          metadata: { ...transaction.metadata, circleId: "not-a-uuid" },
+        },
+        { ...attempt, circleId: "not-a-uuid" },
+      ),
+    { code: "PAYMENT_VERIFICATION_FAILED" },
+  );
+});
+
+test("provider verification accepts both UUID wire forms and rejects malformed references before fetch", async (t) => {
+  const calls = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    calls.push(String(url));
+    return Response.json({ status: true, data: transaction });
+  });
+  const provider = new PaystackTestProvider(secret);
+  for (const reference of [
+    attempt.providerReference,
+    "bc-" + id.replaceAll("-", ""),
+  ]) {
+    await provider.verifyTransaction(reference);
+    assert.equal(
+      calls.at(-1),
+      "https://api.paystack.co/transaction/verify/" + reference,
+    );
+  }
+  const acceptedCalls = calls.length;
+  for (const reference of [
+    "bc-" + "-".repeat(36),
+    "bc-" + "f".repeat(35),
+    "bc-not-a-uuid",
+    "bc-" + id + "extra",
+  ]) {
+    await assert.rejects(provider.verifyTransaction(reference), {
+      code: "PAYMENT_VERIFICATION_FAILED",
+    });
+  }
+  assert.equal(calls.length, acceptedCalls);
+});

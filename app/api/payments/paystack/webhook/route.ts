@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getActivationPaymentProvider } from "@/server/pricing/provider";
 import {
   PaystackTestProvider,
+  parsePaystackActivationReference,
   paystackTestConfiguration,
   validPaystackSignature,
 } from "@/server/pricing/paystack";
@@ -70,16 +71,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true });
     }
     const reference = event.data?.reference;
-    if (
-      typeof reference !== "string" ||
-      !/^bc-[a-f0-9-]{36}$/i.test(reference)
-    ) {
+    const activationId = parsePaystackActivationReference(reference);
+    if (!activationId) {
       return NextResponse.json(
         { error: "Invalid activation reference." },
         { status: 400 },
       );
     }
-    await settlePaystackActivation(provider, reference.slice(3));
+    await settlePaystackActivation(provider, activationId);
     return NextResponse.json({ received: true });
   } catch {
     // Do not acknowledge failed settlement: Paystack retries signed deliveries.
