@@ -74,6 +74,12 @@ A provider integration must:
 - record failures without leaking provider or payment secrets;
 - call the repository completion transaction only after verification.
 
+## Equal allocations after membership or capacity changes
+
+Owner-approved30 October2026: preserve each joined member's existing expected and confirmed amounts. For Equal Gift and Support circles, a new joined member receives the first share when the remaining target (`targetAmount - sum(joined expectedAmount)`) is divided across unfilled places (`memberLimit - joined count`) using the existing integer-remainder convention. Recompute from persisted joined assignments for each direct acceptance or creator approval; client invitation amounts do not override Equal allocation.
+
+For target₦3,000 with an existing₦1,000 assignment and capacity increased from3 to10, the nine new shares are₦223,₦223 and seven₦222. The final place receives the remaining target directly; a fully assigned target permits zero for later places. Existing zero or unequal assignments remain unchanged. Invalid negative/noninteger amounts, over-target sums, stale member counts and exhausted capacity fail safely for organizer review. Custom Gift/Support and Aso-Ebi retain their existing rules. No historical customer-data rewrite or confirmed-payment change is authorized.
+
 ## Existing-circle migration
 
 Existing rows are mapped to `pricingModelVersion = legacy_universal_v1` and
