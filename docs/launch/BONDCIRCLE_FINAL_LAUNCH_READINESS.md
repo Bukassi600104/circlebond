@@ -24,6 +24,8 @@ Lock SHA256:12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38. Sc
 
 Failure histories, command statuses and environment limits remain in [test evidence](BONDCIRCLE_TEST_EVIDENCE.md), [current CI](AGENT_A_FINAL_CI_EVIDENCE.md), [browser evidence](AGENT_H_BROWSER_ACCEPTANCE.md), [allocation regression](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md) and [independent review](BONDCIRCLE_FINAL_INDEPENDENT_REVIEW.md). No passing subset is described as a green pipeline.
 
+[Draft PR1](https://github.com/Bukassi600104/circlebond/pull/1) is published, remains draft/unmerged, and main is unchanged. [Hosted run34](https://github.com/Bukassi600104/circlebond/actions/runs/41048618241) passes all required Linux/Node22 steps and423 tests with zero fail/skip/cancel. It checked out merge102dcdcf5b87f41deef964b479074f57e553be71; its complete tree is identical to publishedabd2454. Independent reviewer verified actual logs/tree identity. See test evidence for versions/package counts/proof hashes. Subsequent documentation-only commits require their own check; local lab buildRk5 remains distinct from hosted output.
+
 ## Approved allocation policy
 
 The owner explicitly approved keeping existing assigned amounts and splitting only the remaining target across unfilled places. Equal Gift and Support direct joins and approvals now use persisted joined assignments. Target3000, existing assigned1000 and capacity3→10 gives nine new shares223,223,222×7. Existing expected/confirmed amounts, including valid zero/unequal legacy values, remain fixed. Invalid negative/noninteger/over-target values, stale counts and exhausted capacity fail safely. The final place receives the remaining target directly.

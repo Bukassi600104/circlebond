@@ -23,7 +23,7 @@ All six persisted command statuses name exact3b56d820031e7234b32e87805248bde8f24
 
 Before H service ownership,11:06:18.260UTC verification recorded clean tracked checkout, exact physical/committed lock equality and all ten owned ports closed. H browser acceptance on that artifact passes: public39/39 and all7 named authenticated phases; independent final local evidence review PASS. The earlier scripts-enabled clean install is reused at the unchanged lock; no fresh installation claim is made for3b56. Raw proof is CI tmp/launch-evidence/final-3b56d82 and the primary recovered copy. Independent final local evidence review PASS. This local synthetic artifact is not production-configured output.
 
-The final non-author Ponytail reviewer independently read all six actual status records, lock/build bytes,423-test logs and the final immutable browser reports/screenshots. Verdict: **PASS for reviewed local source/evidence**; public launch remains **BLOCKED**. Hosted candidate CI remains pending publication.
+The final non-author Ponytail reviewer independently read all six actual status records, lock/build bytes,423-test logs and the final immutable browser reports/screenshots. Verdict: **PASS for reviewed local source/evidence**; public launch remains **BLOCKED**. Hosted Linux/Node22 CI also passes for publishedabd2454 and an identical PR merge tree; see the verified hosted section below.
 
 ## Installation and environment
 
@@ -31,7 +31,15 @@ Scripts-enabled clean npm ci completed2026-10-30T00:23:29.9118764Z, exit0,1085 p
 
 Actual host: Node24.13.1/npm11.9.0/TemurinJRE21.0.11+10. Installed Next16.4.3, Sharp0.35.5, Nodemailer10.1.4, TypeScript5.9.3, FirebaseTools15.25.1. Exact-lock audit: zero critical/high,15 moderate full-tree findings including8 production-chain findings. See [dependency assessment](AGENT_A_DEPENDENCY_SECURITY.md); zero high/critical is not vulnerability-free.
 
-Production-mode local builds use synthetic Firebase values and guarded loopback DNS/SMTP/Auth/Data Connect. They are not production-configured artifacts to promote. Linux/Node22 GitHub Actions remains a separate verification environment until a hosted result is recorded.
+Production-mode local builds use synthetic Firebase values and guarded loopback DNS/SMTP/Auth/Data Connect. They are not production-configured artifacts to promote. The distinct Linux/Node22 hosted result is now verified below; package counts and runtime versions are reported separately from Windows.
+
+## Verified hosted GitHub CI
+
+[Draft PR1](https://github.com/Bukassi600104/circlebond/pull/1) remains open/draft/unmerged; main remainsc0b1f913caeeffee546f79e2804f2583f2963edd. [Run34](https://github.com/Bukassi600104/circlebond/actions/runs/41048618241), required verify job124038838746, completes successfully for published headabd2454f63ac17dcbe7a9dffd166bdd9f474e037. Actual checkout is PR merge102dcdcf5b87f41deef964b479074f57e553be71; both commits have identical complete treef07d6b9dc3b2fa0af03231ba3664e86cb511779a. This is verified tree equivalence, not an assumption that Actions checks out the literal head.
+
+Actual runner Ubuntu24.04.5/Node22.23.4/npm10.9.9/Temurin21.0.13+9. Scripts-enabled npm ci adds1105 packages/audits1107; high-threshold audit succeeds with15 moderate findings. Install, audit, lint, format, types and complete npm test all pass. The logs show367 unit/integration+1 local Auth/SMTP+55 actual database=**423 PASS**, zero failures/skips/cancellations, and42 static pages built. Independent Ponytail review reads the actual job/logs and verifies the merge/head tree identity. This is not deployment, genuine provider or physical-device acceptance.
+
+Compact proof and decoded206901-byte log are preserved under tmp/launch-evidence/hosted-abd2454f-run41048618241/. Log SHA256:63fd2a4a1437900fd4511c365c1defc916991b508659e36f524364bd9fef7434. Later documentation-only commits require their own GitHub check; the PR checks show the latest exact head.
 
 ## Preserved causal and historical results
 
@@ -70,7 +78,7 @@ Command: npm run verify:production -- --base-url https://www.bondcircles.com --s
 
 Health is configuration evidence, not hosted CRUD/delivery/recovery proof. Owning Vercel scope remains inaccessible, so live deployment SHA/configuration/rollback relationship is unverified. No authenticated production request/customer write/provider change was performed.
 
-GitHub main now requires actual verify/app15368 with strict up-to-date checking and administrator enforcement; force pushes/deletion and auto-merge remain off. Fresh non-author API/workflow readback PASS. No merge/deploy/test merge occurred; a hosted candidate result must be reported separately.
+GitHub main now requires actual verify/app15368 with strict up-to-date checking and administrator enforcement; force pushes/deletion and auto-merge remain off. Fresh non-author API/workflow readback PASS. No main merge, deployment or manual test-merge attempt occurred; the hosted candidate result is verified in its own section.
 
 ## Acceptance environments and limitations
 
