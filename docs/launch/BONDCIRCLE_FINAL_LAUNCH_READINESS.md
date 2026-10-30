@@ -12,15 +12,15 @@ Lock SHA256:12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38. Sc
 
 ## Current evidence
 
-| Gate                                              | Actual result                                                                                                                      |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Approved-policy unit regression                   | PASS32/32 after old007 RED24 PASS/8 FAIL; actual repository and allocator used                                                     |
-| Approved-policy actual database regression        | PASS34/34, unchanged test blob across old982 RED28/6, initial78 RED20/14 and correctedadb GREEN34/0; all original guards retained  |
-| Fresh format/lint/audit/types/full npm test/build | PASS at exact3b56d82;423 tests,0 failures/skips/cancellations;42-page final buildRk5aHEWUVu4sxKLFjosoY                             |
-| Fresh final-build public/authenticated browser    | PASS39 public checks/24 layouts and7 authenticated phases on Rk5; ordinary creator/member1000 both verified; lab budgets unchanged |
-| Final non-author Ponytail source/evidence review  | PASS for all9 corrections, exact423-test local CI and final39/7 artifact evidence; external launch approval excluded               |
-| Current production read-only verifier             | FAIL,6/8: published legal placeholders and configured Storage HTTP404                                                              |
-| GitHub merge protection                           | PASS, independently read back: required verify/app15368, strict up-to-date/admin enforcement; no force-push/deletion/auto-merge    |
+| Gate                                              | Actual result                                                                                                                                                                                         |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approved-policy unit regression                   | PASS32/32 after old007 RED24 PASS/8 FAIL; actual repository and allocator used                                                                                                                        |
+| Approved-policy actual database regression        | PASS34/34, unchanged test blob across old982 RED28/6, initial78 RED20/14 and correctedadb GREEN34/0; all original guards retained                                                                     |
+| Fresh format/lint/audit/types/full npm test/build | PASS at exact3b56d82;423 tests,0 failures/skips/cancellations;42-page final buildRk5aHEWUVu4sxKLFjosoY                                                                                                |
+| Fresh final-build public/authenticated browser    | PASS39 public checks/24 layouts and7 authenticated phases per browser in actual Edge156.0.4314.50 and Chrome156.0.8078.49, same Rk5; ordinary creator/member1000 both verified; lab budgets unchanged |
+| Final non-author Ponytail source/evidence review  | PASS for all9 corrections, exact423-test local CI and final39/7 artifact evidence; external launch approval excluded                                                                                  |
+| Current production read-only verifier             | FAIL,6/8: published legal placeholders and configured Storage HTTP404                                                                                                                                 |
+| GitHub merge protection                           | PASS, independently read back: required verify/app15368, strict up-to-date/admin enforcement; no force-push/deletion/auto-merge                                                                       |
 
 Failure histories, command statuses and environment limits remain in [test evidence](BONDCIRCLE_TEST_EVIDENCE.md), [current CI](AGENT_A_FINAL_CI_EVIDENCE.md), [browser evidence](AGENT_H_BROWSER_ACCEPTANCE.md), [allocation regression](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md) and [independent review](BONDCIRCLE_FINAL_INDEPENDENT_REVIEW.md). No passing subset is described as a green pipeline.
 

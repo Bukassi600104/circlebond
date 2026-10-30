@@ -6,14 +6,14 @@ Updated 30 October 2026 (Africa/Lagos). Integration: C:/Users/USER/Desktop/Bond 
 
 Owner decision BC-050: preserve existing assigned amounts and split only the remaining target across unfilled places. Source `78e459d` plus adb619c implements this for Equal Gift/Support direct joins and approvals. Existing expected/confirmed amounts remain unchanged. Query/schema/generated SDK/lock are unchanged from `00750cd` by these policy source edits.
 
-| Gate                                           | Actual result / scope                                                                                                                              |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Approved-policy actual database regression     | PASS 34/34, zero failures/skips, source `adb619c` with unchanged test blob 525a51b85d1e4f985f88187d551da15e1bdf50c4; native compile/configure PASS |
-| Non-author source/database review              | PASS, bounded; final place, four complete upgrade sequences, concurrency, lifecycle and database-time expiry independently inspected               |
-| Approved-policy unit regression                | PASS32/32 on corrected source and independent exact3b56d82 rerun; old007 RED24 PASS/8 FAIL retained                                                |
-| Complete local CI                              | PASS at exact3b56d82: format/lint/high-threshold audit/types/full npm test/explicit build all exit0;423 tests,0 failures/skips/cancellations       |
-| Final artifact public/authenticated browser    | PASS public39/39 and7 named authenticated phases on exact3b56d82/buildRk5aHEWUVu4sxKLFjosoY; final non-author local source/evidence review PASS    |
-| Production/provider/device/recovery acceptance | BLOCKED; details below                                                                                                                             |
+| Gate                                           | Actual result / scope                                                                                                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approved-policy actual database regression     | PASS 34/34, zero failures/skips, source `adb619c` with unchanged test blob 525a51b85d1e4f985f88187d551da15e1bdf50c4; native compile/configure PASS                                    |
+| Non-author source/database review              | PASS, bounded; final place, four complete upgrade sequences, concurrency, lifecycle and database-time expiry independently inspected                                                  |
+| Approved-policy unit regression                | PASS32/32 on corrected source and independent exact3b56d82 rerun; old007 RED24 PASS/8 FAIL retained                                                                                   |
+| Complete local CI                              | PASS at exact3b56d82: format/lint/high-threshold audit/types/full npm test/explicit build all exit0;423 tests,0 failures/skips/cancellations                                          |
+| Final artifact public/authenticated browser    | PASS39 public checks and7 named authenticated phases per browser, actual Edge and Chrome, exact3b56d82/buildRk5aHEWUVu4sxKLFjosoY; final non-author local source/evidence review PASS |
+| Production/provider/device/recovery acceptance | BLOCKED; details below                                                                                                                                                                |
 
 Actual database execution10:50:16.030–10:51:11.308UTC used fresh in-memory PGlite and local Data Connect, with notification delivery isolated. All four Gift/Support direct/approval upgrades fill nine places with [223,223,222,222,222,222,222,222,222] while creator assigned 1000/confirmed 700 remain unchanged. Existing zero/unequal amounts are preserved. Invalid amounts/over-target totals and stale/full/closed/revoked/expired/unpaid-draft cases reject safely. See [causal database evidence](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md). These stored-capacity fixtures do not claim payment checkout occurred.
 
@@ -56,6 +56,10 @@ Production-mode local builds use synthetic Firebase values and guarded loopback 
 
 Failures are not combined with separate runs into a passing pipeline. Detailed command statuses, UTC times, exact commits, lock hashes and fixture limits are in [Agent A CI](AGENT_A_FINAL_CI_EVIDENCE.md), [H browser](AGENT_H_BROWSER_ACCEPTANCE.md), [H database](AGENT_H_DATABASE_ACCEPTANCE.md), [allocation regression](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md) and [independent review](BONDCIRCLE_FINAL_INDEPENDENT_REVIEW.md).
 
+### Desktop checkout line endings
+
+The post-closeout desktop format check initially exited1 with117 warnings caused by older physical CRLF files, while the clean CI checkout and committed files were LF. Both installed Prettier versions are3.6.2. Only128 tracked text files whose normalized bytes exactly equaled committed HEAD were restored to those exact LF bytes; binary or changed content was not overwritten. Refreshing index stat information produced no staged diff and clean status. The subsequent full desktop npm run format:check exited0. This changes no committed source/configuration/test/lock bytes and does not require a new application build. Raw proof: tmp/launch-evidence/publication/desktop-line-ending-materialization.json.
+
 ## Production read-only verification
 
 Command: npm run verify:production -- --base-url https://www.bondcircles.com --storage-bucket bond-circle.firebasestorage.app. Fresh post-restart result: exit1,6/8 PASS.
@@ -70,21 +74,23 @@ GitHub main now requires actual verify/app15368 with strict up-to-date checking 
 
 ## Acceptance environments and limitations
 
-| Environment / journey                            | Status         | Required evidence                                                                                       |
-| ------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------- |
-| Physical iPhone Safari/installed PWA             | BLOCKED        | Actual install, standalone auth/invite/upload/app-switch/offline/update journey                         |
-| Physical Android Chrome/installed PWA            | BLOCKED        | Actual installation/session/sharing/upload/recovery journey                                             |
-| Desktop local browser                            | PASS           | Current exact3b56/buildRk5 public39 and7 authenticated phases; Edge viewports are simulated devices     |
-| Desktop Chrome                                   | PENDING REVIEW | Installed executable verified; unchanged final-build suite running separately, Edge proof retained      |
-| Safari/VoiceOver/other real assistive technology | BLOCKED        | Supported device/browser and operator testing                                                           |
-| Genuine staging Storage/SMTP/persistence         | BLOCKED        | Approved resources/credentials; upload/read/replace/delete, failures and recovery                       |
-| Approved payment sandbox/webhooks/refunds        | BLOCKED        | Provider approval, actual sandbox and reconciliation/refund operator; mocks are not provider acceptance |
-| Backup/restore/compatible rollout/rollback       | BLOCKED        | Recoverable backup and approved isolated rehearsal target/operator                                      |
-| Legacy allocation/counter reconciliation         | BLOCKED        | Authorized audit of historical overbooking/drift/invalid amounts; no production rewrite                 |
-| Dense individually-valid5MB image combinations   | BLOCKED        | Approved transport resolution; current client rejects aggregate hosting overflow safely                 |
-| Legal/privacy/incident/notification operations   | BLOCKED        | Identity/contacts/professional review, fulfillment and alert/retry/reconciliation evidence              |
+| Environment / journey                            | Status  | Required evidence                                                                                                                     |
+| ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Physical iPhone Safari/installed PWA             | BLOCKED | Actual install, standalone auth/invite/upload/app-switch/offline/update journey                                                       |
+| Physical Android Chrome/installed PWA            | BLOCKED | Actual installation/session/sharing/upload/recovery journey                                                                           |
+| Desktop Edge                                     | PASS    | Current exact3b56/buildRk5 public39 and7 authenticated phases; Actual Edge156.0.4314.50; phone/tablet layouts are viewport simulation |
+| Desktop Chrome                                   | PASS    | Actual Google Chrome156.0.8078.49, exact3b56/Rk5,39 public/seven authenticated phases; non-author evidence PASS                       |
+| Safari/VoiceOver/other real assistive technology | BLOCKED | Supported device/browser and operator testing                                                                                         |
+| Genuine staging Storage/SMTP/persistence         | BLOCKED | Approved resources/credentials; upload/read/replace/delete, failures and recovery                                                     |
+| Approved payment sandbox/webhooks/refunds        | BLOCKED | Provider approval, actual sandbox and reconciliation/refund operator; mocks are not provider acceptance                               |
+| Backup/restore/compatible rollout/rollback       | BLOCKED | Recoverable backup and approved isolated rehearsal target/operator                                                                    |
+| Legacy allocation/counter reconciliation         | BLOCKED | Authorized audit of historical overbooking/drift/invalid amounts; no production rewrite                                               |
+| Dense individually-valid5MB image combinations   | BLOCKED | Approved transport resolution; current client rejects aggregate hosting overflow safely                                               |
+| Legal/privacy/incident/notification operations   | BLOCKED | Identity/contacts/professional review, fulfillment and alert/retry/reconciliation evidence                                            |
 
 Controlled browser lab budgets remain LCP≤2500ms, CLS≤0.1, interaction≤200ms and warm unauthenticated session APIp95≤800ms, under150ms added latency/1.6Mbpsdown/750kbpsup/4xCPU. Historical007 samples passed: sign-in1032/1084/1156ms, onboarding1076/1344/2228ms, CLS0.024387, interaction≤38.9ms,20-sample warm unauthenticatedp95=7.94ms; responsive image640px/24,062bytes. Small local lab samples are not fieldp75/INP or authenticated database latency. Current Rk5 lab samples also pass: sign-in1188/1220/1572ms, onboarding1144/1144/1104ms, maximum CLS0.024387, next-screen76.9/40.8/30.8ms,20-sample warm unauthenticated APIp95=23.22ms. Wrapper11:06:48–11:09:04UTC exits0 with public39/39 and7 named authenticated phases. Its8 authenticated-report entries include one delegated public-suite check. Both ordinary creator and joined member display1000 expected; invitation amount is omitted. H records CI clean and all ten ports closed after execution. No provider/device acceptance is inferred.
+
+Actual separate Chrome acceptance: wrapper11:18:29.448–11:21:01.971UTC exit0, version156.0.8078.49, public39/39 and7 named authenticated phases. Sign-in LCP1328/1504/1208ms; onboarding1344/1328/1324ms; max CLS0.024387, interaction21ms, warm unauthenticated APIp95=10.22ms. Same budgets/fixtures/assertions, actual creator/member1000, no invitation amount. Immutable Chrome hashes match its handoff and original Edge hashes remain unchanged. Non-author reviewer viewed reports and three screenshots and accepted this separate evidence. Safe primary copy: tmp/launch-evidence/qa-h-3b56d82-chrome-browser-20261030T1121. Physical-device/provider gates remain open.
 
 ## Evidence custody and publication hygiene
 

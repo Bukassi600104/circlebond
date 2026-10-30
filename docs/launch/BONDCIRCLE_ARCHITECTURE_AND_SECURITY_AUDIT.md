@@ -1,6 +1,6 @@
 # BondCircle architecture and security audit
 
-Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases per browser in actual desktop Edge and Google Chrome. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
 
 Updated 30 October 2026. Baseline c0b1f913caeeffee546f79e2804f2583f2963edd; current acceptance is the central remediation ledger. This report distinguishes reviewed code from unverified production operation.
 

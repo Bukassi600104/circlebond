@@ -1,6 +1,6 @@
 # BondCircle API and native readiness
 
-Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases per browser in actual desktop Edge and Google Chrome. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
 
 Assessment: 29 October 2026; reconciled30 October 2026. Implementation owner: Agent G. Bounded implementation review and historical129f1e1 local CI: **PASS**. Staging/provider/native delivery acceptance: **BLOCKED**. Native client delivery is a separate track and does not block web release by itself.
 

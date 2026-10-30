@@ -1,6 +1,6 @@
 # BondCircle PWA acceptance matrix
 
-Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases per browser in actual desktop Edge and Google Chrome. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
 
 Session date: 29 October 2026 (Africa/Lagos). Agent E. The current deliverable is an installable web application; it is not a native Android or iOS binary.
 
