@@ -214,5 +214,5 @@ test("external-reference query cannot hide another circle behind two same-circle
     })
   ).data;
   assert.equal(refs.receipts.length, 1);
-  assert.equal(refs.receipts[0].circle.id, otherCircleId);
+  assert.equal(refs.receipts[0].circle.id, otherCircleId.replaceAll("-", ""));
 });

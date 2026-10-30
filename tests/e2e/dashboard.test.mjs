@@ -34,7 +34,8 @@ test("actual dashboard query scopes before limiting and retrieves more than200 p
     })),
   );
   const rows = Array.from({ length: 302 }, (_, i) => ({
-    id: randomUUID(),
+    // SQL Connect UUID outputs use 32 lowercase hexadecimal digits.
+    id: randomUUID().replaceAll("-", ""),
     creatorId: i < 201 ? self : other,
     name: "Synthetic dashboard circle",
     type: "gift",

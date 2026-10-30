@@ -1154,6 +1154,13 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
     role: "member",
     createdAt: new Date().toISOString(),
   });
+  // Receipt submissions require a joined member, not an outstanding invitation.
+  await dataConnect.upsert("circleMembership", {
+    circleId,
+    userId: memberId,
+    role: "member",
+    membershipStatus: "joined",
+  });
   await dataConnect.executeMutation("SetGiftMemberAllocation", {
     circleId,
     memberId,
