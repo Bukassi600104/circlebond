@@ -2,6 +2,81 @@
 
 All runs described here use synthetic loopback data and desktop Edge controlled through Playwright. Simulated phone/tablet viewports are not physical-device acceptance. Provider, Storage, physical iPhone/Android and real Safari acceptance remain **BLOCKED**.
 
+## Recorded invitation-fix run: build 00750cd
+
+Frozen application/configuration/schema/SDK/lock source:
+`00750cd316885f27e5a3f215f005971908f44f25`; local build:
+`PD4mqlXuPDW5HzsyLaaCe`. Clean checkout
+`6f75f4a5a25e2c1a15d883d962c6da1dfcbb30e3` differs only by an independently
+reviewed positive database fixture. No application or build change was made for
+the browser run. The ordinary guarded Firebase CLI wrapper ran from
+2026-10-30 10:34:28.700Z to 10:36:45.743Z and exited zero. Desktop Edge was
+`156.0.4314.50`.
+
+**Bounded browser result: PASS. Overall release: BLOCKED.** Public39/39 passed,
+including24 layouts and six unchanged controlled samples. All seven authenticated
+journey phases passed. The authenticated JSON reports eight PASS entries because
+its first entry delegates to the separate public harness; there are seven
+authenticated phases.
+
+The actual phases cover UI OTP/session and persisted legal consent; valid
+pre-consent multipart403 with `LEGAL_ACCEPTANCE_REQUIRED` and no circle side
+effect; Starter draft creation/reload without checkout; a separate eligible
+Trial's automatic publication; invitation continuation through
+Register/Sign-in/OTP/consent and joining; member invitation POST400/GET403,
+unchanged owner counts and absent admin controls; persisted profile edits and
+caller-scoped export; phone viewport overflow; and logout followed by session401.
+Auth accounts were seeded in the emulator, so this is not UI registration.
+
+The ordinary unupgraded Equal Gift target3000/capacity3 now visibly shows
+**₦1,000 expected for both the joined member and retained creator**. Exact DOM
+assertions locate their controlled display names after the real join. Invitation
+input omits `expectedAmount`. Source trace: `GetGiftCircleDetail` returns stored
+membership amounts, `server/repositories/gift-circles.ts` maps them without
+recalculating, and `GiftCircleView` renders `money(member.expectedAmount)`. H
+inspected the screenshot and confirmed the previous zero-share defect corrected.
+QA assertions `271c7ea`/`60fa5af` were independently reviewed before execution.
+
+| Route      | Sample | LCP ms | CLS       | Controlled next-screen ms |
+| ---------- | ------ | ------ | --------- | ------------------------- |
+| Sign-in    | 1      | 1032   | 0.0001391 | NOT APPLICABLE            |
+| Sign-in    | 2      | 1084   | 0.0001243 | NOT APPLICABLE            |
+| Sign-in    | 3      | 1156   | 0.0001243 | NOT APPLICABLE            |
+| Onboarding | 1      | 1076   | 0.0243870 | 35.9                      |
+| Onboarding | 2      | 1344   | 0.0243870 | 20.7                      |
+| Onboarding | 3      | 2228   | 0.0243870 | 38.9                      |
+
+Original budgets are unchanged: LCP2500ms, CLS0.1, controlled next-screen200ms,
+warm unauthenticated API p95800ms. All six fresh390x844 samples used latency150ms,
+1.6Mbps down,750kbps up and CPU4x. Onboarding selected width640 and encoded24062
+bytes in all three samples. Warm **unauthenticated** session401 p95 was7.94ms over20
+samples. These are not authenticated API, field or physical-device measurements.
+Public contexts retained the original CSP, received no local-network permission,
+and recorded zero blocked external requests.
+
+Authenticated contexts retain the reviewed loopback-only document CSP adapter,
+exact-origin temporary Local Network Access permission, native browser fetch for
+Secure-cookie handling, and one pre-OTP Sign-in refresh after verified invitation
+continuation. The diagnostic again recorded APIRequest401/browser200. There was
+no Cookie/Bearer injection or production header change. Twelve documents and one
+pre-OTP refresh are recorded. These fixtures do not accept production CSP,
+provider operation or real public-browser permissions.
+
+CI evidence: `tmp/launch-evidence/public-browser/007-public-pass.json`,
+`tmp/launch-evidence/authenticated-browser/007-authenticated-pass.json` and
+`tmp/launch-evidence/h-browser-wrapper-last.json`. Safe copies plus verified24
+public/three authenticated screenshots are in primary
+`tmp/launch-evidence/qa-h-007-final-browser-20261030T1036/`. Prior failures are
+archived separately. Next/emulators stopped; all ten application/emulator ports
+were confirmed closed and CI tracked source was clean. No cleanup was performed.
+
+At this recorded source, four unit/integration cases and one real-DB upgrade
+compatibility case still failed. The subsequent human decision preserves assigned
+amounts and splits the remaining target over unfilled places; implementation and
+fresh source-specific verification are required. This recorded browser pass does
+not resolve those failures or production/provider/recovery/legal/device gates.
+The synthetic Firebase build is not a promotable production artifact.
+
 ## First actual run: candidate 129f1e1
 
 Date: 30 October 2026. Application commit `129f1e14b36cfe24edacaca276801d6b0ca543fe`, clean tracked CI checkout, completed updated-lock install, production-mode local build `RPkt0JpvTKX8H-5okJbgd`. The build contains synthetic Firebase emulator configuration and is not a promotable production artifact. Desktop Edge version `156.0.4314.50`.
