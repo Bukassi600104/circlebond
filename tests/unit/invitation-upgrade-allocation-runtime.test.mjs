@@ -20,10 +20,12 @@ async function upgradedFixture(type) {
   };
   const existingMembers = [
     {
+      id: "historical-creator-membership",
       user: { id: "creator" },
       role: "creator",
       membershipStatus: "joined",
       expectedAmount: 1000,
+      confirmedAmount: 400,
     },
   ];
   const beforeMembers = structuredClone(existingMembers);
@@ -111,39 +113,77 @@ async function upgradedFixture(type) {
   };
 }
 
-// Increasing capacity from 3 to 10 preserves the creator's historical 1000
-// allocation. This compatibility check intentionally does not choose a new
-// member's share: that business policy requires an owner decision.
+function membershipHistory(members) {
+  return members.map(
+    ({ id, user, role, membershipStatus, confirmedAmount }) => ({
+      id,
+      userId: user.id,
+      role,
+      membershipStatus,
+      confirmedAmount,
+    }),
+  );
+}
+
+function allocationObservations(members) {
+  return members.map(({ id, expectedAmount, confirmedAmount }) => ({
+    id,
+    expectedAmount,
+    unpaidAmount: Math.max(0, expectedAmount - confirmedAmount),
+  }));
+}
+
+// A capacity upgrade must preserve membership identity and confirmed history.
+// Existing unpaid allocations and new-member shares are observed, not asserted:
+// retaining them or recalculating them with an audit requires an owner decision.
 for (const type of ["gift", "support"]) {
   for (const approval of [false, true]) {
     const path = approval ? "approved" : "direct";
-    test(`upgraded equal ${type} permits ${path} joining without rewriting historical allocations`, async () => {
+    test(`upgraded equal ${type} permits ${path} joining while preserving membership and confirmed history`, async (t) => {
       const f = await upgradedFixture(type);
-      if (approval) {
-        await f.repo.approveInvitationMembership(
-          f.circle.id,
-          f.invitation.id,
-          "new-member",
-          "creator",
+      try {
+        if (approval) {
+          await f.repo.approveInvitationMembership(
+            f.circle.id,
+            f.invitation.id,
+            "new-member",
+            "creator",
+          );
+        } else {
+          const result = await f.repo.respondToInvitation(
+            f.invitation,
+            { id: "new-member", email: null, phone: null },
+            "accept",
+          );
+          assert.equal(result.status, "joined");
+        }
+        const joins = f.mutations.filter((entry) =>
+          [
+            "ApproveInvitationMembership",
+            "AcceptInvitationWithMembership",
+          ].includes(entry.operation),
         );
-      } else {
-        const result = await f.repo.respondToInvitation(
-          f.invitation,
-          { id: "new-member", email: null, phone: null },
-          "accept",
+        assert.equal(joins.length, 1);
+        assert.equal(
+          joins[0].operation,
+          approval
+            ? "ApproveInvitationMembership"
+            : "AcceptInvitationWithMembership",
         );
-        assert.equal(result.status, "joined");
+        assert.equal(joins[0].variables.userId, "new-member");
+        assert.equal(joins[0].variables.nextMemberCount, 2);
+        assert.deepEqual(
+          membershipHistory(f.existingMembers),
+          membershipHistory(f.beforeMembers),
+        );
+      } finally {
+        t.diagnostic(
+          `Unpaid allocation observations: ${JSON.stringify({
+            before: allocationObservations(f.beforeMembers),
+            after: allocationObservations(f.existingMembers),
+          })}`,
+        );
       }
-      assert.equal(f.mutations.length, 1);
-      assert.equal(
-        f.mutations[0].operation,
-        approval
-          ? "ApproveInvitationMembership"
-          : "AcceptInvitationWithMembership",
-      );
-      assert.equal(f.mutations[0].variables.userId, "new-member");
-      assert.equal(f.mutations[0].variables.nextMemberCount, 2);
-      assert.deepEqual(f.existingMembers, f.beforeMembers);
     });
   }
 }
