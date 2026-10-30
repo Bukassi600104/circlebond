@@ -969,23 +969,69 @@ test("Firebase persists secure invitations, approvals, revocation and multi-circ
 
   async function createCircle(name) {
     const createdAt = new Date().toISOString();
-    const created = await dataConnect.executeMutation(
-      "CreateModelPricedCircleDraft",
-      {
-        creatorId,
-        name,
-        type: "gift",
-        description: "Invitation workflow persistence verification.",
-        targetAmount: 90000,
-        ...pricingVariables("gift", "starter", 10),
-        deadline: "2026-12-30",
-        eventDate: null,
-        visibility: "private",
-        createdAt,
-        updatedAt: createdAt,
-      },
+    // This positive journey represents an existing grandfathered circle, not
+    // an unpaid model-priced draft or a simulated successful payment.
+    const created = await dataConnect.executeMutation("CreateCircleDraft", {
+      creatorId,
+      name,
+      type: "gift",
+      description: "Invitation workflow persistence verification.",
+      targetAmount: 90000,
+      pricingPlan: "legacy",
+      memberLimit: 10,
+      activationPrice: 0,
+      deadline: "2026-12-30",
+      eventDate: null,
+      visibility: "private",
+      createdAt,
+      updatedAt: createdAt,
+    });
+    const circleId = created.data.circle_insert.id;
+    await dataConnect.executeMutation("ConfigureGiftCircle", {
+      circleId,
+      actorId: creatorId,
+      giftTitle: "Synthetic invitation fixture",
+      contributionMode: "custom",
+      paymentBankName: "Fixture bank",
+      paymentAccountName: "Fixture creator",
+      paymentAccountNumber: "0123456789",
+      imageUrl: "",
+      imageStoragePath: "",
+      updatedAt: createdAt,
+    });
+    await dataConnect.executeMutation("SetGiftMemberAllocation", {
+      circleId,
+      memberId: creatorId,
+      expectedAmount: 30000,
+      contributionStatus: "joined",
+    });
+    for (const [fromStatus, toStatus] of [
+      ["draft", "published"],
+      ["published", "active"],
+    ]) {
+      await dataConnect.executeMutation("TransitionCircleWithAudit", {
+        circleId,
+        actorId: creatorId,
+        fromStatus,
+        toStatus,
+        updatedAt: new Date().toISOString(),
+        completedAt: null,
+        retentionDueAt: null,
+        archiveAt: null,
+        purgeAt: null,
+      });
+    }
+    const persisted = await dataConnect.executeQuery("GetCircleEngineRecord", {
+      circleId,
+    });
+    assert.equal(
+      persisted.data.circle.pricingModelVersion,
+      "legacy_universal_v1",
     );
-    return created.data.circle_insert.id;
+    assert.equal(persisted.data.circle.activationStatus, "grandfathered");
+    assert.equal(persisted.data.circle.status, "active");
+    assert.equal(persisted.data.circle.contributionMode, "custom");
+    return circleId;
   }
 
   async function createInvitation(
