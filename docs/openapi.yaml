@@ -360,10 +360,14 @@ components:
           type: string
           enum:
             - DRAFT
+            - PUBLISHED
             - ACTIVE
+            - TARGET_REACHED
+            - FULFILMENT
             - COMPLETED
             - CANCELLED
             - ARCHIVED
+            - PURGED
         deadline:
           type:
             - string
@@ -456,15 +460,20 @@ components:
           type: boolean
     EmailOtpResponse:
       type: object
+      description:
+        An issued challenge includes challengeId and expiresAt. Address
+        throttling returns only message and does not confirm delivery.
       required:
-        - challengeId
-        - expiresAt
         - message
       properties:
         challengeId:
           type: string
         expiresAt:
-          type: string
+          type: integer
+          format: int64
+          description:
+            Challenge expiration as Unix milliseconds, present only when a
+            challenge was issued
         message:
           type: string
         delivery:

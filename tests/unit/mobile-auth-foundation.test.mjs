@@ -3,6 +3,11 @@ import { timingSafeEqual } from "node:crypto";
 import test from "node:test";
 import { loadTypescriptModule } from "../helpers/typescript-module.mjs";
 
+const verifiedContact = await loadTypescriptModule(
+  "server/auth/verified-contact.ts",
+  {},
+);
+
 test("native authentication verifies revocation and takes identity only from the verified token", async () => {
   const auth = await loadTypescriptModule("server/auth/native.ts", {
     "server-only": {},
@@ -11,7 +16,11 @@ test("native authentication verifies revocation and takes identity only from the
         verifyIdToken: async (token, revoked) => {
           assert.equal(token, "signed-token");
           assert.equal(revoked, true);
-          return { uid: "verified-user" };
+          return {
+            uid: "verified-user",
+            email: "verified@example.test",
+            email_verified: true,
+          };
         },
       }),
     },
@@ -24,6 +33,7 @@ test("native authentication verifies revocation and takes identity only from the
         },
       }),
     },
+    "./verified-contact": verifiedContact,
     "./index": {
       authenticatePrincipal: () => {
         throw new Error("Bearer must not fall back to cookies");
@@ -51,6 +61,7 @@ test("invalid bearer tokens cannot fall back to a valid browser session", async 
       }),
     },
     "@/server/firebase/data-connect": {},
+    "./verified-contact": verifiedContact,
     "./index": {
       authenticatePrincipal: () => {
         throw new Error("must not use browser session");
@@ -71,7 +82,11 @@ test("native authentication denies suspended users and propagates database outag
     "server-only": {},
     "@/server/firebase/admin": {
       getFirebaseAdminAuth: () => ({
-        verifyIdToken: async () => ({ uid: "user" }),
+        verifyIdToken: async () => ({
+          uid: "user",
+          email: "verified@example.test",
+          email_verified: true,
+        }),
       }),
     },
     "@/server/firebase/data-connect": {
@@ -82,6 +97,7 @@ test("native authentication denies suspended users and propagates database outag
         },
       }),
     },
+    "./verified-contact": verifiedContact,
     "./index": {},
   });
   const request = new Request("https://example.test", {
@@ -104,6 +120,7 @@ test("native authentication can restore a verified web session", async () => {
     "server-only": {},
     "@/server/firebase/admin": {},
     "@/server/firebase/data-connect": {},
+    "./verified-contact": verifiedContact,
     "./index": { authenticatePrincipal: async () => principal },
   });
   assert.equal(

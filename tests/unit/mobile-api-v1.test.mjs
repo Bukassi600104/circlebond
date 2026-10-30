@@ -242,12 +242,13 @@ const token = "test-fcm-registration-token";
 async function otpRoute(options = {}) {
   const audits = [];
   const verified = [];
+  const authCalls = [];
   const limits = new Map();
   const budgets = [];
   const dependencies = {
     "@/server/auth/request": {
-      clientKey: (request) =>
-        request.headers.get("x-forwarded-for") ?? "test-client",
+      clientKey: (request, identifier = "") =>
+        `${request.headers.get("x-forwarded-for") ?? "test-client"}:${identifier}`,
     },
     "@/server/auth/security": {
       authChallengeFingerprint: () => "test-hash",
@@ -268,10 +269,15 @@ async function otpRoute(options = {}) {
     },
     "@/server/firebase/admin": {
       getFirebaseAdminAuth: () => {
+        authCalls.push("auth-initialized");
         if (options.failure) throw new Error("private provider failure");
         return {
-          getUserByEmail: async () => ({ uid: "verified-user" }),
+          getUserByEmail: async () => ({
+            uid: "verified-user",
+            emailVerified: true,
+          }),
           createCustomToken: async (uid) => {
+            authCalls.push("custom-token-created");
             assert.equal(uid, "verified-user");
             return "test-custom-token";
           },
@@ -284,7 +290,7 @@ async function otpRoute(options = {}) {
   const loaded = await route("app/api/v1/auth/email-otp/verify/route.ts", {
     dependencies,
   });
-  return { ...loaded, audits, verified, budgets };
+  return { ...loaded, audits, verified, budgets, authCalls };
 }
 
 const otpRequest = (body) =>
@@ -323,6 +329,7 @@ test("OTP expiration, rate limiting and challenge replay never return credential
     );
     assert.equal(response.status, status);
     assert.equal((await response.json()).customToken, undefined);
+    assert.equal(r.authCalls.length, 0);
   }
 });
 

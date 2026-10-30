@@ -8,10 +8,14 @@ export const runtime = "nodejs";
 type ApiCircleType = "GIFT" | "ASO_EBI" | "SUPPORT";
 type ApiCircleStatus =
   | "DRAFT"
+  | "PUBLISHED"
   | "ACTIVE"
+  | "TARGET_REACHED"
+  | "FULFILMENT"
   | "COMPLETED"
   | "CANCELLED"
-  | "ARCHIVED";
+  | "ARCHIVED"
+  | "PURGED";
 type ApiCircleRole = "creator" | "co_admin" | "member";
 
 // Stored circle types are lowercase ("gift" | "aso-ebi" | "support").
@@ -24,10 +28,14 @@ const CIRCLE_TYPE_BY_SOURCE: Record<string, ApiCircleType> = {
 
 const CIRCLE_STATUS_VALUES = new Set([
   "draft",
+  "published",
   "active",
+  "target_reached",
+  "fulfilment",
   "completed",
   "cancelled",
   "archived",
+  "purged",
 ]);
 
 function circleTypeEnum(sourceType: string): ApiCircleType {

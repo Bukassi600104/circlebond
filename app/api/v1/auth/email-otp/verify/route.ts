@@ -19,6 +19,18 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, "otp-verify"),
+        300,
+        15 * 60_000,
+      ))
+    ) {
+      return apiJson(
+        { error: "Too many verification requests. Try again shortly." },
+        { status: 429, headers: { "Retry-After": "900" } },
+      );
+    }
     const body: unknown = await request.json().catch(() => null);
     const { challengeId, code } = (body ?? {}) as Record<string, unknown>;
 
@@ -78,6 +90,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!(await consumeAuthChallenge(challengeId))) {
+      return apiJson(
+        { error: "That code has already been used. Request a new one." },
+        { status: 409 },
+      );
+    }
+
     const auth = getFirebaseAdminAuth();
     let user;
     try {
@@ -119,6 +138,7 @@ export async function POST(request: Request) {
 
       if (persisted?.termsAcceptedAt && persisted.privacyAcceptedAt) {
         await auth.setCustomUserClaims(user.uid, {
+          ...user.customClaims,
           termsAcceptedAt: persisted.termsAcceptedAt,
           privacyAcceptedAt: persisted.privacyAcceptedAt,
         });
@@ -131,6 +151,7 @@ export async function POST(request: Request) {
         emailVerified: true,
       });
       await auth.setCustomUserClaims(user.uid, {
+        ...user.customClaims,
         termsAcceptedAt: result.challenge.termsAcceptedAt,
         privacyAcceptedAt: result.challenge.privacyAcceptedAt,
       });
@@ -141,15 +162,11 @@ export async function POST(request: Request) {
         termsAcceptedAt: result.challenge.termsAcceptedAt,
         privacyAcceptedAt: result.challenge.privacyAcceptedAt,
       });
+    } else if (!user.emailVerified) {
+      await auth.updateUser(user.uid, { emailVerified: true });
     }
 
     const customToken = await auth.createCustomToken(user.uid);
-    if (!(await consumeAuthChallenge(challengeId))) {
-      return apiJson(
-        { error: "That code has already been used. Request a new one." },
-        { status: 409 },
-      );
-    }
 
     recordAuthAudit({
       userId: user.uid,
@@ -166,7 +183,10 @@ export async function POST(request: Request) {
       channel: "email",
     });
     return apiJson(
-      { error: "Authentication service is temporarily unavailable." },
+      {
+        error:
+          "Authentication service is temporarily unavailable. Request a new code and try again.",
+      },
       { status: 500 },
     );
   }

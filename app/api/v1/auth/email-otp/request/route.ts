@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
 import { clientKey } from "@/server/auth/request";
 import {
   createEmailOtpChallenge,
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         15 * 60_000,
       ))
     ) {
-      return NextResponse.json(
+      return apiJson(
         { error: "Too many requests. Try again shortly." },
         { status: 429, headers: { "Retry-After": "900" } },
       );
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     };
 
     if (!["register", "sign-in", "recovery"].includes(input.purpose ?? "")) {
-      return NextResponse.json({ error: "Invalid purpose." }, { status: 400 });
+      return apiJson({ error: "Invalid purpose." }, { status: 400 });
     }
     const developmentMode = process.env.NODE_ENV !== "production";
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     });
 
     if (!(await enforceRateLimit(`otp-address:${email}`, 5, 15 * 60_000))) {
-      return NextResponse.json(
+      return apiJson(
         { message: "If the address can be used, a code will arrive shortly." },
         { status: 202 },
       );
@@ -60,10 +60,7 @@ export async function POST(request: Request) {
       input.purpose === "register" &&
       (input.termsAccepted !== true || input.privacyAccepted !== true)
     ) {
-      return NextResponse.json(
-        { error: "Legal acceptance required." },
-        { status: 400 },
-      );
+      return apiJson({ error: "Legal acceptance required." }, { status: 400 });
     }
 
     const { challenge, challengeToken, code } = createEmailOtpChallenge({
@@ -82,7 +79,7 @@ export async function POST(request: Request) {
 
     const delivery = await sendEmailOtp({ code, email });
 
-    return NextResponse.json(
+    return apiJson(
       {
         challengeId: challengeToken,
         expiresAt: challenge.expiresAt,
@@ -100,7 +97,7 @@ export async function POST(request: Request) {
       outcome: "failure",
       channel: "email",
     });
-    return NextResponse.json(
+    return apiJson(
       {
         error: "Unable to send a code. Check the details and try again.",
       },
