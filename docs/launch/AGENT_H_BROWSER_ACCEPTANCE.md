@@ -2,6 +2,74 @@
 
 All runs described here use synthetic loopback data and desktop Edge controlled through Playwright. Simulated phone/tablet viewports are not physical-device acceptance. Provider, Storage, physical iPhone/Android and real Safari acceptance remain **BLOCKED**.
 
+## Final integrated local run: 3b56d82
+
+Exact clean application/test commit:
+`3b56d820031e7234b32e87805248bde8f2441e35`. Final local build:
+`Rk5aHEWUVu4sxKLFjosoY`. The reviewed H scripts are byte-identical to this
+checkout (auth Git blob `7da6962a626a7769d448fad0051b07a1def9da2a`, public
+`b586ef2b7bb322943ed1bb926bd0b9e81e8c07de`). No assertions, budgets, source,
+schema, SDK, lock or artifact were changed for this run.
+
+**Actual results: public39/39 and all seven authenticated phases PASS. Bounded
+independent acceptance: PASS. Overall public launch: BLOCKED.** The
+authenticated JSON has eight PASS entries because its first delegates to the
+separate public harness. Do not count that as an eighth authenticated journey.
+
+All seven phases listed in the recorded007 run below were exercised again,
+including valid pre-consent403/code/no-side-effect, real UI OTP/session and legal
+continuation, saved pending-payment draft/reload without checkout, eligible Trial
+publication, invitation→OTP/consent→join, exact member invitation POST400/GET403
+and unchanged owner counts, profile persistence/self-scoped export, viewport
+overflow checks, and logout401. Both actual member/creator rows display exactly
+₦1,000 expected on the ordinary unupgraded3000/3 circle; the invitation amount is
+omitted. H inspected the new member screenshot. This uses seeded synthetic Auth
+accounts and does not claim UI registration, provider settlement or Storage bytes.
+
+| Route      | Sample | LCP ms | CLS       | Controlled next-screen ms |
+| ---------- | ------ | ------ | --------- | ------------------------- |
+| Sign-in    | 1      | 1188   | 0.0001391 | NOT APPLICABLE            |
+| Sign-in    | 2      | 1220   | 0.0001243 | NOT APPLICABLE            |
+| Sign-in    | 3      | 1572   | 0.0001243 | NOT APPLICABLE            |
+| Onboarding | 1      | 1144   | 0.0243870 | 76.9                      |
+| Onboarding | 2      | 1144   | 0.0243870 | 40.8                      |
+| Onboarding | 3      | 1104   | 0.0243870 | 30.8                      |
+
+The original budgets/profile below are unchanged and all six samples pass.
+Onboarding selected width640/encoded24062bytes in each. Warm **unauthenticated**
+session401 p95 was23.22ms over20 samples. Public24 layouts pass and the external
+request counter is zero. These remain controlled desktop Edge156.0.4314.50
+measurements, not field or physical-device results. Authenticated loopback CSP,
+temporary exact-origin Local Network Access, native browser Secure-cookie fetch,
+and pre-OTP redirect-refresh fixtures are unchanged (12 modified documents,
+one pre-OTP refresh, APIRequest401/browser200 diagnostic). They do not verify
+production CSP, genuine Firebase-provider configuration or public permissions.
+
+The ordinary CLI wrapper exited0, from 2026-10-30 11:06:48.169Z to11:09:04.906Z;
+the browser report spans11:07:22.535Z–11:08:58.877Z. Next and emulators shut down,
+all ten ports were confirmed closed, and tracked CI source remained clean. Exact
+immutable reports are `public-browser/3b56d82-public-pass.json` and
+`authenticated-browser/3b56d82-authenticated-pass.json` under CI
+`tmp/launch-evidence/`. The wrapper result and
+`h-browser-3b56d82-handoff.json` retain build/head/lock, report SHA256s and closed
+ports. Safe copies with verified24 public/three authenticated screenshots are in
+primary `tmp/launch-evidence/qa-h-3b56d82-final-browser-20261030T1109/`.
+All previous failures and reports remain retained; no cleanup was performed.
+
+The non-author Ponytail skill reviewer `ponytail_final` independently read both
+immutable reports, matched their SHA256s against the handoff, viewed the new
+member/draft/settings screenshots and accepted this bounded result. It verified
+the clean-source/closed-port record at11:10:31.957Z. That review explicitly
+excludes provider, physical-device and production-policy acceptance.
+
+Agent A's exact-source updated-lock CI separately records423 PASS
+(367 unit/integration +1 Auth/SMTP +55 actual DB), zero failed/skipped/cancelled,
+all six gates exit0 and the explicit final build. Its authoritative proof is
+`tmp/launch-evidence/final-3b56d82/release-verification.json` in CI. The approved
+upgrade policy's former failures are corrected and covered there; provider,
+production infrastructure/recovery, legal and actual-device gates remain open.
+This synthetic Firebase local build is not a promotable production artifact.
+
 ## Recorded invitation-fix run: build 00750cd
 
 Frozen application/configuration/schema/SDK/lock source:

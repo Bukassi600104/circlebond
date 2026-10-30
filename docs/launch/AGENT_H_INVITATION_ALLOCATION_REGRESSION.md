@@ -8,9 +8,10 @@ Storage bytes and real devices are outside this test's acceptance scope.
 ## Scope and classification
 
 - Equal Gift/Support allocation, approved upgrade policy and invitation guards:
-  **PENDING REVIEW** on product `adb619c`. All 34 real-database tests pass;
-  independent review, updated-lock integrated CI and the final build's browser
-  regression are still required for acceptance.
+  **PASS** within the verified local scope on integrated product `3b56d82`
+  (approved helper `adb619c`). All 34 H database tests pass, followed by clean-lock
+  integrated CI and exact-build browser regression; independent evidence review
+  accepted these bounded results. The details are recorded below.
 - The human owner approved preserving existing assigned and confirmed amounts
   while splitting the remaining target over unfilled places. The former policy
   decision blocker is resolved; external provider approval is separate.
@@ -24,6 +25,17 @@ planned-capacity unit cases. Target 3000 with capacity 3 yields 1000 each; targe
 these cases, matching the normal equal-mode workflow. The backend assigns it.
 
 ## Owner-approved upgrade correction
+
+The same approved implementation and tests are integrated into exact commit
+`3b56d820031e7234b32e87805248bde8f2441e35`. Agent A's updated-lock pipeline passed
+all423 tests (367 unit/integration,1 Auth/SMTP,55 real DB) without exclusions,
+failures or skips. H then exercised its exact final local build
+`Rk5aHEWUVu4sxKLFjosoY`: public39/39 and all seven authenticated phases pass,
+including actual ordinary member/creator1000 amounts with invitation amount
+omitted. See `AGENT_H_BROWSER_ACCEPTANCE.md` for immutable reports and fixture
+boundaries. The non-author Ponytail skill reviewer independently accepted the
+source/database,423-test CI and exact-build browser evidence. External release
+gates are unaffected by these local passes.
 
 After the earlier upgrade failure, the owner explicitly chose to preserve
 assigned/confirmed history and divide the remaining target among unfilled places.
