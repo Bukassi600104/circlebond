@@ -77,6 +77,12 @@ const report = {
   checks: [],
   authNetwork: [],
   browserSecurity: [],
+  localNetworkFixture: {
+    permission: "local-network-access",
+    origin: base.origin,
+    scope:
+      "Temporary authenticated browser contexts only; external requests remain blocked",
+  },
   cspFixture: {
     scope:
       "Authenticated loopback document response headers only; production policy is unchanged and unaccepted by this fixture",
@@ -329,6 +335,9 @@ try {
     reducedMotion: "reduce",
   });
   for (const context of [organizer, member]) {
+    await context.grantPermissions(["local-network-access"], {
+      origin: base.origin,
+    });
     context.on("page", (page) => {
       page.on("console", (message) => {
         const value = message.text();
