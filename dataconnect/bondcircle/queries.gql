@@ -1792,7 +1792,7 @@ mutation AcceptInvitationWithMembership(
       useCount: { eq_expr: "vars.nextUseCount - 1" }
       maxUses: { ge: $nextUseCount }
       state: { in: ["created", "sent", "opened", "approval_pending"] }
-      expiresAt: { gt: $respondedAt }
+      expiresAt: { gt_expr: "request.time" }
       requireApproval: { eq: false }
     }
     data: { updatedAt: $respondedAt }
@@ -2174,7 +2174,7 @@ mutation ApproveInvitationMembership(
       useCount: { eq_expr: "vars.nextUseCount - 1" }
       maxUses: { ge: $nextUseCount }
       state: { in: ["created", "sent", "opened", "approval_pending"] }
-      expiresAt: { gt: $respondedAt }
+      expiresAt: { gt_expr: "request.time" }
     }
     data: { updatedAt: $respondedAt }
   )
