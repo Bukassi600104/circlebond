@@ -131,6 +131,19 @@ const server = spawn(
 server.stdout.pipe(log);
 server.stderr.pipe(log);
 let browser;
+function giftFields(title) {
+  return {
+    circleName: title,
+    giftTitle: "Synthetic shared gift",
+    targetAmount: "3000",
+    deadline: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+    memberCapacity: "3",
+    description: "Synthetic local browser acceptance only.",
+    paymentBankName: "Local Test Bank",
+    paymentAccountName: "Synthetic Organizer",
+    paymentAccountNumber: "0123456789",
+  };
+}
 async function csrf(page) {
   const response = await page.request.get(new URL("/api/auth/csrf", base).href);
   assert.equal(response.status(), 200);
@@ -203,12 +216,34 @@ async function signIn(page, email, next, fromInvitation = false) {
       .fill(code[index]);
   await page.waitForURL("**/legal/accept?**", { timeout: 30000 });
   assert.equal(new URL(page.url()).searchParams.get("next"), next);
-  const before = await post(page, "/api/circles/gift", {});
+  const beforeCircles = await page.request.get(
+    new URL("/api/v1/circles", base).href,
+  );
+  assert.equal(beforeCircles.status(), 200);
+  const originalCircles = (await beforeCircles.json()).circles;
+  assert.deepEqual(originalCircles, []);
+  const before = await page.request.post(
+    new URL("/api/circles/gift", base).href,
+    {
+      headers: { Origin: base.origin, "X-CSRF-Token": await csrf(page) },
+      multipart: {
+        ...giftFields("Consent gate negative"),
+        pricingPlan: "starter",
+        contributionMode: "equal",
+      },
+    },
+  );
   assert.equal(
     before.status(),
     403,
     "Persisted legal gate must precede circle creation",
   );
+  assert.equal((await before.json()).code, "LEGAL_ACCEPTANCE_REQUIRED");
+  const afterCircles = await page.request.get(
+    new URL("/api/v1/circles", base).href,
+  );
+  assert.equal(afterCircles.status(), 200);
+  assert.deepEqual((await afterCircles.json()).circles, originalCircles);
   await page.locator("#existing-terms-accepted").check();
   await page.locator("#existing-privacy-accepted").check();
   await page
@@ -293,17 +328,7 @@ try {
         .isChecked(),
       true,
     );
-    const fields = {
-      circleName: title,
-      giftTitle: "Synthetic shared gift",
-      targetAmount: "3000",
-      deadline: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
-      memberCapacity: "3",
-      description: "Synthetic local browser acceptance only.",
-      paymentBankName: "Local Test Bank",
-      paymentAccountName: "Synthetic Organizer",
-      paymentAccountNumber: "0123456789",
-    };
+    const fields = giftFields(title);
     for (const [name, value] of Object.entries(fields))
       await ownerPage.locator(`[name="${name}"]`).fill(value);
     const pending = ownerPage.waitForResponse(
