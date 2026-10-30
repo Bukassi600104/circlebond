@@ -663,7 +663,7 @@ for (const approval of [false, true]) {
   });
 }
 
-test("real stored capacity upgrade permits joining while preserving existing equal shares", async () => {
+test("real stored capacity upgrade permits joining with allocation policy unasserted", async (context) => {
   const repo = await repository();
   const fixture = await circle({ target: 3000, capacity: 3 });
   const before = await members(fixture.id);
@@ -672,13 +672,23 @@ test("real stored capacity upgrade permits joining while preserving existing equ
   await writeCircle(fixture, { memberLimit: 10, pricingPlan: "standard" });
   const created = await invitation(repo, fixture);
   const member = await user("capacity-upgrade");
-  assert.equal((await accept(repo, created, member)).status, "joined");
+  const result = await Promise.allSettled([accept(repo, created, member)]);
   const after = await members(fixture.id);
+  context.diagnostic(
+    JSON.stringify({
+      beforeAmounts: before.map((row) => row.expectedAmount),
+      afterAmounts: after.map((row) => row.expectedAmount),
+      outcome: result[0].status,
+      rejectionCode:
+        result[0].status === "rejected" ? result[0].reason.code : null,
+    }),
+  );
+  assert.equal(result[0].status, "fulfilled");
+  assert.equal(result[0].value.status, "joined");
   assert.equal(after.length, before.length + 1);
   for (const existing of before)
-    assert.equal(
-      after.find((row) => row.user.id === existing.user.id).expectedAmount,
-      existing.expectedAmount,
-      "An upgrade must preserve previously assigned contribution amounts.",
+    assert.ok(
+      after.some((row) => row.user.id === existing.user.id),
+      "Previously joined members must remain members after the new join.",
     );
 });

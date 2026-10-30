@@ -31,14 +31,15 @@ Safe result/TAP files, plus earlier bounded public/authenticated browser reports
 and screenshots, were also copied without overwriting to primary
 `tmp/launch-evidence/qa-h-recovered-c296-and-invitations-20261030T1003/`.
 
-| Product source / test state                                                  | Actual result           | Evidence directory                             |
-| ---------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------- |
-| `c296297`, original 11 cases                                                 | 1 PASS, 10 FAIL         | `tmp/h-invitation-allocation-baseline/`        |
-| `c296297`, corrected complete upsert fixtures / expanded 22 cases            | 2 PASS, 20 FAIL         | `tmp/h-invitation-allocation-baseline-v2/`     |
-| `0339082`, unchanged 22-case blob `5f19e2474404522959b8a85fa67480d4b3bbf4dd` | 10 PASS, 12 FAIL        | `tmp/h-invitation-allocation-green-unchanged/` |
-| `0339082`, corrected legacy/pending fixtures plus two causal expiry cases    | 12 PASS, 12 FAIL        | `tmp/h-invitation-expiry-red-033/`             |
-| `c5236c6`, same 24-case assertions                                           | 24 PASS, 0 FAIL, 0 SKIP | `tmp/h-invitation-final-guards-green/`         |
-| `c5236c6`, separate stored capacity-upgrade compatibility case               | 0 PASS, 1 FAIL          | `tmp/h-invitation-upgrade-policy-repro/`       |
+| Product source / test state                                                  | Actual result           | Evidence directory                                     |
+| ---------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------ |
+| `c296297`, original 11 cases                                                 | 1 PASS, 10 FAIL         | `tmp/h-invitation-allocation-baseline/`                |
+| `c296297`, corrected complete upsert fixtures / expanded 22 cases            | 2 PASS, 20 FAIL         | `tmp/h-invitation-allocation-baseline-v2/`             |
+| `0339082`, unchanged 22-case blob `5f19e2474404522959b8a85fa67480d4b3bbf4dd` | 10 PASS, 12 FAIL        | `tmp/h-invitation-allocation-green-unchanged/`         |
+| `0339082`, corrected legacy/pending fixtures plus two causal expiry cases    | 12 PASS, 12 FAIL        | `tmp/h-invitation-expiry-red-033/`                     |
+| `c5236c6`, same 24-case assertions                                           | 24 PASS, 0 FAIL, 0 SKIP | `tmp/h-invitation-final-guards-green/`                 |
+| `c5236c6`, separate stored capacity-upgrade compatibility case               | 0 PASS, 1 FAIL          | `tmp/h-invitation-upgrade-policy-repro/`               |
+| `c5236c6`, upgrade narrowed after review to observational amounts            | 0 PASS, 1 FAIL          | `tmp/h-invitation-upgrade-policy-repro-observational/` |
 
 The 24-case green run used QA commit
 `9020b4a68d6a63c0a6fdb177da15e4dce05db8d3` (product `c5236c6` plus QA-only
@@ -85,12 +86,18 @@ The separate real-repository test starts with target 3000, capacity 3 and the
 existing creator share 1000. It represents an already-upgraded stored Standard
 circle at capacity 10, then creates and accepts a normal invitation. This fixture
 does **not** claim that a real provider payment or upgrade checkout occurred.
-The compatibility assertion requires joining and unchanged prior shares without
-choosing a new member amount. The operation fails with `ACTIVITY_NOT_ALLOWED`:
+The compatibility assertion requires joining and retaining prior membership;
+before/after assigned amounts are observational while owner policy is pending.
+The operation fails with `ACTIVITY_NOT_ALLOWED`:
 “Existing equal contributions need organizer review before more members can join.”
+The first prototype also asserted unchanged unpaid shares. Independent review
+correctly identified that this would preselect one of the owner's policy options.
+That assertion was removed; the observational rerun still rejects the join, with
+before/after amounts both `[1000]`. Its original failed evidence remains intact.
 
-The approved upgrade requirements preserve existing amounts, while the allocation
-policy after capacity changes is not defined. Owner selection and implementation
+The approved upgrade requirements protect historic data, while the owner decision
+between preserving assigned shares and recalculating unpaid shares with an audit
+is pending. Owner selection and implementation
 must precede final acceptance; neither test data nor an inferred policy may hide
 the failure. The new browser assertion also requires the normal 3000/3 invitee
 to display “₦1,000 expected”; the earlier seven browser phases did not assert
