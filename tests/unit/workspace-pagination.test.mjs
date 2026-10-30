@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as giftRules from "../../server/circles/gift.ts";
 import * as crypto from "node:crypto";
 import test from "node:test";
 import { loadTypescriptModule } from "../helpers/typescript-module.mjs";
@@ -209,6 +210,7 @@ async function invitations(failLater = false) {
       "@/server/repositories/circles": {
         firebaseCircleStore: { findById: async () => circle },
       },
+      "@/server/circles/gift": giftRules,
       "@/server/invitations/rules": invitationRules,
       "@/server/repositories/notifications": {},
       "@/server/pricing": {},

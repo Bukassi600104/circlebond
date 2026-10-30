@@ -2,7 +2,12 @@ import "server-only";
 import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { assertLegalAcceptance } from "@/server/auth/legal";
-import { assertPermission, type CircleRole } from "@/server/circles/engine";
+import {
+  assertPermission,
+  CircleRuleError,
+  type CircleRole,
+} from "@/server/circles/engine";
+import { calculateEqualSlotAllocations } from "@/server/circles/gift";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
   assertInvitationCapacity,
@@ -160,6 +165,50 @@ export async function listCircleInvitations(circleId: string) {
       acceptances: [...(grouped.get(invitation.id)?.values() ?? [])],
     }),
   );
+}
+
+async function expectedMembershipAmount(
+  circleId: string,
+  currentMembers: number,
+  invitationAmount: number,
+) {
+  const { data } = await getBondCircleDataConnect().executeQuery<
+    {
+      circle?: {
+        type: string;
+        contributionMode?: string | null;
+        targetAmount: number;
+        memberLimit: number;
+      };
+      circleMemberships: Array<{ expectedAmount: number }>;
+    },
+    { circleId: string }
+  >("GetCircleEngineRecord", { circleId });
+  const circle = data.circle;
+  if (!circle) throw new Error("Circle not found.");
+  if (circle.type !== "gift" || circle.contributionMode === "custom")
+    return invitationAmount;
+  const available = calculateEqualSlotAllocations(
+    circle.targetAmount,
+    circle.memberLimit,
+  );
+  if (!currentMembers || data.circleMemberships.length !== currentMembers)
+    throw new CircleRuleError(
+      "Circle membership changed. Refresh and try again.",
+      "ACTIVITY_NOT_ALLOWED",
+    );
+  for (const member of data.circleMemberships) {
+    const slot = available.indexOf(member.expectedAmount);
+    if (slot < 0)
+      throw new CircleRuleError(
+        "Existing equal contributions need organizer review before more members can join.",
+        "ACTIVITY_NOT_ALLOWED",
+      );
+    available.splice(slot, 1);
+  }
+  if (available.length === 0)
+    throw new CircleRuleError("This circle is full.", "MEMBER_LIMIT_REACHED");
+  return available[0];
 }
 
 export async function assertCanManageInvitations(
@@ -400,7 +449,11 @@ export async function respondToInvitation(
       circleId: invitation.circle.id,
       userId: user.id,
       role: "member",
-      expectedAmount: invitation.expectedAmount,
+      expectedAmount: await expectedMembershipAmount(
+        invitation.circle.id,
+        currentMembers,
+        invitation.expectedAmount,
+      ),
       nextMemberCount: currentMembers + 1,
       nextInvitationState,
       nextUseCount,
@@ -448,7 +501,11 @@ export async function approveInvitationMembership(
       actorId,
       userId,
       role: "member",
-      expectedAmount: invitation.expectedAmount,
+      expectedAmount: await expectedMembershipAmount(
+        circleId,
+        currentMembers,
+        invitation.expectedAmount,
+      ),
       nextMemberCount: currentMembers + 1,
       nextInvitationState:
         nextUseCount >= invitation.maxUses ? "accepted" : "sent",

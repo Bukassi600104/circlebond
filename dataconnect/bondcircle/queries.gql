@@ -179,6 +179,7 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     type
     description
     targetAmount
+    contributionMode
     pricingPlan
     memberLimit
     activationPrice
@@ -205,6 +206,7 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
   ) {
     role
+    expectedAmount
     membershipStatus
     user {
       id

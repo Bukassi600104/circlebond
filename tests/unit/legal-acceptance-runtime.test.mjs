@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as giftRules from "../../server/circles/gift.ts";
 import { readFile } from "node:fs/promises";
 import { runInNewContext } from "node:vm";
 import test from "node:test";
@@ -322,6 +323,7 @@ test("invitation acceptance requires persisted acceptance before admitting membe
     "@/server/repositories/circles": {
       firebaseCircleStore: { memberCount: async () => 1 },
     },
+    "@/server/circles/gift": giftRules,
     "@/server/invitations/rules": { invitationMatchesUser: () => true },
     "@/server/repositories/notifications": {},
     "@/server/pricing": {},
