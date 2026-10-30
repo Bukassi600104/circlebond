@@ -25,6 +25,10 @@ import {
   type NotificationType,
 } from "@/server/notifications/rules";
 
+type DeadlineCandidates = {
+  circles: Array<{ id: string; deadline: string }>;
+};
+
 type Recipient = {
   id: string;
   displayName: string;
@@ -550,15 +554,11 @@ export async function processDeadlineNotifications(today = new Date()) {
   let processed = 0;
   let after: string | null = null;
   for (;;) {
-    const response = await getBondCircleDataConnect().executeQuery<
-      {
-        circles: Array<{
-          id: string;
-          deadline: string;
-        }>;
-      },
-      { from: string; to: string; after: string | null }
-    >("GetDeadlineNotificationCandidates", { from, to, after });
+    const response: { data: DeadlineCandidates } =
+      await getBondCircleDataConnect().executeQuery<
+        DeadlineCandidates,
+        { from: string; to: string; after: string | null }
+      >("GetDeadlineNotificationCandidates", { from, to, after });
     // Native SQL returns Any; validate the cursor rows before use.
     if (
       !Array.isArray(response.data.circles) ||
