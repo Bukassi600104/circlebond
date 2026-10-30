@@ -7,12 +7,13 @@ Storage bytes and real devices are outside this test's acceptance scope.
 
 ## Scope and classification
 
-- Equal Gift/Support allocation and invitation transaction guards: **PENDING
-  REVIEW** on product `9820dfb`. All 27 scoped real-database guard cases pass; independent
-  review and updated-lock integrated CI are still required for acceptance.
-- Capacity-upgrade contribution policy: **BLOCKED** on owner decision. The actual
-  new-member journey currently fails after a stored capacity increase; its minimal
-  compatibility regression is **FAIL**. No new allocation policy was invented.
+- Equal Gift/Support allocation, approved upgrade policy and invitation guards:
+  **PENDING REVIEW** on product `adb619c`. All 34 real-database tests pass;
+  independent review, updated-lock integrated CI and the final build's browser
+  regression are still required for acceptance.
+- The human owner approved preserving existing assigned and confirmed amounts
+  while splitting the remaining target over unfilled places. The former policy
+  decision blocker is resolved; external provider approval is separate.
 - Overall public release: **BLOCKED**; this evidence does not replace production
   configuration, recovery, provider, legal or physical-device gates.
 
@@ -21,6 +22,50 @@ UI and creator allocation, `calculateEqualSlotAllocations`, and the existing
 planned-capacity unit cases. Target 3000 with capacity 3 yields 1000 each; target
 100 with capacity 3 yields 34, 33, 33. Invitation input still omits an amount for
 these cases, matching the normal equal-mode workflow. The backend assigns it.
+
+## Owner-approved upgrade correction
+
+After the earlier upgrade failure, the owner explicitly chose to preserve
+assigned/confirmed history and divide the remaining target among unfilled places.
+The new QA commit `8a3b0a5` changes the former legacy-zero rejection expectation
+because that old rule is superseded by this approval; it does not weaken circle
+permissions, capacity, invitation-use, lifecycle or expiry assertions.
+
+The exact test blob `525a51b85d1e4f985f88187d551da15e1bdf50c4` was exercised in
+three preserved runs:
+
+| Application source                                  | Result                   | Evidence directory                         |
+| --------------------------------------------------- | ------------------------ | ------------------------------------------ |
+| `9820dfb`, old helper / newly approved expectations | 28 PASS, 6 FAIL, 0 SKIP  | `tmp/h-invitation-owner-policy-red/`       |
+| `78e459d`, initial policy implementation            | 20 PASS, 14 FAIL, 0 SKIP | `tmp/h-invitation-owner-policy-green/`     |
+| `adb619c`, corrected final-place implementation     | 34 PASS, 0 FAIL, 0 SKIP  | `tmp/h-invitation-owner-policy-adb-green/` |
+
+The second run exposed a real implementation defect: passing one remaining place
+to `calculateEqualSlotAllocations` invokes its whole-circle pricing validation,
+which rejects group size1. This broke ordinary final joins and the ninth new
+upgrade member. Assertions were unchanged. The corrected helper validates the
+original circle capacity and returns the remaining target directly for its final
+place. The exact 34-case rerun on QA commit
+`ac97d4042ec3043d938f5aa042f4ff363edcd256` (product `adb619c` plus unchanged test
+commit) ran from 2026-10-30 10:50:16.030Z to 10:51:11.308Z. Native compile, parsed
+JSON errors and actual configure all passed. Dependencies remain the reused older
+desktop install; this is not a replacement for updated-lock CI.
+
+Four upgrade tests exercise Gift/Support and direct/organizer-approved joining.
+They represent an already-upgraded stored capacity3→10, without claiming payment
+settlement. Creator assigned1000/confirmed700 remain unchanged after every actual
+join. All nine unfilled places are filled with exactly
+`[223,223,222,222,222,222,222,222,222]`; expected amounts sum to3000, memberCount
+becomes10 and useCount9. Additional actual cases preserve zero/unequal assignments
+and confirmed history, reject negative/over-target stored amounts without a join,
+and prove that real database Int validation rejects malformed writes without
+changing existing records. Malformed-read defensive logic is a separate module
+test boundary, since malformed Int records cannot be inserted through this schema.
+
+Earlier rejected/failed results are retained. No live records, provider payments,
+dependency installation or application build were used for these H runs. Safe
+JSON/TAP copies are preserved in primary
+`tmp/launch-evidence/qa-h-owner-policy-db-20261030T1051/`.
 
 ## Preserved actual runs
 
@@ -98,14 +143,14 @@ pending.
   both (T2-T1 was 34 ms direct, 13 ms approval). No sleeps or fabricated outcomes
   were used to establish that window.
 
-## Unresolved upgrade compatibility
+## Historical upgrade blocker before the owner decision
 
 The separate real-repository test starts with target 3000, capacity 3 and the
 existing creator share 1000. It represents an already-upgraded stored Standard
 circle at capacity 10, then creates and accepts a normal invitation. This fixture
 does **not** claim that a real provider payment or upgrade checkout occurred.
 The compatibility assertion requires joining and retaining prior membership;
-before/after assigned amounts are observational while owner policy is pending.
+before/after assigned amounts were observational while owner policy was pending.
 The operation fails with `ACTIVITY_NOT_ALLOWED`:
 “Existing equal contributions need organizer review before more members can join.”
 The first prototype also asserted unchanged unpaid shares. Independent review
@@ -113,11 +158,9 @@ correctly identified that this would preselect one of the owner's policy options
 That assertion was removed; the observational rerun still rejects the join, with
 before/after amounts both `[1000]`. Its original failed evidence remains intact.
 
-The approved upgrade requirements protect historic data, while the owner decision
-between preserving assigned shares and recalculating unpaid shares with an audit
-is pending. Owner selection and implementation
-must precede final acceptance; neither test data nor an inferred policy may hide
-the failure. The new browser assertion also requires the normal 3000/3 invitee
+The owner subsequently chose the preserving-assigned policy described above.
+The historical failure was not hidden or replaced with an invented policy.
+The new browser assertion also requires the normal 3000/3 invitee
 to display “₦1,000 expected”; the earlier seven browser phases did not assert
 this amount and remain bounded historical evidence.
 
@@ -132,7 +175,7 @@ owned emulator connections closed; these were retained. Both owned ports were
 confirmed closed after the final repro. No dependency installation or application
 build was performed by H during these runs.
 
-Next gates: independent review, owner upgrade decision, updated SDK and clean-lock
+Next gates: independent review, updated SDK and clean-lock
 integrated CI, then the exact new build's real browser journeys including the
 equal-member amount assertion. Do not promote the previous build or infer a
 production/provider/device pass from local database results.
