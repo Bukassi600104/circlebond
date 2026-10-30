@@ -135,6 +135,43 @@ query GetDashboardCircles @auth(level: NO_ACCESS) {
   }
 }
 
+# Preserve the legacy operation for rollback; current servers use this user-scoped query.
+query GetDashboardCirclesForUser($userId: String!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  circleMemberships(
+    where: { userId: { eq: $userId } }
+    orderBy: [{ joinedAt: DESC }, { circleId: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    role
+    membershipStatus
+    user {
+      id
+    }
+    circle {
+      id
+      name
+      type
+      imageUrl
+      targetAmount
+      contributedAmount
+      showTargetToMembers
+      showConfirmedTotalToMembers
+      memberCount
+      memberLimit
+      deadline
+      eventDate
+      status
+      createdAt
+      updatedAt
+      creator {
+        id
+      }
+    }
+  }
+}
+
 query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
   circle(key: { id: $circleId }) {
     id

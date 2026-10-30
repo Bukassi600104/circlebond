@@ -31,6 +31,7 @@ const testFiles = [
   "tests/e2e/circle-engine.test.mjs",
   "tests/e2e/account-privacy.test.mjs",
   "tests/e2e/rate-limit.test.mjs",
+  "tests/e2e/dashboard.test.mjs",
 ];
 const testCommand = `"${process.execPath}" --test ${testFiles.join(" ")}`;
 

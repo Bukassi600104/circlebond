@@ -57,22 +57,20 @@ export async function loadDashboardCircles(
   userId: string,
 ): Promise<DashboardCircle[]> {
   try {
-    const response =
-      await getBondCircleDataConnect().executeQuery<DashboardQueryData>(
-        "GetDashboardCircles",
-      );
-
-    const membershipCounts = new Map<string, number>();
-    for (const { circle, membershipStatus } of response.data
-      .circleMemberships) {
-      if (membershipStatus !== "joined") continue;
-      membershipCounts.set(
-        circle.id,
-        (membershipCounts.get(circle.id) ?? 0) + 1,
-      );
+    const memberships: DashboardQueryData["circleMemberships"] = [];
+    let offset = 0;
+    for (;;) {
+      const response: { data: DashboardQueryData } =
+        await getBondCircleDataConnect().executeQuery<
+          DashboardQueryData,
+          { userId: string; offset: number }
+        >("GetDashboardCirclesForUser", { userId, offset });
+      memberships.push(...response.data.circleMemberships);
+      if (response.data.circleMemberships.length < 200) break;
+      offset += response.data.circleMemberships.length;
     }
 
-    return response.data.circleMemberships
+    return memberships
       .filter((membership) => membership.user.id === userId)
       .map(({ circle, membershipStatus, role }) => {
         const isManager = circle.creator.id === userId || role === "co_admin";
@@ -91,7 +89,7 @@ export async function loadDashboardCircles(
           imageUrl: circle.imageUrl ?? null,
           role,
           membershipStatus,
-          memberCount: membershipCounts.get(circle.id) ?? circle.memberCount,
+          memberCount: circle.memberCount,
           memberLimit: circle.memberLimit,
           targetAmount: canSeeTarget ? circle.targetAmount : null,
           contributedAmount: canSeeConfirmedTotal
