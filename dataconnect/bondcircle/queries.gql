@@ -2707,7 +2707,7 @@ query FindNotificationRecipientByEmail($email: String!)
   }
 }
 
-query GetDeadlineNotificationCandidates($from: Date!, $to: Date!)
+query GetDeadlineNotificationCandidates($from: Date!, $to: Date!, $offset: Int! = 0)
 @auth(level: NO_ACCESS) {
   circles(
     where: {
@@ -2715,6 +2715,8 @@ query GetDeadlineNotificationCandidates($from: Date!, $to: Date!)
       status: { in: ["published", "active", "target_reached", "fulfilment"] }
     }
     limit: 200
+    offset: $offset
+    orderBy: [{ id: ASC }]
   ) {
     id
     name

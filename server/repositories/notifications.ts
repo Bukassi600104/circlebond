@@ -547,25 +547,29 @@ export async function processDeadlineNotifications(today = new Date()) {
   const toDate = new Date(today);
   toDate.setUTCDate(toDate.getUTCDate() + 3);
   const to = toDate.toISOString().slice(0, 10);
-  const response = await getBondCircleDataConnect().executeQuery<
-    {
-      circles: Array<{
-        id: string;
-        name: string;
-        type: string;
-        deadline?: string | null;
-      }>;
-    },
-    { from: string; to: string }
-  >("GetDeadlineNotificationCandidates", { from, to });
-  for (const circle of response.data.circles) {
-    await emitCircleNotification({
-      circleId: circle.id,
-      type: "deadline_approaching",
-      entityId: circle.deadline ?? to,
-    });
+  let processed = 0;
+  for (;;) {
+    const response = await getBondCircleDataConnect().executeQuery<
+      {
+        circles: Array<{
+          id: string;
+          name: string;
+          type: string;
+          deadline?: string | null;
+        }>;
+      },
+      { from: string; to: string; offset: number }
+    >("GetDeadlineNotificationCandidates", { from, to, offset: processed });
+    for (const circle of response.data.circles) {
+      await emitCircleNotification({
+        circleId: circle.id,
+        type: "deadline_approaching",
+        entityId: circle.deadline ?? to,
+      });
+    }
+    processed += response.data.circles.length;
+    if (response.data.circles.length < 200) return { processed };
   }
-  return { processed: response.data.circles.length };
 }
 
 export async function safelyEmitNotification(

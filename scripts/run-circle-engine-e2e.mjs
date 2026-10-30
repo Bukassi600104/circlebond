@@ -27,7 +27,12 @@ const firebaseCli = join(
   "bin",
   "firebase.js",
 );
-const testCommand = `"${process.execPath}" --test tests/e2e/circle-engine.test.mjs`;
+const testFiles = [
+  "tests/e2e/circle-engine.test.mjs",
+  "tests/e2e/account-privacy.test.mjs",
+  "tests/e2e/rate-limit.test.mjs",
+];
+const testCommand = `"${process.execPath}" --test ${testFiles.join(" ")}`;
 
 function portIsOpen(port) {
   return new Promise((resolvePort) => {
@@ -41,7 +46,7 @@ function portIsOpen(port) {
 }
 
 const child = (await portIsOpen(9399))
-  ? spawn(process.execPath, ["--test", "tests/e2e/circle-engine.test.mjs"], {
+  ? spawn(process.execPath, ["--test", ...testFiles], {
       cwd: root,
       env,
       stdio: "inherit",

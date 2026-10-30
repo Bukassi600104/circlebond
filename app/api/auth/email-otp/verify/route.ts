@@ -100,6 +100,13 @@ export async function POST(request: Request) {
       return response;
     }
 
+    if (!(await consumeAuthChallenge(challengeId))) {
+      return NextResponse.json(
+        { error: "That code has already been used. Request a new one." },
+        { status: 409 },
+      );
+    }
+
     try {
       const auth = getFirebaseAdminAuth();
       let user;
@@ -165,12 +172,6 @@ export async function POST(request: Request) {
       }
 
       const customToken = await auth.createCustomToken(user.uid);
-      if (!(await consumeAuthChallenge(challengeId))) {
-        return NextResponse.json(
-          { error: "That code has already been used. Request a new one." },
-          { status: 409 },
-        );
-      }
       recordAuthAudit({
         event:
           result.challenge.purpose === "recovery" ? "recovery" : "verification",
@@ -193,7 +194,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Authentication service is temporarily unavailable. Your code was accepted; try again shortly.",
+            "Authentication could not complete. Request a new code and try again.",
         },
         { status: 503 },
       );
