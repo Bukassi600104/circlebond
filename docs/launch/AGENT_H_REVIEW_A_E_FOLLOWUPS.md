@@ -44,4 +44,12 @@ The first reviewer browser launch failed before any test assertion because Playw
 
 Not checked: integrated application browser journeys, final dependency-tree CI, genuine Storage upload/retrieval/replacement/deletion, Safari encoder behavior, physical iPhone/Android, low-memory devices, interrupted real transfers and every dense maximum-size image collection. The remaining aggregate limit is **BLOCKED** pending an approved transport strategy and staging/security verification, as E's report states; this patch does not silently reduce the 5 MB input allowance or claim universal transport support. Risk: **medium**, concentrated in browser memory/encoder variation and that explicit transport limitation.
 
+## Final clean-install and CI audit guard follow-up
+
+H independently inspected `TEMP/bondcircle-final-rc-install-status.json` and the matching log after A's final install: `npm ci --prefer-offline --no-audit`, scripts enabled, exit0, **1,085 packages**, completed `2026-10-30T00:23:29.9118764Z`. The actual CI-worktree lock hash still matches `12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38`; direct installed-package reads confirm Next16.4.3, Sharp0.35.5 and Nodemailer10.1.4. The final-lock clean-install sub-gate is now **PASS**; the initial installation limitation above is superseded. This does not substitute for the still-running final application checks.
+
+Bounded independent source review of the parent's CI audit guard: **PASS**. `.github/workflows/ci.yml` runs `npm audit --audit-level=high` after clean installation, covering the complete dependency tree. No ignore, `continue-on-error` or unconditional-success clause suppresses a high/critical finding or audit failure. Existing read-only repository permissions, Java21/Node22 setup and lint/format/type/test gates remain intact. This is a workflow review, not a claim that GitHub ran the new candidate or that repository branch protection was configured.
+
+Final integrated CI, actual new Sharp decoding/Next rendering, browser journeys, staging/providers and physical-device acceptance remain separate gates. The current owner-facing readiness report correctly withholds public-launch approval while live defects and external dependencies remain open.
+
 No production deployment, live data operation, real financial transaction or external email occurred.
