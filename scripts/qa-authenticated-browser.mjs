@@ -282,6 +282,44 @@ try {
   let memberId;
   let circleId;
   let invitationPath;
+  async function createGift(plan, title) {
+    await ownerPage.goto(new URL("/account/create?type=gift", base).href);
+    await ownerPage
+      .locator(`label:has(input[name="pricingPlan"][value="${plan}"])`)
+      .click();
+    assert.equal(
+      await ownerPage
+        .locator(`input[name="pricingPlan"][value="${plan}"]`)
+        .isChecked(),
+      true,
+    );
+    const fields = {
+      circleName: title,
+      giftTitle: "Synthetic shared gift",
+      targetAmount: "3000",
+      deadline: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+      memberCapacity: "3",
+      description: "Synthetic local browser acceptance only.",
+      paymentBankName: "Local Test Bank",
+      paymentAccountName: "Synthetic Organizer",
+      paymentAccountNumber: "0123456789",
+    };
+    for (const [name, value] of Object.entries(fields))
+      await ownerPage.locator(`[name="${name}"]`).fill(value);
+    const pending = ownerPage.waitForResponse(
+      (response) =>
+        response.url().endsWith("/api/circles/gift") &&
+        response.request().method() === "POST",
+    );
+    await ownerPage
+      .getByRole("button", { name: "Create Gift Circle", exact: true })
+      .click();
+    const response = await pending;
+    assert.equal(response.status(), 201);
+    const created = await response.json();
+    await ownerPage.waitForURL(`**/account/circles/${created.circleId}`);
+    return created;
+  }
   await check(
     "fresh OTP sign-in requires persisted consent and preserves create continuation",
     async () => {
@@ -296,28 +334,10 @@ try {
     },
   );
   await check(
-    "organizer creates and reloads a real Gift trial draft",
+    "organizer saves and reloads a paid-tier Gift draft without starting checkout",
     async () => {
-      const fields = {
-        circleName: "Synthetic browser coordination",
-        giftTitle: "Synthetic shared gift",
-        targetAmount: "3000",
-        deadline: new Date(Date.now() + 30 * 86400000)
-          .toISOString()
-          .slice(0, 10),
-        memberCapacity: "3",
-        description: "Synthetic local browser acceptance only.",
-        paymentBankName: "Local Test Bank",
-        paymentAccountName: "Synthetic Organizer",
-        paymentAccountNumber: "0123456789",
-      };
-      for (const [name, value] of Object.entries(fields))
-        await ownerPage.locator(`[name="${name}"]`).fill(value);
-      await ownerPage
-        .getByRole("button", { name: "Create Gift Circle", exact: true })
-        .click();
-      await ownerPage.waitForURL(/\/account\/circles\/[a-f0-9-]+/);
-      circleId = new URL(ownerPage.url()).pathname.split("/").at(-1);
+      const created = await createGift("starter", "Synthetic saved draft");
+      assert.equal(created.activationStatus, "pending_payment");
       await ownerPage
         .getByRole("heading", {
           name: "Your circle draft is safely saved",
@@ -326,7 +346,7 @@ try {
         .waitFor();
       await ownerPage.reload();
       await ownerPage
-        .getByText("Synthetic browser coordination", { exact: true })
+        .getByText("Synthetic saved draft", { exact: true })
         .first()
         .waitFor();
       await ownerPage.screenshot({
@@ -336,15 +356,14 @@ try {
     },
   );
   await check(
-    "free trial activates through creator controls without a payment provider",
+    "eligible free trial publishes through UI creation without a payment provider",
     async () => {
-      const activated = ownerPage.waitForResponse(
-        (response) =>
-          response.url().endsWith(`/api/circles/${circleId}/activation`) &&
-          response.request().method() === "POST",
+      const created = await createGift(
+        "trial",
+        "Synthetic browser coordination",
       );
-      await ownerPage.getByRole("button", { name: /^Activate for/ }).click();
-      assert.equal((await activated).status(), 200);
+      assert.equal(created.activationStatus, "active");
+      circleId = created.circleId;
       await ownerPage
         .getByRole("heading", {
           name: "Your circle draft is safely saved",
