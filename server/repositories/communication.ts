@@ -141,17 +141,6 @@ export type CircleCommunication = {
   }>;
 };
 
-function safeMetadata(value: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
-  } catch {
-    return {};
-  }
-}
-
 function isActivityType(value: string): value is ActivityType {
   return [
     "circle_created",
@@ -196,7 +185,7 @@ function mapActivity(
     type,
     actorId: row.actor?.id ?? null,
     actorName: row.actor?.displayName ?? null,
-    metadata: safeMetadata(row.metadata),
+    metadata: {},
     createdAt: row.createdAt,
     filter: activityFilterFor(type),
   };
@@ -696,7 +685,9 @@ export async function recordSystemActivity(input: {
 }
 
 export async function loadUserActivity(userId: string) {
-  const circles = await loadDashboardCircles(userId);
+  const circles = (await loadDashboardCircles(userId)).filter(
+    (circle) => circle.membershipStatus === "joined",
+  );
   if (!circles.length) return [];
   const response = await getBondCircleDataConnect().executeQuery<
     ActivityRows,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
 import { canViewReceipt } from "@/server/contributions/engine";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
-import { loadContributionWorkspace } from "@/server/repositories/contributions";
+import { loadPrivateContributionWorkspace } from "@/server/repositories/contributions";
 import { verifyPrivateFileAccess } from "@/server/uploads/private-access";
 
 export const runtime = "nodejs";
@@ -26,7 +26,10 @@ export async function GET(
   ) {
     return new NextResponse(null, { status: 404 });
   }
-  const workspace = await loadContributionWorkspace(circleId, session.uid);
+  const workspace = await loadPrivateContributionWorkspace(
+    circleId,
+    session.uid,
+  );
   if (!workspace) return new NextResponse(null, { status: 404 });
   const receipt = [...workspace.receipts, ...workspace.reviewQueue].find(
     (candidate) => candidate.id === receiptId,

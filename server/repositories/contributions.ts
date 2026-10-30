@@ -88,7 +88,7 @@ function mapReceipt(
   };
 }
 
-export async function loadContributionWorkspace(
+export async function loadPrivateContributionWorkspace(
   circleId: string,
   viewerId: string,
 ) {
@@ -165,6 +165,29 @@ export async function loadContributionWorkspace(
   };
 }
 
+// Raw totals and storage paths stay in the server-only loader above.
+export async function loadContributionWorkspace(
+  circleId: string,
+  viewerId: string,
+) {
+  const workspace = await loadPrivateContributionWorkspace(circleId, viewerId);
+  if (!workspace) return null;
+  const { circle: _circle, ...visible } = workspace;
+  void _circle;
+  const publicReceipt = ({
+    imageStoragePath: _path,
+    ...receipt
+  }: ContributionReceipt) => {
+    void _path;
+    return receipt;
+  };
+  return {
+    ...visible,
+    receipts: workspace.receipts.map(publicReceipt),
+    reviewQueue: workspace.reviewQueue.map(publicReceipt),
+  };
+}
+
 export async function submitContributionReceipt(input: {
   receiptId: string;
   circleId: string;
@@ -176,7 +199,7 @@ export async function submitContributionReceipt(input: {
   contentType: string;
   replacementOfId?: string | null;
 }) {
-  const workspace = await loadContributionWorkspace(
+  const workspace = await loadPrivateContributionWorkspace(
     input.circleId,
     input.uploaderId,
   );
@@ -240,7 +263,7 @@ export async function reviewContributionReceipt(input: {
   decision: "approve" | "reject";
   rejectionReason?: string | null;
 }) {
-  const workspace = await loadContributionWorkspace(
+  const workspace = await loadPrivateContributionWorkspace(
     input.circleId,
     input.reviewerId,
   );

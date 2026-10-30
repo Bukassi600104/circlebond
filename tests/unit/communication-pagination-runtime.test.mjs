@@ -109,6 +109,20 @@ async function fixture({
         assert.equal(input.reporterId, "self");
         return { data: { commentReports: [] } };
       }
+      if (operation === "GetActivityLogsForCircles") {
+        assert.equal(
+          JSON.stringify(input.circleIds),
+          JSON.stringify([circleId]),
+        );
+        return {
+          data: {
+            activityLogs: context.activityLogs.map((row) => ({
+              ...row,
+              circle,
+            })),
+          },
+        };
+      }
       assert.equal(input.circleId, circleId);
       if (
         ["GetCircleCommunicationContext", "GetSupportCircleDetail"].includes(
@@ -149,7 +163,11 @@ async function fixture({
       ...common,
       "node:crypto": { randomUUID: () => "generated-id" },
       "@/server/communication/rules": rules,
-      "@/server/repositories/dashboard": {},
+      "@/server/repositories/dashboard": {
+        loadDashboardCircles: async () => [
+          { id: circleId, membershipStatus: joined ? "joined" : "invited" },
+        ],
+      },
       "@/server/repositories/notifications": {
         safelyEmitNotification: async () => {},
       },
@@ -409,4 +427,52 @@ test("history operations retain circle scope, stable ordering, bounded pages and
   assert.match(operations[1], /deletedAt: \{ isNull: true \}/);
   assert.doesNotMatch(operations[2], /status: \{ eq: "visible"/);
   assert.match(operations[3], /status: \{ eq: "open" \}/);
+});
+
+test("public circle and global activity never serialize private financial audit metadata", async () => {
+  const f = await fixture({ role: "member", type: "support" });
+  f.context.circle.creator = { id: "organizer" };
+  const privateMetadata = JSON.stringify({
+    amount: 918273645,
+    fromConfirmedAmount: 1234,
+    toConfirmedAmount: 918274879,
+    rejectionReason: "Private review",
+    targetAmount: 987654321,
+    contributedAmount: 876543210,
+  });
+  f.context.activityLogs.push({
+    id: "private-audit",
+    eventType: "receipt_confirmed",
+    metadata: privateMetadata,
+    createdAt: timestamp,
+    actor: { id: "organizer", displayName: "Organizer" },
+  });
+  const circle = await f.communication.loadCircleCommunication(
+    circleId,
+    "self",
+  );
+  const global = await f.communication.loadUserActivity("self");
+  assert.equal(circle.viewerCanManage, false);
+  for (const activity of [circle.activity, global]) {
+    assert.equal(activity.length, 1);
+    assert.equal(JSON.stringify(activity[0].metadata), "{}");
+    assert.doesNotMatch(
+      JSON.stringify(activity),
+      /918273645|987654321|876543210|Private review/,
+    );
+  }
+  assert.equal(
+    f.context.activityLogs[0].metadata,
+    privateMetadata,
+    "Private audit records remain intact",
+  );
+});
+
+test("global activity excludes circles where the viewer has not joined", async () => {
+  const f = await fixture({ joined: false });
+  assert.equal((await f.communication.loadUserActivity("self")).length, 0);
+  assert.equal(
+    f.calls.some((call) => call.operation === "GetActivityLogsForCircles"),
+    false,
+  );
 });

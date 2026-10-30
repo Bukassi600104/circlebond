@@ -15,14 +15,6 @@ import { sanitizeUploadedImage } from "@/server/uploads/images";
 
 export const runtime = "nodejs";
 
-function publicReceipt<T extends { imageStoragePath: string }>(
-  receipt: T,
-): Omit<T, "imageStoragePath"> {
-  const { imageStoragePath: _privatePath, ...visible } = receipt;
-  void _privatePath;
-  return visible;
-}
-
 export async function GET(
   request: Request,
   context: { params: Promise<{ circleId: string }> },
@@ -36,11 +28,7 @@ export async function GET(
   if (!workspace) {
     return NextResponse.json({ error: "Circle not found." }, { status: 404 });
   }
-  return NextResponse.json({
-    ...workspace,
-    receipts: workspace.receipts.map(publicReceipt),
-    reviewQueue: workspace.reviewQueue.map(publicReceipt),
-  });
+  return NextResponse.json(workspace);
 }
 
 export async function POST(
