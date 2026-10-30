@@ -12,7 +12,7 @@ Verified-contact normalization rejects unverified identities and strips unverifi
 
 The two H test-only corrections preserve their original protection: the outage-copy assertion now expects the explicit new-code recovery instruction and still requires503; the plaintext invitation-token prohibition is scoped to the Invitation model, retaining its mandatory hash while allowing the unrelated persisted device token. Initial broader primary unit evidence was **263 PASS / 4 FAIL / 0 skipped** out of267: those two stale assertions and two missing native `_response` fixture aliases. The parent owns the latter fixture corrections. Full-suite acceptance remains PENDING REVIEW until the complete rerun passes.
 
-Real combined connector compilation/persistence, final updated-lock CI, staging/provider checks, account lifecycle cleanup and physical/native delivery remain separate gates. This scoped decision is not API/native or public-launch acceptance. Risk: medium, concentrated in these external/integration gates.
+Subsequent independent local database acceptance at `957d19af` (application source `566d05b`) compiled the combined schema and passed all17 synthetic connector tests, including device reassignment/owner-only removal, privacy intake and concurrent rate budgets. See `AGENT_H_DATABASE_ACCEPTANCE.md` for exact evidence and boundaries. Final updated-lock CI, staging/provider checks, account lifecycle fulfillment and physical/native delivery remain separate gates. This scoped decision is not API/native or public-launch acceptance. Risk: medium, concentrated in these external/integration gates.
 
 ## Initial decision — FAIL (superseded by the resubmission above)
 
