@@ -2707,22 +2707,19 @@ query FindNotificationRecipientByEmail($email: String!)
   }
 }
 
-query GetDeadlineNotificationCandidates($from: Date!, $to: Date!, $offset: Int! = 0)
+# UUID filters do not expose ordering comparisons, so this server-only cursor uses parameterized SQL.
+query GetDeadlineNotificationCandidates($from: Date!, $to: Date!, $after: UUID)
 @auth(level: NO_ACCESS) {
-  circles(
-    where: {
-      deadline: { ge: $from, le: $to }
-      status: { in: ["published", "active", "target_reached", "fulfilment"] }
-    }
-    limit: 200
-    offset: $offset
-    orderBy: [{ id: ASC }]
-  ) {
-    id
-    name
-    type
-    deadline
-  }
+  circles: _select(
+    sql: """
+      SELECT id, deadline::text AS deadline FROM circle
+      WHERE deadline >= $1::date AND deadline <= $2::date
+        AND status IN ('published', 'active', 'target_reached', 'fulfilment')
+        AND ($3::uuid IS NULL OR id > $3::uuid)
+      ORDER BY id ASC LIMIT 200
+    """
+    params: [$from, $to, $after]
+  )
 }
 
 query GetUserDeadlineNotificationCandidates($userId: String!)

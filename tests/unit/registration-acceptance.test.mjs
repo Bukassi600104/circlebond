@@ -12,6 +12,7 @@ for (const path of [
       path,
       {
         "next/server": { NextResponse: Response },
+        "@/app/api/v1/_response": { apiJson: Response.json },
         "@/server/auth/request": { clientKey: () => "test" },
         "@/server/auth/security": {
           validateEmailAddress: async (email) => email,

@@ -5,6 +5,13 @@ import { getApps, initializeApp } from "firebase-admin/app";
 import { getDataConnect } from "firebase-admin/data-connect";
 import { pricingForCircle } from "../../lib/circle-pricing.ts";
 
+assert.ok(
+  /^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(
+    process.env.DATA_CONNECT_EMULATOR_HOST ?? "",
+  ),
+  "Circle database tests require an explicit loopback Data Connect emulator.",
+);
+
 const app =
   getApps().find((candidate) => candidate.name === "circle-engine-e2e") ??
   initializeApp({ projectId: "bond-circle" }, "circle-engine-e2e");
@@ -1327,4 +1334,41 @@ test("device registrations persist, reassign shared-device ownership and delete 
     tokenId,
   });
   assert.equal((await metadata(secondUser)).length, 0);
+});
+
+test("deadline SQL cursor uses real UUID ordering and survives earlier circle closure", async () => {
+  const creatorId = `deadline-cursor-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Deadline cursor test",
+  });
+  const rows = Array.from({ length: 3 }, () => ({
+    id: randomUUID(),
+    creatorId,
+    name: "Synthetic deadline cursor",
+    type: "gift",
+    targetAmount: 1000,
+    deadline: "2099-06-01",
+    status: "active",
+  })).sort((a, b) => a.id.localeCompare(b.id));
+  for (const row of rows) await dataConnect.upsert("circle", row);
+  const page = async (after) =>
+    (
+      await dataConnect.executeQuery("GetDeadlineNotificationCandidates", {
+        from: "2099-06-01",
+        to: "2099-06-01",
+        after,
+      })
+    ).data.circles;
+  assert.deepEqual(
+    (await page(null)).map((row) => row.id),
+    rows.map((row) => row.id),
+  );
+  assert.equal((await page(null))[0].deadline, "2099-06-01");
+  await dataConnect.upsert("circle", { ...rows[0], status: "completed" });
+  assert.deepEqual(
+    (await page(rows[0].id)).map((row) => row.id),
+    rows.slice(1).map((row) => row.id),
+  );
+  assert.deepEqual(await page(rows[2].id), []);
 });

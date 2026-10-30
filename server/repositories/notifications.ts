@@ -548,18 +548,28 @@ export async function processDeadlineNotifications(today = new Date()) {
   toDate.setUTCDate(toDate.getUTCDate() + 3);
   const to = toDate.toISOString().slice(0, 10);
   let processed = 0;
+  let after: string | null = null;
   for (;;) {
     const response = await getBondCircleDataConnect().executeQuery<
       {
         circles: Array<{
           id: string;
-          name: string;
-          type: string;
-          deadline?: string | null;
+          deadline: string;
         }>;
       },
-      { from: string; to: string; offset: number }
-    >("GetDeadlineNotificationCandidates", { from, to, offset: processed });
+      { from: string; to: string; after: string | null }
+    >("GetDeadlineNotificationCandidates", { from, to, after });
+    // Native SQL returns Any; validate the cursor rows before use.
+    if (
+      !Array.isArray(response.data.circles) ||
+      !response.data.circles.every(
+        (circle) =>
+          circle &&
+          typeof circle.id === "string" &&
+          typeof circle.deadline === "string",
+      )
+    )
+      throw new Error("Deadline candidates are unavailable.");
     for (const circle of response.data.circles) {
       await emitCircleNotification({
         circleId: circle.id,
@@ -569,6 +579,7 @@ export async function processDeadlineNotifications(today = new Date()) {
     }
     processed += response.data.circles.length;
     if (response.data.circles.length < 200) return { processed };
+    after = response.data.circles.at(-1)!.id;
   }
 }
 
