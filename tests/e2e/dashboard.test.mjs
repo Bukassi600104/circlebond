@@ -70,3 +70,74 @@ test("actual dashboard query scopes before limiting and retrieves more than200 p
     false,
   );
 });
+
+test("invited history cannot displace joined users in authorization and detail queries", async () => {
+  const creatorId = `membership-creator-${randomUUID()}`;
+  const memberId = `membership-joined-${randomUUID()}`;
+  const invited = Array.from(
+    { length: 101 },
+    () => `membership-invited-${randomUUID()}`,
+  );
+  await db.upsertMany(
+    "user",
+    [creatorId, memberId, ...invited].map((id) => ({
+      id,
+      displayName: "Synthetic membership user",
+    })),
+  );
+  const circleId = randomUUID();
+  await db.upsert("circle", {
+    id: circleId,
+    creatorId,
+    name: "Synthetic membership history",
+    type: "gift",
+    targetAmount: 1000,
+    memberCount: 2,
+    memberLimit: 100,
+    status: "active",
+  });
+  await db.upsertMany("circleMembership", [
+    {
+      circleId,
+      userId: creatorId,
+      role: "creator",
+      membershipStatus: "joined",
+      joinedAt: "2097-01-01T00:00:00Z",
+    },
+    ...invited.map((userId) => ({
+      circleId,
+      userId,
+      role: "member",
+      membershipStatus: "invited",
+      joinedAt: "2098-01-01T00:00:00Z",
+    })),
+    {
+      circleId,
+      userId: memberId,
+      role: "member",
+      membershipStatus: "joined",
+      joinedAt: "2099-01-01T00:00:00Z",
+    },
+  ]);
+  for (const operation of [
+    "GetCircleEngineRecord",
+    "GetGiftCircleDetail",
+    "GetAsoEbiCircleDetail",
+    "GetSupportCircleDetail",
+    "GetContributionWorkspaceMetadata",
+    "GetCircleCommunication",
+  ]) {
+    const result = await db.executeQuery(operation, { circleId });
+    assert.equal(result.data.circleMemberships.length, 2, operation);
+    assert.ok(
+      result.data.circleMemberships.some((row) => row.user.id === memberId),
+      operation,
+    );
+    assert.ok(
+      result.data.circleMemberships.every(
+        (row) => row.membershipStatus === "joined",
+      ),
+      operation,
+    );
+  }
+});
