@@ -250,7 +250,14 @@ async function signIn(page, email, next, fromInvitation = false) {
   if (fromInvitation) {
     await page.waitForURL("**/register?**");
     await page.getByRole("link", { name: "Sign in", exact: true }).click();
+    await page.waitForURL(
+      (url) =>
+        url.pathname === "/sign-in" && url.searchParams.get("next") === next,
+    );
   }
+  await page
+    .getByRole("button", { name: "Continue", exact: true })
+    .waitFor({ state: "visible" });
   await page
     .getByRole("textbox", { name: "Email address", exact: true })
     .fill(email);
@@ -703,6 +710,17 @@ try {
         .map(async (page) => ({
           path: safe(new URL(page.url()).pathname),
           headings: (await page.locator("main h1").allTextContents()).map(safe),
+          signInEmailHasValue:
+            new URL(page.url()).pathname === "/sign-in"
+              ? (
+                  await page
+                    .getByRole("textbox", {
+                      name: "Email address",
+                      exact: true,
+                    })
+                    .inputValue()
+                ).length > 0
+              : null,
           alerts: (await page.locator('[role="alert"]').allTextContents()).map(
             safe,
           ),
