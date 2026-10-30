@@ -98,14 +98,13 @@ test("production server renders authentication screens, component library, and h
     const health = await fetch(`${baseUrl}/api/health`);
     const body = await health.json();
     assert.equal(body.application, "ok");
-    if (body.firebase === "configured") {
-      assert.equal(health.status, 200);
-      assert.equal(body.sqlConnect, "configured");
-    } else {
-      assert.equal(health.status, 503);
-      assert.equal(body.firebase, "not_configured");
-      assert.equal(body.sqlConnect, "not_configured");
+    for (const flag of [body.firebase, body.sqlConnect]) {
+      assert.ok(["configured", "not_configured"].includes(flag));
     }
+    const configured =
+      body.firebase === "configured" && body.sqlConnect === "configured";
+    assert.equal(health.status, configured ? 200 : 503);
+    assert.equal(body.status, configured ? "ok" : "degraded");
   } finally {
     server.kill();
   }
