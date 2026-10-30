@@ -188,7 +188,7 @@ test("valid OTPs never surface backend outages as invalid codes", async () => {
 
   assert.match(
     verifyRoute,
-    /Authentication service is temporarily unavailable/,
+    /Authentication could not complete\. Request a new code and try again\./,
   );
   assert.match(verifyRoute, /status: 503/);
   assert.match(developmentRunner, /emulators:start/);
