@@ -7,8 +7,9 @@ Storage bytes and real devices are outside this test's acceptance scope.
 
 ## Scope and classification
 
-- Equal Gift/Support allocation and invitation transaction guards: **PASS** on
-  product `c5236c6`, subject to independent review and updated-lock integrated CI.
+- Equal Gift/Support allocation and invitation transaction guards: **PENDING
+  REVIEW** on product `c5236c6`. All 24 real-database cases pass; independent
+  review and updated-lock integrated CI are still required for acceptance.
 - Capacity-upgrade contribution policy: **BLOCKED** on owner decision. The actual
   new-member journey currently fails after a stored capacity increase; its minimal
   compatibility regression is **FAIL**. No new allocation policy was invented.
@@ -26,6 +27,9 @@ these cases, matching the normal equal-mode workflow. The backend assigns it.
 All evidence directories below are ignored local artifacts in the payments QA
 worktree. Each retains `result.json`, `database-tests.tap`, `compile.log` and
 `toolkit.log`. No earlier failed result was overwritten.
+Safe result/TAP files, plus earlier bounded public/authenticated browser reports
+and screenshots, were also copied without overwriting to primary
+`tmp/launch-evidence/qa-h-recovered-c296-and-invitations-20261030T1003/`.
 
 | Product source / test state                                                  | Actual result           | Evidence directory                             |
 | ---------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------- |
