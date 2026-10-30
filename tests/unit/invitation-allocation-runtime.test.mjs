@@ -235,10 +235,65 @@ for (const approval of [false, true]) {
     assert.equal(34 + 33 + f.mutations[0].variables.expectedAmount, 101);
   });
 
-  test(`custom Gift and Support ${path} joins preserve their invitation amount`, async () => {
+  test(`equal Support ${path} joins ignore zero and forged invitation amounts`, async () => {
+    for (const expectedAmount of [0, 999999]) {
+      const f = await fixture({ type: "support", expectedAmount });
+      await f.join("member-one", approval);
+      assert.equal(f.mutations.length, 1);
+      assert.equal(f.mutations[0].variables.expectedAmount, 1000);
+      assert.equal(f.mutations[0].variables.nextMemberCount, 2);
+      assert.equal(f.notifications.length, 1);
+    }
+  });
+
+  test(`equal Support ${path} joins conserve rounded allocations and fill a removed share`, async () => {
+    for (const targetAmount of [100, 101]) {
+      const f = await fixture({ type: "support", targetAmount });
+      await f.join("member-one", approval);
+      await f.join("member-two", approval);
+      const actual = [
+        34,
+        ...f.mutations.map((entry) => entry.variables.expectedAmount),
+      ];
+      assert.deepEqual(
+        actual,
+        targetAmount === 100 ? [34, 33, 33] : [34, 34, 33],
+      );
+      assert.equal(
+        actual.reduce((sum, value) => sum + value, 0),
+        targetAmount,
+      );
+    }
+    const replacement = await fixture({
+      type: "support",
+      targetAmount: 101,
+      existingAllocations: [34, 33],
+    });
+    await replacement.join("replacement-member", approval);
+    assert.equal(replacement.mutations.length, 1);
+    assert.equal(replacement.mutations[0].variables.expectedAmount, 34);
+  });
+
+  test(`legacy missing contribution mode defaults to equal for Gift and Support ${path} joins`, async () => {
+    for (const type of ["gift", "support"]) {
+      for (const mode of [null, undefined]) {
+        const f = await fixture({ type, contributionMode: null });
+        f.circle.contributionMode = mode;
+        f.invitation.circle.contributionMode = mode;
+        await f.join("member-one", approval);
+        assert.equal(f.mutations.length, 1);
+        assert.equal(f.mutations[0].variables.expectedAmount, 1000);
+      }
+    }
+  });
+
+  test(`custom Gift, Custom Support and Aso-Ebi ${path} joins preserve their invitation amount`, async () => {
+    // Support creation accepts equal/custom and seeds equal creator allocations
+    // with the actual Gift allocator. Only Custom Support belongs in this case.
     for (const options of [
       { type: "gift", contributionMode: "custom" },
-      { type: "support", contributionMode: "flexible" },
+      { type: "support", contributionMode: "custom" },
+      { type: "aso-ebi", contributionMode: null },
     ]) {
       const f = await fixture({ ...options, expectedAmount: 725 });
       await f.join("member-one", approval);
