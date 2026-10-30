@@ -53,3 +53,19 @@ The second reports are preserved as `second-4008ace-report.json` beside each ori
 A third, auth-only diagnostic confirmed OTP request202/verify200, no observed Auth9099 request or session POST, and a visible Firebase network-request error. A separate no-token probe against the unchanged production-mode page confirmed a `connect-src` CSP rejection mentioning the explicit local Auth origin before any9099 request reached the network. The probe is retained as `csp-probe-4008ace.json`; the auth diagnostic is `third-4008ace-auth-diagnostic.json`.
 
 The authenticated test fixture therefore adjusts only intercepted loopback document response headers, appending `http://127.0.0.1:9099` to the existing explicit `connect-src`. It preserves every other directive, rejects public/non-origin URLs and absent/duplicate/deny-all policies, disables redirect following in its document fetch, retains external-request blocking, and records original policy hashes. Application headers, global environment, source policy and public browser tests are unchanged. This fixture cannot establish production CSP or genuine Firebase-provider acceptance. No `bypassCSP` setting is used.
+
+## Fourth actual run and restart recovery
+
+The reviewed d7d9061 fixture ran against the same clean 4008ace application/build. Persistent wrapper evidence records start `2026-10-30T02:57:36.7729635Z`, completion `03:01:03.9165602Z`, exit1. Its saved results survived the later app restart and were reread before any services resumed.
+
+**Result: FAIL.** Public checks: 38 PASS, 1 FAIL. All public behavioral assertions and 24 layout checks passed, including legal-dialog focus restoration, correctly scoped consent/error alerts, invitation/recovery continuation and unauthenticated redirects. Onboarding lab sample3 measured LCP2540ms against the unchanged 2500ms budget. This is a real recorded budget failure; it is not waived by earlier passing samples.
+
+The six LCP values were sign-in1360/1352/1260ms and onboarding2456/2428/2540ms. Onboarding CLS remained0.0243870 and controlled next-screen times were50.5/27.2/47.9ms. Warm unauthenticated API p95 was36.07ms over20 samples. Raw reports are retained as `fourth-4008ace-report.json` in both evidence directories.
+
+The authenticated suite remained FAIL at phase1: OTP request202 and verification200, followed by an actual local9099 custom-token request failing `net::ERR_FAILED`; no session/legal continuation was reached. The exact-origin CSP fixture modified one authenticated document and recorded the original policy SHA256. This later transport/browser-policy failure remains under diagnosis; no CORS, permission or product root cause is asserted without console/preflight evidence. H commit05470a3 adds independently reviewed, sanitized policy-reason diagnostics without changing permissions or assertions.
+
+## Actual image attribution before responsive correction
+
+A targeted browser probe on4008ace confirmed viewport390px at DPR1, rendered image width358.797px, natural dimensions1280x853, empty `sizes`, and actual `currentSrc` selecting `w=1920`. The largest-contentful-paint element was that image. Its encoded resource body was67238bytes. The exact evidence is `public-browser/lcp-attribution-4008ace.json`.
+
+This attribution probe was unthrottled and ran separately from the controlled budget suite; its timings are not substituted for the recorded budget results. A first20s cold-start readiness timeout produced no page measurement and was retained as fixture-readiness evidence. The subsequent probe recorded Next ready in3.8s and completed successfully. All ten application/emulator ports were confirmed closed at handoff to Agent A for the responsive-image build. Actual new image selection, transfer size, budgets and authenticated journeys still require fresh evidence.
