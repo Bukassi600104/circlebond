@@ -449,24 +449,31 @@ try {
   let invitationPath;
   async function createGift(plan, title) {
     await ownerPage.goto(new URL("/account/create?type=gift", base).href);
-    await ownerPage
+    const form = ownerPage.locator("form").filter({
+      has: ownerPage.getByRole("button", {
+        name: "Create Gift Circle",
+        exact: true,
+      }),
+    });
+    assert.equal(await form.count(), 1);
+    await form
       .locator(`label:has(input[name="pricingPlan"][value="${plan}"])`)
       .click();
     assert.equal(
-      await ownerPage
+      await form
         .locator(`input[name="pricingPlan"][value="${plan}"]`)
         .isChecked(),
       true,
     );
     const fields = giftFields(title);
     for (const [name, value] of Object.entries(fields))
-      await ownerPage.locator(`[name="${name}"]`).fill(value);
+      await form.locator(`[name="${name}"]`).fill(value);
     const pending = ownerPage.waitForResponse(
       (response) =>
         response.url().endsWith("/api/circles/gift") &&
         response.request().method() === "POST",
     );
-    await ownerPage
+    await form
       .getByRole("button", { name: "Create Gift Circle", exact: true })
       .click();
     const response = await pending;
@@ -587,12 +594,18 @@ try {
         `/api/circles/${circleId}/invitations`,
         { mode: "open", maxUses: 1, expiresInDays: 7 },
       );
-      assert.ok(denied.status() >= 400);
+      assert.equal(denied.status(), 400);
+      const deniedRead = await browserApi(
+        memberPage,
+        new URL(`/api/circles/${circleId}/invitations`, base).href,
+      );
+      assert.equal(deniedRead.status(), 403);
       const after = await browserApi(
         ownerPage,
         new URL(`/api/circles/${circleId}/invitations`, base).href,
       );
       assert.equal((await after.json()).invitations.length, count);
+      assert.equal(await memberPage.locator(".bc-invite-trigger").count(), 0);
       assert.equal(
         await memberPage
           .getByRole("heading", {
