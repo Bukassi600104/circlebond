@@ -219,8 +219,8 @@ async function expectedMembershipAmount(
       "ACTIVITY_NOT_ALLOWED",
     );
   // Existing assignments stay fixed; only unfilled places share the remaining target.
-  return remainingTarget === 0
-    ? 0
+  return remainingTarget === 0 || remainingPlaces === 1
+    ? remainingTarget
     : calculateEqualSlotAllocations(remainingTarget, remainingPlaces)[0];
 }
 
