@@ -176,16 +176,46 @@ function giftFields(title) {
     paymentAccountNumber: "0123456789",
   };
 }
+async function browserApi(page, path, options = {}) {
+  const url = new URL(path, base);
+  assert.equal(url.origin, base.origin);
+  const result = await page.evaluate(
+    async ({ path, options }) => {
+      const headers = { ...options.headers };
+      let body;
+      if (options.multipart) {
+        body = new FormData();
+        for (const [key, value] of Object.entries(options.multipart))
+          body.append(key, String(value));
+      } else if (Object.hasOwn(options, "data")) {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(options.data);
+      }
+      const response = await fetch(path, {
+        method: options.method ?? "GET",
+        headers,
+        body,
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      return { status: response.status, body: await response.json() };
+    },
+    { path: url.pathname + url.search, options },
+  );
+  // Preserve the existing assertions while returning only actual browser HTTP values.
+  return { status: () => result.status, json: async () => result.body };
+}
 async function csrf(page) {
-  const response = await page.request.get(new URL("/api/auth/csrf", base).href);
+  const response = await browserApi(page, "/api/auth/csrf");
   assert.equal(response.status(), 200);
   const token = (await response.json()).csrfToken;
   secrets.add(token);
   return token;
 }
 async function post(page, path, data) {
-  return page.request.post(new URL(path, base).href, {
-    headers: { Origin: base.origin, "X-CSRF-Token": await csrf(page) },
+  return browserApi(page, path, {
+    method: "POST",
+    headers: { "X-CSRF-Token": await csrf(page) },
     data,
   });
 }
@@ -248,16 +278,30 @@ async function signIn(page, email, next, fromInvitation = false) {
       .fill(code[index]);
   await page.waitForURL("**/legal/accept?**", { timeout: 30000 });
   assert.equal(new URL(page.url()).searchParams.get("next"), next);
-  const beforeCircles = await page.request.get(
+  const beforeCircles = await browserApi(
+    page,
     new URL("/api/v1/circles", base).href,
   );
+  if (!report.cookieTransportComparison) {
+    const apiRequest = await page.request.get(
+      new URL("/api/v1/circles", base).href,
+    );
+    report.cookieTransportComparison = {
+      scope:
+        "Read-only diagnostic; functional assertions use actual same-origin browser fetch",
+      apiRequestStatus: apiRequest.status(),
+      browserStatus: beforeCircles.status(),
+    };
+  }
   assert.equal(beforeCircles.status(), 200);
   const originalCircles = (await beforeCircles.json()).circles;
   assert.deepEqual(originalCircles, []);
-  const before = await page.request.post(
+  const before = await browserApi(
+    page,
     new URL("/api/circles/gift", base).href,
     {
-      headers: { Origin: base.origin, "X-CSRF-Token": await csrf(page) },
+      method: "POST",
+      headers: { "X-CSRF-Token": await csrf(page) },
       multipart: {
         ...giftFields("Consent gate negative"),
         pricingPlan: "starter",
@@ -271,7 +315,8 @@ async function signIn(page, email, next, fromInvitation = false) {
     "Persisted legal gate must precede circle creation",
   );
   assert.equal((await before.json()).code, "LEGAL_ACCEPTANCE_REQUIRED");
-  const afterCircles = await page.request.get(
+  const afterCircles = await browserApi(
+    page,
     new URL("/api/v1/circles", base).href,
   );
   assert.equal(afterCircles.status(), 200);
@@ -282,7 +327,8 @@ async function signIn(page, email, next, fromInvitation = false) {
     .getByRole("button", { name: "Accept & continue", exact: true })
     .click();
   await page.waitForURL((url) => url.pathname + url.search === next);
-  const session = await page.request.get(
+  const session = await browserApi(
+    page,
     new URL("/api/auth/session", base).href,
   );
   assert.equal(session.status(), 200);
@@ -500,7 +546,8 @@ try {
         invitationPath,
         true,
       );
-      const privateBeforeJoin = await memberPage.request.get(
+      const privateBeforeJoin = await browserApi(
+        memberPage,
         new URL(`/api/v1/circles/${circleId}`, base).href,
       );
       assert.equal(privateBeforeJoin.status(), 404);
@@ -514,7 +561,8 @@ try {
         .waitFor();
       assert.equal(
         (
-          await memberPage.request.get(
+          await browserApi(
+            memberPage,
             new URL(`/api/v1/circles/${circleId}`, base).href,
           )
         ).status(),
@@ -529,7 +577,8 @@ try {
   await check(
     "member cannot administer invitations or obtain organizer controls",
     async () => {
-      const before = await ownerPage.request.get(
+      const before = await browserApi(
+        ownerPage,
         new URL(`/api/circles/${circleId}/invitations`, base).href,
       );
       const count = (await before.json()).invitations.length;
@@ -539,7 +588,8 @@ try {
         { mode: "open", maxUses: 1, expiresInDays: 7 },
       );
       assert.ok(denied.status() >= 400);
-      const after = await ownerPage.request.get(
+      const after = await browserApi(
+        ownerPage,
         new URL(`/api/circles/${circleId}/invitations`, base).href,
       );
       assert.equal((await after.json()).invitations.length, count);
@@ -586,7 +636,8 @@ try {
       assert.equal(exported.format, "bondcircle-account-v1");
       assert.equal(exported.profile.id, ownerId);
       await download.delete();
-      const selfScoped = await ownerPage.request.get(
+      const selfScoped = await browserApi(
+        ownerPage,
         new URL(`/api/account/export?userId=${memberId}`, base).href,
       );
       assert.equal(selfScoped.status(), 200);
@@ -614,7 +665,7 @@ try {
       await ownerPage.waitForURL("**/sign-in");
       assert.equal(
         (
-          await ownerPage.request.get(new URL("/api/auth/session", base).href)
+          await browserApi(ownerPage, new URL("/api/auth/session", base).href)
         ).status(),
         401,
       );
