@@ -31,6 +31,7 @@ const report = {
   checks: [],
   layouts: [],
   performance: [],
+  blockedExternalRequestCount: 0,
 };
 const browser = await chromium.launch({
   executablePath:
@@ -38,6 +39,20 @@ const browser = await chromium.launch({
   headless: true,
 });
 report.browserVersion = browser.version();
+async function localContext(options) {
+  const context = await browser.newContext(options);
+  await context.route("**/*", (route) => {
+    const url = new URL(route.request().url());
+    if (
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) ||
+      !url.protocol.startsWith("http")
+    )
+      return route.continue();
+    report.blockedExternalRequestCount++;
+    return route.abort();
+  });
+  return context;
+}
 async function check(name, run) {
   try {
     await run();
@@ -84,7 +99,7 @@ try {
     { width: 1280, height: 900 },
     { width: 844, height: 390 },
   ]) {
-    const context = await browser.newContext({
+    const context = await localContext({
       viewport,
       reducedMotion: "reduce",
       serviceWorkers: "block",
@@ -119,7 +134,7 @@ try {
     await context.close();
   }
 
-  const context = await browser.newContext({
+  const context = await localContext({
     viewport: { width: 390, height: 844 },
     reducedMotion: "reduce",
     serviceWorkers: "block",
@@ -288,7 +303,7 @@ try {
   // These are three controlled local lab samples per public route, not field p75.
   for (const path of ["/sign-in", "/onboarding"]) {
     for (let sample = 1; sample <= 3; sample++) {
-      const perfContext = await browser.newContext({
+      const perfContext = await localContext({
         viewport: { width: 390, height: 844 },
         serviceWorkers: "block",
       });
