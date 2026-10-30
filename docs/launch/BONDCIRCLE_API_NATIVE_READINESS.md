@@ -1,6 +1,8 @@
 # BondCircle API and native readiness
 
-Assessment: 29 October2026; reconciled30 October2026. Implementation owner: Agent G. Code acceptance: **PENDING REVIEW**. Native client delivery is a separate track and does not block web release by itself.
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+
+Assessment: 29 October 2026; reconciled30 October 2026. Implementation owner: Agent G. Bounded implementation review and historical129f1e1 local CI: **PASS**. Staging/provider/native delivery acceptance: **BLOCKED**. Native client delivery is a separate track and does not block web release by itself.
 
 ## Verified source defects and corrections
 
@@ -15,18 +17,18 @@ Assessment: 29 October2026; reconciled30 October2026. Implementation owner: Agen
 
 ## Contract and coverage
 
-| Capability                                           | Current source contract                                                          | Acceptance                                                                                           |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Profile bootstrap/preferences read                   | `GET /api/v1/me`                                                                 | PENDING REVIEW; route behavior tested with controlled dependencies                                   |
-| Email OTP request/exchange                           | `POST /api/v1/auth/email-otp/request`, `POST /api/v1/auth/email-otp/verify`      | PENDING REVIEW; real delivery remains BLOCKED until provider tests                                   |
-| Circle listing/detail                                | `GET /api/v1/circles`, `GET /api/v1/circles/{id}`                                | PENDING REVIEW; membership scope and redaction exercised                                             |
-| Device token register/remove                         | `POST` and `DELETE /api/v1/devices/push-token`                                   | PENDING REVIEW; schema compile/database/provider delivery are separate gates                         |
-| Native circle creation/activation/upgrade            | No v1 mutation implemented                                                       | NOT STARTED; existing web repositories remain authoritative                                          |
-| Native invitation acceptance/management              | No v1 mutation implemented                                                       | NOT STARTED; existing web invitation rules must be reused                                            |
-| Native contributions/receipt submission/review       | No v1 contract implemented                                                       | NOT STARTED; existing private upload/review path remains authoritative                               |
-| Native notifications/preferences/lifecycle mutations | No v1 contract implemented                                                       | NOT STARTED; reuse existing rules when approved                                                      |
-| Account export/privacy requests                      | Existing authenticated web export and persisted intake endpoints now implemented | Bounded F review PASS; actual deletion fulfillment/operator policy BLOCKED; no native parity claimed |
-| Native binary/app-store readiness                    | No Android/iOS client built in this stabilization                                | NOT APPLICABLE to web release; physical native acceptance NOT STARTED                                |
+| Capability                                           | Current source contract                                                          | Acceptance                                                                                              |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Profile bootstrap/preferences read                   | `GET /api/v1/me`                                                                 | PASS for route tests and final local CI; genuine staging acceptance BLOCKED                             |
+| Email OTP request/exchange                           | `POST /api/v1/auth/email-otp/request`, `POST /api/v1/auth/email-otp/verify`      | PASS for local request/exchange tests; genuine delivery BLOCKED                                         |
+| Circle listing/detail                                | `GET /api/v1/circles`, `GET /api/v1/circles/{id}`                                | PASS for membership/redaction and final local CI; staging acceptance BLOCKED                            |
+| Device token register/remove                         | `POST` and `DELETE /api/v1/devices/push-token`                                   | PASS for compiled schema and actual local database persistence; push-provider/device acceptance BLOCKED |
+| Native circle creation/activation/upgrade            | No v1 mutation implemented                                                       | NOT STARTED; existing web repositories remain authoritative                                             |
+| Native invitation acceptance/management              | No v1 mutation implemented                                                       | NOT STARTED; existing web invitation rules must be reused                                               |
+| Native contributions/receipt submission/review       | No v1 contract implemented                                                       | NOT STARTED; existing private upload/review path remains authoritative                                  |
+| Native notifications/preferences/lifecycle mutations | No v1 contract implemented                                                       | NOT STARTED; reuse existing rules when approved                                                         |
+| Account export/privacy requests                      | Existing authenticated web export and persisted intake endpoints now implemented | Bounded F review PASS; actual deletion fulfillment/operator policy BLOCKED; no native parity claimed    |
+| Native binary/app-store readiness                    | No Android/iOS client built in this stabilization                                | NOT APPLICABLE to web release; physical native acceptance NOT STARTED                                   |
 
 The six implemented path families in `docs/openapi.yaml` are the supported v1 foundation. The contract deliberately does not advertise absent endpoints as complete parity. Offset pagination is deterministic for an unchanged membership dataset; clients should restart after membership changes.
 
@@ -43,7 +45,7 @@ The six implemented path families in `docs/openapi.yaml` are the supported v1 fo
 
 Firebase Auth identifies the user; Data Connect is the authoritative relational store; Firebase Storage holds validated files. Money, catalogue versions, once-per-account trial use, activation history, entitlements, membership and receipt permissions remain server-controlled. Do not copy them into a native client or AppDeploy backend.
 
-Before enabling token persistence in a deployed environment, review the additive schema/connector change, create the required production backup, compile the combined schema and verify a staging registration/read/remove/reassignment flow. No production schema deployment or migration was executed by Agent G. The new operations are `NO_ACCESS` to direct client SDK callers and are invoked only after server authentication. Generated SDK artifacts need coordinated regeneration only if clients use the new operations; this server calls the reviewed operation names directly.
+Before enabling token persistence in a deployed environment, review the additive schema/connector change, create the required production backup, compile the combined schema and verify a staging registration/read/remove/reassignment flow. No production schema deployment or migration was executed by Agent G. The new operations are `NO_ACCESS` to direct client SDK callers and are invoked only after server authentication. The generated SDK was regenerated twice with the locked local tool: all output hashes matched, 30 functions were added, zero removed, and every new operation is NO_ACCESS. This server invokes the reviewed operation names directly.
 
 Private receipt upload must continue through authenticated server validation, image decoding/re-encoding, limits and role checks. Retrieval uses short-lived viewer-bound authorization and no-store responses. Do not expose direct public receipt objects or cache them for offline use. Staging upload/replace/delete acceptance remains blocked by unavailable approved staging resources.
 
@@ -63,16 +65,20 @@ Final focused route/repository run: `node --test tests/unit/mobile-api-v1.test.m
 
 Local schema and all connector operations, including metadata-only device lookup, compiled with the cached native Data Connect toolkit (`dataconnect-emulator-3.4.16.exe --logtostderr build --config_dir=<worktree>/dataconnect`). Process exit was zero and parsed output `.errors` was null. No `--project_id`, deployed sources, credentials, schema migration or SDK generation was used. This is compiler evidence, not database persistence acceptance.
 
-A device persistence/reassignment/owner-only deletion E2E scenario was added to the existing circle-engine suite, which the default runner already executes. It requires a loopback emulator host before any writes. It has not been run in G's checkout; the parent must run the combined emulator suite after schema integration. Additional memory-heavy local databases were avoided while payment and final CI checks shared this host.
+A device persistence/reassignment/owner-only deletion E2E scenario was added to the existing circle-engine suite, which the default runner already executes. It requires a loopback emulator host before any writes. It was not run in G's initial checkout; H subsequently passed the combined17-test real database suite, including device ownership/reassignment/deletion. The final updated-dependency run also passed all 21 database tests as part of the 350-test pipeline at129f1e1.
 
 The first scoped ESLint attempt was blocked by a missing file in A's still-running dependency install. A second check using the existing desktop config found one test variable violating Next's `no-assign-module-variable`; the variable was renamed. The final scoped ESLint check using the existing desktop config **PASS** with zero warnings/errors across all v1 routes, the two changed repositories, runtime test harness, two native unit files and circle-engine E2E file.
 
-Initial partial-install typecheck was BLOCKED; after integration, G reran scoped ESLint and `tsc --noEmit --incremental false` successfully. G correction commit d593394 (integrated e3791dd) also passed43 focused API/auth/OTP/contract checks. The final updated-lock whole-application CI remains pending. No dependency or lockfile was changed by G.
+Initial partial-install typecheck was BLOCKED; after integration, G reran scoped ESLint and `tsc --noEmit --incremental false` successfully. G correction commit d593394 (integrated e3791dd) also passed43 focused API/auth/OTP/contract checks. The final updated-lock whole-application CI passed at129f1e1: formatting, lint, audit, types, 350 tests and optimized build. No dependency or lockfile was changed by G.
 
-Required before API acceptance: final focused tests, integrated lint/type/build, combined Data Connect compilation and isolated DB tests, account lifecycle cleanup, independent Ponytail review and staging/provider checks. Do not classify API/native readiness PASS based only on these unit tests.
+Focused route tests, integrated lint/type/build, combined Data Connect compilation, local database tests and independent implementation review now PASS. Staging/provider/device checks and account lifecycle fulfillment still require owner access and operational acceptance. Full native mutation parity is a separate NOT STARTED track; the existing foundation does not establish complete native readiness.
 
-## Reviewed contract correction — 30 October2026
+## Reviewed contract correction — 30 October 2026
 
 H's first review correctly rejected missing lifecycle enum values and inaccurate OTP expiry/202 schemas. The correction preserves all nine backend lifecycle states in list/detail/OpenAPI, documents Unix-millisecond integer expiry and message-only throttled202, and applies private API response handling to the request route. Both verifiers reserve valid proof before account mutation/token issuance; consumed proof returns409 with zero Auth/profile access. Stable IP and shared address/challenge budgets, strict purpose/consent, merged custom claims and existing-mailbox verification are covered by actual-source tests. Parent's integrated24 OTP/auth/contract checks pass; final independent/integrated evidence remains in the central test/review records.
 
 Supported native foundation remains the six documented path families, not complete web parity. Missing native mutations are a separate future delivery track. Token persistence is not push delivery; requests do not claim notification capability before provider/device acceptance.
+
+## Identifier wire format
+
+Treat returned entity IDs as opaque strings and reuse them unchanged. [SQL Connect UUID scalar documentation](https://firebase.google.com/docs/reference/sql-connect/gql/scalar#uuid) specifies compact32-character lowercase hexadecimal output, even when canonical dashed input was accepted. Firebase Authentication user IDs are a separate, case-sensitive identity domain. Do not normalize user IDs or reconstruct payment references from serialized database IDs. Payment references retain their exact persisted provider string; equivalent UUID representations are validated only for the bound SQL entities. The read-only native detail path currently expects the returned opaque ID; alternate-format native request compatibility is a separate handoff check, not a web-launch dependency.

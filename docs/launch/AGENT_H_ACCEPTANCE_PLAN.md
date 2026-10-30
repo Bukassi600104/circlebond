@@ -31,7 +31,7 @@ Prepared 30 October 2026 (Africa/Lagos). This is the execution checklist, not a 
 
 Run from an isolated tracked-clean candidate with the exact intended commit recorded. Preserve package/lock integrity and distinguish a reused dependency tree from a completed `npm ci`. Required commands remain `npm ci`, `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test` and `npm run build`. Do not launch competing builds/emulators while the parent integrates source changes.
 
-The circle-engine runner includes only its Data Connect suites: `circle-engine.test.mjs`, `account-privacy.test.mjs` and `rate-limit.test.mjs`. Authentication retains its separate Auth/Data Connect wrapper. Synthetic operations must target explicit loopback emulators. Actual Storage writes additionally require an explicit local Storage emulator; never let an emulator test fall back to a production bucket.
+The circle-engine runner includes only its Data Connect suites: `circle-engine.test.mjs`, `account-privacy.test.mjs`, `rate-limit.test.mjs`, `dashboard.test.mjs`, `retention-pagination.test.mjs` and `invitation-allocation.test.mjs`. Authentication retains its separate Auth/Data Connect wrapper. Synthetic operations must target explicit loopback emulators. Actual Storage writes additionally require an explicit local Storage emulator; never let an emulator test fall back to a production bucket.
 
 ## Browser and performance execution
 

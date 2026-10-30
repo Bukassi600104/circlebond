@@ -1,7 +1,9 @@
 # BondCircle payment integration
 
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+
 Evidence date: 29 October 2026 (Africa/Lagos). Baseline: `c0b1f91`.
-Engineering: bounded H independent review PASS after creator-control CSRF correction; final integrated CI PENDING REVIEW. Live provider acceptance: BLOCKED.
+Engineering: bounded H independent review PASS after creator-control CSRF correction; final integrated local CI PASS at129f1e1 (350 tests and all required commands). Live provider acceptance: BLOCKED.
 
 ## Current evidence and boundary
 
@@ -81,7 +83,7 @@ route's public fallback text instead of internal exception messages.
 | Emulator transaction regression             | PASS: 4 selected tests; three payment scenarios plus the existing partial-payment receipt test                                                             |
 | Type checking                               | PASS: tsc --noEmit, including payment routes/components                                                                                                    |
 | Scoped lint and formatting                  | PASS: scoped lint/format; final changed-test checks before commit                                                                                          |
-| Integrated clean install/full build/full CI | PENDING REVIEW: parent integration gate                                                                                                                    |
+| Integrated clean install/full build/full CI | PASS for local exact129f1e1; clean install, audit, lint/type, 350 tests and optimized build                                                                |
 | Independent Ponytail review                 | PASS for bounded adapter/settlement/control changes; H28+6 regressions, AGENT_H_REVIEW_C.md; final integrated acceptance pending                           |
 | Real Paystack test checkout/webhook/refund  | BLOCKED: approved sandbox account, test credentials and publicly reachable staging webhook unavailable                                                     |
 | Live financial transactions                 | BLOCKED: explicit provider/policy/production approval required                                                                                             |
@@ -131,3 +133,7 @@ own clean-install and full integrated CI proof.
 
 These sources establish integration requirements, not approval of BondCircle's
 business account, legal identity, payment service contract or refund policy.
+
+## Historical integrated verification at129f1e1
+
+Exact `129f1e14b36cfe24edacaca276801d6b0ca543fe` passed final local CI. Independent H review also reran 24 payment tests and 256 equivalent UUID forms/18 invalid references after the compact SQL UUID correction. Provider references are reused exactly as persisted; only bound SQL entity identities accept the two documented UUID representations. Receipt URLs separately use the queried opaque ID, preserving legacy object paths. No provider request, genuine transaction, sandbox checkout or production migration occurred. Approved provider sandbox/webhook/refund/reconciliation acceptance remains BLOCKED.

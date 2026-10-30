@@ -1,49 +1,75 @@
-# BondCircle launch readiness
+# BondCircle final launch readiness
 
-Updated30 October2026. Current decision: **OVERALL PUBLIC LAUNCH — BLOCKED**. No production deployment/promotion is authorized or performed. This report is maintained during final verification; pending checks are not PASS.
+Updated 30 October 2026 (Africa/Lagos). **OVERALL PUBLIC LAUNCH — BLOCKED.** Local engineering acceptance and production acceptance are separate.
 
-## Candidate and repository
+## Repository and candidate
 
-Correct local checkout: C:/Users/USER/Desktop/Bond Circle. Repository: https://github.com/Bukassi600104/circlebond. Baseline main was c0b1f913caeeffee546f79e2804f2583f2963edd, matched locally/remotely. Work is isolated on codex/production-readiness and three managed worktrees; initial user checkout was clean and no user modifications were discarded. Current code integration includes reviewed security, payments, account/UX, PWA/upload and API corrections. Exact final candidate SHA and final command evidence will be inserted after the remaining integrated checks, not inferred from an earlier build.
+The correct integration checkout is **C:/Users/USER/Desktop/Bond Circle**, branch **codex/production-readiness**, repository [Bukassi600104/circlebond](https://github.com/Bukassi600104/circlebond). The app-selected infrastructure folder is a linked worktree. Initial checkout was clean; baseline and freshly rechecked remote main are c0b1f913caeeffee546f79e2804f2583f2963edd. User-owned work was preserved.
 
-The connected Vercel account cannot access BondCircle's owning team/project. A successful historical Vercel status on baseline is not proof that the current domain serves that commit. Live deployment relationship and rollback are BLOCKED.
+Frozen implementation/test source: **3b56d820031e7234b32e87805248bde8f2441e35**. Fresh full CI/build and final artifact browser acceptance pass; final non-author local source/evidence review also passes. Later documentation-only commits must be explicitly reconciled with this source; no untested production artifact may be promoted.
 
-## Launch gate
+Lock SHA256:12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38. Scripts-enabled clean npm ci passed with1085 packages; the unchanged installed lock is reused. Host Node24.13.1/npm11.9.0/Java21.0.11; GitHub Linux/Node22 is a separate environment. Local production-mode artifacts contain synthetic Firebase settings and are not production-configured artifacts to deploy.
 
-| Category                    | Classification | Evidence and exact remaining gate                                                                                                                                                                         |
-| --------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WEB RELEASE                 | FAIL           | Read-only current live verifier6/8: Storage404 and published legal placeholders; updated-lock final CI/browser/database checks still pending                                                              |
-| PWA IPHONE                  | BLOCKED        | Worker/install prompt/mobile fixtures reviewed; physical Safari Add to Home Screen, standalone/auth/invite/upload/update/app-switch evidence unavailable                                                  |
-| PWA ANDROID                 | BLOCKED        | Browser install/offline/update behavior tested; physical Chrome installation/session/upload/sharing acceptance unavailable                                                                                |
-| PAYMENT SYSTEM              | BLOCKED        | Test-only adapter/atomic settlement/creator controls independently reviewed; approved sandbox/webhook/reconciliation/refund policy and production provider decision absent; live payments disabled        |
-| SECURITY                    | BLOCKED        | Bounded F/D/A/H reviews and focused negative/concurrency tests pass; patched-lock0critical/0high audit with moderate residuals; final complete checks and staging/provider/operational acceptance pending |
-| DATA RECOVERY               | BLOCKED        | No verified approved production backup/isolated restore/rollback rehearsal; staging resources/operator access required                                                                                    |
-| API/NATIVE READINESS        | BLOCKED        | Secure documented v1 foundation and contract fixes reviewed; integratedDB/staging/push acceptance pending; native mutation parity/builds are a separate future track                                      |
-| PONYTAIL INDEPENDENT REVIEW | BLOCKED        | Bounded non-author review cycles pass with corrected findings; exact integrated release review cannot accept unresolved CI/provider/device/recovery gates                                                 |
-| OVERALL PUBLIC LAUNCH       | BLOCKED        | Above launch-critical gates and explicit final owner promotion approval remain open                                                                                                                       |
+## Current evidence
 
-Native client delivery alone does not block web release. Shared authentication/storage/data defects do. A PWA is an installable web application; no native APK/IPA was built or claimed.
+| Gate                                              | Actual result                                                                                                                      |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Approved-policy unit regression                   | PASS32/32 after old007 RED24 PASS/8 FAIL; actual repository and allocator used                                                     |
+| Approved-policy actual database regression        | PASS34/34, unchanged test blob across old982 RED28/6, initial78 RED20/14 and correctedadb GREEN34/0; all original guards retained  |
+| Fresh format/lint/audit/types/full npm test/build | PASS at exact3b56d82;423 tests,0 failures/skips/cancellations;42-page final buildRk5aHEWUVu4sxKLFjosoY                             |
+| Fresh final-build public/authenticated browser    | PASS39 public checks/24 layouts and7 authenticated phases on Rk5; ordinary creator/member1000 both verified; lab budgets unchanged |
+| Final non-author Ponytail source/evidence review  | PASS for all9 corrections, exact423-test local CI and final39/7 artifact evidence; external launch approval excluded               |
+| Current production read-only verifier             | FAIL,6/8: published legal placeholders and configured Storage HTTP404                                                              |
+| GitHub merge protection                           | PASS, independently read back: required verify/app15368, strict up-to-date/admin enforcement; no force-push/deletion/auto-merge    |
 
-## Implemented and independently reviewed scope
+Failure histories, command statuses and environment limits remain in [test evidence](BONDCIRCLE_TEST_EVIDENCE.md), [current CI](AGENT_A_FINAL_CI_EVIDENCE.md), [browser evidence](AGENT_H_BROWSER_ACCEPTANCE.md), [allocation regression](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md) and [independent review](BONDCIRCLE_FINAL_INDEPENDENT_REVIEW.md). No passing subset is described as a green pipeline.
 
-- CI formatting/Java21 release checks and patched dependency lock; actual old-lock npmci completed, patched-lock clean install completed exit0/1085packages; final CI remains pending. No historic CI root cause fabricated from expired logs.
-- Verified-contact authorization, browser CSRF, production OTP fail-closed behavior, durable shared quotas, one-time proof before side effects, merged claims, persisted consent gates, safe errors/logs and partial-profile preservation. F's final focused account integration55/55 PASS; A closed replay/cursor findings after regressions.
-- Isolated Paystack test checkout/signature/server verification, exact amount/currency/creator/circle binding, durable checkout locks and guarded idempotent activation/upgrades; no invented success/live charges or custody changes.
-- Functional account/profile/settings, structured self-export and persisted privacy intake/operator queue, accessible dialogs, returning/reduced-motion splash and recoverable invitation continuation. Requests do not claim completed erasure.
-- PWA offline fallback/update/cache protections and recoverable iPhone/iPad/Android installation guidance; client multipart preparation for all five image callers preserves input allowance without silent resizing/drop. Incompressible aggregate image sets remain a disclosed hosting transport gap.
-- Versioned private API responses, persistent device ownership, actual lifecycle/OTP contracts and canonical production host; future native clients use the existing backend and authoritative rules.
+## Approved allocation policy
 
-## Owner register and rollout
+The owner explicitly approved keeping existing assigned amounts and splitting only the remaining target across unfilled places. Equal Gift and Support direct joins and approvals now use persisted joined assignments. Target3000, existing assigned1000 and capacity3→10 gives nine new shares223,223,222×7. Existing expected/confirmed amounts, including valid zero/unequal legacy values, remain fixed. Invalid negative/noninteger/over-target values, stale counts and exhausted capacity fail safely. The final place receives the remaining target directly.
 
-The short prioritized decision/access register is in BONDCIRCLE_PRODUCTION_REMEDIATION_LEDGER.md. It covers correct Vercel/Firebase staging access/billing and Storage, backup/restore operator/target, legal identity/support/privacy/incident contacts and professional review, payment provider/sandbox/refund policy, physical devices, upload transport resolution and final exact-commit promotion. Configure service credentials through approved service connections; do not put secrets in this repository or report.
+Atomic database updates guard capacity/use counters, activation, published lifecycle, revocation and current database-time expiry before membership insertion. Actual race/negative tests pass. No historical/customer amounts or confirmed payments were rewritten. The normative rule is recorded in docs/MODEL_SPECIFIC_PRICING.md; authorized historical allocation/counter audit remains an external rollout gate.
 
-No production secret/config change, real charge, live customer mutation, destructive migration, retention execution, public AppDeploy replacement, duplicate database, production promotion or unsolicited message occurred. Automatic approval review rejected recursive partial-dependency cleanup with reason “blocked by policy”; the directory remains untouched outside commits and no workaround was attempted.
+## Final classifications
 
-## Authoritative evidence
+| Category                    | Classification | Evidence / remaining gate                                                                                                                                                               |
+| --------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WEB RELEASE                 | FAIL           | Current live legal placeholders and configured Storage HTTP404; reviewed local engineering acceptance passes                                                                            |
+| PWA IPHONE                  | BLOCKED        | Physical Safari installation/standalone/auth/invite/upload/update/app-switch acceptance unavailable                                                                                     |
+| PWA ANDROID                 | BLOCKED        | Physical Chrome installation/session/sharing/upload/update acceptance unavailable                                                                                                       |
+| PAYMENT SYSTEM              | BLOCKED        | Test-only adapter/settlement reviewed; approved genuine sandbox/webhook/refund/reconciliation evidence absent; live charges disabled                                                    |
+| SECURITY                    | BLOCKED        | Reviewed hardening/regressions; deployed cross-user/configuration/exposure review and legal/incident/operator controls unavailable;8 production/15 full-tree moderate advisories remain |
+| DATA RECOVERY               | BLOCKED        | Recoverable backup, isolated restore, compatible additive rollout, legacy reconciliation and rollback rehearsal unavailable                                                             |
+| API/NATIVE READINESS        | BLOCKED        | Reviewed v1/device persistence foundation; staging/push/lifecycle fulfillment open. Native mutation parity/builds are a separate future track                                           |
+| PONYTAIL INDEPENDENT REVIEW | PASS           | Reviewed local source/all9 corrections/423-test CI/final39 public and7 authenticated phases; no production/provider/device approval                                                     |
+| OVERALL PUBLIC LAUNCH       | BLOCKED        | Infrastructure/legal/provider/device/recovery gates and final exact-commit production approval remain open                                                                              |
 
-- BONDCIRCLE_PRODUCTION_REMEDIATION_LEDGER.md: tasks, owners, dependencies, findings and required decisions.
-- BONDCIRCLE_TEST_EVIDENCE.md: commands/results and explicit simulated/local/provider/device boundaries.
-- BONDCIRCLE_PONYTAIL_REVIEW_LOG.md: independent decisions and corrections/retests.
-- BONDCIRCLE_ARCHITECTURE_AND_SECURITY_AUDIT.md, BONDCIRCLE_UX_AUDIT.md, BONDCIRCLE_PWA_ACCEPTANCE_MATRIX.md, BONDCIRCLE_PAYMENT_INTEGRATION_REPORT.md, BONDCIRCLE_API_NATIVE_READINESS.md and APPDEPLOY_FEASIBILITY_AND_NATIVE_HANDOFF.md: specialist handoff and remaining risks.
+Native client delivery alone does not delay the web release. A PWA is an installable web application; no APK/IPA was built or claimed.
 
-No public-launch PASS or legal/provider/device approval is granted by this report. Production promotion must target the exact subsequently accepted release commit after applicable gates close.
+## Implemented remediation
+
+- CI/dependencies/toolchain and deterministic SDK checks, bounded emulator readiness and required GitHub merge checks.
+- Verified contacts, cookie CSRF, production OTP fail-closed behavior, durable shared budgets, proof reservation before side effects, persisted consent, partial-profile preservation and safe errors/logs.
+- Test-only server-verified payment/settlement/idempotency/checkout locking and upgrade credit. Approved pricing/trials, creator-only activation fees and no custody of member contribution funds remain.
+- Functional profile/settings/export/privacy intake and owner queue; intake does not claim erasure. Existing design, dialogs, invitation continuation and returning-user splash improved.
+- Scoped complete history reads, retention/shared-file protection, Support/private-path/financial-metadata redaction, canonical private receipt URLs and authorization before upload side effects.
+- Owner-approved Equal allocations and transactional invitation capacity/use/lifecycle/expiry guards with causal regression tests.
+- Safe limited offline/Retry/cache/update behavior, installation guidance, all five multipart callers and measured responsive-image improvement. Dense maximum-size aggregate uploads and HEIC remain disclosed limits.
+- Corrected v1 authentication/error/lifecycle/OTP/domain contracts and persistent device ownership. AppDeploy: DEFER an isolated prototype; DO NOT USE as a production replacement.
+
+## Owner and operational gates
+
+The single [decision register](BONDCIRCLE_PRODUCTION_REMEDIATION_LEDGER.md#consolidated-owner-decision-register) specifies exactly what is needed:
+
+1. Owning Vercel/Firebase staging/Storage/billing access, exact live SHA mapping and approved upload transport resolution.
+2. Recoverable backup plus approved isolated restore/rollout/rollback target and operator; authorized legacy allocation/counter/orphan audit.
+3. Final legal identity, support/privacy/incident contacts, fulfillment operator and professional Nigerian legal/privacy review.
+4. Approved payment provider/sandbox/webhook target and refund/reconciliation operator; real email/cron/alert/retry evidence.
+5. Current physical iPhone and Android with approved test identities.
+6. Explicit production promotion approval only after the applicable gates close.
+
+Credentials belong in approved service connections, never reports/commits. Notification deduplication is not automatic SMTP retry; demonstrate operator alert/triage/retry/reconciliation. Whether previously found local privacy defects were deployed or historical overbooking/orphans exist requires authorized review. No customer records were inspected.
+
+No production deploy, real charge, production secret/configuration change, customer mutation, destructive migration, restore, retention execution, public pilot, AppDeploy deployment or replacement database occurred. Automatic approval review rejected recursive partial-dependency cleanup as “blocked by policy”; it remains untouched outside commits, with no workaround.
+
+All ten requested launch deliverables and agent/review evidence are indexed by the authoritative [remediation ledger](BONDCIRCLE_PRODUCTION_REMEDIATION_LEDGER.md). No overall public-launch PASS is granted.

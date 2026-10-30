@@ -1,62 +1,95 @@
 # BondCircle test evidence
 
-Started29 October2026; updated30 October2026 (Africa/Lagos). Integration branch: `codex/production-readiness`. This record is updated as checks finish; no historical counts imply current acceptance.
+Updated 30 October 2026 (Africa/Lagos). Integration: C:/Users/USER/Desktop/Bond Circle, codex/production-readiness. Baseline main c0b1f913caeeffee546f79e2804f2583f2963edd. This record separates current acceptance, preserved failures and external gates.
 
-## Baseline and completed bounded checks
+## Current source acceptance
 
-| Check                           | Actual result                              | Evidence / boundary                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository identity             | PASS                                       | Baseline local/GitHub main `c0b1f913caeeffee546f79e2804f2583f2963edd`, tree `d25b5b798b28aa70dabf74fbcc5252e5e85a77dc`; initially clean                                                                                                                                                                                                                                                                                 |
-| Baseline unit/integration run   | FAIL                                       | A: 129 tests, 127 passed, 2 failed; stale native resolver source assertions assigned to G; this does not justify reverting correct authentication code                                                                                                                                                                                                                                                                  |
-| Baseline formatting             | FAIL, corrected in bounded change          | A's formatted checkout full Prettier check passed; see AGENT_A_CI_EVIDENCE.md; integrated gate still required                                                                                                                                                                                                                                                                                                           |
-| Deadline scheduler regression   | PASS for bounded change                    | B and independently F each ran 21 tests with no failures; three new tests execute actual transpiled route; remaining checks include source contracts                                                                                                                                                                                                                                                                    |
-| Offline service worker          | PASS for bounded change                    | Parent: 6 actual-worker VM behavior tests and 5 existing PWA source tests passed (11 total); targeted ESLint passed. No physical installation result implied                                                                                                                                                                                                                                                            |
-| Loopback SMTP fixture           | PASS for bounded transport compatibility   | Parent: one real Nodemailer-to-loopback-SMTP transport test passed; authentication E2E now uses production OTP delivery mode, not development-code exposure                                                                                                                                                                                                                                                             |
-| Full final CI                   | PENDING REVIEW                             | Must run after integrations, including production build and both emulator suites                                                                                                                                                                                                                                                                                                                                        |
-| Fresh dependency installation   | PENDING REVIEW                             | Old-lock scripts-enabled npmci completed exit0/1086packages; superseded. Final patched-lock clean npmci completed exit0:1085packages, scripts enabled,24minutes,2026-10-30T00:23:29.9118764Z; exact lock SHA12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38 unchanged. InstalledNext16.4.3/Sharp0.35.5/Nodemailer10.1.4/TypeScript5.9.3 verified; TEMP/bondcircle-final-rc-install-status.json and.log |
-| Dependency vulnerability review | PASS for bounded high/critical remediation | Fresh original audit1critical/11high/8moderate; patched exact-lock production0critical/0high/8moderate and full0/0/15moderate; H independently inspected audit/integrity/compatibility. Final install/build and moderate residual assessment separate                                                                                                                                                                   |
+Owner decision BC-050: preserve existing assigned amounts and split only the remaining target across unfilled places. Source `78e459d` plus adb619c implements this for Equal Gift/Support direct joins and approvals. Existing expected/confirmed amounts remain unchanged. Query/schema/generated SDK/lock are unchanged from `00750cd` by these policy source edits.
 
-## Current production, read-only
+| Gate                                           | Actual result / scope                                                                                                                              |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approved-policy actual database regression     | PASS 34/34, zero failures/skips, source `adb619c` with unchanged test blob 525a51b85d1e4f985f88187d551da15e1bdf50c4; native compile/configure PASS |
+| Non-author source/database review              | PASS, bounded; final place, four complete upgrade sequences, concurrency, lifecycle and database-time expiry independently inspected               |
+| Approved-policy unit regression                | PASS32/32 on corrected source and independent exact3b56d82 rerun; old007 RED24 PASS/8 FAIL retained                                                |
+| Complete local CI                              | PASS at exact3b56d82: format/lint/high-threshold audit/types/full npm test/explicit build all exit0;423 tests,0 failures/skips/cancellations       |
+| Final artifact public/authenticated browser    | PASS public39/39 and7 named authenticated phases on exact3b56d82/buildRk5aHEWUVu4sxKLFjosoY; final non-author local source/evidence review PASS    |
+| Production/provider/device/recovery acceptance | BLOCKED; details below                                                                                                                             |
 
-Command: `npm run verify:production -- --base-url https://www.bondcircles.com --storage-bucket bond-circle.firebasestorage.app`.
+Actual database execution10:50:16.030–10:51:11.308UTC used fresh in-memory PGlite and local Data Connect, with notification delivery isolated. All four Gift/Support direct/approval upgrades fill nine places with [223,223,222,222,222,222,222,222,222] while creator assigned 1000/confirmed 700 remain unchanged. Existing zero/unequal amounts are preserved. Invalid amounts/over-target totals and stale/full/closed/revoked/expired/unpaid-draft cases reject safely. See [causal database evidence](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md). These stored-capacity fixtures do not claim payment checkout occurred.
 
-Actual exit status: 1. Six of eight checks passed:
+## Exact current local CI —3b56d82
 
-- PASS: HTTPS canonical origin, configuration-health response, browser security headers, manifest/service worker assets, crawler metadata, absence of exposed development-only codes on checked pages.
-- FAIL: published legal pages contain `pre-launch details required`.
-- FAIL: configured production Storage bucket returns HTTP 404. B independently confirmed with two provider endpoints.
+All six persisted command statuses name exact3b56d820031e7234b32e87805248bde8f2441e35 and lock12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38. Format, lint, high-threshold audit and types exit0. Complete npm test ran11:01:41.331–11:04:41.484UTC:367 unit/integration+1 production-mode local Auth/SMTP+55 actual database=**423 PASS**, zero failed/skipped/cancelled. Its internal build passed42 static pages. The separate final build ran11:04:50.218–11:05:25.288UTC, exit0,42 pages; actual BUILD_ID **Rk5aHEWUVu4sxKLFjosoY**.
 
-Health checks verify configuration, not successful database writes, backups, authorized storage operations or email delivery. No customer writes, payment, retention invocation or provider configuration change was performed.
+Before H service ownership,11:06:18.260UTC verification recorded clean tracked checkout, exact physical/committed lock equality and all ten owned ports closed. H browser acceptance on that artifact passes: public39/39 and all7 named authenticated phases; independent final local evidence review PASS. The earlier scripts-enabled clean install is reused at the unchanged lock; no fresh installation claim is made for3b56. Raw proof is CI tmp/launch-evidence/final-3b56d82 and the primary recovered copy. Independent final local evidence review PASS. This local synthetic artifact is not production-configured output.
 
-## Browser evidence
+The final non-author Ponytail reviewer independently read all six actual status records, lock/build bytes,423-test logs and the final immutable browser reports/screenshots. Verdict: **PASS for reviewed local source/evidence**; public launch remains **BLOCKED**. Hosted candidate CI remains pending publication.
 
-Bundled Playwright used an existing installed desktop Chromium executable. Public live sign-in screenshots were captured at 390, 768 and 1280 CSS pixels. At each width `document.documentElement.scrollWidth === innerWidth`; horizontal overflow assertion passed.
+## Installation and environment
 
-Local captures: `tmp/launch-evidence/sign-in-live-before-{390,768,1280}.png`. These are desktop browser viewports, not physical phones/tablets. The initial in-app-browser attempt timed out; bundled headless-shell was absent, so the existing full Chromium executable was used successfully without downloading another browser.
+Scripts-enabled clean npm ci completed2026-10-30T00:23:29.9118764Z, exit0,1085 packages. The unchanged committed lock SHA256 is12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38. It is reused for subsequent source-only checks; no fresh installation is invented.
 
-Initial harness wall times included navigation, heading wait and screenshot I/O on a heavily stalled host. They are not product latency or Core Web Vitals benchmarks. Controlled-network journey measurements remain NOT STARTED.
+Actual host: Node24.13.1/npm11.9.0/TemurinJRE21.0.11+10. Installed Next16.4.3, Sharp0.35.5, Nodemailer10.1.4, TypeScript5.9.3, FirebaseTools15.25.1. Exact-lock audit: zero critical/high,15 moderate full-tree findings including8 production-chain findings. See [dependency assessment](AGENT_A_DEPENDENCY_SECURITY.md); zero high/critical is not vulnerability-free.
 
-## Acceptance environments
+Production-mode local builds use synthetic Firebase values and guarded loopback DNS/SMTP/Auth/Data Connect. They are not production-configured artifacts to promote. Linux/Node22 GitHub Actions remains a separate verification environment until a hosted result is recorded.
 
-| Environment / provider journey                          | Status         | Needed                                                                                        |
-| ------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------- |
-| Physical iPhone Safari and installed PWA                | BLOCKED        | Actual device, approved staging/test identity, recorded install/auth/upload/recovery journey  |
-| Physical Android Chrome and installed PWA               | BLOCKED        | Actual device, approved staging/test identity, recorded journey                               |
-| Desktop browser complete authenticated journeys         | PENDING REVIEW | Integrated local/emulator candidate; public sign-in baseline is insufficient                  |
-| Safari / VoiceOver                                      | BLOCKED        | Supported browser/device and assistive-technology test                                        |
-| Staging storage / persistence / SMTP                    | BLOCKED        | Approved staging resources and credentials, no production credentials reused                  |
-| Payment provider sandbox                                | BLOCKED        | Approved provider and sandbox configuration; pure mocks are not provider acceptance           |
-| Database backup / restore and Vercel rollback rehearsal | BLOCKED        | Correct provider scope, approved isolated restore/rollback target and owner/operator evidence |
+## Preserved causal and historical results
 
-Full journey acceptance and final exact-commit evidence are pending. Source assertions, module tests, emulator tests and real provider/device tests are reported separately.
+| Source / check                         | Actual result / correction                                                                                                                                                                                                 |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Baseline129 unit/integration           | 127 PASS/2 FAIL; stale native source-name expectations replaced with actual handler/auth regressions                                                                                                                       |
+| Initial full integration               | Formatting/type/prerender/fixture failures retained and corrected, including real recovery Suspense and no altered health success behavior                                                                                 |
+| 129f1e1 complete local CI              | 350 PASS =328 unit/integration+1 local Auth/SMTP+21 actual DB; all six commands PASS, buildRPkt0JpvTKX8H-5okJbgd                                                                                                           |
+| 7e4b76c full test                      | FAIL at locked Firebase CLI configure before native HTTP readiness; prior unit result does not imply Auth/DB completion                                                                                                    |
+| 4008ace complete local CI              | 354 PASS =332+1+21; all six commands PASS, buildC9BwsS1dP5v77CXiA9lsW; bounded test-only readiness correction                                                                                                              |
+| c296297 complete local CI              | 357 PASS =335+1+21; all six commands PASS, buildLj4cseoIXmldPNwpBuEcd                                                                                                                                                      |
+| c296/007 ordinary browser              | 39 public checks/24 layouts and7 named authenticated phases PASS; later007 assertions verify both ordinary creator/member 1000. Earlier c296 screenshots exposed omitted amount assertions; no upgrade acceptance inferred |
+| Initial Equal allocation22 actual DB   | 2 PASS/20 outcome FAIL, including genuine capacity/use races and zero assigned shares                                                                                                                                      |
+| 0339082 no-op guard prototype          | Initial22 cases:10 PASS/12 FAIL, including two invalid fixtures subsequently corrected; genuine duplicate-write counter/race defects remained. Replaced by single guarded actual writes                                    |
+| c523/982 corrected guards              | 24 then27 ordinary/race/expiry/pending cases PASS; the additional upgrade case still FAIL until policy approval                                                                                                            |
+| 00750cd complete npm test              | FAIL: build PASS,361 unit/integration=357 PASS/4 upgrade FAIL; no skips/cancellations, automatic Auth/DB stages not reached                                                                                                |
+| 00750cd separate checks                | Format/lint/audit/types/build PASS; separate Auth1 PASS; separate DB49=47 PASS/2 FAIL                                                                                                                                      |
+| 6f75f4a fixture-only DB follow-up      | 49=48 PASS/1 upgrade FAIL; positive fixture corrected to actual grandfathered active Custom Gift, with all existing assertions retained                                                                                    |
+| Approved-policy tests on old982 helper | 34=28 PASS/6 FAIL, unchanged new-policy test blob                                                                                                                                                                          |
+| Initial policy source `78e459d`        | 34=20 PASS/14 FAIL; group-size helper rejected final remaining place1                                                                                                                                                      |
+| Corrected source `adb619c`             | Unchanged34 PASS/0 FAIL/0 SKIP; final place directly receives remaining target                                                                                                                                             |
 
-## Integrated correction checks — 30 October2026
+Failures are not combined with separate runs into a passing pipeline. Detailed command statuses, UTC times, exact commits, lock hashes and fixture limits are in [Agent A CI](AGENT_A_FINAL_CI_EVIDENCE.md), [H browser](AGENT_H_BROWSER_ACCEPTANCE.md), [H database](AGENT_H_DATABASE_ACCEPTANCE.md), [allocation regression](AGENT_H_INVITATION_ALLOCATION_REGRESSION.md) and [independent review](BONDCIRCLE_FINAL_INDEPENDENT_REVIEW.md).
 
-- Shared contact/CAS/recovery/registration/security focused run:31 PASS, zero failures. Public-error/profile checks initially4 PASS; after legal-responder correction5 PASS. Account/legal/profile/public-error integration15 PASS. These execute actual transpiled source with isolated provider boundaries.
-- Payment/UX/privacy integration:46 checks initially45 PASS/one fixture dependency failure; corrected legal session fixture then15/15 related checks PASS. Neither the fixture failure nor its correction is represented as a live provider defect.
-- Web/native OTP/auth/OpenAPI integrated run:24 PASS, zero failures/skips, including consumed-proof409 with zero provider/profile access. G isolated correction43 focused checks PASS; scoped lint/typecheck PASS.
-- H full integrated unit run before final fixture corrections:267 tests,263 PASS,4 FAIL, no skips. Failures were stale outage-copy/token-model assertions and two missing response-helper fixture dependencies. H corrected the two source assertions with parent review; parent corrected the two helper fixtures and reran17 relevant tests PASS. Final complete rerun remains required.
-- Deadline offset concurrency defect was independently reproduced by A. Replaced offset with parameterized server-only SQL UUID cursor; combined schema/connector compile exited0 with metadata only and no error list. Three actual-module regressions PASS:501 eligible circles,401 with concurrent earlier closure, malformed nativeSQL rows fail closed. Real SQL/UUID/null-cursor E2E is added and pending H execution.
-- H independently checked exact patched-lock audit/integrity and actual Nodemailer10 transport; E upload helper/five callers in a separate browser fixture passed9 checks. Both reviews retain finalCI/provider/device limits.
+## Production read-only verification
 
-Raw transient logs/screenshots are ignored under tmp/launch-evidence and task-specific TEMP paths. Durable conclusions and command boundaries are in this file and linked review records. Do not attach raw OTPs, credentials, customer records or provider payloads.
+Command: npm run verify:production -- --base-url https://www.bondcircles.com --storage-bucket bond-circle.firebasestorage.app. Fresh post-restart result: exit1,6/8 PASS.
+
+- PASS: HTTPS canonical origin, configuration-health response, security headers, manifest/service worker assets, crawler metadata and no development-only codes on checked pages.
+- FAIL: legal pages contain “pre-launch details required”.
+- FAIL: configured Storage bucket returns HTTP404 on two provider endpoints. Thirteen inspected public client chunks confirm this bucket without printing configuration keys.
+
+Health is configuration evidence, not hosted CRUD/delivery/recovery proof. Owning Vercel scope remains inaccessible, so live deployment SHA/configuration/rollback relationship is unverified. No authenticated production request/customer write/provider change was performed.
+
+GitHub main now requires actual verify/app15368 with strict up-to-date checking and administrator enforcement; force pushes/deletion and auto-merge remain off. Fresh non-author API/workflow readback PASS. No merge/deploy/test merge occurred; a hosted candidate result must be reported separately.
+
+## Acceptance environments and limitations
+
+| Environment / journey                            | Status         | Required evidence                                                                                       |
+| ------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------- |
+| Physical iPhone Safari/installed PWA             | BLOCKED        | Actual install, standalone auth/invite/upload/app-switch/offline/update journey                         |
+| Physical Android Chrome/installed PWA            | BLOCKED        | Actual installation/session/sharing/upload/recovery journey                                             |
+| Desktop local browser                            | PASS           | Current exact3b56/buildRk5 public39 and7 authenticated phases; Edge viewports are simulated devices     |
+| Desktop Chrome                                   | PENDING REVIEW | Installed executable verified; unchanged final-build suite running separately, Edge proof retained      |
+| Safari/VoiceOver/other real assistive technology | BLOCKED        | Supported device/browser and operator testing                                                           |
+| Genuine staging Storage/SMTP/persistence         | BLOCKED        | Approved resources/credentials; upload/read/replace/delete, failures and recovery                       |
+| Approved payment sandbox/webhooks/refunds        | BLOCKED        | Provider approval, actual sandbox and reconciliation/refund operator; mocks are not provider acceptance |
+| Backup/restore/compatible rollout/rollback       | BLOCKED        | Recoverable backup and approved isolated rehearsal target/operator                                      |
+| Legacy allocation/counter reconciliation         | BLOCKED        | Authorized audit of historical overbooking/drift/invalid amounts; no production rewrite                 |
+| Dense individually-valid5MB image combinations   | BLOCKED        | Approved transport resolution; current client rejects aggregate hosting overflow safely                 |
+| Legal/privacy/incident/notification operations   | BLOCKED        | Identity/contacts/professional review, fulfillment and alert/retry/reconciliation evidence              |
+
+Controlled browser lab budgets remain LCP≤2500ms, CLS≤0.1, interaction≤200ms and warm unauthenticated session APIp95≤800ms, under150ms added latency/1.6Mbpsdown/750kbpsup/4xCPU. Historical007 samples passed: sign-in1032/1084/1156ms, onboarding1076/1344/2228ms, CLS0.024387, interaction≤38.9ms,20-sample warm unauthenticatedp95=7.94ms; responsive image640px/24,062bytes. Small local lab samples are not fieldp75/INP or authenticated database latency. Current Rk5 lab samples also pass: sign-in1188/1220/1572ms, onboarding1144/1144/1104ms, maximum CLS0.024387, next-screen76.9/40.8/30.8ms,20-sample warm unauthenticated APIp95=23.22ms. Wrapper11:06:48–11:09:04UTC exits0 with public39/39 and7 named authenticated phases. Its8 authenticated-report entries include one delegated public-suite check. Both ordinary creator and joined member display1000 expected; invitation amount is omitted. H records CI clean and all ten ports closed after execution. No provider/device acceptance is inferred.
+
+## Evidence custody and publication hygiene
+
+Ignored raw proof stays under tmp/launch-evidence and specialist worktrees. Primary recovered bundles include qa-h-007-final-browser-20261030T1036, qa-h-owner-policy-db-20261030T1051 and qa-h-3b56d82-final-browser-20261030T1109. Do not publish raw OTPs, invitation tokens, credentials, provider payloads or customer records.
+
+Publication scan10:55:09.912UTC at377ebcd covered baseline-to-HEAD and pending reports:242 files,233 text/9 binary, no unreadable files and no high-confidence private-key/GitHub/OAuth/full-JWT/live-key markers. Scope excludes ignored artifacts, prior history, unchanged baseline, image OCR and live-key validation. The pre-publication refresh at11:16:42.292UTC on4119b5d plus pending reports again covered242 files/233 text/9 binary with zero unreadable files or high-confidence markers; raw summary is tmp/launch-evidence/publication/hygiene-before-publication.json. Earlier PNG provenance/metadata checks remain separately documented. This is bounded hygiene, not complete secret certification.
+
+Automatic approval review rejected recursive cleanup of node_modules.partial with reason “blocked by policy”. It remains untouched and excluded from commits; no workaround was attempted. No production deployment, real charge, production secret change, customer mutation, destructive migration, restore or public pilot occurred.

@@ -1,6 +1,8 @@
 # BondCircle UX and account completion audit
 
-Date: 29 October 2026 (Africa/Lagos). Owner: Agent D. Branch: `codex/launch-ux`. Implementation acceptance: **PENDING REVIEW**; this report is not an author approval.
+Current local verification at exact3b56d82: all six CI gates PASS,423 tests (367 unit/integration+1 local Auth/SMTP+55 actual database), zero failures/skips/cancellations. Final buildRk5aHEWUVu4sxKLFjosoY also passes39 public checks and7 named authenticated browser phases. Final non-author local source/evidence review PASS; production/provider/device/recovery acceptance remains separately BLOCKED. Earlier results below are scoped history; authoritative current evidence is BONDCIRCLE_TEST_EVIDENCE.md.
+
+Date: 29 October 2026 (Africa/Lagos). Owner: Agent D. Branch: `codex/launch-ux`. Bounded implementation acceptance: **PASS** through the final non-author review; genuine provider/device/operational acceptance remains **BLOCKED**.
 
 ## Scope and source of truth
 
@@ -44,7 +46,7 @@ Reviewed current primary product/help pages. [Partiful's RSVP flow](https://part
 - Final focused related unit/source suites: **50 tests passed, zero failures**, exit 0. This includes 15 new actual-module/component-harness checks; the existing source assertions do not establish provider/browser journey acceptance.
 - `tsc --noEmit`, touched-file ESLint and touched-file Prettier checks passed. An initial typecheck found two new type issues, corrected before rechecking; an initial effect lint finding was corrected by separating asynchronous reading from state callbacks.
 - Native Data Connect toolkit 3.4.16 `build --config_dir=<worktree>/dataconnect` returned connector metadata without errors. It found and led to correction of unsupported selection sets on scalar key outputs. No SDK regeneration, migration or deployment was performed by D.
-- Added loopback-only `tests/e2e/account-privacy.test.mjs` for the integrated Data Connect runner: actual repository/query execution, two-user redaction, concurrent intake, owner acknowledgment/audit, nonexistent-reference rejection and preservation of account/shared data/device registration. It depends on G's device-registration operations in the integrated schema. It is **PENDING REVIEW/EXECUTION** by H; it has not been reported passing here.
+- Added loopback-only `tests/e2e/account-privacy.test.mjs` for the integrated Data Connect runner: actual repository/query execution, two-user redaction, concurrent intake, owner acknowledgment/audit, nonexistent-reference rejection and preservation of account/shared data/device registration. It depends on G's device-registration operations in the integrated schema. H subsequently passed this actual database scenario; the final updated-lock pipeline also passed all21 database cases across five suites. This does not establish operational fulfillment of real privacy requests.
 
 ## Browser evidence and limits
 
@@ -65,3 +67,11 @@ Existing installed desktop Chromium was used through bundled Playwright, without
 | Legal approval and operational privacy fulfillment                                               | BLOCKED        | Owner identity/contacts/operator and professional review                                                                         |
 
 No overall UX, security, PWA or public-launch PASS is granted by this implementation report. Pricing panels are owned by C, PWA by E, API contracts by G and integrated acceptance by H; the central ledger reconciles their evidence.
+
+## Integrated verification update — 30 October 2026
+
+Independent F review closed account/export/legal boundaries after corrections. Fresh final review closed the shared dashboard/history/public projection defects, and exact129f1e1 passed all required local CI commands and350 tests, including actual local Auth/SMTP and database privacy scenarios. Component preview and module results remain separately labelled. H is executing the final full-application public/authenticated browser checks; actual results belong in BONDCIRCLE_TEST_EVIDENCE.md and the final QA report. Unavailable real-device, provider, Storage, screen-reader and complete staging-pilot journeys remain BLOCKED.
+
+## Approved Equal allocation clarity
+
+Gift and Support creation forms now say: “Unfilled places share the remaining target. Assigned amounts stay fixed.” This matches the owner-approved 30 October 2026 rule for joining after a capacity upgrade. Existing expected/confirmed values are preserved. See docs/MODEL_SPECIFIC_PRICING.md for authoritative calculation and AGENT_H_INVITATION_ALLOCATION_REGRESSION.md for actual database evidence. Fresh Rk5 browser acceptance passes39 public/seven named authenticated phases; actual upgrade allocation is verified in the database suite. Physical devices/provider acceptance remains separate.
