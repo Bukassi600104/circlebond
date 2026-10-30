@@ -35,3 +35,13 @@ Production dependency-audit acceptance remains with Agent F and final CI. No rea
 The [GitHub Vercel status](https://vercel.com/bond-circle/circlebond/H9WBdHwjC4dVmW1T2HwexZ6E5pBt) for the baseline SHA reports success. It references team slug `bond-circle`, project `circlebond`, deployment `H9WBdHwjC4dVmW1T2HwexZ6E5pBt`. It does **not** prove that `www.bondcircles.com` currently serves that build. Alias lookup in the default connected Vercel scope returned no matches; the parent is reconciling production access separately. No deployment, push, provider change, production data write or charge occurred.
 
 Overall CI acceptance remains FAIL until the two confirmed baseline test failures are fixed and the exact integrated release candidate passes all required gates and independent review.
+
+## Final security-lock clean install — 30 October 2026
+
+**PASS**: `npm ci --prefer-offline --no-audit` completed with exit code 0 at `2026-10-30T00:23:29.9118764Z`, adding 1,085 packages in 24 minutes. Lifecycle scripts were enabled. Task-local fetch timeout was 30 seconds with one retry; global npm settings were unchanged. The isolated worktree had a real `node_modules` directory, not a junction to the desktop checkout. No competing install ran.
+
+The lockfile SHA-256 before and after installation was `12cb493a8918761ed4c9af7ac7c8f93b42786953efe394f14d19baf16ccb5e38`. Installed package metadata independently confirmed Next.js `16.4.3`, matching `eslint-config-next`, Sharp `0.35.5`, Nodemailer `10.1.4` and TypeScript `5.9.3`. The earlier successful old-lock install is superseded.
+
+Persisted raw evidence: `TEMP/bondcircle-final-rc-install-status.json` and `TEMP/bondcircle-final-rc-install.log`. The status records the exact command, exit code, completion timestamp, enabled scripts and lock hash. Preserve these files before worktree cleanup.
+
+The `--no-audit` install flag did not waive the separate audit gate. The exact-lock production/full-tree audits and remaining moderate findings are documented in `AGENT_A_DEPENDENCY_SECURITY.md`; both audit commands exited zero at the high-severity threshold, with zero critical/high findings. This install result alone does not accept the final application build, native image processing, SMTP provider, browser journeys or launch. Those integrated checks belong to independent Agent H and the central ledger.
