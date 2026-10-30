@@ -18,12 +18,17 @@ export function DialogOverlay({
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
+    const previousFocus = document.activeElement;
     const overflow = document.body.style.overflow;
     dialog?.showModal();
     document.body.style.overflow = "hidden";
     return () => {
       dialog?.close();
       document.body.style.overflow = overflow;
+      // React can detach the dialog before native close restores its opener.
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
     };
   }, []);
   return (

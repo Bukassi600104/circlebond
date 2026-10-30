@@ -203,7 +203,7 @@ test("dialog overlay uses native modal isolation, backdrop/Escape dismissal and 
       },
       "react/jsx-runtime": { jsx: (type, props) => ({ type, props }) },
     },
-    { document },
+    { document, HTMLElement: class {} },
   );
   const element = DialogOverlay({
     children: "Content",
@@ -404,5 +404,47 @@ test("returning and reduced-motion splash navigation skips the decorative wait e
     effect();
     assert.equal(delay, scenario.delay);
     assert.equal(target, scenario.target);
+  }
+});
+
+test("dialog cleanup restores the connected opener after native close without scrolling", async () => {
+  for (const connected of [true, false]) {
+    let effect;
+    const events = [];
+    class HTMLElement {
+      isConnected = connected;
+      focus(options) {
+        assert.equal(options.preventScroll, true);
+        events.push("focus");
+      }
+    }
+    const opener = new HTMLElement();
+    const { DialogOverlay } = await load(
+      "components/ui/DialogOverlay.tsx",
+      {
+        react: {
+          useRef: () => ({
+            current: { showModal() {}, close: () => events.push("close") },
+          }),
+          useEffect: (callback) => {
+            effect = callback;
+          },
+        },
+        "react/jsx-runtime": { jsx: (type, props) => ({ type, props }) },
+      },
+      {
+        document: { activeElement: opener, body: { style: { overflow: "" } } },
+        HTMLElement,
+      },
+    );
+    DialogOverlay({
+      children: "Content",
+      className: "test",
+      labelledBy: "title",
+      onClose() {},
+    });
+    const cleanup = effect();
+    cleanup();
+    assert.deepEqual(events, connected ? ["close", "focus"] : ["close"]);
   }
 });
