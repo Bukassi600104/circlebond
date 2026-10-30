@@ -1699,6 +1699,7 @@ export interface GetCircleEngineRecordData {
     type: string;
     description: string;
     targetAmount: number;
+    contributionMode?: string | null;
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
@@ -1723,6 +1724,7 @@ export interface GetCircleEngineRecordData {
   } & Circle_Key;
   circleMemberships: ({
     role: string;
+    expectedAmount: number;
     membershipStatus: string;
     user: {
       id: string;
@@ -10432,10 +10434,10 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AcceptInvitationWithMembership` Mutation is of type `AcceptInvitationWithMembershipData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface AcceptInvitationWithMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -10505,10 +10507,10 @@ export default function AcceptInvitationWithMembershipComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.circleMembership_insert);
-    console.log(mutation.data.invitationAcceptance_insert);
     console.log(mutation.data.circle_update);
     console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleMembership_insert);
+    console.log(mutation.data.invitationAcceptance_insert);
     console.log(mutation.data.circleAuditEntry_insert);
     console.log(mutation.data.activityLog_insert);
   }
@@ -10547,8 +10549,9 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RequestInvitationApproval` Mutation is of type `RequestInvitationApprovalData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface RequestInvitationApprovalData {
+  circleApprovalRequestGuard: number;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  invitation_update?: Invitation_Key | null;
+  invitation_update: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -10612,6 +10615,7 @@ export default function RequestInvitationApprovalComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
+    console.log(mutation.data.circleApprovalRequestGuard);
     console.log(mutation.data.invitationAcceptance_insert);
     console.log(mutation.data.invitation_update);
     console.log(mutation.data.circleAuditEntry_insert);
@@ -11025,10 +11029,10 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ApproveInvitationMembership` Mutation is of type `ApproveInvitationMembershipData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface ApproveInvitationMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_update?: InvitationAcceptance_Key | null;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -11099,10 +11103,10 @@ export default function ApproveInvitationMembershipComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.circleMembership_insert);
-    console.log(mutation.data.invitationAcceptance_update);
     console.log(mutation.data.circle_update);
     console.log(mutation.data.invitation_update);
+    console.log(mutation.data.circleMembership_insert);
+    console.log(mutation.data.invitationAcceptance_update);
     console.log(mutation.data.circleAuditEntry_insert);
     console.log(mutation.data.activityLog_insert);
   }

@@ -2068,6 +2068,7 @@ export interface GetCircleEngineRecordData {
     type: string;
     description: string;
     targetAmount: number;
+    contributionMode?: string | null;
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
@@ -2092,6 +2093,7 @@ export interface GetCircleEngineRecordData {
   } & Circle_Key;
   circleMemberships: ({
     role: string;
+    expectedAmount: number;
     membershipStatus: string;
     user: {
       id: string;
@@ -13098,10 +13100,10 @@ Recall that executing the `AcceptInvitationWithMembership` mutation returns a `M
 The `data` property is an object of type `AcceptInvitationWithMembershipData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface AcceptInvitationWithMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -13135,20 +13137,20 @@ const { data } = await acceptInvitationWithMembership({ invitationId: ..., circl
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await acceptInvitationWithMembership(dataConnect, acceptInvitationWithMembershipVars);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_insert);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 acceptInvitationWithMembership(acceptInvitationWithMembershipVars).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_insert);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_insert);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -13186,20 +13188,20 @@ const ref = acceptInvitationWithMembershipRef(dataConnect, acceptInvitationWithM
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_insert);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_insert);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_insert);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -13251,8 +13253,9 @@ Recall that executing the `RequestInvitationApproval` mutation returns a `Mutati
 The `data` property is an object of type `RequestInvitationApprovalData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface RequestInvitationApprovalData {
+  circleApprovalRequestGuard: number;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  invitation_update?: Invitation_Key | null;
+  invitation_update: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -13280,6 +13283,7 @@ const { data } = await requestInvitationApproval({ invitationId: ..., circleId: 
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await requestInvitationApproval(dataConnect, requestInvitationApprovalVars);
 
+console.log(data.circleApprovalRequestGuard);
 console.log(data.invitationAcceptance_insert);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
@@ -13287,6 +13291,7 @@ console.log(data.circleAuditEntry_insert);
 // Or, you can use the `Promise` API.
 requestInvitationApproval(requestInvitationApprovalVars).then((response) => {
   const data = response.data;
+  console.log(data.circleApprovalRequestGuard);
   console.log(data.invitationAcceptance_insert);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
@@ -13320,6 +13325,7 @@ const ref = requestInvitationApprovalRef(dataConnect, requestInvitationApprovalV
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
+console.log(data.circleApprovalRequestGuard);
 console.log(data.invitationAcceptance_insert);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
@@ -13327,6 +13333,7 @@ console.log(data.circleAuditEntry_insert);
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
+  console.log(data.circleApprovalRequestGuard);
   console.log(data.invitationAcceptance_insert);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
@@ -13863,10 +13870,10 @@ Recall that executing the `ApproveInvitationMembership` mutation returns a `Muta
 The `data` property is an object of type `ApproveInvitationMembershipData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface ApproveInvitationMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_update?: InvitationAcceptance_Key | null;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -13901,20 +13908,20 @@ const { data } = await approveInvitationMembership({ invitationId: ..., circleId
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await approveInvitationMembership(dataConnect, approveInvitationMembershipVars);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_update);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 approveInvitationMembership(approveInvitationMembershipVars).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_update);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_update);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -13953,20 +13960,20 @@ const ref = approveInvitationMembershipRef(dataConnect, approveInvitationMembers
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_update);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_update);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_update);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });

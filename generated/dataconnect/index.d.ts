@@ -16,10 +16,10 @@ export interface AbuseAttempt_Key {
 }
 
 export interface AcceptInvitationWithMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -76,10 +76,10 @@ export interface Announcement_Key {
 }
 
 export interface ApproveInvitationMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_update?: InvitationAcceptance_Key | null;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -1158,6 +1158,7 @@ export interface GetCircleEngineRecordData {
     type: string;
     description: string;
     targetAmount: number;
+    contributionMode?: string | null;
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
@@ -1182,6 +1183,7 @@ export interface GetCircleEngineRecordData {
   } & Circle_Key;
   circleMemberships: ({
     role: string;
+    expectedAmount: number;
     membershipStatus: string;
     user: {
       id: string;
@@ -2717,8 +2719,9 @@ export interface ReportCommentWithAuditVariables {
 }
 
 export interface RequestInvitationApprovalData {
+  circleApprovalRequestGuard: number;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  invitation_update?: Invitation_Key | null;
+  invitation_update: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 
