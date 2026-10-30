@@ -57,6 +57,9 @@ const { chromium } = await import(
 const { startSmtpSink } = await import(
   pathToFileURL(resolve(root, "tests/helpers/smtp-sink.mjs"))
 );
+const { startDnsSink, E2E_EMAIL_DOMAIN } = await import(
+  pathToFileURL(resolve(root, "tests/helpers/dns-sink.mjs"))
+);
 const evidence = resolve(root, "tmp/launch-evidence/authenticated-browser");
 await mkdir(evidence, { recursive: true });
 const report = {
@@ -65,7 +68,7 @@ const report = {
   }).trim(),
   startedAt: new Date().toISOString(),
   scope:
-    "Synthetic loopback Auth/DataConnect/SMTP, actual UI OTP exchange; no Storage/provider/device acceptance",
+    "Synthetic loopback Auth/DataConnect/SMTP/DNS, actual UI OTP exchange; no Storage/provider/device acceptance",
   checks: [],
 };
 const secrets = new Set();
@@ -89,6 +92,7 @@ async function check(name, action) {
   }
 }
 const smtp = await startSmtpSink();
+const dns = await startDnsSink();
 const env = {
   ...process.env,
   NODE_ENV: "production",
@@ -96,7 +100,7 @@ const env = {
   NEXT_PUBLIC_APP_URL: base.origin,
   AUTH_EMAIL_OTP_MODE: "production",
   AUTH_EMAIL_SMTP_URL: smtp.url,
-  AUTH_EMAIL_FROM: "BondCircle QA <synthetic@example.test>",
+  AUTH_EMAIL_FROM: `BondCircle QA <synthetic@${E2E_EMAIL_DOMAIN}>`,
   AUTH_CHALLENGE_SECRET:
     "local-qa-synthetic-only-secret-more-than-thirty-two-bytes",
   ACTIVATION_PAYMENT_PROVIDER: "",
@@ -113,6 +117,8 @@ const log = createWriteStream(resolve(evidence, "server.log"));
 const server = spawn(
   process.execPath,
   [
+    "--import",
+    dns.preload,
     "node_modules/next/dist/bin/next",
     "start",
     "--hostname",
@@ -178,6 +184,11 @@ async function signIn(page, email, next, fromInvitation = false) {
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   const response = await issued;
   assert.equal(response.status(), 202);
+  assert.ok(
+    dns.queries.some(
+      ({ name, type }) => name === E2E_EMAIL_DOMAIN && type === 15,
+    ),
+  );
   const challenge = await response.json();
   secrets.add(challenge.challengeId);
   assert.equal(challenge.developmentCode, undefined);
@@ -274,7 +285,7 @@ try {
     async () => {
       ownerId = await signIn(
         ownerPage,
-        `qa-organizer-${suffix}@example.com`,
+        `qa-organizer-${suffix}@${E2E_EMAIL_DOMAIN}`,
         "/account/create?type=gift",
       );
       await ownerPage
@@ -355,7 +366,7 @@ try {
     async () => {
       memberId = await signIn(
         memberPage,
-        `qa-member-${suffix}@example.com`,
+        `qa-member-${suffix}@${E2E_EMAIL_DOMAIN}`,
         invitationPath,
         true,
       );
@@ -492,6 +503,7 @@ try {
   server.kill();
   await Promise.race([stopped, new Promise((done) => setTimeout(done, 5000))]);
   await smtp.close();
+  await dns.close();
   log.end();
   report.completedAt = new Date().toISOString();
   report.result = report.checks.some((entry) => entry.status === "FAIL")
