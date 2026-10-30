@@ -1770,7 +1770,7 @@ mutation AcceptInvitationWithMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleJoinGuard: circle_updateMany(
+  circle_update: circle_updateMany(
     where: {
       id: { eq: $circleId }
       memberCount: { eq_expr: "vars.nextMemberCount - 1" }
@@ -1779,13 +1779,13 @@ mutation AcceptInvitationWithMembership(
       activationStatus: { in: ["active", "grandfathered"] }
       requireCreatorApproval: { eq: false }
     }
-    data: { updatedAt: $respondedAt }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
   )
     @check(
       expr: "this == 1"
       message: "Circle membership or availability changed"
     )
-  invitationJoinGuard: invitation_updateMany(
+  invitation_update: invitation_updateMany(
     where: {
       id: { eq: $invitationId }
       circleId: { eq: $circleId }
@@ -1795,7 +1795,13 @@ mutation AcceptInvitationWithMembership(
       expiresAt: { gt_expr: "request.time" }
       requireApproval: { eq: false }
     }
-    data: { updatedAt: $respondedAt }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      acceptedBy: { id: $userId }
+      updatedAt: $respondedAt
+    }
   )
     @check(
       expr: "this == 1"
@@ -1820,20 +1826,6 @@ mutation AcceptInvitationWithMembership(
       status: "accepted"
       createdAt: $respondedAt
       respondedAt: $respondedAt
-    }
-  )
-  circle_update(
-    key: { id: $circleId }
-    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
-  )
-  invitation_update(
-    key: { id: $invitationId }
-    data: {
-      state: $nextInvitationState
-      useCount: $nextUseCount
-      acceptedAt: $respondedAt
-      acceptedBy: { id: $userId }
-      updatedAt: $respondedAt
     }
   )
   circleAuditEntry_insert(
@@ -2153,7 +2145,7 @@ mutation ApproveInvitationMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleJoinGuard: circle_updateMany(
+  circle_update: circle_updateMany(
     where: {
       id: { eq: $circleId }
       memberCount: { eq_expr: "vars.nextMemberCount - 1" }
@@ -2161,13 +2153,13 @@ mutation ApproveInvitationMembership(
       status: { in: ["published", "active", "target_reached", "fulfilment"] }
       activationStatus: { in: ["active", "grandfathered"] }
     }
-    data: { updatedAt: $respondedAt }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
   )
     @check(
       expr: "this == 1"
       message: "Circle membership or availability changed"
     )
-  invitationJoinGuard: invitation_updateMany(
+  invitation_update: invitation_updateMany(
     where: {
       id: { eq: $invitationId }
       circleId: { eq: $circleId }
@@ -2176,7 +2168,12 @@ mutation ApproveInvitationMembership(
       state: { in: ["created", "sent", "opened", "approval_pending"] }
       expiresAt: { gt_expr: "request.time" }
     }
-    data: { updatedAt: $respondedAt }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      updatedAt: $respondedAt
+    }
   )
     @check(
       expr: "this == 1"
@@ -2197,19 +2194,6 @@ mutation ApproveInvitationMembership(
   invitationAcceptance_update(
     key: { invitationId: $invitationId, userId: $userId }
     data: { status: "accepted", respondedAt: $respondedAt }
-  )
-  circle_update(
-    key: { id: $circleId }
-    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
-  )
-  invitation_update(
-    key: { id: $invitationId }
-    data: {
-      state: $nextInvitationState
-      useCount: $nextUseCount
-      acceptedAt: $respondedAt
-      updatedAt: $respondedAt
-    }
   )
   circleAuditEntry_insert(
     data: {
