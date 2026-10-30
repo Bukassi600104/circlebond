@@ -31,7 +31,7 @@ async function repository(beforeMutation = async () => {}) {
   const connection = {
     executeQuery: (...args) => database.executeQuery(...args),
     executeMutation: async (operation, variables) => {
-      await beforeMutation(operation);
+      await beforeMutation(operation, variables);
       return database.executeMutation(operation, variables);
     },
   };
@@ -435,7 +435,12 @@ for (const approval of [false, true]) {
   });
 }
 
-async function expireInvitation(fixture, created, detail) {
+async function expireInvitation(
+  fixture,
+  created,
+  detail,
+  expiresAt = new Date(Date.now() - 1000).toISOString(),
+) {
   await database.upsert("invitation", {
     id: created.id,
     circleId: fixture.id,
@@ -447,7 +452,7 @@ async function expireInvitation(fixture, created, detail) {
     state: detail.state,
     maxUses: detail.maxUses,
     useCount: detail.useCount,
-    expiresAt: new Date(Date.now() - 1000).toISOString(),
+    expiresAt,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     updatedAt: new Date().toISOString(),
   });
@@ -548,10 +553,10 @@ for (const approval of [false, true]) {
     const member = await user("unpaid-draft");
     if (approval) {
       // A pre-existing pending request must not bypass publication on approval.
-      await database.executeMutation("RequestInvitationApproval", {
+      await database.upsert("invitationAcceptance", {
         invitationId: created.id,
-        circleId: fixture.id,
         userId: member.id,
+        status: "pending",
         respondedAt: new Date().toISOString(),
       });
     }
@@ -583,10 +588,77 @@ test("real active grandfathered circles retain valid invitation membership", asy
   await writeCircle(fixture, {
     pricingPlan: "free",
     pricingModelVersion: "legacy",
-    activationStatus: "not_required",
+    activationStatus: "grandfathered",
   });
   const created = await invitation(repo, fixture);
   const member = await user("grandfathered");
   assert.equal((await accept(repo, created, member)).status, "joined");
   assert.equal((await members(fixture.id)).length, 2);
 });
+
+for (const approval of [false, true]) {
+  test(`real prechecked ${approval ? "approval" : "acceptance"} uses transaction time for expiry after respondedAt`, async (context) => {
+    const setup = await repository();
+    const fixture = await circle();
+    const created = await invitation(setup, fixture, {
+      requireApproval: approval,
+    });
+    const member = await user("expiry-window");
+    if (approval)
+      assert.equal(
+        (await accept(setup, created, member)).status,
+        "approval_pending",
+      );
+    let timing;
+    const repo = await repository(async (operation, variables) => {
+      if (
+        operation !==
+        (approval
+          ? "ApproveInvitationMembership"
+          : "AcceptInvitationWithMembership")
+      )
+        return;
+      const respondedAt = Date.parse(variables.respondedAt);
+      const expiry = respondedAt + 1;
+      await expireInvitation(
+        fixture,
+        created,
+        await setup.loadInvitationByToken(created.token),
+        new Date(expiry).toISOString(),
+      );
+      const mutationCall = Date.now();
+      assert.ok(
+        respondedAt < expiry && expiry < mutationCall,
+        "The actual database fixture must prove respondedAt < expiry < mutation call.",
+      );
+      timing = {
+        respondedToExpiryMs: expiry - respondedAt,
+        expiryToMutationCallMs: mutationCall - expiry,
+      };
+    });
+    const result = await Promise.allSettled([
+      approval
+        ? repo.approveInvitationMembership(
+            fixture.id,
+            created.id,
+            member.id,
+            fixture.creator.id,
+          )
+        : accept(repo, created, member),
+    ]);
+    assert.ok(
+      timing,
+      "The expiry change must occur at the real write boundary.",
+    );
+    context.diagnostic(JSON.stringify(timing));
+    const detail = await setup.loadInvitationByToken(created.token);
+    assert.deepEqual(
+      {
+        outcome: result[0].status,
+        joinedMembers: (await members(fixture.id)).length,
+        useCount: detail.useCount,
+      },
+      { outcome: "rejected", joinedMembers: 1, useCount: 0 },
+    );
+  });
+}
