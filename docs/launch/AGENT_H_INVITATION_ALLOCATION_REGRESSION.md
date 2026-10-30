@@ -8,7 +8,7 @@ Storage bytes and real devices are outside this test's acceptance scope.
 ## Scope and classification
 
 - Equal Gift/Support allocation and invitation transaction guards: **PENDING
-  REVIEW** on product `c5236c6`. All 24 real-database cases pass; independent
+  REVIEW** on product `9820dfb`. All 27 scoped real-database guard cases pass; independent
   review and updated-lock integrated CI are still required for acceptance.
 - Capacity-upgrade contribution policy: **BLOCKED** on owner decision. The actual
   new-member journey currently fails after a stored capacity increase; its minimal
@@ -57,6 +57,24 @@ fixture directly seeds a historical pending acceptance and uses the actual schem
 legacy status `grandfathered`. Rejection/legacy-success assertions are retained.
 
 ## Causal findings and corrected behavior
+
+The final pending-request correction `9820dfb` was also exercised without
+excluding the unresolved upgrade test. The full run at 2026-10-30
+10:09:13.922Z–10:09:47.200Z yielded **27 PASS, 1 FAIL, 0 SKIP**, with compile and
+configure passing. All original 24 cases plus three new pending-request stale
+completion/revocation/expiry cases pass. The sole failure remains the upgrade
+compatibility assertion below. Evidence is retained in
+`tmp/h-invitation-pending-guard-final/` and its primary-directory copy.
+
+The three new cases change actual state after repository prechecks and before
+the SDK transaction, asserting no pending acceptance, no membership, unchanged
+use count and no revoked-token resurrection. They do not claim to reproduce the
+narrower concurrent revoke occurring after an internal transaction query and
+before its write. That exact internal interleaving was not injectable through
+the repository hook. Legitimate pending requests are exercised by the successful
+approval allocation and concurrent-approval cases. The new conditional token
+write was inspected separately; integrated CI and independent acceptance remain
+pending.
 
 - The original repository saved equal invitee amounts as zero. Both direct and
   approved joins are now checked for exact balanced allocations, rounding and

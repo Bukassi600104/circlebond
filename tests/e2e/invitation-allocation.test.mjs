@@ -663,6 +663,62 @@ for (const approval of [false, true]) {
   });
 }
 
+for (const state of ["completed", "revoked", "expired"]) {
+  test(`real prechecked approval request rejects a newly ${state} state without resurrection`, async () => {
+    const setup = await repository();
+    const fixture = await circle();
+    const created = await invitation(setup, fixture, { requireApproval: true });
+    const member = await user("pending-state");
+    let changed = false;
+    const repo = await repository(async (operation) => {
+      if (operation !== "RequestInvitationApproval") return;
+      changed = true;
+      if (state === "completed")
+        await writeCircle(fixture, {
+          status: "completed",
+          completedAt: new Date().toISOString(),
+        });
+      if (state === "revoked")
+        await setup.revokeInvitation(
+          created.id,
+          fixture.id,
+          fixture.creator.id,
+        );
+      if (state === "expired")
+        await expireInvitation(
+          fixture,
+          created,
+          await setup.loadInvitationByToken(created.token),
+        );
+    });
+    const result = await Promise.allSettled([accept(repo, created, member)]);
+    assert.equal(
+      changed,
+      true,
+      "Change state after the real repository prechecks.",
+    );
+    const detail = await setup.loadInvitationByToken(created.token);
+    assert.deepEqual(
+      {
+        outcome: result[0].status,
+        joinedMembers: (await members(fixture.id)).length,
+        pendingRequests: detail.acceptances.filter(
+          (row) => row.status === "pending",
+        ).length,
+        useCount: detail.useCount,
+        state: detail.state,
+      },
+      {
+        outcome: "rejected",
+        joinedMembers: 1,
+        pendingRequests: 0,
+        useCount: 0,
+        state: state === "revoked" ? "revoked" : "created",
+      },
+    );
+  });
+}
+
 test("real stored capacity upgrade permits joining with allocation policy unasserted", async (context) => {
   const repo = await repository();
   const fixture = await circle({ target: 3000, capacity: 3 });
