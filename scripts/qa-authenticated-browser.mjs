@@ -617,6 +617,15 @@ try {
         path: resolve(evidence, "member-circle-390.png"),
         fullPage: true,
       });
+      const joinedMember = memberPage
+        .locator(".bc-gift-members button")
+        .filter({ hasText: `qa-member-${suffix}` });
+      await joinedMember.waitFor({ state: "visible" });
+      assert.match(
+        await joinedMember.locator("small").textContent(),
+        /^\s*₦\s*1,000\s+expected\s*$/,
+        "Joined equal Gift members must receive their server-derived planned share.",
+      );
     },
   );
   await check(
