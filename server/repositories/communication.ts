@@ -25,6 +25,7 @@ import {
 } from "@/server/pricing";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
 import { safelyEmitNotification } from "@/server/repositories/notifications";
+import { readAllRows } from "@/server/repositories/pages";
 
 type CommunicationQuery = {
   circle?: {
@@ -203,9 +204,9 @@ function mapActivity(
 
 async function queryCommunication(circleId: string) {
   const response = await getBondCircleDataConnect().executeQuery<
-    CommunicationQuery,
+    Pick<CommunicationQuery, "circle" | "circleMemberships" | "activityLogs">,
     { circleId: string }
-  >("GetCircleCommunication", { circleId });
+  >("GetCircleCommunicationContext", { circleId });
   return response.data;
 }
 
@@ -225,6 +226,25 @@ export async function loadCircleCommunication(
   const viewerRole = viewer.role as CircleRole;
   const viewerCanManage = canManageCommunication(viewerRole);
   const pricingContext = entitlementContextForStoredCircle(circle);
+  const [announcements, comments, reports] = await Promise.all([
+    readAllRows<CommunicationQuery["announcements"][number]>(
+      "GetCircleAnnouncementsPage",
+      { circleId },
+      "announcements",
+    ),
+    readAllRows<CommunicationQuery["comments"][number]>(
+      "GetCircleCommentsPage",
+      { circleId },
+      "comments",
+    ),
+    viewerCanManage
+      ? readAllRows<CommunicationQuery["commentReports"][number]>(
+          "GetCircleCommentReportsPage",
+          { circleId },
+          "commentReports",
+        )
+      : Promise.resolve([]),
+  ]);
   return {
     circleId: circle.id,
     circleName: circle.name,
@@ -241,7 +261,7 @@ export async function loadCircleCommunication(
     viewerId,
     viewerRole,
     viewerCanManage,
-    announcements: data.announcements.map((announcement) => ({
+    announcements: announcements.map((announcement) => ({
       id: announcement.id,
       title: announcement.title,
       body: announcement.body,
@@ -253,7 +273,7 @@ export async function loadCircleCommunication(
       createdAt: announcement.createdAt,
       updatedAt: announcement.updatedAt,
     })),
-    comments: data.comments.map((comment) => ({
+    comments: comments.map((comment) => ({
       id: comment.id,
       announcementId: comment.announcementId ?? null,
       parentCommentId: comment.parentCommentId ?? null,
@@ -266,7 +286,7 @@ export async function loadCircleCommunication(
       updatedAt: comment.updatedAt,
     })),
     reports: viewerCanManage
-      ? data.commentReports.map((report) => ({
+      ? reports.map((report) => ({
           id: report.id,
           commentId: report.comment.id,
           reporterId: report.reporter.id,
@@ -507,7 +527,10 @@ export async function createComment(input: {
   if (input.parentCommentId && !parent) {
     throw new Error("The comment you are replying to is unavailable.");
   }
-  if ((parent?.announcementId ?? null) !== (input.announcementId ?? null)) {
+  if (
+    parent &&
+    (parent.announcementId ?? null) !== (input.announcementId ?? null)
+  ) {
     throw new Error("Replies must stay in the same discussion.");
   }
 
