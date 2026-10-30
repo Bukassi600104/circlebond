@@ -191,28 +191,37 @@ async function expectedMembershipAmount(
     circle.contributionMode === "custom"
   )
     return invitationAmount;
-  const available = calculateEqualSlotAllocations(
+  const capacity = calculateEqualSlotAllocations(
     circle.targetAmount,
     circle.memberLimit,
-  );
+  ).length;
   if (!currentMembers || data.circleMemberships.length !== currentMembers)
     throw new CircleRuleError(
       "Circle membership changed. Refresh and try again.",
       "ACTIVITY_NOT_ALLOWED",
     );
+  const remainingPlaces = capacity - currentMembers;
+  if (remainingPlaces < 1)
+    throw new CircleRuleError("This circle is full.", "MEMBER_LIMIT_REACHED");
+  let assigned = 0;
   for (const member of data.circleMemberships) {
-    const slot = available.indexOf(member.expectedAmount);
-    // A prior capacity can leave valid amounts here; an approved policy must precede any reassignment.
-    if (slot < 0)
+    if (!Number.isInteger(member.expectedAmount) || member.expectedAmount < 0)
       throw new CircleRuleError(
-        "Existing equal contributions need organizer review before more members can join.",
+        "Existing assigned contributions need organizer review.",
         "ACTIVITY_NOT_ALLOWED",
       );
-    available.splice(slot, 1);
+    assigned += member.expectedAmount;
   }
-  if (available.length === 0)
-    throw new CircleRuleError("This circle is full.", "MEMBER_LIMIT_REACHED");
-  return available[0];
+  const remainingTarget = circle.targetAmount - assigned;
+  if (remainingTarget < 0)
+    throw new CircleRuleError(
+      "Assigned contributions exceed the target. Ask the organizer to review this circle.",
+      "ACTIVITY_NOT_ALLOWED",
+    );
+  // Existing assignments stay fixed; only unfilled places share the remaining target.
+  return remainingTarget === 0
+    ? 0
+    : calculateEqualSlotAllocations(remainingTarget, remainingPlaces)[0];
 }
 
 export async function assertCanManageInvitations(

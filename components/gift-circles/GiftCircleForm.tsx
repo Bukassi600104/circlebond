@@ -218,7 +218,10 @@ export function GiftCircleForm() {
               onChange={() => setMode("equal")}
             />
             <strong>Equal split</strong>
-            <span>Everyone receives an automatically balanced share.</span>
+            <span>
+              Unfilled places share the remaining target. Assigned amounts stay
+              fixed.
+            </span>
           </label>
           <label className={mode === "custom" ? "is-selected" : ""}>
             <input

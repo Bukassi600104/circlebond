@@ -294,7 +294,10 @@ export function SupportCircleForm() {
               onChange={() => setMode("equal")}
             />
             <strong>Equal amounts</strong>
-            <span>Balance the target across the planned member places.</span>
+            <span>
+              Unfilled places share the remaining target. Assigned amounts stay
+              fixed.
+            </span>
           </label>
           <label className={mode === "custom" ? "is-selected" : ""}>
             <input
