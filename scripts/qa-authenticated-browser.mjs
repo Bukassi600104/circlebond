@@ -76,6 +76,7 @@ const report = {
     "Synthetic loopback Auth/DataConnect/SMTP/DNS, actual UI OTP exchange; no Storage/provider/device acceptance",
   checks: [],
   authNetwork: [],
+  browserSecurity: [],
   cspFixture: {
     scope:
       "Authenticated loopback document response headers only; production policy is unchanged and unaccepted by this fixture",
@@ -90,6 +91,14 @@ function safe(message) {
   for (const secret of secrets)
     if (secret) value = value.replaceAll(secret, "[redacted]");
   return value
+    .replace(/https?:\/\/[^\s<>"')]+/g, (reference) => {
+      try {
+        const url = new URL(reference);
+        return `${url.origin}${url.pathname}`;
+      } catch {
+        return "[url]";
+      }
+    })
     .replace(/\/invite\/[A-Za-z0-9_%.-]+/g, "/invite/[redacted]")
     .replace(
       /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g,
@@ -320,6 +329,20 @@ try {
     reducedMotion: "reduce",
   });
   for (const context of [organizer, member]) {
+    context.on("page", (page) => {
+      page.on("console", (message) => {
+        const value = message.text();
+        if (
+          /content security policy|cors|cross-origin|mixed content|local network|private network|net::ERR_/i.test(
+            value,
+          )
+        )
+          report.browserSecurity.push({
+            type: message.type(),
+            reason: safe(value),
+          });
+      });
+    });
     context.on("response", (response) => {
       const url = new URL(response.url());
       if (url.pathname.startsWith("/api/auth/") || url.port === "9099")
