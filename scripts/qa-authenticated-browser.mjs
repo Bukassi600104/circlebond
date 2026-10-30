@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { createWriteStream, existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createConnection } from "node:net";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import {
+  localAuthCsp,
+  LOCAL_AUTH_ORIGIN,
+} from "../tests/helpers/local-auth-csp.mjs";
 
 // Run only after the owner of the completed build hands off this checkout.
 const root = process.cwd();
@@ -71,6 +76,13 @@ const report = {
     "Synthetic loopback Auth/DataConnect/SMTP/DNS, actual UI OTP exchange; no Storage/provider/device acceptance",
   checks: [],
   authNetwork: [],
+  cspFixture: {
+    scope:
+      "Authenticated loopback document response headers only; production policy is unchanged and unaccepted by this fixture",
+    addedConnectOrigin: LOCAL_AUTH_ORIGIN,
+    modifiedDocuments: 0,
+    originalPolicyHashes: [],
+  },
 };
 const secrets = new Set();
 function safe(message) {
@@ -326,12 +338,28 @@ try {
           failed: safe(request.failure()?.errorText ?? "request failed"),
         });
     });
-    await context.route("**/*", (route) => {
+    await context.route("**/*", async (route) => {
       const url = new URL(route.request().url());
-      return ["127.0.0.1", "localhost"].includes(url.hostname) ||
-        !url.protocol.startsWith("http")
-        ? route.continue()
-        : route.abort();
+      if (
+        !["127.0.0.1", "localhost"].includes(url.hostname) &&
+        url.protocol.startsWith("http")
+      )
+        return route.abort();
+      if (route.request().isNavigationRequest() && url.origin === base.origin) {
+        const response = await route.fetch({ maxRedirects: 0 });
+        const headers = response.headers();
+        const original = headers["content-security-policy"];
+        const adjusted = localAuthCsp(original, base.origin);
+        const hash = createHash("sha256").update(original).digest("hex");
+        if (!report.cspFixture.originalPolicyHashes.includes(hash))
+          report.cspFixture.originalPolicyHashes.push(hash);
+        report.cspFixture.modifiedDocuments++;
+        return route.fulfill({
+          response,
+          headers: { ...headers, "content-security-policy": adjusted },
+        });
+      }
+      return route.continue();
     });
   }
   const ownerPage = await organizer.newPage();

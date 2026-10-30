@@ -47,3 +47,9 @@ Measured sign-in LCP samples were 1352/1396/1224ms (CLS at most 0.0001392). Onbo
 The authenticated suite submitted a genuine UI email OTP successfully (the local server recorded successful verification) but timed out before reaching the legal-acceptance page. Client exchange/session/navigation remained under diagnosis; no authenticated journey PASS is claimed. Subsequent diagnostic instrumentation records sanitized endpoint paths/statuses and visible error messages, excluding request/response bodies, token query strings, entered OTP values and verification screenshots.
 
 The second reports are preserved as `second-4008ace-report.json` beside each original ignored report. The first 129f1e1 reports remain retained separately.
+
+## Local Auth CSP diagnosis and fixture boundary
+
+A third, auth-only diagnostic confirmed OTP request202/verify200, no observed Auth9099 request or session POST, and a visible Firebase network-request error. A separate no-token probe against the unchanged production-mode page confirmed a `connect-src` CSP rejection mentioning the explicit local Auth origin before any9099 request reached the network. The probe is retained as `csp-probe-4008ace.json`; the auth diagnostic is `third-4008ace-auth-diagnostic.json`.
+
+The authenticated test fixture therefore adjusts only intercepted loopback document response headers, appending `http://127.0.0.1:9099` to the existing explicit `connect-src`. It preserves every other directive, rejects public/non-origin URLs and absent/duplicate/deny-all policies, disables redirect following in its document fetch, retains external-request blocking, and records original policy hashes. Application headers, global environment, source policy and public browser tests are unchanged. This fixture cannot establish production CSP or genuine Firebase-provider acceptance. No `bypassCSP` setting is used.
