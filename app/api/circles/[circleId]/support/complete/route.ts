@@ -63,8 +63,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error) ? error.message : "Unable to complete circle.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to complete circle.",
       },
       { status: 400 },
     );

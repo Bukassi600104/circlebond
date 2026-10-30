@@ -30,10 +30,9 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to load invitations.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to load invitations.",
       },
       { status: 403 },
     );
@@ -109,10 +108,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to create invitation.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to create invitation.",
       },
       { status: 400 },
     );

@@ -103,10 +103,9 @@ export async function POST(request: Request) {
     }
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to complete this administrative action.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to complete this administrative action.",
       },
       { status: 400 },
     );

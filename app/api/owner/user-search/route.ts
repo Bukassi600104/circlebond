@@ -53,8 +53,7 @@ export async function POST(request: Request) {
     }
     return NextResponse.json(
       {
-        error:
-          isPublicError(error) ? error.message : "Unable to search users.",
+        error: isPublicError(error) ? error.message : "Unable to search users.",
       },
       { status: 400 },
     );

@@ -30,10 +30,9 @@ export async function PATCH(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update notification.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update notification.",
       },
       { status: 400 },
     );

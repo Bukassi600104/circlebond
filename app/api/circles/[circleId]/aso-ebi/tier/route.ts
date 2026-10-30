@@ -26,8 +26,7 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error) ? error.message : "Unable to select tier.",
+        error: isPublicError(error) ? error.message : "Unable to select tier.",
       },
       { status: 400 },
     );

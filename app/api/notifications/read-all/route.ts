@@ -16,10 +16,9 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update notifications.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update notifications.",
       },
       { status: 400 },
     );

@@ -41,10 +41,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update fulfilment.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update fulfilment.",
       },
       { status: 400 },
     );

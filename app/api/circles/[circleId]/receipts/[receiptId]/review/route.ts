@@ -38,10 +38,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to review this receipt.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to review this receipt.",
       },
       { status: 400 },
     );

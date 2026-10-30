@@ -45,10 +45,9 @@ export async function PATCH(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update invitation.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update invitation.",
       },
       { status: 400 },
     );

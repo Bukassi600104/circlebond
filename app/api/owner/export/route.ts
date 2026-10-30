@@ -62,10 +62,9 @@ export async function POST(request: Request) {
     }
     return Response.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to export this report.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to export this report.",
       },
       { status: 400 },
     );

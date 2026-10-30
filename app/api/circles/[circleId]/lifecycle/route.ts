@@ -42,10 +42,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update circle lifecycle.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update circle lifecycle.",
       },
       { status: 400 },
     );

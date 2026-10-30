@@ -63,10 +63,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to respond to this invitation.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to respond to this invitation.",
       },
       { status: 400 },
     );

@@ -36,10 +36,9 @@ export async function PATCH(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to save notification preferences.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to save notification preferences.",
       },
       { status: 400 },
     );

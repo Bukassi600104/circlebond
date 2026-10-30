@@ -1,0 +1,12 @@
+# Keep text checkouts reproducible across Windows, CI and production.
+* text=auto eol=lf
+
+# Preserve binary media without line-ending conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

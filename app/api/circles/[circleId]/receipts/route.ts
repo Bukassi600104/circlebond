@@ -135,10 +135,9 @@ export async function POST(
     }
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to submit this receipt.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to submit this receipt.",
       },
       { status: 400 },
     );

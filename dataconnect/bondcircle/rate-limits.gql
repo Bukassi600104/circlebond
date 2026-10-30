@@ -7,7 +7,9 @@ query GetRateLimitBucket($bucketKey: String!) @auth(level: NO_ACCESS) {
 
 mutation CreateRateLimitBucket($bucketKey: String!, $attemptsJson: String!)
 @auth(level: NO_ACCESS) {
-  rateLimitBucket_insert(data: { bucketKey: $bucketKey, attemptsJson: $attemptsJson })
+  rateLimitBucket_insert(
+    data: { bucketKey: $bucketKey, attemptsJson: $attemptsJson }
+  )
 }
 
 mutation CompareAndSetRateLimitBucket(
