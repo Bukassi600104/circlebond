@@ -175,7 +175,9 @@ async function signIn(page, email, next, fromInvitation = false) {
     await page.waitForURL("**/register?**");
     await page.getByRole("link", { name: "Sign in", exact: true }).click();
   }
-  await page.getByLabel("Email address", { exact: true }).fill(email);
+  await page
+    .getByRole("textbox", { name: "Email address", exact: true })
+    .fill(email);
   const issued = page.waitForResponse(
     (response) =>
       response.url().endsWith("/api/auth/email-otp/request") &&
@@ -429,7 +431,7 @@ try {
     async () => {
       await ownerPage.goto(new URL("/account/profile", base).href);
       await ownerPage
-        .getByLabel("Display name", { exact: true })
+        .getByRole("textbox", { name: "Display name", exact: true })
         .fill("Synthetic Browser Organizer");
       await ownerPage
         .getByRole("button", { name: "Save display name", exact: true })
@@ -440,7 +442,7 @@ try {
       await ownerPage.reload();
       assert.equal(
         await ownerPage
-          .getByLabel("Display name", { exact: true })
+          .getByRole("textbox", { name: "Display name", exact: true })
           .inputValue(),
         "Synthetic Browser Organizer",
       );

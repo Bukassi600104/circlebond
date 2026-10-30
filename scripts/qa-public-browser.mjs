@@ -177,17 +177,39 @@ try {
       await trigger.click();
       const dialog = page.getByRole("dialog");
       await dialog.waitFor();
+      assert.equal(
+        await dialog.evaluate((element) => element.matches(":modal")),
+        true,
+      );
+      const backgroundField = page.getByRole("textbox", {
+        name: "Display name",
+        exact: true,
+      });
+      await backgroundField.evaluate((element) => element.focus());
+      assert.equal(
+        await backgroundField.evaluate(
+          (element) => element === document.activeElement,
+        ),
+        false,
+      );
+      // Native dialogs can move focus to browser chrome; background DOM controls remain inert.
       for (let index = 0; index < 18; index++) {
         await page.keyboard.press("Tab");
         assert.equal(
-          await dialog.evaluate((element) =>
-            element.contains(document.activeElement),
+          await dialog.evaluate(
+            (element) =>
+              element.contains(document.activeElement) || !document.hasFocus(),
           ),
           true,
         );
       }
       await page.keyboard.press("Escape");
       await dialog.waitFor({ state: "hidden" });
+      await page.waitForFunction(
+        (element) => element === document.activeElement,
+        await trigger.elementHandle(),
+        { timeout: 2000 },
+      );
       assert.equal(
         await trigger.evaluate((element) => element === document.activeElement),
         true,
@@ -205,10 +227,10 @@ try {
       };
       await page.route("**/api/auth/email-otp/request", handler);
       await page
-        .getByLabel("Display name", { exact: true })
+        .getByRole("textbox", { name: "Display name", exact: true })
         .fill("Synthetic Organizer");
       await page
-        .getByLabel("Email address", { exact: true })
+        .getByRole("textbox", { name: "Email address", exact: true })
         .fill("synthetic@example.test");
       await page
         .getByRole("button", { name: "Create account", exact: true })
@@ -231,7 +253,10 @@ try {
           }),
         });
       await page.route("**/api/auth/email-otp/request", handler);
-      const email = page.getByLabel("Email address", { exact: true });
+      const email = page.getByRole("textbox", {
+        name: "Email address",
+        exact: true,
+      });
       await email.fill("synthetic@example.test");
       await page.getByRole("button", { name: "Continue", exact: true }).click();
       await page.getByRole("alert").waitFor();
@@ -279,7 +304,7 @@ try {
         });
       await page.route("**/api/auth/email-otp/request", handler);
       await page
-        .getByLabel("Email address", { exact: true })
+        .getByRole("textbox", { name: "Email address", exact: true })
         .fill("synthetic@example.test");
       await page
         .getByRole("button", { name: "Send recovery code", exact: true })
