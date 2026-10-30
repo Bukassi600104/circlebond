@@ -77,6 +77,7 @@ const report = {
   checks: [],
   authNetwork: [],
   browserSecurity: [],
+  createFormReadiness: [],
   localNetworkFixture: {
     permission: "local-network-access",
     origin: base.origin,
@@ -455,7 +456,16 @@ try {
         exact: true,
       }),
     });
-    assert.equal(await form.count(), 1);
+    const readiness = {
+      plan,
+      path: new URL(ownerPage.url()).pathname,
+      type: new URL(ownerPage.url()).searchParams.get("type"),
+      initialFormCount: await form.count(),
+    };
+    report.createFormReadiness.push(readiness);
+    await form.waitFor({ state: "visible", timeout: 30000 });
+    readiness.visibleFormCount = await form.count();
+    assert.equal(readiness.visibleFormCount, 1);
     await form
       .locator(`label:has(input[name="pricingPlan"][value="${plan}"])`)
       .click();
@@ -692,6 +702,7 @@ try {
         .flatMap((context) => context.pages())
         .map(async (page) => ({
           path: safe(new URL(page.url()).pathname),
+          headings: (await page.locator("main h1").allTextContents()).map(safe),
           alerts: (await page.locator('[role="alert"]').allTextContents()).map(
             safe,
           ),
