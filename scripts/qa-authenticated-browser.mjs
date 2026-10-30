@@ -89,6 +89,7 @@ const report = {
       "Authenticated loopback document response headers only; production policy is unchanged and unaccepted by this fixture",
     addedConnectOrigin: LOCAL_AUTH_ORIGIN,
     modifiedDocuments: 0,
+    redirectDocumentRefreshes: 0,
     originalPolicyHashes: [],
   },
 };
@@ -254,6 +255,26 @@ async function signIn(page, email, next, fromInvitation = false) {
       (url) =>
         url.pathname === "/sign-in" && url.searchParams.get("next") === next,
     );
+    await page
+      .getByRole("button", { name: "Continue", exact: true })
+      .waitFor({ state: "visible" });
+    assert.equal(new URL(page.url()).pathname, "/sign-in");
+    assert.equal(new URL(page.url()).searchParams.get("next"), next);
+    // Playwright routes only the first redirect URL; refresh this verified document for the local CSP fixture.
+    const document = await page.reload();
+    assert.equal(document.status(), 200);
+    const connectPolicy = (await document.allHeaders())[
+      "content-security-policy"
+    ]
+      .split(";")
+      .find((directive) => /^\s*connect-src\s/.test(directive));
+    assert.equal(
+      connectPolicy.trim().split(/\s+/).includes(LOCAL_AUTH_ORIGIN),
+      true,
+    );
+    assert.equal(new URL(page.url()).pathname, "/sign-in");
+    assert.equal(new URL(page.url()).searchParams.get("next"), next);
+    report.cspFixture.redirectDocumentRefreshes++;
   }
   await page
     .getByRole("button", { name: "Continue", exact: true })
