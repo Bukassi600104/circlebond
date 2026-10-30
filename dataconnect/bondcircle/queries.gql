@@ -1885,14 +1885,25 @@ mutation RequestInvitationApproval(
       respondedAt: $respondedAt
     }
   )
-  invitation_update(
-    key: { id: $invitationId }
+  invitation_update: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "response.query.invitation.useCount" }
+      maxUses: { gt_expr: "response.query.invitation.useCount" }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt_expr: "request.time" }
+    }
     data: {
       state: "approval_pending"
       acceptedBy: { id: $userId }
       updatedAt: $respondedAt
     }
   )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed while requesting approval"
+    )
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }
