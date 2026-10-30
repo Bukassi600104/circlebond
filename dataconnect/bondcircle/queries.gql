@@ -1770,6 +1770,37 @@ mutation AcceptInvitationWithMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circleJoinGuard: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      memberCount: { eq_expr: "vars.nextMemberCount - 1" }
+      memberLimit: { ge: $nextMemberCount }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+      requireCreatorApproval: { eq: false }
+    }
+    data: { updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Circle membership or availability changed"
+    )
+  invitationJoinGuard: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "vars.nextUseCount - 1" }
+      maxUses: { ge: $nextUseCount }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt: $respondedAt }
+      requireApproval: { eq: false }
+    }
+    data: { updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed or is no longer available"
+    )
   circleMembership_insert(
     data: {
       circle: { id: $circleId }
@@ -2101,6 +2132,35 @@ mutation ApproveInvitationMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circleJoinGuard: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      memberCount: { eq_expr: "vars.nextMemberCount - 1" }
+      memberLimit: { ge: $nextMemberCount }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+    }
+    data: { updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Circle membership or availability changed"
+    )
+  invitationJoinGuard: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "vars.nextUseCount - 1" }
+      maxUses: { ge: $nextUseCount }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt: $respondedAt }
+    }
+    data: { updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed or is no longer available"
+    )
   circleMembership_insert(
     data: {
       circle: { id: $circleId }

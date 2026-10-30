@@ -186,7 +186,10 @@ async function expectedMembershipAmount(
   >("GetCircleEngineRecord", { circleId });
   const circle = data.circle;
   if (!circle) throw new Error("Circle not found.");
-  if (circle.type !== "gift" || circle.contributionMode === "custom")
+  if (
+    !["gift", "support"].includes(circle.type) ||
+    circle.contributionMode === "custom"
+  )
     return invitationAmount;
   const available = calculateEqualSlotAllocations(
     circle.targetAmount,
