@@ -1,4 +1,4 @@
-import { isPublicError } from "@/server/public-errors";
+import { isPublicError, RequestValidationError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation, clientKey } from "@/server/auth/request";
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     const form = await request.formData();
     const photo = form.get("photo");
     if (!(photo instanceof File)) {
-      throw new Error("Choose a profile photo to upload.");
+      throw new RequestValidationError("Choose a profile photo to upload.");
     }
     const sanitized = await sanitizeUploadedImage(
       photo,
@@ -94,17 +94,9 @@ export async function POST(request: Request) {
           user.email?.split("@")[0] ??
           user.phoneNumber ??
           "BondCircle member",
-        email: user.email ?? null,
-        phone: user.phoneNumber ?? null,
+        email: user.emailVerified ? user.email : undefined,
+        phone: user.phoneNumber,
         profileImage: relativeImageUrl,
-        termsAcceptedAt:
-          typeof user.customClaims?.termsAcceptedAt === "string"
-            ? user.customClaims.termsAcceptedAt
-            : null,
-        privacyAcceptedAt:
-          typeof user.customClaims?.privacyAcceptedAt === "string"
-            ? user.customClaims.privacyAcceptedAt
-            : null,
       },
       { strict: true },
     );
@@ -113,10 +105,9 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          isPublicError(error)
-            ? error.message
-            : "Unable to update your profile photo.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update your profile photo.",
       },
       { status: 400 },
     );

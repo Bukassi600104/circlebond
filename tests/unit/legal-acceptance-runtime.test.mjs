@@ -142,10 +142,19 @@ test("session recreation preserves persisted acceptance when ID token claims are
       clientKey: () => "test",
     },
     "@/server/auth/security": { enforceRateLimit: async () => true },
+    "@/server/auth/verified-contact": await load(
+      "server/auth/verified-contact.ts",
+      {},
+    ),
     "@/server/audit": { recordAuthAudit() {} },
     "@/server/firebase/admin": {
       getFirebaseAdminAuth: () => ({
-        verifyIdToken: async () => ({ uid: "self", name: "Member" }),
+        verifyIdToken: async () => ({
+          uid: "self",
+          name: "Stale name",
+          email: "member@example.test",
+          email_verified: true,
+        }),
       }),
     },
     "@/server/repositories/users": {
@@ -155,6 +164,7 @@ test("session recreation preserves persisted acceptance when ID token claims are
     },
     "@/server/auth/legal": {
       loadLegalAcceptance: async () => ({
+        displayName: "Updated member",
         termsAcceptedAt: "2026-10-29T12:00:00Z",
         privacyAcceptedAt: "2026-10-29T12:00:00Z",
       }),
@@ -170,6 +180,7 @@ test("session recreation preserves persisted acceptance when ID token claims are
   assert.equal((await response.json()).needsLegalAcceptance, false);
   assert.equal(saved.termsAcceptedAt, "2026-10-29T12:00:00Z");
   assert.equal(saved.privacyAcceptedAt, "2026-10-29T12:00:00Z");
+  assert.equal(saved.displayName, "Updated member");
 });
 
 test("dialog overlay uses native modal isolation, backdrop/Escape dismissal and cleanup", async () => {

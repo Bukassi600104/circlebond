@@ -12,6 +12,7 @@ import { enforceRateLimit } from "@/server/auth/security";
 import { recordAuthAudit } from "@/server/audit";
 import { getFirebaseAdminAuth } from "@/server/firebase/admin";
 import { persistUserProfile } from "@/server/repositories/users";
+import { withVerifiedContact } from "@/server/auth/verified-contact";
 import { loadLegalAcceptance } from "@/server/auth/legal";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +49,10 @@ export async function POST(request: Request) {
     if (!idToken || idToken.length > 10_000) throw new Error("Invalid token.");
 
     const sessionCookie = await createSessionCookie(idToken);
-    const decoded = await getFirebaseAdminAuth().verifyIdToken(idToken);
+    const decoded = withVerifiedContact(
+      await getFirebaseAdminAuth().verifyIdToken(idToken, true),
+    );
+    if (!decoded) throw new Error("Verified contact required.");
     const existingAcceptance = await loadLegalAcceptance(decoded.uid);
     const termsAcceptedAt =
       existingAcceptance?.termsAcceptedAt ??
@@ -63,13 +67,14 @@ export async function POST(request: Request) {
     await persistUserProfile({
       id: decoded.uid,
       displayName:
+        existingAcceptance?.displayName ??
         decoded.name ??
         decoded.email?.split("@")[0] ??
         decoded.phone_number ??
         "BondCircle member",
-      email: decoded.email ?? null,
-      phone: decoded.phone_number ?? null,
-      profileImage: decoded.picture ?? null,
+      email: decoded.email,
+      phone: decoded.phone_number,
+      profileImage: decoded.picture,
       termsAcceptedAt,
       privacyAcceptedAt,
     });

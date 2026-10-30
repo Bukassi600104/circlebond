@@ -15,7 +15,12 @@ const entitlements = await loadTypescriptModule(
   "server/pricing/entitlements.ts",
   { "../../lib/circle-pricing.ts": pricing },
 );
+const legal = await loadTypescriptModule("server/auth/legal.ts", {
+  "server-only": {},
+  "@/server/firebase/data-connect": {},
+});
 const publicErrors = await loadTypescriptModule("server/public-errors.ts", {
+  "@/server/auth/legal": legal,
   "@/server/circles/engine": engine,
   "@/server/communication/rules": communication,
   "@/server/pricing/entitlements": entitlements,
@@ -45,6 +50,10 @@ test("only checked domain and validation errors may expose messages to callers",
     publicErrors.isPublicError(
       new publicErrors.RequestValidationError("Choose a valid image"),
     ),
+    true,
+  );
+  assert.equal(
+    publicErrors.isPublicError(new legal.LegalAcceptanceError()),
     true,
   );
   const unexpected = new Error("private provider details");

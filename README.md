@@ -6,6 +6,8 @@ BondCircle is a responsive web application for creating trusted circles around g
 
 ## Delivery status
 
+Current production remediation and acceptance evidence is tracked in the [launch ledger](docs/launch/BONDCIRCLE_PRODUCTION_REMEDIATION_LEDGER.md). Earlier milestone reports record historical results; they do not establish today's operational acceptance. Public launch remains gated by current tests, independent review, provider/device evidence and owner approval.
+
 The product is being delivered against an approved 18-milestone production plan. Milestones 1–16 are implemented and verified. The Milestone 17–18 implementation is published on `main`; operational acceptance and post-launch verification remain in progress:
 
 - Firebase-only application foundation
@@ -62,7 +64,7 @@ Important boundaries:
 
 Requirements:
 
-- Node.js 22.13 or newer
+- Node.js 22.19 or newer
 - Java 21 for Firebase emulators
 - A Firebase project, or the checked-in local emulator topology
 

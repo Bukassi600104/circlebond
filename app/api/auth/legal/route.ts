@@ -30,9 +30,9 @@ export async function POST(request: Request) {
       {
         id: session.uid,
         displayName,
-        email: session.email ?? null,
-        phone: session.decoded.phone_number ?? null,
-        profileImage: session.decoded.picture ?? null,
+        email: session.email,
+        phone: session.decoded.phone_number,
+        profileImage: session.decoded.picture,
         termsAcceptedAt: acceptedAt,
         privacyAcceptedAt: acceptedAt,
       },
