@@ -56,6 +56,7 @@ export default function OnboardingPage() {
             alt={item.imageAlt}
             width={1280}
             height={853}
+            sizes="(max-width: 37rem) 92vw, 34rem"
             priority={page === 0}
           />
         </div>
