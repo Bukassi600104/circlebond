@@ -1,4 +1,5 @@
 "use client";
+import { DialogOverlay } from "@/components/ui/DialogOverlay";
 
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -297,16 +298,13 @@ export function InvitationManager({
       </button>
 
       {isOpen ? (
-        <div
+        <DialogOverlay
           className="bc-invite-backdrop"
-          role="presentation"
-          onMouseDown={() => setManagerOpen(false)}
+          labelledBy="invite-manager-title"
+          onClose={() => setManagerOpen(false)}
         >
           <section
             className="bc-invite-manager"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="invite-manager-title"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <header>
@@ -569,7 +567,7 @@ export function InvitationManager({
               )}
             </section>
           </section>
-        </div>
+        </DialogOverlay>
       ) : null}
     </>
   );

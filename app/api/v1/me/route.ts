@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
+import { logger } from "@/lib/logger";
 import { authenticateNativeRequest } from "@/server/auth/native";
 import { fetchUserBootstrapProfile } from "@/server/repositories/users";
 
@@ -14,16 +15,10 @@ export async function GET(request: Request) {
   try {
     const outcome = await authenticateNativeRequest(request);
     if (outcome.state === "unauthenticated") {
-      return NextResponse.json(
-        { error: "Authentication required." },
-        { status: 401 },
-      );
+      return apiJson({ error: "Authentication required." }, { status: 401 });
     }
     if (outcome.state === "suspended") {
-      return NextResponse.json(
-        { error: "Account suspended." },
-        { status: 403 },
-      );
+      return apiJson({ error: "Account suspended." }, { status: 403 });
     }
     const { principal } = outcome;
 
@@ -32,7 +27,7 @@ export async function GET(request: Request) {
     if (!profile) {
       // No persisted profile row yet (fresh sign-up or emulator mode):
       // fall back to verified Firebase Auth claims so native clients can bootstrap.
-      return NextResponse.json(
+      return apiJson(
         {
           user: {
             id: principal.uid,
@@ -57,7 +52,7 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(
+    return apiJson(
       {
         user: {
           id: profile.id,
@@ -81,15 +76,10 @@ export async function GET(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
-    console.error("[api/v1/me] Failed to load user profile:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to retrieve user profile.",
-      },
+  } catch {
+    logger.error("native_profile_failed");
+    return apiJson(
+      { error: "Unable to retrieve user profile." },
       { status: 500 },
     );
   }

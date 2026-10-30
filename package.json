@@ -17,7 +17,7 @@
     "support-circle"
   ],
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.19.0"
   },
   "scripts": {
     "dev": "node scripts/run-development.mjs",
@@ -47,21 +47,20 @@
     "firebase": "^12.15.0",
     "firebase-admin": "13.6.0",
     "lucide-react": "0.468.0",
-    "next": "16.2.12",
-    "nodemailer": "^9.0.3",
+    "next": "16.4.3",
+    "nodemailer": "10.1.4",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-phone-number-input": "^3.4.17",
-    "sharp": "0.35.3"
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
-    "@types/nodemailer": "^8.0.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "10.1.8",
     "firebase-tools": "^15.18.0",
     "prettier": "3.6.2",
@@ -70,7 +69,11 @@
   },
   "overrides": {
     "postcss": "8.5.25",
-    "sharp": "0.35.3"
+    "sharp": "0.35.5",
+    "@grpc/grpc-js": "1.14.5",
+    "get-uri": {
+      "basic-ftp": "6.2.3"
+    }
   },
   "type": "module"
 }

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
+import { enforceRateLimit } from "@/server/auth/security";
 import { pricingErrorResponse } from "@/server/pricing/http";
 import { requireActivationPaymentProvider } from "@/server/pricing/provider";
 import {
@@ -10,7 +11,7 @@ import {
   upgradePriceMinor,
 } from "@/server/pricing";
 import {
-  createCircleActivationAttempt,
+  startCirclePaymentCheckout,
   loadCirclePricingState,
 } from "@/server/repositories/pricing";
 import {
@@ -52,7 +53,10 @@ export async function POST(
         "ACTIVATION_REQUIRED",
       );
     }
-    const body = (await request.json()) as { targetPlan?: string };
+    const body = (await request.json()) as {
+      targetPlan?: string;
+      billingEmail?: unknown;
+    };
     if (
       !PAID_CIRCLE_PRICING_TIERS.includes(
         body.targetPlan as PaidCirclePricingPlan,
@@ -85,31 +89,49 @@ export async function POST(
     );
     const target = pricingForCircle(circle.type, targetPlan);
     const provider = requireActivationPaymentProvider();
+    if (
+      !(await enforceRateLimit(
+        `payment:checkout:${session.uid}:${circleId}`,
+        5,
+        15 * 60_000,
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "Too many checkout attempts. Try again shortly." },
+        { status: 429 },
+      );
+    }
     const origin = new URL(request.url).origin;
     const activationId = randomUUID();
-    const checkout = await provider.createCheckout({
-      activationId,
-      circleId,
-      creatorId: session.uid,
-      amountMinor: amountDueMinor,
-      currency: "NGN",
-      description: `${circle.type} circle upgrade to ${targetPlan} (${formatMinorNaira(amountDueMinor)})`,
-      returnUrl: `${origin}/account/circles/${encodeURIComponent(circleId)}?upgrade=return`,
-    });
-    await createCircleActivationAttempt({
-      activationId,
-      circleId,
-      creatorId: session.uid,
-      planDefinitionId: target.id,
-      activationType: "upgrade",
-      circleType: circle.type,
-      tier: targetPlan,
-      listPriceMinor: target.priceMinor,
-      amountDueMinor,
-      provider: checkout.provider,
-      providerReference: checkout.providerReference,
-      previousActivationId: latestSuccessfulActivation.id,
-    });
+    const checkout = await startCirclePaymentCheckout(
+      provider,
+      {
+        activationId,
+        circleId,
+        creatorId: session.uid,
+        email:
+          session.email ??
+          (typeof body.billingEmail === "string"
+            ? body.billingEmail.trim()
+            : undefined),
+        amountMinor: amountDueMinor,
+        currency: "NGN",
+        description: `${circle.type} circle upgrade to ${targetPlan} (${formatMinorNaira(amountDueMinor)})`,
+        returnUrl: `${origin}/account/circles/${encodeURIComponent(circleId)}?upgrade=return`,
+      },
+      {
+        activationId,
+        circleId,
+        creatorId: session.uid,
+        planDefinitionId: target.id,
+        activationType: "upgrade",
+        circleType: circle.type,
+        tier: targetPlan,
+        listPriceMinor: target.priceMinor,
+        amountDueMinor,
+        previousActivationId: latestSuccessfulActivation.id,
+      },
+    );
     await recordPricingOutcome({
       eventType: "upgrade_checkout",
       outcome: "started",

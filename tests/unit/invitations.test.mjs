@@ -118,8 +118,12 @@ test("Milestone 9 secure invitation and multi-circle membership surfaces are wir
   ]) {
     assert.match(schema, new RegExp(model));
   }
-  assert.doesNotMatch(schema, /\btoken:\s*String/);
-  assert.match(schema, /tokenHash:\s*String!/);
+  const invitationModel = schema.match(
+    /type Invitation @table\s*\{([\s\S]*?)\r?\n\}/,
+  )?.[1];
+  assert.ok(invitationModel, "The invitation persistence model exists.");
+  assert.doesNotMatch(invitationModel, /\btoken\s*:\s*String/);
+  assert.match(invitationModel, /tokenHash:\s*String!/);
   assert.match(operations, /mutation AcceptInvitationWithMembership/);
   assert.match(operations, /mutation ApproveInvitationMembership/);
   assert.match(repository, /createSecureInvitationToken/);

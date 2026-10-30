@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f5a50" />
+    <meta name="robots" content="noindex" />
+    <title>Connection lost — BondCircle</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: max(1.5rem, env(safe-area-inset-top))
+          max(1.5rem, env(safe-area-inset-right))
+          max(1.5rem, env(safe-area-inset-bottom))
+          max(1.5rem, env(safe-area-inset-left));
+        background: #fff8f0;
+        color: #193d37;
+        font:
+          1rem/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        width: min(100%, 28rem);
+      }
+      .brand {
+        color: #0f5a50;
+        font:
+          600 1.5rem Georgia,
+          serif;
+      }
+      h1 {
+        margin-top: 2rem;
+        line-height: 1.2;
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
+      }
+      a {
+        display: inline-flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 0.7rem 1.2rem;
+        border-radius: 0.8rem;
+        background: #0f5a50;
+        color: #fff8f0;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a:focus-visible {
+        outline: 3px solid #193d37;
+        outline-offset: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="brand">BondCircle</div>
+      <h1>Let’s reconnect.</h1>
+      <p>
+        Your connection is unavailable. Reconnect to continue to your circle.
+      </p>
+      <p>
+        If you were sending a contribution, payment or receipt, check its status
+        after reconnecting before trying again.
+      </p>
+      <a href="">Retry connection</a>
+    </main>
+  </body>
+</html>

@@ -261,7 +261,7 @@ export const legalDocuments: Record<
       {
         title: "13. Account deletion and data export",
         paragraphs: [
-          "The in-product request route, verification steps, completion time, export format and lawful retention exceptions must be implemented and documented before launch. Deleting an account may not remove information another participant is legally entitled to retain or records required for security and legal compliance.",
+          "In Settings, you can download structured account records as JSON and record an assisted export or account deletion request. Receipt images and authentication credentials are excluded from that download. A deletion request starts a review and does not immediately erase your account. Identity-verification procedures, the responsible privacy operator, response times and lawful retention exceptions still require approval before launch. Deleting an account may not remove information another participant is legally entitled to retain or records required for security and legal compliance.",
         ],
       },
       {

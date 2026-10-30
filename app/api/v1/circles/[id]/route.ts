@@ -1,11 +1,21 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
+import { logger } from "@/lib/logger";
 import { authenticateNativeRequest } from "@/server/auth/native";
 import { loadDashboardCircles } from "@/server/repositories/dashboard";
 
 export const runtime = "nodejs";
 
 type ApiCircleType = "GIFT" | "ASO_EBI" | "SUPPORT";
-type ApiCircleStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "ARCHIVED";
+type ApiCircleStatus =
+  | "DRAFT"
+  | "PUBLISHED"
+  | "ACTIVE"
+  | "TARGET_REACHED"
+  | "FULFILMENT"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "ARCHIVED"
+  | "PURGED";
 type ApiCircleRole = "creator" | "co_admin" | "member";
 
 // Stored circle types are lowercase ("gift" | "aso-ebi" | "support").
@@ -18,10 +28,14 @@ const CIRCLE_TYPE_BY_SOURCE: Record<string, ApiCircleType> = {
 
 const CIRCLE_STATUS_VALUES = new Set([
   "draft",
+  "published",
   "active",
+  "target_reached",
+  "fulfilment",
   "completed",
   "cancelled",
   "archived",
+  "purged",
 ]);
 
 function circleTypeEnum(sourceType: string): ApiCircleType {
@@ -63,23 +77,20 @@ export async function GET(
   try {
     const outcome = await authenticateNativeRequest(request);
     if (outcome.state === "unauthenticated") {
-      return NextResponse.json(
-        { error: "Authentication required." },
-        { status: 401 },
-      );
+      return apiJson({ error: "Authentication required." }, { status: 401 });
     }
     if (outcome.state === "suspended") {
-      return NextResponse.json({ error: "Account suspended." }, { status: 403 });
+      return apiJson({ error: "Account suspended." }, { status: 403 });
     }
 
     const { id } = await context.params;
     const memberships = await loadDashboardCircles(outcome.principal.uid);
     const circle = memberships.find((item) => item.id === id);
     if (!circle) {
-      return NextResponse.json({ error: "Circle not found." }, { status: 404 });
+      return apiJson({ error: "Circle not found." }, { status: 404 });
     }
 
-    return NextResponse.json(
+    return apiJson(
       {
         circle: {
           id: circle.id,
@@ -87,7 +98,7 @@ export async function GET(
           type: circleTypeEnum(circle.type),
           imageUrl: circle.imageUrl ?? null,
           targetAmount: circle.targetAmount ?? null,
-          currentAmount: circle.contributedAmount ?? 0,
+          currentAmount: circle.contributedAmount ?? null,
           memberCount: circle.memberCount,
           memberLimit: circle.memberLimit,
           status: circleStatusEnum(circle.status),
@@ -98,16 +109,8 @@ export async function GET(
       },
       { status: 200 },
     );
-  } catch (error) {
-    console.error("[api/v1/circles] Failed to load circle:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to retrieve circle.",
-      },
-      { status: 500 },
-    );
+  } catch {
+    logger.error("native_circle_detail_failed");
+    return apiJson({ error: "Unable to retrieve circle." }, { status: 500 });
   }
 }

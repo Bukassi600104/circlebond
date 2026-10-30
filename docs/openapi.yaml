@@ -1,38 +1,44 @@
 openapi: 3.1.0
 info:
   title: BondCircle Mobile API
-  version: 1.0.0
-  description: Official versioned REST API contract for BondCircle native Android and web clients.
-
+  version: 1.0.1
+  description: Implemented v1 bootstrap, authentication, circle read and device
+    registration foundation. Circle mutations remain on the existing web API;
+    they are not advertised here as completed native endpoints. See the native
+    readiness report for coverage and provider/device acceptance gates.
 servers:
-  - url: https://bondcircle.app
-    description: Production Server
-  - url: https://staging.bondcircle.app
-    description: Staging Server
+  - url: https://www.bondcircles.com
+    description: Canonical production origin; deployment acceptance is separately gated
   - url: http://10.0.2.2:3000
-    description: Local Android Emulator
-
+    description: Local Android emulator only
 security:
   - BearerAuth: []
-
+  - SessionCookie: []
 paths:
   /api/v1/me:
     get:
-      summary: Bootstrap current authenticated user session
-      description: Returns the user profile, legal acceptance timestamps, and notification preferences.
+      summary: Bootstrap the verified user's profile and preferences
+      description:
+        A newly authenticated identity without a persisted profile receives
+        null legal acceptance timestamps. This does not grant circle creation
+        rights. A persistence failure returns an error rather than a synthetic
+        profile.
       responses:
         "200":
-          description: User profile payload
+          description: Private profile; Cache-Control no-store
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserProfileResponse"
         "401":
-          description: Authentication required
-
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
   /api/v1/auth/email-otp/request:
     post:
-      summary: Request email OTP challenge
+      summary: Request a rate-limited email OTP challenge
       security: []
       requestBody:
         required: true
@@ -42,17 +48,23 @@ paths:
               $ref: "#/components/schemas/EmailOtpRequest"
       responses:
         "202":
-          description: Challenge issued
+          description: Challenge issued; delivery acceptance requires provider verification
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmailOtpResponse"
         "400":
-          description: Validation error
-
+          $ref: "#/components/responses/InvalidRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
   /api/v1/auth/email-otp/verify:
     post:
-      summary: Verify email OTP code and receive Firebase Custom Token
+      summary: Verify a single-use challenge and return a Firebase custom token
+      description:
+        Exchange the custom token with Firebase Authentication to obtain
+        the ID token used as Bearer credentials. Never log either token.
       security: []
       requestBody:
         required: true
@@ -62,41 +74,90 @@ paths:
               $ref: "#/components/schemas/VerifyEmailOtpRequest"
       responses:
         "200":
-          description: Verification success with custom token
+          description: Private one-time exchange; Cache-Control no-store
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerifyEmailOtpResponse"
         "400":
-          description: Invalid or expired code
-
+          $ref: "#/components/responses/InvalidRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
   /api/v1/circles:
     get:
-      summary: List user circles
-      description: Returns paginated circles where the user is creator, co-admin, or member, with privacy redaction applied.
+      summary: List the verified user's circles with server privacy redaction
+      description:
+        Newest first, then ID. Offset pagination is deterministic for an
+        unchanged dataset; restart pagination after membership changes.
       parameters:
         - name: cursor
           in: query
-          required: false
           schema:
             type: string
+            pattern: ^[0-9]+$
+            description: Non-negative safe integer offset
         - name: limit
           in: query
-          required: false
           schema:
             type: integer
+            minimum: 1
+            maximum: 50
             default: 20
+            description: Larger positive safe integer requests are capped at 50
       responses:
         "200":
-          description: Circle list
+          description: Private circle list; Cache-Control no-store
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CircleListResponse"
-
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
+  /api/v1/circles/{id}:
+    get:
+      summary: Read a circle visible through the verified user's membership
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Private circle summary; hidden totals remain null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CircleDetailResponse"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
   /api/v1/devices/push-token:
     post:
-      summary: Register FCM device token
+      summary: Persist an FCM token for the verified user
+      description:
+        Idempotent by token hash; a token is reassigned to the currently
+        verified account on a shared device. Cookie callers require same-origin
+        CSRF; verified bearer callers do not. Success confirms persistence only,
+        not notification delivery. Requires the reviewed additive Data Connect
+        schema.
       requestBody:
         required: true
         content:
@@ -105,136 +166,156 @@ paths:
               $ref: "#/components/schemas/DevicePushTokenRequest"
       responses:
         "200":
-          description: Token registered
+          description: Token persisted; Cache-Control no-store
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
     delete:
-      summary: Remove FCM device token
+      summary: Remove one owned device token, or all current-user tokens if omitted
+      description: Cookie CSRF and rate limits apply as for registration. An old
+        account cannot remove a token reassigned to another account.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  minLength: 10
+                  maxLength: 500
       responses:
         "200":
-          description: Token removed
-
+          description: Owned tokens removed; Cache-Control no-store
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/AuthenticationRequired"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/ServiceFailure"
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
-
+      bearerFormat: Firebase ID token
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: __session
+  responses:
+    InvalidRequest:
+      description: Invalid JSON, validation failure or invalid/expired OTP
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    AuthenticationRequired:
+      description: Missing, expired, disabled or revoked credentials
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Suspended account or rejected cookie CSRF verification
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource absent or inaccessible; does not disclose other users' circles
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: OTP challenge already consumed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    RateLimited:
+      description: Request budget exhausted; wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceFailure:
+      description: Generic retryable service failure; no internal/provider details
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
-    UserProfileResponse:
+    ErrorResponse:
       type: object
       required:
-        - user
+        - error
       properties:
-        user:
-          $ref: "#/components/schemas/UserProfile"
-
+        error:
+          type: string
+        code:
+          type: string
+          enum:
+            - INVALID_REQUEST
+            - AUTHENTICATION_REQUIRED
+            - FORBIDDEN
+            - NOT_FOUND
+            - CONFLICT
+            - RATE_LIMITED
+            - INTERNAL_ERROR
+            - REQUEST_FAILED
     UserProfile:
       type: object
       required:
         - id
         - displayName
         - accountStatus
+        - preferences
       properties:
         id:
           type: string
         displayName:
           type: string
         email:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         profileImage:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         termsAcceptedAt:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         privacyAcceptedAt:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         accountStatus:
           type: string
-          enum: [active, suspended]
+          enum:
+            - active
+            - suspended
         preferences:
           $ref: "#/components/schemas/UserPreferences"
-
-    UserPreferences:
-      type: object
-      properties:
-        emailNotifications:
-          type: boolean
-        browserPushNotifications:
-          type: boolean
-        commentNotifications:
-          type: boolean
-        contributionReminders:
-          type: boolean
-        circleUpdateNotifications:
-          type: boolean
-        marketingCommunication:
-          type: boolean
-
-    EmailOtpRequest:
-      type: object
-      required:
-        - email
-        - purpose
-      properties:
-        email:
-          type: string
-          format: email
-        purpose:
-          type: string
-          enum: [sign-in, register, recovery]
-        displayName:
-          type: string
-        termsAccepted:
-          type: boolean
-        privacyAccepted:
-          type: boolean
-
-    EmailOtpResponse:
-      type: object
-      required:
-        - challengeId
-        - expiresAt
-        - message
-      properties:
-        challengeId:
-          type: string
-        expiresAt:
-          type: string
-        message:
-          type: string
-        delivery:
-          type: string
-        developmentCode:
-          type: string
-
-    VerifyEmailOtpRequest:
-      type: object
-      required:
-        - challengeId
-        - code
-      properties:
-        challengeId:
-          type: string
-        code:
-          type: string
-
-    VerifyEmailOtpResponse:
-      type: object
-      required:
-        - customToken
-        - uid
-      properties:
-        customToken:
-          type: string
-        uid:
-          type: string
-
     CircleSummary:
       type: object
       required:
@@ -252,31 +333,77 @@ components:
           type: string
         type:
           type: string
-          enum: [GIFT, ASO_EBI, SUPPORT]
+          enum:
+            - GIFT
+            - ASO_EBI
+            - SUPPORT
         imageUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         targetAmount:
-          type: integer
-          nullable: true
+          type:
+            - number
+            - "null"
         currentAmount:
-          type: integer
+          type:
+            - number
+            - "null"
+          description:
+            Null when privacy hides the total; organizer confirmation is not
+            bank settlement verification
         memberCount:
           type: integer
         memberLimit:
           type: integer
         status:
           type: string
-          enum: [DRAFT, ACTIVE, COMPLETED, CANCELLED, ARCHIVED]
+          enum:
+            - DRAFT
+            - PUBLISHED
+            - ACTIVE
+            - TARGET_REACHED
+            - FULFILMENT
+            - COMPLETED
+            - CANCELLED
+            - ARCHIVED
+            - PURGED
         deadline:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         role:
           type: string
-          enum: [creator, co_admin, member]
+          enum:
+            - creator
+            - co_admin
+            - member
         createdAt:
           type: string
-
+    DevicePushTokenRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          minLength: 10
+          maxLength: 500
+          pattern: ^\S+$
+        platform:
+          type: string
+          enum:
+            - android
+            - ios
+            - web
+          default: android
+    UserProfileResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
     CircleListResponse:
       type: object
       required:
@@ -288,15 +415,89 @@ components:
             $ref: "#/components/schemas/CircleSummary"
         nextCursor:
           type: string
-          nullable: true
-
-    DevicePushTokenRequest:
+    CircleDetailResponse:
       type: object
       required:
-        - token
+        - circle
       properties:
-        token:
+        circle:
+          $ref: "#/components/schemas/CircleSummary"
+    UserPreferences:
+      type: object
+      properties:
+        emailNotifications:
+          type: boolean
+        browserPushNotifications:
+          type: boolean
+        commentNotifications:
+          type: boolean
+        contributionReminders:
+          type: boolean
+        circleUpdateNotifications:
+          type: boolean
+        marketingCommunication:
+          type: boolean
+    EmailOtpRequest:
+      type: object
+      required:
+        - email
+        - purpose
+      properties:
+        email:
           type: string
-        platform:
+          format: email
+        purpose:
           type: string
-          default: android
+          enum:
+            - sign-in
+            - register
+            - recovery
+        displayName:
+          type: string
+        termsAccepted:
+          type: boolean
+        privacyAccepted:
+          type: boolean
+    EmailOtpResponse:
+      type: object
+      description:
+        An issued challenge includes challengeId and expiresAt. Address
+        throttling returns only message and does not confirm delivery.
+      required:
+        - message
+      properties:
+        challengeId:
+          type: string
+        expiresAt:
+          type: integer
+          format: int64
+          description:
+            Challenge expiration as Unix milliseconds, present only when a
+            challenge was issued
+        message:
+          type: string
+        delivery:
+          type: string
+    VerifyEmailOtpRequest:
+      type: object
+      required:
+        - challengeId
+        - code
+      properties:
+        challengeId:
+          type: string
+          minLength: 1
+          maxLength: 16384
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+    VerifyEmailOtpResponse:
+      type: object
+      required:
+        - customToken
+        - uid
+      properties:
+        customToken:
+          type: string
+        uid:
+          type: string

@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
+import { logger } from "@/lib/logger";
 import { authenticateNativeRequest } from "@/server/auth/native";
 import {
   loadDashboardCircles,
@@ -11,7 +12,16 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
 type ApiCircleType = "GIFT" | "ASO_EBI" | "SUPPORT";
-type ApiCircleStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "ARCHIVED";
+type ApiCircleStatus =
+  | "DRAFT"
+  | "PUBLISHED"
+  | "ACTIVE"
+  | "TARGET_REACHED"
+  | "FULFILMENT"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "ARCHIVED"
+  | "PURGED";
 type ApiCircleRole = "creator" | "co_admin" | "member";
 
 // Stored circle types are lowercase ("gift" | "aso-ebi" | "support").
@@ -24,24 +34,30 @@ const CIRCLE_TYPE_BY_SOURCE: Record<string, ApiCircleType> = {
 
 const CIRCLE_STATUS_VALUES = new Set([
   "draft",
+  "published",
   "active",
+  "target_reached",
+  "fulfilment",
   "completed",
   "cancelled",
   "archived",
+  "purged",
 ]);
 
 function parseLimit(raw: string | null): number | null {
   if (raw === null || raw.trim() === "") return DEFAULT_LIMIT;
-  const parsed = Number.parseInt(raw, 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return null;
+  if (!/^\d+$/.test(raw)) return null;
+  const parsed = Number(raw);
+  if (!Number.isSafeInteger(parsed) || parsed < 1) return null;
   return Math.min(parsed, MAX_LIMIT);
 }
 
 /** Simple opaque offset cursor per the v1 contract ("0", "20", ...). */
 function parseCursorOffset(raw: string | null): number | null {
   if (raw === null || raw.trim() === "") return 0;
-  const parsed = Number.parseInt(raw, 10);
-  if (!Number.isFinite(parsed) || parsed < 0) return null;
+  if (!/^\d+$/.test(raw)) return null;
+  const parsed = Number(raw);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) return null;
   return parsed;
 }
 
@@ -92,26 +108,23 @@ export async function GET(request: Request) {
   try {
     const outcome = await authenticateNativeRequest(request);
     if (outcome.state === "unauthenticated") {
-      return NextResponse.json(
-        { error: "Authentication required." },
-        { status: 401 },
-      );
+      return apiJson({ error: "Authentication required." }, { status: 401 });
     }
     if (outcome.state === "suspended") {
-      return NextResponse.json({ error: "Account suspended." }, { status: 403 });
+      return apiJson({ error: "Account suspended." }, { status: 403 });
     }
 
     const url = new URL(request.url);
     const limit = parseLimit(url.searchParams.get("limit"));
     const offset = parseCursorOffset(url.searchParams.get("cursor"));
     if (limit === null) {
-      return NextResponse.json(
+      return apiJson(
         { error: "limit must be a positive integer." },
         { status: 400 },
       );
     }
     if (offset === null) {
-      return NextResponse.json(
+      return apiJson(
         { error: "cursor must be a non-negative integer offset." },
         { status: 400 },
       );
@@ -123,7 +136,7 @@ export async function GET(request: Request) {
     const page = sorted.slice(offset, offset + limit);
     const nextOffset = offset + limit;
 
-    return NextResponse.json(
+    return apiJson(
       {
         circles: page.map((circle) => ({
           id: circle.id,
@@ -131,7 +144,7 @@ export async function GET(request: Request) {
           type: circleTypeEnum(circle.type),
           imageUrl: circle.imageUrl ?? null,
           targetAmount: circle.targetAmount ?? null,
-          currentAmount: circle.contributedAmount ?? 0,
+          currentAmount: circle.contributedAmount ?? null,
           memberCount: circle.memberCount,
           memberLimit: circle.memberLimit,
           status: circleStatusEnum(circle.status),
@@ -145,16 +158,8 @@ export async function GET(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
-    console.error("[api/v1/circles] Failed to list circles:", error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to retrieve circles.",
-      },
-      { status: 500 },
-    );
+  } catch {
+    logger.error("native_circle_list_failed");
+    return apiJson({ error: "Unable to retrieve circles." }, { status: 500 });
   }
 }

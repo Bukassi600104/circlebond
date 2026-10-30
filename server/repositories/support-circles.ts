@@ -1,5 +1,6 @@
 import "server-only";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
+import { readAllRows } from "@/server/repositories/pages";
 import {
   supportAmountVisibility,
   validateSupportPledge,
@@ -174,6 +175,11 @@ export async function loadSupportCircle(
   const viewerCanManage =
     circle.creator.id === viewerId || viewerMembership.role === "co_admin";
   const pricingContext = entitlementContextForStoredCircle(circle);
+  const updates = await readAllRows<SupportQuery["supportUpdates"][number]>(
+    "GetSupportUpdatesPage",
+    { circleId },
+    "supportUpdates",
+  );
   return {
     ...circle,
     imageUrl: circle.imageUrl ?? null,
@@ -236,7 +242,7 @@ export async function loadSupportCircle(
             : null,
         };
       }),
-    updates: response.data.supportUpdates.map((update) => ({
+    updates: updates.map((update) => ({
       id: update.id,
       body: update.body,
       createdAt: update.createdAt,

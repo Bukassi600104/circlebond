@@ -1,6 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
+import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import {
   PricingRuleError,
@@ -12,6 +13,10 @@ import type {
 } from "@/lib/circle-pricing";
 import { safelyEmitNotification } from "@/server/repositories/notifications";
 import { recordPricingOutcome } from "@/server/repositories/operational-events";
+import type {
+  ActivationCheckoutInput,
+  ActivationPaymentProvider,
+} from "@/server/pricing/provider";
 
 type TrialUsageQuery = {
   creatorTrialUsage?: {
@@ -141,6 +146,10 @@ export async function loadCirclePricingState(
   >("GetCirclePricingState", { circleId });
   const circle = response.data.circle;
   if (!circle) return null;
+  const rows = await readAllRows<
+    CirclePricingStateQuery["circleActivations"][number]
+  >("GetCircleActivationsPage", { circleId }, "circleActivations");
+  const activations = [...new Map(rows.map((row) => [row.id, row])).values()];
   return {
     id: circle.id,
     creatorId: circle.creator.id,
@@ -153,7 +162,7 @@ export async function loadCirclePricingState(
     activationPriceMinor: circle.activationPriceMinor,
     activatedAt: circle.activatedAt ?? null,
     status: circle.status,
-    activations: response.data.circleActivations.map((activation) => ({
+    activations: activations.map((activation) => ({
       ...activation,
       provider: activation.provider ?? null,
       providerReference: activation.providerReference ?? null,
@@ -163,7 +172,7 @@ export async function loadCirclePricingState(
   };
 }
 
-export async function createCircleActivationAttempt(input: {
+export type CircleActivationAttemptInput = {
   activationId: string;
   circleId: string;
   creatorId: string;
@@ -176,7 +185,11 @@ export async function createCircleActivationAttempt(input: {
   provider: string;
   providerReference: string;
   previousActivationId?: string | null;
-}) {
+};
+
+export async function createCircleActivationAttempt(
+  input: CircleActivationAttemptInput,
+) {
   await getBondCircleDataConnect().executeMutation(
     "CreateCircleActivationAttempt",
     {
@@ -185,6 +198,110 @@ export async function createCircleActivationAttempt(input: {
       createdAt: new Date().toISOString(),
     },
   );
+}
+
+export type CircleActivationAttempt = {
+  id: string;
+  circle: { id: string };
+  creator: { id: string };
+  planDefinition: {
+    id: string;
+    memberLimit: number;
+    priceMinor: number;
+  } | null;
+  activationType: string;
+  circleType: CirclePricingMode;
+  tier: CirclePricingPlan;
+  currency: string;
+  listPriceMinor: number;
+  amountDueMinor: number;
+  pricePaidMinor: number;
+  status: string;
+  provider: string | null;
+  providerReference: string | null;
+  previousActivationId: string | null;
+};
+
+export async function loadCircleActivationAttempt(activationId: string) {
+  const response = await getBondCircleDataConnect().executeQuery<
+    { circleActivation: CircleActivationAttempt | null },
+    { activationId: string }
+  >("GetCircleActivationAttempt", { activationId });
+  return response.data.circleActivation;
+}
+
+export async function loadCirclePaymentCheckout(circleId: string) {
+  const response = await getBondCircleDataConnect().executeQuery<
+    {
+      circlePaymentCheckout: {
+        checkoutUrl: string | null;
+        activation: { id: string };
+      } | null;
+    },
+    { circleId: string }
+  >("GetCirclePaymentCheckout", { circleId });
+  return response.data.circlePaymentCheckout;
+}
+
+export async function startCirclePaymentCheckout(
+  provider: ActivationPaymentProvider,
+  checkoutInput: ActivationCheckoutInput,
+  attemptInput: Omit<
+    CircleActivationAttemptInput,
+    "provider" | "providerReference"
+  >,
+) {
+  provider.validateCheckout(checkoutInput);
+  const existingCheckout = async () => {
+    const pending = await loadCirclePaymentCheckout(attemptInput.circleId);
+    if (!pending) return null;
+    const attempt = await loadCircleActivationAttempt(pending.activation.id);
+    if (
+      pending.checkoutUrl &&
+      attempt?.status === "pending" &&
+      attempt.creator.id === attemptInput.creatorId &&
+      attempt.planDefinition?.id === attemptInput.planDefinitionId &&
+      attempt.amountDueMinor === attemptInput.amountDueMinor
+    ) {
+      return {
+        provider: attempt.provider,
+        providerReference: attempt.providerReference,
+        checkoutUrl: pending.checkoutUrl,
+      };
+    }
+    throw new PricingRuleError(
+      "An activation checkout is already being prepared or awaiting verification. Verify it before starting another payment.",
+      "PAYMENT_CHECKOUT_PENDING",
+      409,
+    );
+  };
+  const existing = await existingCheckout();
+  if (existing) return existing;
+  const providerReference = provider.referenceForActivation(
+    attemptInput.activationId,
+  );
+  try {
+    await createCircleActivationAttempt({
+      ...attemptInput,
+      provider: provider.name,
+      providerReference,
+    });
+  } catch (error) {
+    const concurrent = await existingCheckout();
+    if (concurrent) return concurrent;
+    throw error;
+  }
+  // Keep the durable attempt on uncertain provider failures to prevent a second charge.
+  const checkout = await provider.createCheckout(checkoutInput);
+  await getBondCircleDataConnect().executeMutation(
+    "SaveCirclePaymentCheckout",
+    {
+      circleId: attemptInput.circleId,
+      activationId: attemptInput.activationId,
+      checkoutUrl: checkout.checkoutUrl,
+    },
+  );
+  return checkout;
 }
 
 export async function failCircleActivationAttempt(input: {

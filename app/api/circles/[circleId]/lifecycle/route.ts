@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
@@ -41,10 +42,9 @@ export async function POST(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to update circle lifecycle.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update circle lifecycle.",
       },
       { status: 400 },
     );

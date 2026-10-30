@@ -1,0 +1,152 @@
+query GetContributionWorkspaceMetadata($circleId: UUID!)
+@auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    targetAmount
+    contributedAmount
+    status
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+    orderBy: { joinedAt: ASC }
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    expectedAmount
+    confirmedAmount
+    user {
+      id
+      displayName
+      profileImage
+    }
+  }
+}
+
+query GetContributionReceiptsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  receipts(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ submittedAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    amount
+    note
+    imageUrl
+    imageStoragePath
+    contentType
+    status
+    overpaymentAmount
+    replacementOfId
+    rejectionReason
+    submittedAt
+    reviewedAt
+    uploadedBy {
+      id
+      displayName
+    }
+    reviewedBy {
+      id
+      displayName
+    }
+  }
+}
+
+query GetCircleInvitationsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  invitations(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ createdAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    mode
+    recipientName
+    recipientEmail
+    recipientPhone
+    expectedAmount
+    requireApproval
+    state
+    maxUses
+    useCount
+    expiresAt
+    createdAt
+    updatedAt
+  }
+}
+
+query GetInvitationAcceptancesPage($invitationId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  invitationAcceptances(
+    where: { invitationId: { eq: $invitationId } }
+    orderBy: [{ createdAt: ASC }, { userId: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    status
+    createdAt
+    respondedAt
+    user {
+      id
+      displayName
+      email
+      phone
+      profileImage
+    }
+  }
+}
+
+query GetCircleActivationsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  circleActivations(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ createdAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    activationType
+    tier
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    provider
+    providerReference
+    createdAt
+    paidAt
+    activatedAt
+  }
+}
+
+query GetCircleInvitationAcceptancesPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  invitationAcceptances(
+    where: { invitation: { circleId: { eq: $circleId } } }
+    orderBy: [{ createdAt: ASC }, { invitationId: ASC }, { userId: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    invitation {
+      id
+    }
+    status
+    createdAt
+    respondedAt
+    user {
+      id
+      displayName
+      email
+      phone
+      profileImage
+    }
+  }
+}

@@ -168,5 +168,6 @@ test("purge persistence, shared-file protection, retries, alerts and cron are wi
   assert.match(cronRoute, /timingSafeEqual/);
   assert.deepEqual(vercel.crons, [
     { path: "/api/jobs/retention", schedule: "0 3 * * *" },
+    { path: "/api/jobs/notifications/deadlines", schedule: "0 8 * * *" },
   ]);
 });

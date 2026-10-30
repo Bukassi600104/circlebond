@@ -25,6 +25,10 @@ import {
   type NotificationType,
 } from "@/server/notifications/rules";
 
+type DeadlineCandidates = {
+  circles: Array<{ id: string; deadline: string }>;
+};
+
 type Recipient = {
   id: string;
   displayName: string;
@@ -130,9 +134,8 @@ async function sendAndLogEmail(input: {
       status: "sent",
       providerMessageId: delivery.messageId,
     });
-  } catch (error) {
-    const failureReason =
-      error instanceof Error ? error.message : "Unknown email delivery error";
+  } catch {
+    const failureReason = "EMAIL_DELIVERY_FAILED";
     logger.error("notification_email_failed", {
       type: input.type,
       recipientId: input.recipientId,
@@ -143,10 +146,9 @@ async function sendAndLogEmail(input: {
       eventType: input.type,
       status: "failed",
       failureReason,
-    }).catch((loggingError) => {
+    }).catch(() => {
       logger.error("notification_delivery_log_failed", {
         type: input.type,
-        error: loggingError instanceof Error ? loggingError.message : "unknown",
       });
     });
   }
@@ -409,10 +411,9 @@ async function processUserDeadlineNotifications(userId: string) {
         });
       }
     }
-  } catch (error) {
+  } catch {
     logger.error("user_deadline_notification_failed", {
       userId,
-      error: error instanceof Error ? error.message : "unknown",
     });
   }
 }
@@ -550,25 +551,36 @@ export async function processDeadlineNotifications(today = new Date()) {
   const toDate = new Date(today);
   toDate.setUTCDate(toDate.getUTCDate() + 3);
   const to = toDate.toISOString().slice(0, 10);
-  const response = await getBondCircleDataConnect().executeQuery<
-    {
-      circles: Array<{
-        id: string;
-        name: string;
-        type: string;
-        deadline?: string | null;
-      }>;
-    },
-    { from: string; to: string }
-  >("GetDeadlineNotificationCandidates", { from, to });
-  for (const circle of response.data.circles) {
-    await emitCircleNotification({
-      circleId: circle.id,
-      type: "deadline_approaching",
-      entityId: circle.deadline ?? to,
-    });
+  let processed = 0;
+  let after: string | null = null;
+  for (;;) {
+    const response: { data: DeadlineCandidates } =
+      await getBondCircleDataConnect().executeQuery<
+        DeadlineCandidates,
+        { from: string; to: string; after: string | null }
+      >("GetDeadlineNotificationCandidates", { from, to, after });
+    // Native SQL returns Any; validate the cursor rows before use.
+    if (
+      !Array.isArray(response.data.circles) ||
+      !response.data.circles.every(
+        (circle) =>
+          circle &&
+          typeof circle.id === "string" &&
+          typeof circle.deadline === "string",
+      )
+    )
+      throw new Error("Deadline candidates are unavailable.");
+    for (const circle of response.data.circles) {
+      await emitCircleNotification({
+        circleId: circle.id,
+        type: "deadline_approaching",
+        entityId: circle.deadline ?? to,
+      });
+    }
+    processed += response.data.circles.length;
+    if (response.data.circles.length < 200) return { processed };
+    after = response.data.circles.at(-1)!.id;
   }
-  return { processed: response.data.circles.length };
 }
 
 export async function safelyEmitNotification(
@@ -576,11 +588,10 @@ export async function safelyEmitNotification(
 ) {
   try {
     await emitCircleNotification(input);
-  } catch (error) {
+  } catch {
     logger.error("notification_emit_failed", {
       circleId: input.circleId,
       type: input.type,
-      error: error instanceof Error ? error.message : "unknown",
     });
   }
 }

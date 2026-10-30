@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       privacyAccepted?: boolean;
       displayName?: string;
     };
-    if (!input.termsAccepted || !input.privacyAccepted) {
+    if (input.termsAccepted !== true || input.privacyAccepted !== true) {
       throw new Error("Both policies must be accepted.");
     }
     const acceptedAt = new Date().toISOString();
@@ -26,17 +26,23 @@ export async function POST(request: Request) {
     if (displayName.length < 2 || displayName.length > 80) {
       throw new Error("Invalid display name.");
     }
-    await getFirebaseAdminAuth().updateUser(session.uid, { displayName });
-    await getFirebaseAdminAuth().setCustomUserClaims(session.uid, {
-      termsAcceptedAt: acceptedAt,
-      privacyAcceptedAt: acceptedAt,
-    });
-    await persistUserProfile({
-      id: session.uid,
-      displayName,
-      email: session.email ?? null,
-      phone: session.decoded.phone_number ?? null,
-      profileImage: session.decoded.picture ?? null,
+    await persistUserProfile(
+      {
+        id: session.uid,
+        displayName,
+        email: session.email,
+        phone: session.decoded.phone_number,
+        profileImage: session.decoded.picture,
+        termsAcceptedAt: acceptedAt,
+        privacyAcceptedAt: acceptedAt,
+      },
+      { strict: true },
+    );
+    const auth = getFirebaseAdminAuth();
+    const user = await auth.getUser(session.uid);
+    await auth.updateUser(session.uid, { displayName });
+    await auth.setCustomUserClaims(session.uid, {
+      ...user.customClaims,
       termsAcceptedAt: acceptedAt,
       privacyAcceptedAt: acceptedAt,
     });

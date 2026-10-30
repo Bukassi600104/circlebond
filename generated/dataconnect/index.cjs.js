@@ -7,6 +7,211 @@ const connectorConfig = {
 };
 exports.connectorConfig = connectorConfig;
 
+const getAccountExportPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetAccountExportPage', inputVars);
+}
+getAccountExportPageRef.operationName = 'GetAccountExportPage';
+exports.getAccountExportPageRef = getAccountExportPageRef;
+
+exports.getAccountExportPage = function getAccountExportPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getAccountExportPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getAccountPrivacyRequestsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetAccountPrivacyRequests', inputVars);
+}
+getAccountPrivacyRequestsRef.operationName = 'GetAccountPrivacyRequests';
+exports.getAccountPrivacyRequestsRef = getAccountPrivacyRequestsRef;
+
+exports.getAccountPrivacyRequests = function getAccountPrivacyRequests(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getAccountPrivacyRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const createAccountPrivacyRequestRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateAccountPrivacyRequest', inputVars);
+}
+createAccountPrivacyRequestRef.operationName = 'CreateAccountPrivacyRequest';
+exports.createAccountPrivacyRequestRef = createAccountPrivacyRequestRef;
+
+exports.createAccountPrivacyRequest = function createAccountPrivacyRequest(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createAccountPrivacyRequestRef(dcInstance, inputVars));
+}
+;
+
+const getOwnerPrivacyRequestsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetOwnerPrivacyRequests', inputVars);
+}
+getOwnerPrivacyRequestsRef.operationName = 'GetOwnerPrivacyRequests';
+exports.getOwnerPrivacyRequestsRef = getOwnerPrivacyRequestsRef;
+
+exports.getOwnerPrivacyRequests = function getOwnerPrivacyRequests(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getOwnerPrivacyRequestsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const acknowledgeAccountPrivacyRequestRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'AcknowledgeAccountPrivacyRequest', inputVars);
+}
+acknowledgeAccountPrivacyRequestRef.operationName = 'AcknowledgeAccountPrivacyRequest';
+exports.acknowledgeAccountPrivacyRequestRef = acknowledgeAccountPrivacyRequestRef;
+
+exports.acknowledgeAccountPrivacyRequest = function acknowledgeAccountPrivacyRequest(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(acknowledgeAccountPrivacyRequestRef(dcInstance, inputVars));
+}
+;
+
+const getCircleCommunicationContextRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleCommunicationContext', inputVars);
+}
+getCircleCommunicationContextRef.operationName = 'GetCircleCommunicationContext';
+exports.getCircleCommunicationContextRef = getCircleCommunicationContextRef;
+
+exports.getCircleCommunicationContext = function getCircleCommunicationContext(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleCommunicationContextRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleAnnouncementsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleAnnouncementsPage', inputVars);
+}
+getCircleAnnouncementsPageRef.operationName = 'GetCircleAnnouncementsPage';
+exports.getCircleAnnouncementsPageRef = getCircleAnnouncementsPageRef;
+
+exports.getCircleAnnouncementsPage = function getCircleAnnouncementsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleAnnouncementsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleCommentsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleCommentsPage', inputVars);
+}
+getCircleCommentsPageRef.operationName = 'GetCircleCommentsPage';
+exports.getCircleCommentsPageRef = getCircleCommentsPageRef;
+
+exports.getCircleCommentsPage = function getCircleCommentsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleCommentsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleCommentReportsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleCommentReportsPage', inputVars);
+}
+getCircleCommentReportsPageRef.operationName = 'GetCircleCommentReportsPage';
+exports.getCircleCommentReportsPageRef = getCircleCommentReportsPageRef;
+
+exports.getCircleCommentReportsPage = function getCircleCommentReportsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleCommentReportsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getSupportUpdatesPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetSupportUpdatesPage', inputVars);
+}
+getSupportUpdatesPageRef.operationName = 'GetSupportUpdatesPage';
+exports.getSupportUpdatesPageRef = getSupportUpdatesPageRef;
+
+exports.getSupportUpdatesPage = function getSupportUpdatesPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getSupportUpdatesPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getUserDeviceRegistrationsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserDeviceRegistrations', inputVars);
+}
+getUserDeviceRegistrationsRef.operationName = 'GetUserDeviceRegistrations';
+exports.getUserDeviceRegistrationsRef = getUserDeviceRegistrationsRef;
+
+exports.getUserDeviceRegistrations = function getUserDeviceRegistrations(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getUserDeviceRegistrationsRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const registerDeviceRegistrationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RegisterDeviceRegistration', inputVars);
+}
+registerDeviceRegistrationRef.operationName = 'RegisterDeviceRegistration';
+exports.registerDeviceRegistrationRef = registerDeviceRegistrationRef;
+
+exports.registerDeviceRegistration = function registerDeviceRegistration(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(registerDeviceRegistrationRef(dcInstance, inputVars));
+}
+;
+
+const deleteDeviceRegistrationRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteDeviceRegistration', inputVars);
+}
+deleteDeviceRegistrationRef.operationName = 'DeleteDeviceRegistration';
+exports.deleteDeviceRegistrationRef = deleteDeviceRegistrationRef;
+
+exports.deleteDeviceRegistration = function deleteDeviceRegistration(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteDeviceRegistrationRef(dcInstance, inputVars));
+}
+;
+
+const deleteUserDeviceRegistrationsRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteUserDeviceRegistrations', inputVars);
+}
+deleteUserDeviceRegistrationsRef.operationName = 'DeleteUserDeviceRegistrations';
+exports.deleteUserDeviceRegistrationsRef = deleteUserDeviceRegistrationsRef;
+
+exports.deleteUserDeviceRegistrations = function deleteUserDeviceRegistrations(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteUserDeviceRegistrationsRef(dcInstance, inputVars));
+}
+;
+
 const getCurrentUserRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
@@ -106,6 +311,21 @@ exports.getDashboardCircles = function getDashboardCircles(dcOrOptions, options)
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
   return executeQuery(getDashboardCirclesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getDashboardCirclesForUserRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDashboardCirclesForUser', inputVars);
+}
+getDashboardCirclesForUserRef.operationName = 'GetDashboardCirclesForUser';
+exports.getDashboardCirclesForUserRef = getDashboardCirclesForUserRef;
+
+exports.getDashboardCirclesForUser = function getDashboardCirclesForUser(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getDashboardCirclesForUserRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;
 
@@ -253,6 +473,50 @@ exports.getCirclePricingState = function getCirclePricingState(dcOrVars, varsOrO
   
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getCirclePricingStateRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCirclePaymentCheckoutRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCirclePaymentCheckout', inputVars);
+}
+getCirclePaymentCheckoutRef.operationName = 'GetCirclePaymentCheckout';
+exports.getCirclePaymentCheckoutRef = getCirclePaymentCheckoutRef;
+
+exports.getCirclePaymentCheckout = function getCirclePaymentCheckout(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCirclePaymentCheckoutRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleActivationAttemptRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleActivationAttempt', inputVars);
+}
+getCircleActivationAttemptRef.operationName = 'GetCircleActivationAttempt';
+exports.getCircleActivationAttemptRef = getCircleActivationAttemptRef;
+
+exports.getCircleActivationAttempt = function getCircleActivationAttempt(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleActivationAttemptRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const saveCirclePaymentCheckoutRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SaveCirclePaymentCheckout', inputVars);
+}
+saveCirclePaymentCheckoutRef.operationName = 'SaveCirclePaymentCheckout';
+exports.saveCirclePaymentCheckoutRef = saveCirclePaymentCheckoutRef;
+
+exports.saveCirclePaymentCheckout = function saveCirclePaymentCheckout(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(saveCirclePaymentCheckoutRef(dcInstance, inputVars));
 }
 ;
 
@@ -1485,5 +1749,183 @@ exports.provisionOwnerAdministratorRef = provisionOwnerAdministratorRef;
 exports.provisionOwnerAdministrator = function provisionOwnerAdministrator(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(provisionOwnerAdministratorRef(dcInstance, inputVars));
+}
+;
+
+const getRateLimitBucketRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetRateLimitBucket', inputVars);
+}
+getRateLimitBucketRef.operationName = 'GetRateLimitBucket';
+exports.getRateLimitBucketRef = getRateLimitBucketRef;
+
+exports.getRateLimitBucket = function getRateLimitBucket(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getRateLimitBucketRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const createRateLimitBucketRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateRateLimitBucket', inputVars);
+}
+createRateLimitBucketRef.operationName = 'CreateRateLimitBucket';
+exports.createRateLimitBucketRef = createRateLimitBucketRef;
+
+exports.createRateLimitBucket = function createRateLimitBucket(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(createRateLimitBucketRef(dcInstance, inputVars));
+}
+;
+
+const compareAndSetRateLimitBucketRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CompareAndSetRateLimitBucket', inputVars);
+}
+compareAndSetRateLimitBucketRef.operationName = 'CompareAndSetRateLimitBucket';
+exports.compareAndSetRateLimitBucketRef = compareAndSetRateLimitBucketRef;
+
+exports.compareAndSetRateLimitBucket = function compareAndSetRateLimitBucket(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(compareAndSetRateLimitBucketRef(dcInstance, inputVars));
+}
+;
+
+const getCircleRetentionStateRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleRetentionState', inputVars);
+}
+getCircleRetentionStateRef.operationName = 'GetCircleRetentionState';
+exports.getCircleRetentionStateRef = getCircleRetentionStateRef;
+
+exports.getCircleRetentionState = function getCircleRetentionState(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleRetentionStateRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleRetentionPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleRetentionPage', inputVars);
+}
+getCircleRetentionPageRef.operationName = 'GetCircleRetentionPage';
+exports.getCircleRetentionPageRef = getCircleRetentionPageRef;
+
+exports.getCircleRetentionPage = function getCircleRetentionPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleRetentionPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getRetentionExternalStorageReferencesRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetRetentionExternalStorageReferences', inputVars);
+}
+getRetentionExternalStorageReferencesRef.operationName = 'GetRetentionExternalStorageReferences';
+exports.getRetentionExternalStorageReferencesRef = getRetentionExternalStorageReferencesRef;
+
+exports.getRetentionExternalStorageReferences = function getRetentionExternalStorageReferences(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getRetentionExternalStorageReferencesRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getContributionWorkspaceMetadataRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetContributionWorkspaceMetadata', inputVars);
+}
+getContributionWorkspaceMetadataRef.operationName = 'GetContributionWorkspaceMetadata';
+exports.getContributionWorkspaceMetadataRef = getContributionWorkspaceMetadataRef;
+
+exports.getContributionWorkspaceMetadata = function getContributionWorkspaceMetadata(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getContributionWorkspaceMetadataRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getContributionReceiptsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetContributionReceiptsPage', inputVars);
+}
+getContributionReceiptsPageRef.operationName = 'GetContributionReceiptsPage';
+exports.getContributionReceiptsPageRef = getContributionReceiptsPageRef;
+
+exports.getContributionReceiptsPage = function getContributionReceiptsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getContributionReceiptsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleInvitationsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleInvitationsPage', inputVars);
+}
+getCircleInvitationsPageRef.operationName = 'GetCircleInvitationsPage';
+exports.getCircleInvitationsPageRef = getCircleInvitationsPageRef;
+
+exports.getCircleInvitationsPage = function getCircleInvitationsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleInvitationsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getInvitationAcceptancesPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetInvitationAcceptancesPage', inputVars);
+}
+getInvitationAcceptancesPageRef.operationName = 'GetInvitationAcceptancesPage';
+exports.getInvitationAcceptancesPageRef = getInvitationAcceptancesPageRef;
+
+exports.getInvitationAcceptancesPage = function getInvitationAcceptancesPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getInvitationAcceptancesPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleActivationsPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleActivationsPage', inputVars);
+}
+getCircleActivationsPageRef.operationName = 'GetCircleActivationsPage';
+exports.getCircleActivationsPageRef = getCircleActivationsPageRef;
+
+exports.getCircleActivationsPage = function getCircleActivationsPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleActivationsPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
+const getCircleInvitationAcceptancesPageRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetCircleInvitationAcceptancesPage', inputVars);
+}
+getCircleInvitationAcceptancesPageRef.operationName = 'GetCircleInvitationAcceptancesPage';
+exports.getCircleInvitationAcceptancesPageRef = getCircleInvitationAcceptancesPageRef;
+
+exports.getCircleInvitationAcceptancesPage = function getCircleInvitationAcceptancesPage(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getCircleInvitationAcceptancesPageRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 ;

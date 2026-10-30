@@ -1,0 +1,215 @@
+query GetAccountExportPage($userId: String!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  user(key: { id: $userId }) {
+    id
+    displayName
+    email
+    phone
+    profileImage
+    termsAcceptedAt
+    privacyAcceptedAt
+    emailNotifications
+    browserPushNotifications
+    commentNotifications
+    contributionReminders
+    circleUpdateNotifications
+    marketingCommunication
+    accountStatus
+    createdAt
+  }
+  memberships: circleMemberships(
+    where: { userId: { eq: $userId } }
+    orderBy: { circleId: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    role
+    membershipStatus
+    contributionStatus
+    expectedAmount
+    pledgedAmount
+    confirmedAmount
+    fulfilmentStatus
+    notificationsMuted
+    joinedAt
+    circle {
+      id
+      name
+      type
+      status
+    }
+  }
+  receipts(
+    where: { uploadedById: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    amount
+    note
+    status
+    overpaymentAmount
+    rejectionReason
+    submittedAt
+    reviewedAt
+    circle {
+      id
+    }
+  }
+  comments(
+    where: { authorId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    body
+    status
+    createdAt
+    updatedAt
+    deletedAt
+    circle {
+      id
+    }
+  }
+  announcements(
+    where: { authorId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    title
+    body
+    createdAt
+    updatedAt
+    deletedAt
+    circle {
+      id
+    }
+  }
+  supportUpdates(
+    where: { authorId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    body
+    createdAt
+    circle {
+      id
+    }
+  }
+  notifications(
+    where: { recipientId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    type
+    title
+    body
+    readAt
+    dismissedAt
+    createdAt
+  }
+  activations: circleActivations(
+    where: { creatorId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    activationType
+    circleType
+    tier
+    currency
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    createdAt
+    paidAt
+    activatedAt
+    circle {
+      id
+    }
+  }
+  authEvents: authAuditEvents(
+    where: { userId: { eq: $userId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    event
+    channel
+    outcome
+    occurredAt
+  }
+}
+
+query GetAccountPrivacyRequests($userId: String!) @auth(level: NO_ACCESS) {
+  accountPrivacyRequests(
+    where: { userId: { eq: $userId } }
+    orderBy: { createdAt: DESC }
+    limit: 2
+  ) {
+    id
+    kind
+    status
+    createdAt
+    updatedAt
+  }
+}
+
+mutation CreateAccountPrivacyRequest(
+  $id: String!
+  $userId: String!
+  $kind: String!
+) @auth(level: NO_ACCESS) {
+  accountPrivacyRequest_insert(data: { id: $id, userId: $userId, kind: $kind })
+}
+
+query GetOwnerPrivacyRequests($offset: Int!) @auth(level: NO_ACCESS) {
+  accountPrivacyRequests(
+    orderBy: { createdAt: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    kind
+    status
+    createdAt
+    updatedAt
+    user {
+      id
+      displayName
+      email
+      phone
+    }
+  }
+}
+
+mutation AcknowledgeAccountPrivacyRequest($id: String!, $actorId: String!)
+@auth(level: NO_ACCESS)
+@transaction {
+  accountPrivacyRequest_update(
+    key: { id: $id }
+    data: { status: "processing", updatedAt_expr: "request.time" }
+  ) @check(expr: "this != null", message: "Privacy request not found.")
+  ownerAdminAuditEvent_insert(
+    data: {
+      actorId: $actorId
+      action: "privacy_request_acknowledged"
+      targetType: "account_privacy_request"
+      targetId: $id
+      purpose: "legal"
+      outcome: "succeeded"
+      metadata: "{\"reasonCode\":\"processing_started\"}"
+    }
+  )
+}

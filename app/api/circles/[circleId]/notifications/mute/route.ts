@@ -1,3 +1,4 @@
+import { isPublicError } from "@/server/public-errors";
 import { NextResponse } from "next/server";
 import { authenticatePrincipal } from "@/server/auth";
 import { assertTrustedMutation } from "@/server/auth/request";
@@ -23,10 +24,9 @@ export async function PATCH(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to update this circle.",
+        error: isPublicError(error)
+          ? error.message
+          : "Unable to update this circle.",
       },
       { status: 400 },
     );

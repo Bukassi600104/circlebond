@@ -5,6 +5,13 @@ import { getApps, initializeApp } from "firebase-admin/app";
 import { getDataConnect } from "firebase-admin/data-connect";
 import { pricingForCircle } from "../../lib/circle-pricing.ts";
 
+assert.ok(
+  /^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(
+    process.env.DATA_CONNECT_EMULATOR_HOST ?? "",
+  ),
+  "Circle database tests require an explicit loopback Data Connect emulator.",
+);
+
 const app =
   getApps().find((candidate) => candidate.name === "circle-engine-e2e") ??
   initializeApp({ projectId: "bond-circle" }, "circle-engine-e2e");
@@ -109,7 +116,7 @@ test("one concurrent first-circle trial succeeds and the other remains a draft",
   ]);
 });
 
-test("paid activation and upgrade preserve exact historical prices", async () => {
+test("payment: paid activation and upgrade preserve exact historical prices", async () => {
   const creatorId = `pricing-paid-${randomUUID()}`;
   await dataConnect.upsert("user", {
     id: creatorId,
@@ -149,13 +156,31 @@ test("paid activation and upgrade preserve exact historical prices", async () =>
     previousActivationId: null,
     createdAt: new Date().toISOString(),
   });
-  await dataConnect.executeMutation("CompletePaidCircleActivation", {
+  const paidCompletion = {
     activationId: paidActivationId,
     circleId,
     creatorId,
     pricePaidMinor: 150000,
     activatedAt: new Date().toISOString(),
-  });
+  };
+  await assert.rejects(
+    dataConnect.executeMutation("CompletePaidCircleActivation", {
+      ...paidCompletion,
+      pricePaidMinor: 150001,
+    }),
+  );
+  const concurrentSettlements = await Promise.allSettled([
+    dataConnect.executeMutation("CompletePaidCircleActivation", paidCompletion),
+    dataConnect.executeMutation("CompletePaidCircleActivation", paidCompletion),
+  ]);
+  assert.equal(
+    concurrentSettlements.filter(({ status }) => status === "fulfilled").length,
+    1,
+  );
+  assert.equal(
+    concurrentSettlements.filter(({ status }) => status === "rejected").length,
+    1,
+  );
 
   const upgradeActivationId = randomUUID();
   await dataConnect.executeMutation("CreateCircleActivationAttempt", {
@@ -173,6 +198,12 @@ test("paid activation and upgrade preserve exact historical prices", async () =>
     previousActivationId: paidActivationId,
     createdAt: new Date().toISOString(),
   });
+  const duringUpgrade = await dataConnect.executeQuery(
+    "GetCirclePricingState",
+    { circleId },
+  );
+  assert.equal(duringUpgrade.data.circle.activationStatus, "active");
+  assert.equal(duringUpgrade.data.circle.pricingPlan, "starter");
   await dataConnect.executeMutation("CompleteCirclePlanUpgrade", {
     activationId: upgradeActivationId,
     circleId,
@@ -189,6 +220,9 @@ test("paid activation and upgrade preserve exact historical prices", async () =>
   const state = await dataConnect.executeQuery("GetCirclePricingState", {
     circleId,
   });
+  await assert.rejects(
+    dataConnect.executeMutation("CompletePaidCircleActivation", paidCompletion),
+  );
   assert.equal(state.data.circle.pricingPlan, "standard");
   assert.equal(state.data.circle.memberLimit, 30);
   assert.equal(state.data.circle.activationStatus, "active");
@@ -213,6 +247,166 @@ test("paid activation and upgrade preserve exact historical prices", async () =>
       },
     ],
   );
+});
+
+test("payment: concurrent checkouts use one lock and a failed upgrade preserves the active plan", async () => {
+  const creatorId = `payment-lock-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Payment lock tester",
+  });
+  const circleId = await createPricedDraft(
+    creatorId,
+    "Payment lock circle",
+    "gift",
+    "starter",
+    10,
+  );
+  await createPricedDraft(
+    creatorId,
+    "Target definition",
+    "gift",
+    "standard",
+    30,
+  );
+  const attemptInput = (activationId) => ({
+    activationId,
+    circleId,
+    creatorId,
+    planDefinitionId: "gift_starter_v1_2026_08_02",
+    activationType: "paid",
+    circleType: "gift",
+    tier: "starter",
+    listPriceMinor: 150000,
+    amountDueMinor: 150000,
+    provider: "e2e_verified_provider",
+    providerReference: `e2e-${activationId}`,
+    previousActivationId: null,
+    createdAt: new Date().toISOString(),
+  });
+  const attempts = [randomUUID(), randomUUID()];
+  const starts = await Promise.allSettled(
+    attempts.map((activationId) =>
+      dataConnect.executeMutation(
+        "CreateCircleActivationAttempt",
+        attemptInput(activationId),
+      ),
+    ),
+  );
+  assert.equal(starts.filter(({ status }) => status === "fulfilled").length, 1);
+  assert.equal(starts.filter(({ status }) => status === "rejected").length, 1);
+  const activationId =
+    attempts[starts.findIndex(({ status }) => status === "fulfilled")];
+  await dataConnect.executeMutation("CompletePaidCircleActivation", {
+    activationId,
+    circleId,
+    creatorId,
+    pricePaidMinor: 150000,
+    activatedAt: new Date().toISOString(),
+  });
+  const upgradeActivationId = randomUUID();
+  const upgrade = {
+    ...attemptInput(upgradeActivationId),
+    planDefinitionId: "gift_standard_v1_2026_08_02",
+    activationType: "upgrade",
+    tier: "standard",
+    listPriceMinor: 350000,
+    amountDueMinor: 200000,
+    previousActivationId: activationId,
+  };
+  await dataConnect.executeMutation("CreateCircleActivationAttempt", upgrade);
+  await dataConnect.executeMutation("FailCircleActivationAttempt", {
+    activationId: upgradeActivationId,
+    circleId,
+    failureCode: "paystack_failed",
+    failedAt: new Date().toISOString(),
+  });
+  const state = await dataConnect.executeQuery("GetCirclePricingState", {
+    circleId,
+  });
+  assert.equal(state.data.circle.pricingPlan, "starter");
+  assert.equal(state.data.circle.activationStatus, "active");
+  assert.equal(state.data.circle.memberLimit, 10);
+  assert.equal(
+    (await dataConnect.executeQuery("GetCirclePaymentCheckout", { circleId }))
+      .data.circlePaymentCheckout,
+    null,
+  );
+  await assert.rejects(
+    dataConnect.executeMutation("CompleteCirclePlanUpgrade", {
+      activationId: upgradeActivationId,
+      circleId,
+      creatorId,
+      targetPlan: "standard",
+      targetPlanDefinitionId: "gift_standard_v1_2026_08_02",
+      targetMemberLimit: 30,
+      targetActivationPrice: 3500,
+      targetActivationPriceMinor: 350000,
+      pricePaidMinor: 200000,
+      activatedAt: new Date().toISOString(),
+    }),
+  );
+  await dataConnect.executeMutation("CreateCircleActivationAttempt", {
+    ...upgrade,
+    activationId: randomUUID(),
+    providerReference: `e2e-${randomUUID()}`,
+  });
+});
+
+test("a verified payment cannot reopen a cancelled draft", async () => {
+  const creatorId = `payment-closed-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Closed payment tester",
+  });
+  const circleId = await createPricedDraft(
+    creatorId,
+    "Cancelled checkout",
+    "gift",
+    "starter",
+    10,
+  );
+  const activationId = randomUUID();
+  await dataConnect.executeMutation("CreateCircleActivationAttempt", {
+    activationId,
+    circleId,
+    creatorId,
+    planDefinitionId: "gift_starter_v1_2026_08_02",
+    activationType: "paid",
+    circleType: "gift",
+    tier: "starter",
+    listPriceMinor: 150000,
+    amountDueMinor: 150000,
+    provider: "e2e_verified_provider",
+    providerReference: `e2e-${activationId}`,
+    previousActivationId: null,
+    createdAt: new Date().toISOString(),
+  });
+  await dataConnect.executeMutation("TransitionCircleWithAudit", {
+    circleId,
+    actorId: creatorId,
+    fromStatus: "draft",
+    toStatus: "cancelled",
+    updatedAt: new Date().toISOString(),
+    completedAt: null,
+    retentionDueAt: null,
+    archiveAt: null,
+    purgeAt: null,
+  });
+  await assert.rejects(
+    dataConnect.executeMutation("CompletePaidCircleActivation", {
+      activationId,
+      circleId,
+      creatorId,
+      pricePaidMinor: 150000,
+      activatedAt: new Date().toISOString(),
+    }),
+  );
+  const state = await dataConnect.executeQuery("GetCirclePricingState", {
+    circleId,
+  });
+  assert.equal(state.data.circle.status, "cancelled");
+  assert.equal(state.data.circleActivations[0].status, "pending");
 });
 
 test("Firebase persists owner access, operational telemetry and immutable admin audit", async () => {
@@ -775,23 +969,69 @@ test("Firebase persists secure invitations, approvals, revocation and multi-circ
 
   async function createCircle(name) {
     const createdAt = new Date().toISOString();
-    const created = await dataConnect.executeMutation(
-      "CreateModelPricedCircleDraft",
-      {
-        creatorId,
-        name,
-        type: "gift",
-        description: "Invitation workflow persistence verification.",
-        targetAmount: 90000,
-        ...pricingVariables("gift", "starter", 10),
-        deadline: "2026-12-30",
-        eventDate: null,
-        visibility: "private",
-        createdAt,
-        updatedAt: createdAt,
-      },
+    // This positive journey represents an existing grandfathered circle, not
+    // an unpaid model-priced draft or a simulated successful payment.
+    const created = await dataConnect.executeMutation("CreateCircleDraft", {
+      creatorId,
+      name,
+      type: "gift",
+      description: "Invitation workflow persistence verification.",
+      targetAmount: 90000,
+      pricingPlan: "legacy",
+      memberLimit: 10,
+      activationPrice: 0,
+      deadline: "2026-12-30",
+      eventDate: null,
+      visibility: "private",
+      createdAt,
+      updatedAt: createdAt,
+    });
+    const circleId = created.data.circle_insert.id;
+    await dataConnect.executeMutation("ConfigureGiftCircle", {
+      circleId,
+      actorId: creatorId,
+      giftTitle: "Synthetic invitation fixture",
+      contributionMode: "custom",
+      paymentBankName: "Fixture bank",
+      paymentAccountName: "Fixture creator",
+      paymentAccountNumber: "0123456789",
+      imageUrl: "",
+      imageStoragePath: "",
+      updatedAt: createdAt,
+    });
+    await dataConnect.executeMutation("SetGiftMemberAllocation", {
+      circleId,
+      memberId: creatorId,
+      expectedAmount: 30000,
+      contributionStatus: "joined",
+    });
+    for (const [fromStatus, toStatus] of [
+      ["draft", "published"],
+      ["published", "active"],
+    ]) {
+      await dataConnect.executeMutation("TransitionCircleWithAudit", {
+        circleId,
+        actorId: creatorId,
+        fromStatus,
+        toStatus,
+        updatedAt: new Date().toISOString(),
+        completedAt: null,
+        retentionDueAt: null,
+        archiveAt: null,
+        purgeAt: null,
+      });
+    }
+    const persisted = await dataConnect.executeQuery("GetCircleEngineRecord", {
+      circleId,
+    });
+    assert.equal(
+      persisted.data.circle.pricingModelVersion,
+      "legacy_universal_v1",
     );
-    return created.data.circle_insert.id;
+    assert.equal(persisted.data.circle.activationStatus, "grandfathered");
+    assert.equal(persisted.data.circle.status, "active");
+    assert.equal(persisted.data.circle.contributionMode, "custom");
+    return circleId;
   }
 
   async function createInvitation(
@@ -960,6 +1200,13 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
     role: "member",
     createdAt: new Date().toISOString(),
   });
+  // Receipt submissions require a joined member, not an outstanding invitation.
+  await dataConnect.upsert("circleMembership", {
+    circleId,
+    userId: memberId,
+    role: "member",
+    membershipStatus: "joined",
+  });
   await dataConnect.executeMutation("SetGiftMemberAllocation", {
     circleId,
     memberId,
@@ -1077,4 +1324,104 @@ test("Firebase receipt review accumulates partial payments, rejects, replaces, a
       "receipt_confirmed",
     ],
   );
+});
+
+test("device registrations persist, reassign shared-device ownership and delete only owned tokens", async () => {
+  assert.ok(
+    /^(127\.0\.0\.1|localhost|\[::1\]):\d+$/.test(
+      process.env.DATA_CONNECT_EMULATOR_HOST ?? "",
+    ),
+    "Device persistence acceptance must use the local Data Connect emulator.",
+  );
+  const firstUser = `device-first-${randomUUID()}`;
+  const secondUser = `device-second-${randomUUID()}`;
+  for (const id of [firstUser, secondUser]) {
+    await dataConnect.upsert("user", {
+      id,
+      displayName: "Device acceptance user",
+    });
+  }
+  const tokenId = randomUUID();
+  const variables = {
+    tokenId,
+    userId: firstUser,
+    token: "test-device-token",
+    platform: "android",
+    updatedAt: new Date().toISOString(),
+  };
+  const metadata = async (userId) =>
+    (await dataConnect.executeQuery("GetUserDeviceRegistrations", { userId }))
+      .data.deviceRegistrations;
+  await dataConnect.executeMutation("RegisterDeviceRegistration", variables);
+  await dataConnect.executeMutation("RegisterDeviceRegistration", variables);
+  const firstRows = await metadata(firstUser);
+  assert.equal(firstRows.length, 1);
+  assert.equal(firstRows[0].platform, "android");
+  assert.equal(
+    firstRows[0].token,
+    undefined,
+    "Account metadata must not expose raw push credentials.",
+  );
+  await dataConnect.executeMutation("RegisterDeviceRegistration", {
+    ...variables,
+    userId: secondUser,
+    platform: "ios",
+  });
+  assert.equal((await metadata(firstUser)).length, 0);
+  assert.equal((await metadata(secondUser)).length, 1);
+  await dataConnect.executeMutation("DeleteDeviceRegistration", {
+    userId: firstUser,
+    tokenId,
+  });
+  assert.equal(
+    (await metadata(secondUser)).length,
+    1,
+    "Previous owner cannot remove the reassigned registration.",
+  );
+  await dataConnect.executeMutation("DeleteUserDeviceRegistrations", {
+    userId: firstUser,
+  });
+  assert.equal((await metadata(secondUser)).length, 1);
+  await dataConnect.executeMutation("DeleteDeviceRegistration", {
+    userId: secondUser,
+    tokenId,
+  });
+  assert.equal((await metadata(secondUser)).length, 0);
+});
+
+test("deadline SQL cursor uses real UUID ordering and survives earlier circle closure", async () => {
+  const creatorId = `deadline-cursor-${randomUUID()}`;
+  await dataConnect.upsert("user", {
+    id: creatorId,
+    displayName: "Deadline cursor test",
+  });
+  const rows = Array.from({ length: 3 }, () => ({
+    id: randomUUID(),
+    creatorId,
+    name: "Synthetic deadline cursor",
+    type: "gift",
+    targetAmount: 1000,
+    deadline: "2099-06-01",
+    status: "active",
+  })).sort((a, b) => a.id.localeCompare(b.id));
+  for (const row of rows) await dataConnect.upsert("circle", row);
+  const page = async (after) =>
+    (
+      await dataConnect.executeQuery("GetDeadlineNotificationCandidates", {
+        from: "2099-06-01",
+        to: "2099-06-01",
+        after,
+      })
+    ).data.circles;
+  assert.deepEqual(
+    (await page(null)).map((row) => row.id),
+    rows.map((row) => row.id),
+  );
+  assert.equal((await page(null))[0].deadline, "2099-06-01");
+  await dataConnect.upsert("circle", { ...rows[0], status: "completed" });
+  assert.deepEqual(
+    (await page(rows[0].id)).map((row) => row.id),
+    rows.slice(1).map((row) => row.id),
+  );
+  assert.deepEqual(await page(rows[2].id), []);
 });

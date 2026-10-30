@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { createConnection } from "node:net";
+import { pathToFileURL } from "node:url";
 
 const root = resolve(import.meta.dirname, "..");
 const portableRoot = join(root, ".tools", "temurin-jre21");
@@ -27,7 +28,15 @@ const firebaseCli = join(
   "bin",
   "firebase.js",
 );
-const testCommand = `"${process.execPath}" --test tests/e2e/circle-engine.test.mjs`;
+const testFiles = [
+  "tests/e2e/circle-engine.test.mjs",
+  "tests/e2e/account-privacy.test.mjs",
+  "tests/e2e/rate-limit.test.mjs",
+  "tests/e2e/dashboard.test.mjs",
+  "tests/e2e/retention-pagination.test.mjs",
+  "tests/e2e/invitation-allocation.test.mjs",
+];
+const testCommand = `"${process.execPath}" --test ${testFiles.join(" ")}`;
 
 function portIsOpen(port) {
   return new Promise((resolvePort) => {
@@ -41,7 +50,7 @@ function portIsOpen(port) {
 }
 
 const child = (await portIsOpen(9399))
-  ? spawn(process.execPath, ["--test", "tests/e2e/circle-engine.test.mjs"], {
+  ? spawn(process.execPath, ["--test", ...testFiles], {
       cwd: root,
       env,
       stdio: "inherit",
@@ -50,6 +59,9 @@ const child = (await portIsOpen(9399))
   : spawn(
       process.execPath,
       [
+        "--import",
+        pathToFileURL(join(root, "tests/helpers/firebase-cli-readiness.mjs"))
+          .href,
         firebaseCli,
         "emulators:exec",
         "--only",

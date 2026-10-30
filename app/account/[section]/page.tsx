@@ -9,6 +9,7 @@ import { AsoEbiCircleForm } from "@/components/aso-ebi/AsoEbiCircleForm";
 import { SupportCircleForm } from "@/components/support-circles/SupportCircleForm";
 import { LogoutButton } from "@/features/auth/components";
 import { ProfileSettings } from "@/components/profile/ProfileSettings";
+import { AccountSettings } from "@/components/profile/AccountSettings";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { requireSession } from "@/server/auth";
@@ -150,11 +151,12 @@ export default async function AccountSectionPage({
   if (!information) notFound();
   const Icon = information.icon;
   let profileImage = session.picture ?? null;
+  let profileName = session.name ?? "BondCircle member";
   if (section === "profile") {
     try {
-      profileImage =
-        (await getFirebaseAdminAuth().getUser(session.uid)).photoURL ??
-        profileImage;
+      const user = await getFirebaseAdminAuth().getUser(session.uid);
+      profileImage = user.photoURL ?? profileImage;
+      profileName = user.displayName ?? profileName;
     } catch {
       // The verified session still provides a safe fallback profile.
     }
@@ -171,7 +173,7 @@ export default async function AccountSectionPage({
       {section === "profile" && (
         <>
           <ProfileSettings
-            displayName={session.name ?? "BondCircle member"}
+            displayName={profileName}
             email={session.email ?? null}
             phone={session.phone_number ?? null}
             profileImage={profileImage}
@@ -185,7 +187,7 @@ export default async function AccountSectionPage({
           </div>
         </>
       )}
-      {section === "settings" && <LogoutButton />}
+      {section === "settings" && <AccountSettings />}
     </section>
   );
 }

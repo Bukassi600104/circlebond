@@ -33,7 +33,7 @@ function withTimeout<T>(
   });
 }
 
-async function csrfToken() {
+export async function csrfToken() {
   const response = await fetch("/api/auth/csrf", { cache: "no-store" });
   if (!response.ok) throw new Error("Unable to start a secure session.");
   return ((await response.json()) as { csrfToken: string }).csrfToken;
@@ -70,10 +70,12 @@ function shouldUseGoogleRedirect() {
 }
 
 export function hasPendingGoogleRedirect() {
-  return (
-    typeof window !== "undefined" &&
-    window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING) === "true"
-  );
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export async function completeGoogleRedirect() {

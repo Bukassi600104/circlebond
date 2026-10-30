@@ -1,0 +1,134 @@
+# Server-only history pages. Keep legacy operations available during rollout.
+query GetCircleCommunicationContext($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    name
+    type
+    status
+    commentsEnabled
+    memberLimit
+    pricingPlan
+    pricingModelVersion
+    creator {
+      id
+    }
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+    orderBy: [{ joinedAt: ASC }, { userId: ASC }]
+    limit: 100
+  ) {
+    role
+    membershipStatus
+    expectedAmount
+    confirmedAmount
+    user {
+      id
+      displayName
+      profileImage
+    }
+  }
+  activityLogs(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ createdAt: DESC }, { id: ASC }]
+    limit: 200
+  ) {
+    id
+    eventType
+    entityId
+    metadata
+    createdAt
+    actor {
+      id
+      displayName
+    }
+  }
+}
+
+query GetCircleAnnouncementsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  announcements(
+    where: { circleId: { eq: $circleId }, deletedAt: { isNull: true } }
+    orderBy: [{ pinned: DESC }, { createdAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    title
+    body
+    pinned
+    important
+    commentsEnabled
+    createdAt
+    updatedAt
+    author {
+      id
+      displayName
+    }
+  }
+}
+
+query GetCircleCommentsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  comments(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ createdAt: ASC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    announcementId
+    parentCommentId
+    body
+    status
+    deletionReason
+    createdAt
+    updatedAt
+    deletedAt
+    author {
+      id
+      displayName
+      profileImage
+    }
+  }
+}
+
+query GetCircleCommentReportsPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  commentReports(
+    where: { circleId: { eq: $circleId }, status: { eq: "open" } }
+    orderBy: [{ createdAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    reason
+    status
+    createdAt
+    comment {
+      id
+    }
+    reporter {
+      id
+      displayName
+    }
+  }
+}
+
+query GetSupportUpdatesPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  supportUpdates(
+    where: { circleId: { eq: $circleId } }
+    orderBy: [{ createdAt: DESC }, { id: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    id
+    body
+    createdAt
+    author {
+      id
+      displayName
+    }
+  }
+}

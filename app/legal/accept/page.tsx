@@ -10,7 +10,11 @@ export default async function LegalAcceptancePage({
   await requireSession();
   const { next } = await searchParams;
   const nextPath =
-    next?.startsWith("/") && !next.startsWith("//") ? next : "/account";
+    next?.startsWith("/") &&
+    !next.startsWith("//") &&
+    !/[\\\u0000-\u001f]/.test(next)
+      ? next
+      : "/account";
   return (
     <AuthShell
       eyebrow="One final step"

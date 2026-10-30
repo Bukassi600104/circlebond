@@ -8,7 +8,7 @@ async function source(path) {
   return readFile(new URL(path, root), "utf8");
 }
 
-test("BondCircle is installable as a standalone mobile web app", async () => {
+test("PWA source declares standalone metadata and installation assets", async () => {
   const manifest = await source("app/manifest.ts");
   const layout = await source("app/layout.tsx");
   const serviceWorker = await source("public/sw.js");
@@ -24,7 +24,7 @@ test("BondCircle is installable as a standalone mobile web app", async () => {
   assert.match(serviceWorker, /addEventListener\("fetch"/);
   assert.match(installPrompt, /beforeinstallprompt/);
   assert.match(installPrompt, /Add to Home Screen/);
-  assert.match(installPrompt, /navigator\.serviceWorker\.register/);
+  assert.match(installPrompt, /navigator\.serviceWorker\s*\.register/);
   assert.match(installPrompt, /display-mode:\s*standalone/);
 });
 

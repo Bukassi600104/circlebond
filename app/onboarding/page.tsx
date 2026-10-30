@@ -33,7 +33,11 @@ export default function OnboardingPage() {
   const item = pages[page];
 
   function finish() {
-    localStorage.setItem("bc-onboarding-complete", "true");
+    try {
+      localStorage.setItem("bc-onboarding-complete", "true");
+    } catch {
+      // Completing onboarding must work when the browser disables storage.
+    }
     router.push("/sign-in");
   }
 
@@ -52,6 +56,7 @@ export default function OnboardingPage() {
             alt={item.imageAlt}
             width={1280}
             height={853}
+            sizes="(max-width: 37rem) 92vw, 34rem"
             priority={page === 0}
           />
         </div>

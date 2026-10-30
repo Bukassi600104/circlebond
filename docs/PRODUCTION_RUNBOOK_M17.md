@@ -11,6 +11,7 @@ data, or bank details.
 - Authentication, relational persistence and file storage: Google Firebase
 - Transactional email: Resend through the configured SMTP transport
 - Scheduled retention endpoint: `/api/jobs/retention`, daily at 03:00 UTC
+- Scheduled deadline endpoint: `/api/jobs/notifications/deadlines`, daily at 08:00 UTC (09:00 Africa/Lagos); authenticated with the same `CRON_SECRET`
 
 Record the Git commit, Vercel deployment ID, release operator, verification
 time and previous known-good deployment in the private release ticket before
@@ -94,6 +95,7 @@ Milestone 17 acceptance gate closes.
   or raw request URLs.
 - Alert on elevated 5xx rate, degraded `/api/health`, OTP delivery failure,
   Storage errors, retention retry alerts and authentication abuse signals.
+- Alert on `deadline_notification_job_failed` and missed daily deadline invocations. Vercel does not automatically retry failed cron invocations; investigate failures and rerun the protected job only with authorized operational access. The existing notification deduplication prevents duplicate in-app deadline notifications for the same recipient and deadline.
 - Never paste production secrets or personal data into chat, email or public
   issue trackers.
 - For a suspected credential leak, revoke and rotate at the provider first,

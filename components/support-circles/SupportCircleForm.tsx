@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { prepareImageUpload } from "@/lib/image-upload";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -85,11 +86,12 @@ export function SupportCircleForm() {
     setBusy(true);
     try {
       const form = new FormData(event.currentTarget);
+      const prepared = await prepareImageUpload(form);
       const csrf = await csrfToken();
       const response = await fetch("/api/circles/support", {
         method: "POST",
-        headers: { "X-CSRF-Token": csrf },
-        body: form,
+        headers: { "X-CSRF-Token": csrf, "Content-Type": prepared.contentType },
+        body: prepared.body,
       });
       const data = (await response.json()) as {
         circleId?: string;
@@ -292,7 +294,10 @@ export function SupportCircleForm() {
               onChange={() => setMode("equal")}
             />
             <strong>Equal amounts</strong>
-            <span>Balance the target across the planned member places.</span>
+            <span>
+              Unfilled places share the remaining target. Assigned amounts stay
+              fixed.
+            </span>
           </label>
           <label className={mode === "custom" ? "is-selected" : ""}>
             <input

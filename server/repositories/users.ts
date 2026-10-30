@@ -43,16 +43,14 @@ export async function persistUserProfile(
     await dataConnect.upsert("User", {
       id: profile.id,
       displayName: profile.displayName,
-      phone: profile.phone ?? null,
-      email: profile.email ?? null,
-      profileImage: profile.profileImage ?? null,
-      termsAcceptedAt: profile.termsAcceptedAt ?? null,
-      privacyAcceptedAt: profile.privacyAcceptedAt ?? null,
+      ...Object.fromEntries(
+        Object.entries(profile).filter(([, value]) => value !== undefined),
+      ),
     });
   } catch (error) {
     logger.warn("user_profile_sync_deferred", {
       userId: profile.id,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "PERSISTENCE_UNAVAILABLE",
     });
     if (options.strict) throw error;
   }
@@ -78,10 +76,10 @@ export async function persistAuthAudit(input: {
       channel: input.channel ?? null,
       outcome: input.outcome,
     });
-  } catch (error) {
+  } catch {
     logger.warn("auth_audit_sync_deferred", {
       event: input.event,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "PERSISTENCE_UNAVAILABLE",
     });
   }
 }
@@ -118,11 +116,8 @@ export async function fetchUserBootstrapProfile(userId: string) {
     >("GetUserBootstrapProfile", { userId });
     return response.data.user ?? null;
   } catch (error) {
-    logger.warn("bootstrap_profile_fetch_failed", {
-      userId,
-      error: error instanceof Error ? error.message : "unknown",
-    });
-    return null;
+    logger.warn("bootstrap_profile_fetch_failed", { userId });
+    throw error;
   }
 }
 
@@ -134,7 +129,7 @@ export async function updatePersistedDisplayName(
     process.env.FIREBASE_AUTH_EMULATOR_HOST &&
     !process.env.DATA_CONNECT_EMULATOR_HOST
   ) {
-    logger.info("emulator_display_name_updated", { userId, displayName });
+    logger.info("emulator_display_name_updated", { userId });
     return;
   }
   try {
@@ -146,8 +141,8 @@ export async function updatePersistedDisplayName(
   } catch (error) {
     logger.warn("display_name_update_failed", {
       userId,
-      error: error instanceof Error ? error.message : "unknown",
+      reasonCode: "PERSISTENCE_UNAVAILABLE",
     });
+    throw error;
   }
 }
-

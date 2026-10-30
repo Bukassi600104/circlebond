@@ -1,3 +1,40 @@
+query GetUserDeviceRegistrations($userId: String!) @auth(level: NO_ACCESS) {
+  deviceRegistrations(where: { userId: { eq: $userId } }) {
+    platform
+    updatedAt
+  }
+}
+
+mutation RegisterDeviceRegistration(
+  $tokenId: String!
+  $userId: String!
+  $token: String!
+  $platform: String!
+  $updatedAt: Timestamp!
+) @auth(level: NO_ACCESS) {
+  deviceRegistration_upsert(
+    data: {
+      id: $tokenId
+      userId: $userId
+      token: $token
+      platform: $platform
+      updatedAt: $updatedAt
+    }
+  )
+}
+
+mutation DeleteDeviceRegistration($tokenId: String!, $userId: String!)
+@auth(level: NO_ACCESS) {
+  deviceRegistration_deleteMany(
+    where: { id: { eq: $tokenId }, userId: { eq: $userId } }
+  )
+}
+
+mutation DeleteUserDeviceRegistrations($userId: String!)
+@auth(level: NO_ACCESS) {
+  deviceRegistration_deleteMany(where: { userId: { eq: $userId } })
+}
+
 query GetCurrentUser @auth(level: USER) {
   user(key: { id_expr: "auth.uid" }) {
     id
@@ -16,7 +53,7 @@ query GetRecentAbuseAttempts($bucketKey: String!, $since: Timestamp!)
   abuseAttempts(
     where: { bucketKey: { eq: $bucketKey }, occurredAt: { ge: $since } }
     orderBy: { occurredAt: DESC }
-    limit: 100
+    limit: 1000
   ) {
     id
     occurredAt
@@ -54,7 +91,7 @@ mutation UpsertCurrentUser(
   $profileImage: String
   $termsAcceptedAt: Timestamp
   $privacyAcceptedAt: Timestamp
-) @auth(level: USER) {
+) @auth(level: NO_ACCESS) {
   user_upsert(
     data: {
       id_expr: "auth.uid"
@@ -98,6 +135,43 @@ query GetDashboardCircles @auth(level: NO_ACCESS) {
   }
 }
 
+# Preserve the legacy operation for rollback; current servers use this user-scoped query.
+query GetDashboardCirclesForUser($userId: String!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  circleMemberships(
+    where: { userId: { eq: $userId } }
+    orderBy: [{ joinedAt: DESC }, { circleId: ASC }]
+    limit: 200
+    offset: $offset
+  ) {
+    role
+    membershipStatus
+    user {
+      id
+    }
+    circle {
+      id
+      name
+      type
+      imageUrl
+      targetAmount
+      contributedAmount
+      showTargetToMembers
+      showConfirmedTotalToMembers
+      memberCount
+      memberLimit
+      deadline
+      eventDate
+      status
+      createdAt
+      updatedAt
+      creator {
+        id
+      }
+    }
+  }
+}
+
 query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
   circle(key: { id: $circleId }) {
     id
@@ -105,6 +179,7 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
     type
     description
     targetAmount
+    contributionMode
     pricingPlan
     memberLimit
     activationPrice
@@ -127,8 +202,11 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
       id
     }
   }
-  circleMemberships(where: { circleId: { eq: $circleId } }) {
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+  ) {
     role
+    expectedAmount
     membershipStatus
     user {
       id
@@ -218,7 +296,7 @@ query GetGiftCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -527,6 +605,54 @@ query GetCirclePricingState($circleId: UUID!) @auth(level: NO_ACCESS) {
   }
 }
 
+query GetCirclePaymentCheckout($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circlePaymentCheckout(key: { circleId: $circleId }) {
+    checkoutUrl
+    activation {
+      id
+    }
+  }
+}
+
+query GetCircleActivationAttempt($activationId: UUID!) @auth(level: NO_ACCESS) {
+  circleActivation(key: { id: $activationId }) {
+    id
+    circle {
+      id
+    }
+    creator {
+      id
+    }
+    planDefinition {
+      id
+      memberLimit
+      priceMinor
+    }
+    activationType
+    circleType
+    tier
+    currency
+    listPriceMinor
+    amountDueMinor
+    pricePaidMinor
+    status
+    provider
+    providerReference
+    previousActivationId
+  }
+}
+
+mutation SaveCirclePaymentCheckout(
+  $circleId: UUID!
+  $activationId: UUID!
+  $checkoutUrl: String!
+) @auth(level: NO_ACCESS) @transaction {
+  circlePaymentCheckout_updateMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+    data: { checkoutUrl: $checkoutUrl }
+  ) @check(expr: "this == 1", message: "Checkout no longer pending")
+}
+
 mutation CreateCircleActivationAttempt(
   $activationId: UUID!
   $circleId: UUID!
@@ -542,6 +668,35 @@ mutation CreateCircleActivationAttempt(
   $previousActivationId: UUID
   $createdAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  query @redact {
+    circle(key: { id: $circleId })
+      @check(
+        expr: "this.creator.id == vars.creatorId && this.pricingModelVersion == 'model_specific_v1' && ((vars.activationType == 'paid' && this.status == 'draft' && this.activationStatus != 'active' && this.pricingPlanDefinitionId == vars.planDefinitionId) || (vars.activationType == 'upgrade' && this.activationStatus == 'active' && !(this.status in ['completed', 'cancelled', 'archived', 'purged'])))"
+        message: "Circle is not eligible for this checkout"
+      ) {
+      creator {
+        id
+      }
+      pricingModelVersion
+      status
+      activationStatus
+      pricingPlanDefinitionId
+    }
+  }
+  previous: query @redact {
+    circleActivations(where: { id: { eq: $previousActivationId } }, limit: 1)
+      @check(
+        expr: "vars.activationType == 'paid' || (this.size() == 1 && this[0].status == 'succeeded' && this[0].circleId == vars.circleId && this[0].creatorId == vars.creatorId && this[0].planDefinition != null)"
+        message: "Upgrade requires this circle's preceding verified activation"
+      ) {
+      status
+      circleId
+      creatorId
+      planDefinition {
+        id
+      }
+    }
+  }
   circleActivation_insert(
     data: {
       id: $activationId
@@ -561,10 +716,29 @@ mutation CreateCircleActivationAttempt(
       createdAt: $createdAt
     }
   )
-  circle_update(
-    key: { id: $circleId }
-    data: { activationStatus: "pending_payment", updatedAt: $createdAt }
+  circlePaymentCheckout_insert(
+    data: { circle: { id: $circleId }, activation: { id: $activationId } }
   )
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      pricingModelVersion: { eq: "model_specific_v1" }
+      pricingPlanDefinitionId: {
+        eq_expr: "vars.activationType == 'paid' ? vars.planDefinitionId : response.previous.circleActivations[0].planDefinition.id"
+      }
+      status: {
+        eq_expr: "vars.activationType == 'paid' ? 'draft' : response.query.circle.status"
+      }
+      activationStatus: {
+        eq_expr: "vars.activationType == 'upgrade' ? 'active' : response.query.circle.activationStatus"
+      }
+    }
+    data: {
+      activationStatus_expr: "vars.activationType == 'upgrade' ? 'active' : 'pending_payment'"
+      updatedAt: $createdAt
+    }
+  ) @check(expr: "this == 1", message: "Circle changed while starting checkout")
 }
 
 mutation FailCircleActivationAttempt(
@@ -573,13 +747,28 @@ mutation FailCircleActivationAttempt(
   $failureCode: String!
   $failedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) {
+      activationType
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      status: { eq: "pending" }
+    }
     data: { status: "failed", failureCode: $failureCode }
-  )
+  ) @check(expr: "this == 1", message: "Activation already settled")
   circle_update(
     key: { id: $circleId }
-    data: { activationStatus: "payment_failed", updatedAt: $failedAt }
+    data: {
+      activationStatus_expr: "response.query.circleActivation.activationType == 'upgrade' ? 'active' : 'payment_failed'"
+      updatedAt: $failedAt
+    }
   )
 }
 
@@ -590,8 +779,26 @@ mutation CompletePaidCircleActivation(
   $pricePaidMinor: Int!
   $activatedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) @check {
+      planDefinition {
+        id
+      }
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationType: { eq: "paid" }
+      status: { eq: "pending" }
+      currency: { eq: "NGN" }
+      amountDueMinor: { eq: $pricePaidMinor }
+    }
     data: {
       status: "succeeded"
       pricePaidMinor: $pricePaidMinor
@@ -599,8 +806,21 @@ mutation CompletePaidCircleActivation(
       activatedAt: $activatedAt
     }
   )
-  circle_update(
-    key: { id: $circleId }
+    @check(
+      expr: "this == 1"
+      message: "Payment does not match pending activation"
+    )
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      status: { eq: "draft" }
+      pricingModelVersion: { eq: "model_specific_v1" }
+      pricingPlanDefinitionId: {
+        eq_expr: "response.query.circleActivation.planDefinition.id"
+      }
+      activationStatus: { ne: "active" }
+    }
     data: {
       status: "published"
       activationStatus: "active"
@@ -608,6 +828,10 @@ mutation CompletePaidCircleActivation(
       updatedAt: $activatedAt
     }
   )
+    @check(
+      expr: "this == 1"
+      message: "Circle no longer eligible for activation"
+    )
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }
@@ -633,17 +857,55 @@ mutation CompleteCirclePlanUpgrade(
   $pricePaidMinor: Int!
   $activatedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
-  circleActivation_update(
-    key: { id: $activationId }
+  query @redact {
+    circleActivation(key: { id: $activationId }) @check {
+      previousActivationId
+    }
+  }
+  previous: query @redact {
+    circleActivation(
+      key: { id_expr: "response.query.circleActivation.previousActivationId" }
+    ) @check {
+      status @check(expr: "this == 'succeeded'")
+      planDefinition {
+        id
+      }
+    }
+  }
+  circlePaymentCheckout_deleteMany(
+    where: { circleId: { eq: $circleId }, activationId: { eq: $activationId } }
+  ) @check(expr: "this == 1", message: "Checkout already settled")
+  circleActivation_updateMany(
+    where: {
+      id: { eq: $activationId }
+      circleId: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationType: { eq: "upgrade" }
+      status: { eq: "pending" }
+      currency: { eq: "NGN" }
+      amountDueMinor: { eq: $pricePaidMinor }
+      tier: { eq: $targetPlan }
+      planDefinitionId: { eq: $targetPlanDefinitionId }
+      listPriceMinor: { eq: $targetActivationPriceMinor }
+    }
     data: {
       status: "succeeded"
       pricePaidMinor: $pricePaidMinor
       paidAt: $activatedAt
       activatedAt: $activatedAt
     }
-  )
-  circle_update(
-    key: { id: $circleId }
+  ) @check(expr: "this == 1", message: "Payment does not match pending upgrade")
+  circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      creatorId: { eq: $creatorId }
+      activationStatus: { eq: "active" }
+      status: { nin: ["completed", "cancelled", "archived", "purged"] }
+      pricingPlanDefinitionId: {
+        eq_expr: "response.previous.circleActivation.planDefinition.id"
+      }
+      memberLimit: { lt: $targetMemberLimit }
+    }
     data: {
       pricingPlan: $targetPlan
       pricingPlanDefinitionId: $targetPlanDefinitionId
@@ -653,7 +915,7 @@ mutation CompleteCirclePlanUpgrade(
       activationStatus: "active"
       updatedAt: $activatedAt
     }
-  )
+  ) @check(expr: "this == 1", message: "Upgrade is stale or circle is closed")
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }
@@ -965,7 +1227,7 @@ query GetAsoEbiCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     sortOrder
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1167,7 +1429,7 @@ query GetSupportCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1508,6 +1770,43 @@ mutation AcceptInvitationWithMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circle_update: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      memberCount: { eq_expr: "vars.nextMemberCount - 1" }
+      memberLimit: { ge: $nextMemberCount }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+      requireCreatorApproval: { eq: false }
+    }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Circle membership or availability changed"
+    )
+  invitation_update: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "vars.nextUseCount - 1" }
+      maxUses: { ge: $nextUseCount }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt_expr: "request.time" }
+      requireApproval: { eq: false }
+    }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      acceptedBy: { id: $userId }
+      updatedAt: $respondedAt
+    }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed or is no longer available"
+    )
   circleMembership_insert(
     data: {
       circle: { id: $circleId }
@@ -1527,20 +1826,6 @@ mutation AcceptInvitationWithMembership(
       status: "accepted"
       createdAt: $respondedAt
       respondedAt: $respondedAt
-    }
-  )
-  circle_update(
-    key: { id: $circleId }
-    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
-  )
-  invitation_update(
-    key: { id: $invitationId }
-    data: {
-      state: $nextInvitationState
-      useCount: $nextUseCount
-      acceptedAt: $respondedAt
-      acceptedBy: { id: $userId }
-      updatedAt: $respondedAt
     }
   )
   circleAuditEntry_insert(
@@ -1570,6 +1855,27 @@ mutation RequestInvitationApproval(
   $userId: String!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circleApprovalRequestGuard: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+    }
+    data: { updatedAt: $respondedAt }
+  ) @check(expr: "this == 1", message: "Circle is not available for joining")
+  query @redact {
+    invitation(key: { id: $invitationId })
+      @check(
+        expr: "this != null && this.circleId == vars.circleId && this.useCount < this.maxUses && this.expiresAt > request.time && this.state in ['created', 'sent', 'opened', 'approval_pending']"
+        message: "Invitation is no longer available"
+      ) {
+      circleId
+      useCount
+      maxUses
+      expiresAt
+      state
+    }
+  }
   invitationAcceptance_insert(
     data: {
       invitation: { id: $invitationId }
@@ -1579,14 +1885,25 @@ mutation RequestInvitationApproval(
       respondedAt: $respondedAt
     }
   )
-  invitation_update(
-    key: { id: $invitationId }
+  invitation_update: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "response.query.invitation.useCount" }
+      maxUses: { gt_expr: "response.query.invitation.useCount" }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt_expr: "request.time" }
+    }
     data: {
       state: "approval_pending"
       acceptedBy: { id: $userId }
       updatedAt: $respondedAt
     }
   )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed while requesting approval"
+    )
   circleAuditEntry_insert(
     data: {
       circle: { id: $circleId }
@@ -1611,7 +1928,7 @@ query GetContributionWorkspace($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1839,6 +2156,40 @@ mutation ApproveInvitationMembership(
   $nextUseCount: Int!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circle_update: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      memberCount: { eq_expr: "vars.nextMemberCount - 1" }
+      memberLimit: { ge: $nextMemberCount }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+    }
+    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Circle membership or availability changed"
+    )
+  invitation_update: invitation_updateMany(
+    where: {
+      id: { eq: $invitationId }
+      circleId: { eq: $circleId }
+      useCount: { eq_expr: "vars.nextUseCount - 1" }
+      maxUses: { ge: $nextUseCount }
+      state: { in: ["created", "sent", "opened", "approval_pending"] }
+      expiresAt: { gt_expr: "request.time" }
+    }
+    data: {
+      state: $nextInvitationState
+      useCount: $nextUseCount
+      acceptedAt: $respondedAt
+      updatedAt: $respondedAt
+    }
+  )
+    @check(
+      expr: "this == 1"
+      message: "Invitation changed or is no longer available"
+    )
   circleMembership_insert(
     data: {
       circle: { id: $circleId }
@@ -1854,19 +2205,6 @@ mutation ApproveInvitationMembership(
   invitationAcceptance_update(
     key: { invitationId: $invitationId, userId: $userId }
     data: { status: "accepted", respondedAt: $respondedAt }
-  )
-  circle_update(
-    key: { id: $circleId }
-    data: { memberCount: $nextMemberCount, updatedAt: $respondedAt }
-  )
-  invitation_update(
-    key: { id: $invitationId }
-    data: {
-      state: $nextInvitationState
-      useCount: $nextUseCount
-      acceptedAt: $respondedAt
-      updatedAt: $respondedAt
-    }
   )
   circleAuditEntry_insert(
     data: {
@@ -1952,7 +2290,7 @@ query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -2486,20 +2824,19 @@ query FindNotificationRecipientByEmail($email: String!)
   }
 }
 
-query GetDeadlineNotificationCandidates($from: Date!, $to: Date!)
+# UUID filters do not expose ordering comparisons, so this server-only cursor uses parameterized SQL.
+query GetDeadlineNotificationCandidates($from: Date!, $to: Date!, $after: UUID)
 @auth(level: NO_ACCESS) {
-  circles(
-    where: {
-      deadline: { ge: $from, le: $to }
-      status: { in: ["published", "active", "target_reached", "fulfilment"] }
-    }
-    limit: 200
-  ) {
-    id
-    name
-    type
-    deadline
-  }
+  circles: _select(
+    sql: """
+    SELECT id, deadline::text AS deadline FROM circle
+    WHERE deadline >= $1::date AND deadline <= $2::date
+      AND status IN ('published', 'active', 'target_reached', 'fulfilment')
+      AND ($3::uuid IS NULL OR id > $3::uuid)
+    ORDER BY id ASC LIMIT 200
+    """
+    params: [$from, $to, $after]
+  )
 }
 
 query GetUserDeadlineNotificationCandidates($userId: String!)

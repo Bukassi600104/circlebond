@@ -1,11 +1,13 @@
 import "server-only";
 
 import { PricingRuleError } from "./entitlements.ts";
+import { PaystackTestProvider, paystackTestConfiguration } from "./paystack.ts";
 
 export type ActivationCheckoutInput = {
   activationId: string;
   circleId: string;
   creatorId: string;
+  email?: string;
   amountMinor: number;
   currency: "NGN";
   description: string;
@@ -20,6 +22,8 @@ export type ActivationCheckout = {
 
 export interface ActivationPaymentProvider {
   readonly name: string;
+  referenceForActivation(activationId: string): string;
+  validateCheckout(input: ActivationCheckoutInput): void;
   createCheckout(input: ActivationCheckoutInput): Promise<ActivationCheckout>;
 }
 
@@ -30,7 +34,8 @@ export interface ActivationPaymentProvider {
  * a refund/reconciliation decision. Until then, production fails closed.
  */
 export function getActivationPaymentProvider(): ActivationPaymentProvider | null {
-  return null;
+  const secret = paystackTestConfiguration(process.env);
+  return secret ? new PaystackTestProvider(secret) : null;
 }
 
 export function requireActivationPaymentProvider() {

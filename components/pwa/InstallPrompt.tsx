@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Download, Share2, X } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 type InstallChoice = {
   outcome: "accepted" | "dismissed";
@@ -27,38 +28,56 @@ function isStandalone() {
 }
 
 function isIos() {
-  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  return (
+    /iphone|ipad|ipod/i.test(window.navigator.userAgent) ||
+    (window.navigator.platform === "MacIntel" &&
+      window.navigator.maxTouchPoints > 1)
+  );
 }
 
 function wasRecentlyDismissed() {
-  const dismissedAt = Number(window.localStorage.getItem(DISMISSED_AT_KEY));
-  return Number.isFinite(dismissedAt)
-    ? Date.now() - dismissedAt < DISMISSAL_COOLDOWN
-    : false;
+  try {
+    const elapsed =
+      Date.now() - Number(window.localStorage.getItem(DISMISSED_AT_KEY));
+    return elapsed >= 0 && elapsed < DISMISSAL_COOLDOWN;
+  } catch {
+    return false;
+  }
 }
 
 export function InstallPrompt() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        // Installation remains optional; a registration failure must not block
-        // authentication or dashboard use.
-      });
+      navigator.serviceWorker
+        .register("/sw.js", { updateViaCache: "none" })
+        .catch(() => {
+          // Installation remains optional; a registration failure must not block
+          // authentication or dashboard use.
+        });
     }
 
     if (isStandalone() || wasRecentlyDismissed()) return;
 
+    let iosTimer: number | undefined;
     const onInstallPrompt = (event: Event) => {
+      if (wasRecentlyDismissed() || isStandalone()) return;
       event.preventDefault();
+      if (iosTimer) window.clearTimeout(iosTimer);
+      setShowIosHelp(false);
+      setMessage("");
       setDeferredPrompt(event as BeforeInstallPromptEvent);
       setVisible(true);
     };
     const onInstalled = () => {
+      if (iosTimer) window.clearTimeout(iosTimer);
       setVisible(false);
       setDeferredPrompt(null);
     };
@@ -66,7 +85,6 @@ export function InstallPrompt() {
     window.addEventListener("beforeinstallprompt", onInstallPrompt);
     window.addEventListener("appinstalled", onInstalled);
 
-    let iosTimer: number | undefined;
     if (isIos()) {
       iosTimer = window.setTimeout(() => {
         setShowIosHelp(true);
@@ -82,25 +100,55 @@ export function InstallPrompt() {
   }, []);
 
   function dismiss() {
-    window.localStorage.setItem(DISMISSED_AT_KEY, String(Date.now()));
+    try {
+      window.localStorage.setItem(DISMISSED_AT_KEY, String(Date.now()));
+    } catch {
+      // A restricted browser must still allow dismissal for this page.
+    }
     setVisible(false);
+    setDeferredPrompt(null);
   }
 
   async function install() {
     if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === "accepted") setVisible(false);
+    const prompt = deferredPrompt;
     setDeferredPrompt(null);
+    setInstalling(true);
+    setMessage("");
+    try {
+      await prompt.prompt();
+      const choice = await prompt.userChoice;
+      if (choice.outcome === "dismissed") dismiss();
+      else setVisible(false);
+    } catch {
+      setMessage(
+        "Installation could not start. Use your browser’s install menu, or try again when Install is available.",
+      );
+    } finally {
+      setInstalling(false);
+    }
   }
 
-  if (!visible) return null;
+  if (
+    !visible ||
+    pathname?.startsWith("/invite/") ||
+    [
+      "/",
+      "/onboarding",
+      "/sign-in",
+      "/register",
+      "/verify",
+      "/account-recovery",
+      "/legal/accept",
+    ].includes(pathname ?? "")
+  )
+    return null;
 
   return (
     <aside
       className="bc-install-prompt"
       aria-label="Install BondCircle"
-      role="dialog"
+      role="region"
     >
       <button
         className="bc-install-prompt__close"
@@ -115,21 +163,24 @@ export function InstallPrompt() {
         <strong>Install BondCircle</strong>
         {showIosHelp ? (
           <p>
-            Tap <Share2 size={14} aria-hidden="true" /> Share, then{" "}
-            <b>Add to Home Screen</b>.
+            In Safari, tap <Share2 size={14} aria-hidden="true" /> Share, then{" "}
+            <b>Add to Home Screen</b> (under More if needed). Leave{" "}
+            <b>Open as Web App</b> on if shown, then tap Add.
           </p>
         ) : (
           <p>Use BondCircle full-screen from your phone.</p>
         )}
+        {message ? <p role="status">{message}</p> : null}
       </div>
-      {deferredPrompt ? (
+      {deferredPrompt || installing ? (
         <button
           className="bc-install-prompt__action"
           type="button"
           onClick={install}
+          disabled={installing}
         >
           <Download size={15} aria-hidden="true" />
-          Install
+          {installing ? "Opening…" : "Install"}
         </button>
       ) : null}
     </aside>

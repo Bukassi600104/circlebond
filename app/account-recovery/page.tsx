@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { RecoveryForm } from "@/features/auth/components";
 
@@ -9,7 +10,9 @@ export default function AccountRecoveryPage() {
       description="We’ll send a verification code. The response is the same whether or not an account exists."
       backHref="/sign-in"
     >
-      <RecoveryForm />
+      <Suspense fallback={<p>Preparing recovery…</p>}>
+        <RecoveryForm />
+      </Suspense>
     </AuthShell>
   );
 }

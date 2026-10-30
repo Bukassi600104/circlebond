@@ -1,0 +1,8 @@
+type AccountPrivacyRequest @table(key: ["id"]) {
+  id: String!
+  user: User!
+  kind: String!
+  status: String! @default(value: "requested")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}

@@ -12,28 +12,28 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useGetCurrentUser, useGetRecentAbuseAttempts, useRecordAbuseAttempt, useGetConsumedAuthChallenge, useConsumeAuthChallenge, useUpsertCurrentUser, useGetDashboardCircles, useGetCircleEngineRecord, useGetCircleLifecycleSummary, useFindUserByEmail } from '@bondcircle/dataconnect/react';
+import { useGetAccountExportPage, useGetAccountPrivacyRequests, useCreateAccountPrivacyRequest, useGetOwnerPrivacyRequests, useAcknowledgeAccountPrivacyRequest, useGetCircleCommunicationContext, useGetCircleAnnouncementsPage, useGetCircleCommentsPage, useGetCircleCommentReportsPage, useGetSupportUpdatesPage } from '@bondcircle/dataconnect/react';
 // The types of these hooks are available in react/index.d.ts
 
-const { data, isPending, isSuccess, isError, error } = useGetCurrentUser();
+const { data, isPending, isSuccess, isError, error } = useGetAccountExportPage(getAccountExportPageVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetRecentAbuseAttempts(getRecentAbuseAttemptsVars);
+const { data, isPending, isSuccess, isError, error } = useGetAccountPrivacyRequests(getAccountPrivacyRequestsVars);
 
-const { data, isPending, isSuccess, isError, error } = useRecordAbuseAttempt(recordAbuseAttemptVars);
+const { data, isPending, isSuccess, isError, error } = useCreateAccountPrivacyRequest(createAccountPrivacyRequestVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetConsumedAuthChallenge(getConsumedAuthChallengeVars);
+const { data, isPending, isSuccess, isError, error } = useGetOwnerPrivacyRequests(getOwnerPrivacyRequestsVars);
 
-const { data, isPending, isSuccess, isError, error } = useConsumeAuthChallenge(consumeAuthChallengeVars);
+const { data, isPending, isSuccess, isError, error } = useAcknowledgeAccountPrivacyRequest(acknowledgeAccountPrivacyRequestVars);
 
-const { data, isPending, isSuccess, isError, error } = useUpsertCurrentUser(upsertCurrentUserVars);
+const { data, isPending, isSuccess, isError, error } = useGetCircleCommunicationContext(getCircleCommunicationContextVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetDashboardCircles();
+const { data, isPending, isSuccess, isError, error } = useGetCircleAnnouncementsPage(getCircleAnnouncementsPageVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetCircleEngineRecord(getCircleEngineRecordVars);
+const { data, isPending, isSuccess, isError, error } = useGetCircleCommentsPage(getCircleCommentsPageVars);
 
-const { data, isPending, isSuccess, isError, error } = useGetCircleLifecycleSummary(getCircleLifecycleSummaryVars);
+const { data, isPending, isSuccess, isError, error } = useGetCircleCommentReportsPage(getCircleCommentReportsPageVars);
 
-const { data, isPending, isSuccess, isError, error } = useFindUserByEmail(findUserByEmailVars);
+const { data, isPending, isSuccess, isError, error } = useGetSupportUpdatesPage(getSupportUpdatesPageVars);
 
 ```
 
@@ -72,38 +72,38 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { getCurrentUser, getRecentAbuseAttempts, recordAbuseAttempt, getConsumedAuthChallenge, consumeAuthChallenge, upsertCurrentUser, getDashboardCircles, getCircleEngineRecord, getCircleLifecycleSummary, findUserByEmail } from '@bondcircle/dataconnect';
+import { getAccountExportPage, getAccountPrivacyRequests, createAccountPrivacyRequest, getOwnerPrivacyRequests, acknowledgeAccountPrivacyRequest, getCircleCommunicationContext, getCircleAnnouncementsPage, getCircleCommentsPage, getCircleCommentReportsPage, getSupportUpdatesPage } from '@bondcircle/dataconnect';
 
 
-// Operation GetCurrentUser: 
-const { data } = await GetCurrentUser(dataConnect);
+// Operation GetAccountExportPage:  For variables, look at type GetAccountExportPageVars in ../index.d.ts
+const { data } = await GetAccountExportPage(dataConnect, getAccountExportPageVars);
 
-// Operation GetRecentAbuseAttempts:  For variables, look at type GetRecentAbuseAttemptsVars in ../index.d.ts
-const { data } = await GetRecentAbuseAttempts(dataConnect, getRecentAbuseAttemptsVars);
+// Operation GetAccountPrivacyRequests:  For variables, look at type GetAccountPrivacyRequestsVars in ../index.d.ts
+const { data } = await GetAccountPrivacyRequests(dataConnect, getAccountPrivacyRequestsVars);
 
-// Operation RecordAbuseAttempt:  For variables, look at type RecordAbuseAttemptVars in ../index.d.ts
-const { data } = await RecordAbuseAttempt(dataConnect, recordAbuseAttemptVars);
+// Operation CreateAccountPrivacyRequest:  For variables, look at type CreateAccountPrivacyRequestVars in ../index.d.ts
+const { data } = await CreateAccountPrivacyRequest(dataConnect, createAccountPrivacyRequestVars);
 
-// Operation GetConsumedAuthChallenge:  For variables, look at type GetConsumedAuthChallengeVars in ../index.d.ts
-const { data } = await GetConsumedAuthChallenge(dataConnect, getConsumedAuthChallengeVars);
+// Operation GetOwnerPrivacyRequests:  For variables, look at type GetOwnerPrivacyRequestsVars in ../index.d.ts
+const { data } = await GetOwnerPrivacyRequests(dataConnect, getOwnerPrivacyRequestsVars);
 
-// Operation ConsumeAuthChallenge:  For variables, look at type ConsumeAuthChallengeVars in ../index.d.ts
-const { data } = await ConsumeAuthChallenge(dataConnect, consumeAuthChallengeVars);
+// Operation AcknowledgeAccountPrivacyRequest:  For variables, look at type AcknowledgeAccountPrivacyRequestVars in ../index.d.ts
+const { data } = await AcknowledgeAccountPrivacyRequest(dataConnect, acknowledgeAccountPrivacyRequestVars);
 
-// Operation UpsertCurrentUser:  For variables, look at type UpsertCurrentUserVars in ../index.d.ts
-const { data } = await UpsertCurrentUser(dataConnect, upsertCurrentUserVars);
+// Operation GetCircleCommunicationContext:  For variables, look at type GetCircleCommunicationContextVars in ../index.d.ts
+const { data } = await GetCircleCommunicationContext(dataConnect, getCircleCommunicationContextVars);
 
-// Operation GetDashboardCircles: 
-const { data } = await GetDashboardCircles(dataConnect);
+// Operation GetCircleAnnouncementsPage:  For variables, look at type GetCircleAnnouncementsPageVars in ../index.d.ts
+const { data } = await GetCircleAnnouncementsPage(dataConnect, getCircleAnnouncementsPageVars);
 
-// Operation GetCircleEngineRecord:  For variables, look at type GetCircleEngineRecordVars in ../index.d.ts
-const { data } = await GetCircleEngineRecord(dataConnect, getCircleEngineRecordVars);
+// Operation GetCircleCommentsPage:  For variables, look at type GetCircleCommentsPageVars in ../index.d.ts
+const { data } = await GetCircleCommentsPage(dataConnect, getCircleCommentsPageVars);
 
-// Operation GetCircleLifecycleSummary:  For variables, look at type GetCircleLifecycleSummaryVars in ../index.d.ts
-const { data } = await GetCircleLifecycleSummary(dataConnect, getCircleLifecycleSummaryVars);
+// Operation GetCircleCommentReportsPage:  For variables, look at type GetCircleCommentReportsPageVars in ../index.d.ts
+const { data } = await GetCircleCommentReportsPage(dataConnect, getCircleCommentReportsPageVars);
 
-// Operation FindUserByEmail:  For variables, look at type FindUserByEmailVars in ../index.d.ts
-const { data } = await FindUserByEmail(dataConnect, findUserByEmailVars);
+// Operation GetSupportUpdatesPage:  For variables, look at type GetSupportUpdatesPageVars in ../index.d.ts
+const { data } = await GetSupportUpdatesPage(dataConnect, getSupportUpdatesPageVars);
 
 
 ```

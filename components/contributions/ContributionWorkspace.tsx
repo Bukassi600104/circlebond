@@ -1,4 +1,5 @@
 "use client";
+import { prepareImageUpload } from "@/lib/image-upload";
 
 import {
   AlertTriangle,
@@ -202,10 +203,14 @@ export function ContributionWorkspace({
     try {
       const form = new FormData(event.currentTarget);
       if (replacementOfId) form.set("replacementOfId", replacementOfId);
+      const prepared = await prepareImageUpload(form);
       const response = await fetch(`/api/circles/${circleId}/receipts`, {
         method: "POST",
-        headers: { "x-csrf-token": await csrfToken() },
-        body: form,
+        headers: {
+          "x-csrf-token": await csrfToken(),
+          "Content-Type": prepared.contentType,
+        },
+        body: prepared.body,
       });
       const body = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(body.error ?? "Unable to submit.");

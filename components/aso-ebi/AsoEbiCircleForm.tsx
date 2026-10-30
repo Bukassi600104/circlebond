@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { prepareImageUpload } from "@/lib/image-upload";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -111,11 +112,12 @@ export function AsoEbiCircleForm() {
           })),
         ),
       );
+      const prepared = await prepareImageUpload(form);
       const csrf = await csrfToken();
       const response = await fetch("/api/circles/aso-ebi", {
         method: "POST",
-        headers: { "X-CSRF-Token": csrf },
-        body: form,
+        headers: { "X-CSRF-Token": csrf, "Content-Type": prepared.contentType },
+        body: prepared.body,
       });
       const data = (await response.json()) as {
         circleId?: string;

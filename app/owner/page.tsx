@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { OwnerDashboard } from "@/components/owner/OwnerDashboard";
 import { requireOwnerSession } from "@/server/owner/auth";
 import { loadOwnerOverview } from "@/server/repositories/owner";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Owner Administration",
@@ -14,5 +15,12 @@ export default async function OwnerPage() {
   const { session } = await requireOwnerSession();
   const overview = await loadOwnerOverview(session.uid);
   if (!overview) return null;
-  return <OwnerDashboard overview={overview} />;
+  return (
+    <>
+      <Link className="bc-auth-text-link" href="/owner/privacy">
+        Privacy request queue
+      </Link>
+      <OwnerDashboard overview={overview} />
+    </>
+  );
 }

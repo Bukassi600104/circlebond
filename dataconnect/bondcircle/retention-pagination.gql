@@ -1,0 +1,109 @@
+query GetCircleRetentionState($circleId: UUID!) @auth(level: NO_ACCESS) {
+  circle(key: { id: $circleId }) {
+    id
+    type
+    status
+    retentionDueAt
+    purgeAt
+    imageStoragePath
+  }
+  retentionPurgeAttempts(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { attemptNumber: DESC }
+    limit: 1
+  ) {
+    attemptNumber
+    status
+    startedAt
+    nextRetryAt
+  }
+}
+
+query GetCircleRetentionPage($circleId: UUID!, $offset: Int!)
+@auth(level: NO_ACCESS) {
+  receipts(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+    imageStoragePath
+  }
+  circleMemberships(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { userId: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    receiptStoragePath
+  }
+  asoEbiTiers(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    fabricImageStoragePath
+    appreciationGiftImageStoragePath
+  }
+  invitations(
+    where: { circleId: { eq: $circleId } }
+    orderBy: { id: ASC }
+    limit: 100
+    offset: $offset
+  ) {
+    id
+  }
+}
+
+query GetRetentionExternalStorageReferences($path: String!, $circleId: UUID!)
+@auth(level: NO_ACCESS) {
+  circles(
+    where: { imageStoragePath: { eq: $path }, id: { ne: $circleId } }
+    limit: 1
+  ) {
+    id
+  }
+  receipts(
+    where: { imageStoragePath: { eq: $path }, circleId: { ne: $circleId } }
+    limit: 1
+  ) {
+    id
+    circle {
+      id
+    }
+  }
+  circleMemberships(
+    where: { receiptStoragePath: { eq: $path }, circleId: { ne: $circleId } }
+    limit: 1
+  ) {
+    circle {
+      id
+    }
+  }
+  fabricReferences: asoEbiTiers(
+    where: {
+      fabricImageStoragePath: { eq: $path }
+      circleId: { ne: $circleId }
+    }
+    limit: 1
+  ) {
+    id
+    circle {
+      id
+    }
+  }
+  giftReferences: asoEbiTiers(
+    where: {
+      appreciationGiftImageStoragePath: { eq: $path }
+      circleId: { ne: $circleId }
+    }
+    limit: 1
+  ) {
+    id
+    circle {
+      id
+    }
+  }
+}

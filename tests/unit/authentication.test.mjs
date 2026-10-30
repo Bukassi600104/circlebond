@@ -140,14 +140,16 @@ test("email OTP delivery is honest and validates before challenge creation", asy
 test("registration legal review uses an in-place modal and preserves form state", async () => {
   const registration = await source("features/auth/components.tsx");
   const legal = await source("components/legal/LegalModal.tsx");
+  const overlay = await source("components/ui/DialogOverlay.tsx");
   const styles = await source("app/auth.css");
 
   assert.match(registration, /LegalModal/);
   assert.match(registration, /setLegalDocument/);
   assert.match(registration, /onAgree/);
   assert.doesNotMatch(registration, /href="\/legal\/(terms|privacy)"/);
-  assert.match(legal, /role="dialog"/);
-  assert.match(legal, /aria-modal="true"/);
+  assert.match(legal, /<DialogOverlay/);
+  assert.match(overlay, /<dialog/);
+  assert.match(overlay, /showModal\(\)/);
   assert.match(legal, /bc-legal-modal__dialog/);
   assert.match(styles, /\.bc-legal-modal[\s\S]*backdrop-filter: blur/);
   assert.match(
@@ -156,7 +158,7 @@ test("registration legal review uses an in-place modal and preserves form state"
   );
   assert.match(
     styles,
-    /\.bc-legal-modal \.bc-button[\s\S]*min-height: 2\.25rem/,
+    /\.bc-legal-modal \.bc-button[\s\S]*min-height: 2\.75rem/,
   );
   assert.match(
     styles,
@@ -186,7 +188,7 @@ test("valid OTPs never surface backend outages as invalid codes", async () => {
 
   assert.match(
     verifyRoute,
-    /Authentication service is temporarily unavailable/,
+    /Authentication could not complete\. Request a new code and try again\./,
   );
   assert.match(verifyRoute, /status: 503/);
   assert.match(developmentRunner, /emulators:start/);

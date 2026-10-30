@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { requireSession } from "@/server/auth";
+import { loadAcceptedLegalProfile } from "@/server/auth/legal";
+import { redirect } from "next/navigation";
 import { loadNotificationWorkspace } from "@/server/repositories/notifications";
 import "../dashboard.css";
 import "../communication.css";
@@ -13,8 +15,15 @@ export default async function AccountLayout({
   children: ReactNode;
 }) {
   const session = await requireSession();
+  const profile = await loadAcceptedLegalProfile(session.uid);
+  if (!profile) {
+    redirect("/legal/accept?next=%2Faccount");
+  }
   const displayName =
-    session.name ?? session.email?.split("@")[0] ?? "BondCircle member";
+    profile.displayName ??
+    session.name ??
+    session.email?.split("@")[0] ??
+    "BondCircle member";
   const { unreadCount } = await loadNotificationWorkspace(session.uid);
 
   return (

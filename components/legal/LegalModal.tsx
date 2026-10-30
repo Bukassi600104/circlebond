@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { BrandLockup } from "@/components/layout";
 import { Button } from "@/components/ui";
+import { DialogOverlay } from "@/components/ui/DialogOverlay";
 import {
   legalDocuments,
   type LegalDocumentType,
@@ -19,41 +19,21 @@ export function LegalModal({
   onClose: () => void;
 }) {
   const content = legalDocuments[documentType];
-  const closeButton = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const previouslyFocused = window.document
-      .activeElement as HTMLElement | null;
-    const previousOverflow = window.document.body.style.overflow;
-    window.document.body.style.overflow = "hidden";
-    closeButton.current?.focus();
-
-    function keyDown(event: globalThis.KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-
-    window.addEventListener("keydown", keyDown);
-    return () => {
-      window.removeEventListener("keydown", keyDown);
-      window.document.body.style.overflow = previousOverflow;
-      previouslyFocused?.focus();
-    };
-  }, [onClose]);
 
   return (
-    <div className="bc-legal-modal" onMouseDown={onClose}>
+    <DialogOverlay
+      className="bc-legal-modal"
+      labelledBy="bc-legal-title"
+      describedBy="bc-legal-summary"
+      onClose={onClose}
+    >
       <div
         className="bc-legal-modal__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="bc-legal-title"
-        aria-describedby="bc-legal-summary"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <header>
           <BrandLockup />
           <button
-            ref={closeButton}
             className="bc-icon-button"
             type="button"
             aria-label="Close"
@@ -102,6 +82,6 @@ export function LegalModal({
           </Button>
         </footer>
       </div>
-    </div>
+    </DialogOverlay>
   );
 }

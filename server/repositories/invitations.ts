@@ -1,6 +1,13 @@
 import "server-only";
+import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
-import { assertPermission, type CircleRole } from "@/server/circles/engine";
+import { assertLegalAcceptance } from "@/server/auth/legal";
+import {
+  assertPermission,
+  CircleRuleError,
+  type CircleRole,
+} from "@/server/circles/engine";
+import { calculateEqualSlotAllocations } from "@/server/circles/gift";
 import { firebaseCircleStore } from "@/server/repositories/circles";
 import {
   assertInvitationCapacity,
@@ -96,11 +103,12 @@ const activeInvitationStates = new Set<InvitationState>([
 ]);
 
 async function acceptancesFor(invitationId: string) {
-  const response = await getBondCircleDataConnect().executeQuery<
-    { invitationAcceptances: InvitationAcceptance[] },
-    { invitationId: string }
-  >("GetInvitationAcceptances", { invitationId });
-  return response.data.invitationAcceptances;
+  const rows = await readAllRows<InvitationAcceptance>(
+    "GetInvitationAcceptancesPage",
+    { invitationId },
+    "invitationAcceptances",
+  );
+  return [...new Map(rows.map((row) => [row.user.id, row])).values()];
 }
 
 export async function loadInvitationByToken(
@@ -129,19 +137,91 @@ export async function loadInvitationByToken(
 }
 
 export async function listCircleInvitations(circleId: string) {
-  const response = await getBondCircleDataConnect().executeQuery<
-    { invitations: InvitationRow[] },
-    { circleId: string }
-  >("GetCircleInvitations", { circleId });
-  return Promise.all(
-    response.data.invitations.map(async (invitation) => ({
+  const invitations = await readAllRows<InvitationRow>(
+    "GetCircleInvitationsPage",
+    { circleId },
+    "invitations",
+  );
+  const acceptanceRows = await readAllRows<
+    InvitationAcceptance & { invitation: { id: string } }
+  >(
+    "GetCircleInvitationAcceptancesPage",
+    { circleId },
+    "invitationAcceptances",
+  );
+  const grouped = new Map<string, Map<string, InvitationAcceptance>>();
+  for (const { invitation, ...acceptance } of acceptanceRows) {
+    const group =
+      grouped.get(invitation.id) ?? new Map<string, InvitationAcceptance>();
+    group.set(acceptance.user.id, acceptance);
+    grouped.set(invitation.id, group);
+  }
+  return [...new Map(invitations.map((row) => [row.id, row])).values()].map(
+    (invitation) => ({
       ...invitation,
       effectiveState: isInvitationExpired(invitation.expiresAt)
         ? ("expired" as const)
         : invitation.state,
-      acceptances: await acceptancesFor(invitation.id),
-    })),
+      acceptances: [...(grouped.get(invitation.id)?.values() ?? [])],
+    }),
   );
+}
+
+async function expectedMembershipAmount(
+  circleId: string,
+  currentMembers: number,
+  invitationAmount: number,
+) {
+  const { data } = await getBondCircleDataConnect().executeQuery<
+    {
+      circle?: {
+        type: string;
+        contributionMode?: string | null;
+        targetAmount: number;
+        memberLimit: number;
+      };
+      circleMemberships: Array<{ expectedAmount: number }>;
+    },
+    { circleId: string }
+  >("GetCircleEngineRecord", { circleId });
+  const circle = data.circle;
+  if (!circle) throw new Error("Circle not found.");
+  if (
+    !["gift", "support"].includes(circle.type) ||
+    circle.contributionMode === "custom"
+  )
+    return invitationAmount;
+  const capacity = calculateEqualSlotAllocations(
+    circle.targetAmount,
+    circle.memberLimit,
+  ).length;
+  if (!currentMembers || data.circleMemberships.length !== currentMembers)
+    throw new CircleRuleError(
+      "Circle membership changed. Refresh and try again.",
+      "ACTIVITY_NOT_ALLOWED",
+    );
+  const remainingPlaces = capacity - currentMembers;
+  if (remainingPlaces < 1)
+    throw new CircleRuleError("This circle is full.", "MEMBER_LIMIT_REACHED");
+  let assigned = 0;
+  for (const member of data.circleMemberships) {
+    if (!Number.isInteger(member.expectedAmount) || member.expectedAmount < 0)
+      throw new CircleRuleError(
+        "Existing assigned contributions need organizer review.",
+        "ACTIVITY_NOT_ALLOWED",
+      );
+    assigned += member.expectedAmount;
+  }
+  const remainingTarget = circle.targetAmount - assigned;
+  if (remainingTarget < 0)
+    throw new CircleRuleError(
+      "Assigned contributions exceed the target. Ask the organizer to review this circle.",
+      "ACTIVITY_NOT_ALLOWED",
+    );
+  // Existing assignments stay fixed; only unfilled places share the remaining target.
+  return remainingTarget === 0 || remainingPlaces === 1
+    ? remainingTarget
+    : calculateEqualSlotAllocations(remainingTarget, remainingPlaces)[0];
 }
 
 export async function assertCanManageInvitations(
@@ -247,10 +327,10 @@ export async function markInvitationSent(
   circleId: string,
   actorId: string,
 ) {
+  await assertCanManageInvitations(circleId, actorId);
   const invitations = await listCircleInvitations(circleId);
   const invitation = invitations.find((item) => item.id === invitationId);
   if (!invitation) throw new Error("Invitation not found.");
-  await assertCanManageInvitations(circleId, actorId);
   if (invitation.state === "created") {
     assertInvitationTransition(invitation.state, "sent");
     await updateInvitationState(
@@ -348,6 +428,7 @@ export async function respondToInvitation(
   const currentMembers = await firebaseCircleStore.memberCount(
     invitation.circle.id,
   );
+  await assertLegalAcceptance(user.id);
   assertInvitationCapacity(
     currentMembers,
     invitation.circle.memberLimit,
@@ -381,7 +462,11 @@ export async function respondToInvitation(
       circleId: invitation.circle.id,
       userId: user.id,
       role: "member",
-      expectedAmount: invitation.expectedAmount,
+      expectedAmount: await expectedMembershipAmount(
+        invitation.circle.id,
+        currentMembers,
+        invitation.expectedAmount,
+      ),
       nextMemberCount: currentMembers + 1,
       nextInvitationState,
       nextUseCount,
@@ -404,6 +489,7 @@ export async function approveInvitationMembership(
   actorId: string,
 ) {
   await assertCanManageInvitations(circleId, actorId);
+  await assertLegalAcceptance(userId);
   const invitation = (await listCircleInvitations(circleId)).find(
     (item) => item.id === invitationId,
   );
@@ -428,7 +514,11 @@ export async function approveInvitationMembership(
       actorId,
       userId,
       role: "member",
-      expectedAmount: invitation.expectedAmount,
+      expectedAmount: await expectedMembershipAmount(
+        circleId,
+        currentMembers,
+        invitation.expectedAmount,
+      ),
       nextMemberCount: currentMembers + 1,
       nextInvitationState:
         nextUseCount >= invitation.maxUses ? "accepted" : "sent",

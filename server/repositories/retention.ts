@@ -11,7 +11,7 @@ import {
 } from "@/server/retention/rules";
 import type { CircleState } from "@/server/circles/engine";
 
-type RetentionPayload = {
+type RetentionState = {
   circle?: {
     id: string;
     type: string;
@@ -20,20 +20,25 @@ type RetentionPayload = {
     purgeAt?: string | null;
     imageStoragePath?: string | null;
   };
-  receipts: Array<{ id: string; imageStoragePath: string }>;
-  circleMemberships: Array<{ receiptStoragePath?: string | null }>;
-  asoEbiTiers: Array<{
-    fabricImageStoragePath?: string | null;
-    appreciationGiftImageStoragePath?: string | null;
-  }>;
   retentionPurgeAttempts: Array<{
     attemptNumber: number;
     status: string;
     startedAt?: string | null;
     nextRetryAt?: string | null;
   }>;
+};
+
+type RetentionPage = {
+  receipts: Array<{ id: string; imageStoragePath: string }>;
+  circleMemberships: Array<{ receiptStoragePath?: string | null }>;
+  asoEbiTiers: Array<{
+    fabricImageStoragePath?: string | null;
+    appreciationGiftImageStoragePath?: string | null;
+  }>;
   invitations: Array<{ id: string }>;
 };
+
+const RETENTION_PAGE_SIZE = 100;
 
 type ReferenceQuery = {
   circles: Array<{ id: string }>;
@@ -46,8 +51,8 @@ type ReferenceQuery = {
 async function isSharedStoragePath(path: string, circleId: string) {
   const response = await getBondCircleDataConnect().executeQuery<
     ReferenceQuery,
-    { path: string }
-  >("GetStoragePathReferences", { path });
+    { path: string; circleId: string }
+  >("GetRetentionExternalStorageReferences", { path, circleId });
   const referencingCircleIds = [
     ...response.data.circles.map((circle) => circle.id),
     ...response.data.receipts.map((receipt) => receipt.circle.id),
@@ -60,15 +65,51 @@ async function isSharedStoragePath(path: string, circleId: string) {
   return referencingCircleIds.some((id) => id !== circleId);
 }
 
-async function loadRetentionPayload(circleId: string) {
+async function loadRetentionState(circleId: string) {
   const response = await getBondCircleDataConnect().executeQuery<
-    RetentionPayload,
+    RetentionState,
     { circleId: string }
-  >("GetCircleRetentionPayload", { circleId });
+  >("GetCircleRetentionState", { circleId });
   return response.data;
 }
 
-function storagePaths(payload: RetentionPayload) {
+async function loadRetentionRecords(circleId: string) {
+  const records: RetentionPage = {
+    receipts: [],
+    circleMemberships: [],
+    asoEbiTiers: [],
+    invitations: [],
+  };
+  for (let offset = 0; ; offset += RETENTION_PAGE_SIZE) {
+    const response = await getBondCircleDataConnect().executeQuery<
+      RetentionPage,
+      { circleId: string; offset: number }
+    >("GetCircleRetentionPage", { circleId, offset });
+    const page = response.data;
+    const collections = [
+      page?.receipts,
+      page?.circleMemberships,
+      page?.asoEbiTiers,
+      page?.invitations,
+    ];
+    if (
+      collections.some(
+        (rows) => !Array.isArray(rows) || rows.length > RETENTION_PAGE_SIZE,
+      )
+    ) {
+      throw new Error("Incomplete retention page.");
+    }
+    records.receipts.push(...page.receipts);
+    records.circleMemberships.push(...page.circleMemberships);
+    records.asoEbiTiers.push(...page.asoEbiTiers);
+    records.invitations.push(...page.invitations);
+    if (collections.every((rows) => rows.length < RETENTION_PAGE_SIZE)) {
+      return records;
+    }
+  }
+}
+
+function storagePaths(payload: RetentionState & RetentionPage) {
   return [
     payload.circle?.imageStoragePath,
     ...payload.receipts.map((receipt) => receipt.imageStoragePath),
@@ -102,7 +143,7 @@ async function finishAttempt(input: {
 }
 
 export async function purgeEligibleCircle(circleId: string, now = new Date()) {
-  const payload = await loadRetentionPayload(circleId);
+  const payload = await loadRetentionState(circleId);
   const circle = payload.circle;
   if (
     !circle ||
@@ -144,8 +185,12 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
   let deletedFileCount = 0;
   let skippedSharedFileCount = 0;
   try {
-    for (const rawPath of new Set(storagePaths(payload))) {
-      const path = assertPrivateStoragePath(rawPath);
+    // Read every page and validate every path before deleting files or metadata.
+    const records = await loadRetentionRecords(circleId);
+    const paths = new Set(
+      storagePaths({ ...payload, ...records }).map(assertPrivateStoragePath),
+    );
+    for (const path of paths) {
       if (await isSharedStoragePath(path, circleId)) {
         skippedSharedFileCount += 1;
         continue;
@@ -159,7 +204,7 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
       deletedFileCount += 1;
     }
 
-    for (const invitation of payload.invitations) {
+    for (const invitation of records.invitations) {
       await getBondCircleDataConnect().executeMutation(
         "PurgeInvitationAcceptances",
         { invitationId: invitation.id },
@@ -187,9 +232,8 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
       deletedFileCount,
       skippedSharedFileCount,
     };
-  } catch (error) {
-    const failureReason =
-      error instanceof Error ? error.message : "Unknown retention failure";
+  } catch {
+    const failureReason = "RETENTION_PURGE_FAILED";
     await finishAttempt({
       attemptId,
       status: "failed",
@@ -197,10 +241,10 @@ export async function purgeEligibleCircle(circleId: string, now = new Date()) {
       skippedSharedFileCount,
       failureReason,
       nextRetryAt: new Date(now.getTime() + RETENTION_RETRY_MS).toISOString(),
-    }).catch((loggingError) => {
+    }).catch(() => {
       logger.error("retention_attempt_log_failed", {
         circleId,
-        error: loggingError instanceof Error ? loggingError.message : "unknown",
+        reasonCode: "RETENTION_ATTEMPT_LOG_FAILED",
       });
     });
     logger.error("retention_purge_alert", {

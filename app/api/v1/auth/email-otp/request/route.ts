@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { apiJson } from "@/app/api/v1/_response";
 import { clientKey } from "@/server/auth/request";
 import {
   createEmailOtpChallenge,
@@ -13,6 +13,18 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    if (
+      !(await enforceRateLimit(
+        clientKey(request, "otp-request"),
+        120,
+        15 * 60_000,
+      ))
+    ) {
+      return apiJson(
+        { error: "Too many requests. Try again shortly." },
+        { status: 429, headers: { "Retry-After": "900" } },
+      );
+    }
     const input = (await request.json()) as {
       email?: string;
       purpose?: "register" | "sign-in" | "recovery";
@@ -21,21 +33,18 @@ export async function POST(request: Request) {
       privacyAccepted?: boolean;
     };
 
-    const developmentMode =
-      process.env.AUTH_EMAIL_OTP_MODE === "development" ||
-      process.env.NODE_ENV !== "production";
+    if (!["register", "sign-in", "recovery"].includes(input.purpose ?? "")) {
+      return apiJson({ error: "Invalid purpose." }, { status: 400 });
+    }
+    const developmentMode = process.env.NODE_ENV !== "production";
 
     const email = await validateEmailAddress(input.email ?? "", {
       allowTestDomains: developmentMode,
       checkDomain: !developmentMode,
     });
 
-    if (!input.purpose) {
-      return NextResponse.json({ error: "Invalid purpose." }, { status: 400 });
-    }
-
-    if (!(await enforceRateLimit(clientKey(request, email), 5, 15 * 60_000))) {
-      return NextResponse.json(
+    if (!(await enforceRateLimit(`otp-address:${email}`, 5, 15 * 60_000))) {
+      return apiJson(
         { message: "If the address can be used, a code will arrive shortly." },
         { status: 202 },
       );
@@ -49,46 +58,48 @@ export async function POST(request: Request) {
 
     if (
       input.purpose === "register" &&
-      (!input.termsAccepted || !input.privacyAccepted)
+      (input.termsAccepted !== true || input.privacyAccepted !== true)
     ) {
-      return NextResponse.json(
-        { error: "Legal acceptance required." },
-        { status: 400 },
-      );
+      return apiJson({ error: "Legal acceptance required." }, { status: 400 });
     }
 
     const { challenge, challengeToken, code } = createEmailOtpChallenge({
       email,
-      purpose: input.purpose,
+      purpose: input.purpose!,
       displayName,
-      termsAcceptedAt: input.termsAccepted ? now : undefined,
-      privacyAcceptedAt: input.privacyAccepted ? now : undefined,
+      termsAcceptedAt:
+        input.purpose === "register" && input.termsAccepted === true
+          ? now
+          : undefined,
+      privacyAcceptedAt:
+        input.purpose === "register" && input.privacyAccepted === true
+          ? now
+          : undefined,
     });
 
     const delivery = await sendEmailOtp({ code, email });
 
-    return NextResponse.json(
+    return apiJson(
       {
         challengeId: challengeToken,
         expiresAt: challenge.expiresAt,
         message: "If the address can be used, a code will arrive shortly.",
         delivery,
-        ...(delivery === "development" ? { developmentCode: code } : {}),
+        ...(developmentMode && delivery === "development"
+          ? { developmentCode: code }
+          : {}),
       },
       { status: 202 },
     );
-  } catch (error) {
+  } catch {
     recordAuthAudit({
       event: "verification",
       outcome: "failure",
       channel: "email",
     });
-    return NextResponse.json(
+    return apiJson(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to send a code. Check the details and try again.",
+        error: "Unable to send a code. Check the details and try again.",
       },
       { status: 400 },
     );

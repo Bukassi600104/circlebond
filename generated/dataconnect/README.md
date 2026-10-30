@@ -10,10 +10,20 @@ This README will guide you through the process of using the generated JavaScript
 - [**Accessing the connector**](#accessing-the-connector)
   - [*Connecting to the local Emulator*](#connecting-to-the-local-emulator)
 - [**Queries**](#queries)
+  - [*GetAccountExportPage*](#getaccountexportpage)
+  - [*GetAccountPrivacyRequests*](#getaccountprivacyrequests)
+  - [*GetOwnerPrivacyRequests*](#getownerprivacyrequests)
+  - [*GetCircleCommunicationContext*](#getcirclecommunicationcontext)
+  - [*GetCircleAnnouncementsPage*](#getcircleannouncementspage)
+  - [*GetCircleCommentsPage*](#getcirclecommentspage)
+  - [*GetCircleCommentReportsPage*](#getcirclecommentreportspage)
+  - [*GetSupportUpdatesPage*](#getsupportupdatespage)
+  - [*GetUserDeviceRegistrations*](#getuserdeviceregistrations)
   - [*GetCurrentUser*](#getcurrentuser)
   - [*GetRecentAbuseAttempts*](#getrecentabuseattempts)
   - [*GetConsumedAuthChallenge*](#getconsumedauthchallenge)
   - [*GetDashboardCircles*](#getdashboardcircles)
+  - [*GetDashboardCirclesForUser*](#getdashboardcirclesforuser)
   - [*GetCircleEngineRecord*](#getcircleenginerecord)
   - [*GetCircleLifecycleSummary*](#getcirclelifecyclesummary)
   - [*FindUserByEmail*](#finduserbyemail)
@@ -21,6 +31,8 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetCircleAuditEntries*](#getcircleauditentries)
   - [*GetCreatorTrialUsage*](#getcreatortrialusage)
   - [*GetCirclePricingState*](#getcirclepricingstate)
+  - [*GetCirclePaymentCheckout*](#getcirclepaymentcheckout)
+  - [*GetCircleActivationAttempt*](#getcircleactivationattempt)
   - [*GetAsoEbiCircleDetail*](#getasoebicircledetail)
   - [*GetSupportCircleDetail*](#getsupportcircledetail)
   - [*GetInvitationByTokenHash*](#getinvitationbytokenhash)
@@ -49,13 +61,29 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetOwnerUserByIdentifier*](#getowneruserbyidentifier)
   - [*GetOwnerOperationalExport*](#getowneroperationalexport)
   - [*GetOwnerInvitation*](#getownerinvitation)
+  - [*GetRateLimitBucket*](#getratelimitbucket)
+  - [*GetCircleRetentionState*](#getcircleretentionstate)
+  - [*GetCircleRetentionPage*](#getcircleretentionpage)
+  - [*GetRetentionExternalStorageReferences*](#getretentionexternalstoragereferences)
+  - [*GetContributionWorkspaceMetadata*](#getcontributionworkspacemetadata)
+  - [*GetContributionReceiptsPage*](#getcontributionreceiptspage)
+  - [*GetCircleInvitationsPage*](#getcircleinvitationspage)
+  - [*GetInvitationAcceptancesPage*](#getinvitationacceptancespage)
+  - [*GetCircleActivationsPage*](#getcircleactivationspage)
+  - [*GetCircleInvitationAcceptancesPage*](#getcircleinvitationacceptancespage)
 - [**Mutations**](#mutations)
+  - [*CreateAccountPrivacyRequest*](#createaccountprivacyrequest)
+  - [*AcknowledgeAccountPrivacyRequest*](#acknowledgeaccountprivacyrequest)
+  - [*RegisterDeviceRegistration*](#registerdeviceregistration)
+  - [*DeleteDeviceRegistration*](#deletedeviceregistration)
+  - [*DeleteUserDeviceRegistrations*](#deleteuserdeviceregistrations)
   - [*RecordAbuseAttempt*](#recordabuseattempt)
   - [*ConsumeAuthChallenge*](#consumeauthchallenge)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
   - [*CreateModelPricedCircleDraft*](#createmodelpricedcircledraft)
   - [*ClaimTrialAndPublishCircle*](#claimtrialandpublishcircle)
+  - [*SaveCirclePaymentCheckout*](#savecirclepaymentcheckout)
   - [*CreateCircleActivationAttempt*](#createcircleactivationattempt)
   - [*FailCircleActivationAttempt*](#failcircleactivationattempt)
   - [*CompletePaidCircleActivation*](#completepaidcircleactivation)
@@ -114,6 +142,8 @@ This README will guide you through the process of using the generated JavaScript
   - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
   - [*ProvisionOwnerAccount*](#provisionowneraccount)
   - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
+  - [*CreateRateLimitBucket*](#createratelimitbucket)
+  - [*CompareAndSetRateLimitBucket*](#compareandsetratelimitbucket)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `bondcircle`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -159,6 +189,1254 @@ The following is true for both the action shortcut function and the `QueryRef` f
 - Both functions can be called with or without passing in a `DataConnect` instance as an argument. If no `DataConnect` argument is passed in, then the generated SDK will call `getDataConnect(connectorConfig)` behind the scenes for you.
 
 Below are examples of how to use the `bondcircle` connector's generated functions to execute each query. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#using-queries).
+
+## GetAccountExportPage
+You can execute the `GetAccountExportPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getAccountExportPage(vars: GetAccountExportPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetAccountExportPageData, GetAccountExportPageVariables>;
+
+interface GetAccountExportPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetAccountExportPageVariables): QueryRef<GetAccountExportPageData, GetAccountExportPageVariables>;
+}
+export const getAccountExportPageRef: GetAccountExportPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getAccountExportPage(dc: DataConnect, vars: GetAccountExportPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetAccountExportPageData, GetAccountExportPageVariables>;
+
+interface GetAccountExportPageRef {
+  ...
+  (dc: DataConnect, vars: GetAccountExportPageVariables): QueryRef<GetAccountExportPageData, GetAccountExportPageVariables>;
+}
+export const getAccountExportPageRef: GetAccountExportPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getAccountExportPageRef:
+```typescript
+const name = getAccountExportPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetAccountExportPage` query requires an argument of type `GetAccountExportPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetAccountExportPageVariables {
+  userId: string;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetAccountExportPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetAccountExportPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetAccountExportPageData {
+  user?: {
+    id: string;
+    displayName: string;
+    email?: string | null;
+    phone?: string | null;
+    profileImage?: string | null;
+    termsAcceptedAt?: TimestampString | null;
+    privacyAcceptedAt?: TimestampString | null;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+    accountStatus: string;
+    createdAt: TimestampString;
+  } & User_Key;
+  memberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    pledgedAmount: number;
+    confirmedAmount: number;
+    fulfilmentStatus: string;
+    notificationsMuted: boolean;
+    joinedAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      status: string;
+    } & Circle_Key;
+  })[];
+  receipts: ({
+    id: UUIDString;
+    amount: number;
+    note?: string | null;
+    status: string;
+    overpaymentAmount: number;
+    rejectionReason?: string | null;
+    submittedAt: TimestampString;
+    reviewedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Receipt_Key)[];
+  comments: ({
+    id: UUIDString;
+    body: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Comment_Key)[];
+  announcements: ({
+    id: UUIDString;
+    title: string;
+    body: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Announcement_Key)[];
+  supportUpdates: ({
+    id: UUIDString;
+    body: string;
+    createdAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & SupportUpdate_Key)[];
+  notifications: ({
+    id: UUIDString;
+    type: string;
+    title: string;
+    body: string;
+    readAt?: TimestampString | null;
+    dismissedAt?: TimestampString | null;
+    createdAt: TimestampString;
+  } & Notification_Key)[];
+  activations: ({
+    id: UUIDString;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+    activatedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & CircleActivation_Key)[];
+  authEvents: ({
+    id: UUIDString;
+    event: string;
+    channel?: string | null;
+    outcome: string;
+    occurredAt: TimestampString;
+  } & AuthAuditEvent_Key)[];
+}
+```
+### Using `GetAccountExportPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getAccountExportPage, GetAccountExportPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetAccountExportPage` query requires an argument of type `GetAccountExportPageVariables`:
+const getAccountExportPageVars: GetAccountExportPageVariables = {
+  userId: ..., 
+  offset: ..., 
+};
+
+// Call the `getAccountExportPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getAccountExportPage(getAccountExportPageVars);
+// Variables can be defined inline as well.
+const { data } = await getAccountExportPage({ userId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getAccountExportPage(dataConnect, getAccountExportPageVars);
+
+console.log(data.user);
+console.log(data.memberships);
+console.log(data.receipts);
+console.log(data.comments);
+console.log(data.announcements);
+console.log(data.supportUpdates);
+console.log(data.notifications);
+console.log(data.activations);
+console.log(data.authEvents);
+
+// Or, you can use the `Promise` API.
+getAccountExportPage(getAccountExportPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+  console.log(data.memberships);
+  console.log(data.receipts);
+  console.log(data.comments);
+  console.log(data.announcements);
+  console.log(data.supportUpdates);
+  console.log(data.notifications);
+  console.log(data.activations);
+  console.log(data.authEvents);
+});
+```
+
+### Using `GetAccountExportPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getAccountExportPageRef, GetAccountExportPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetAccountExportPage` query requires an argument of type `GetAccountExportPageVariables`:
+const getAccountExportPageVars: GetAccountExportPageVariables = {
+  userId: ..., 
+  offset: ..., 
+};
+
+// Call the `getAccountExportPageRef()` function to get a reference to the query.
+const ref = getAccountExportPageRef(getAccountExportPageVars);
+// Variables can be defined inline as well.
+const ref = getAccountExportPageRef({ userId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getAccountExportPageRef(dataConnect, getAccountExportPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.user);
+console.log(data.memberships);
+console.log(data.receipts);
+console.log(data.comments);
+console.log(data.announcements);
+console.log(data.supportUpdates);
+console.log(data.notifications);
+console.log(data.activations);
+console.log(data.authEvents);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user);
+  console.log(data.memberships);
+  console.log(data.receipts);
+  console.log(data.comments);
+  console.log(data.announcements);
+  console.log(data.supportUpdates);
+  console.log(data.notifications);
+  console.log(data.activations);
+  console.log(data.authEvents);
+});
+```
+
+## GetAccountPrivacyRequests
+You can execute the `GetAccountPrivacyRequests` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getAccountPrivacyRequests(vars: GetAccountPrivacyRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+
+interface GetAccountPrivacyRequestsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetAccountPrivacyRequestsVariables): QueryRef<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+}
+export const getAccountPrivacyRequestsRef: GetAccountPrivacyRequestsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getAccountPrivacyRequests(dc: DataConnect, vars: GetAccountPrivacyRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+
+interface GetAccountPrivacyRequestsRef {
+  ...
+  (dc: DataConnect, vars: GetAccountPrivacyRequestsVariables): QueryRef<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+}
+export const getAccountPrivacyRequestsRef: GetAccountPrivacyRequestsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getAccountPrivacyRequestsRef:
+```typescript
+const name = getAccountPrivacyRequestsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetAccountPrivacyRequests` query requires an argument of type `GetAccountPrivacyRequestsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetAccountPrivacyRequestsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetAccountPrivacyRequests` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetAccountPrivacyRequestsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetAccountPrivacyRequestsData {
+  accountPrivacyRequests: ({
+    id: string;
+    kind: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & AccountPrivacyRequest_Key)[];
+}
+```
+### Using `GetAccountPrivacyRequests`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getAccountPrivacyRequests, GetAccountPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+
+// The `GetAccountPrivacyRequests` query requires an argument of type `GetAccountPrivacyRequestsVariables`:
+const getAccountPrivacyRequestsVars: GetAccountPrivacyRequestsVariables = {
+  userId: ..., 
+};
+
+// Call the `getAccountPrivacyRequests()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getAccountPrivacyRequests(getAccountPrivacyRequestsVars);
+// Variables can be defined inline as well.
+const { data } = await getAccountPrivacyRequests({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getAccountPrivacyRequests(dataConnect, getAccountPrivacyRequestsVars);
+
+console.log(data.accountPrivacyRequests);
+
+// Or, you can use the `Promise` API.
+getAccountPrivacyRequests(getAccountPrivacyRequestsVars).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequests);
+});
+```
+
+### Using `GetAccountPrivacyRequests`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getAccountPrivacyRequestsRef, GetAccountPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+
+// The `GetAccountPrivacyRequests` query requires an argument of type `GetAccountPrivacyRequestsVariables`:
+const getAccountPrivacyRequestsVars: GetAccountPrivacyRequestsVariables = {
+  userId: ..., 
+};
+
+// Call the `getAccountPrivacyRequestsRef()` function to get a reference to the query.
+const ref = getAccountPrivacyRequestsRef(getAccountPrivacyRequestsVars);
+// Variables can be defined inline as well.
+const ref = getAccountPrivacyRequestsRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getAccountPrivacyRequestsRef(dataConnect, getAccountPrivacyRequestsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.accountPrivacyRequests);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequests);
+});
+```
+
+## GetOwnerPrivacyRequests
+You can execute the `GetOwnerPrivacyRequests` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getOwnerPrivacyRequests(vars: GetOwnerPrivacyRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+
+interface GetOwnerPrivacyRequestsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetOwnerPrivacyRequestsVariables): QueryRef<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+}
+export const getOwnerPrivacyRequestsRef: GetOwnerPrivacyRequestsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getOwnerPrivacyRequests(dc: DataConnect, vars: GetOwnerPrivacyRequestsVariables, options?: ExecuteQueryOptions): QueryPromise<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+
+interface GetOwnerPrivacyRequestsRef {
+  ...
+  (dc: DataConnect, vars: GetOwnerPrivacyRequestsVariables): QueryRef<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+}
+export const getOwnerPrivacyRequestsRef: GetOwnerPrivacyRequestsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getOwnerPrivacyRequestsRef:
+```typescript
+const name = getOwnerPrivacyRequestsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetOwnerPrivacyRequests` query requires an argument of type `GetOwnerPrivacyRequestsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetOwnerPrivacyRequestsVariables {
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetOwnerPrivacyRequests` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetOwnerPrivacyRequestsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetOwnerPrivacyRequestsData {
+  accountPrivacyRequests: ({
+    id: string;
+    kind: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+    } & User_Key;
+  } & AccountPrivacyRequest_Key)[];
+}
+```
+### Using `GetOwnerPrivacyRequests`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getOwnerPrivacyRequests, GetOwnerPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerPrivacyRequests` query requires an argument of type `GetOwnerPrivacyRequestsVariables`:
+const getOwnerPrivacyRequestsVars: GetOwnerPrivacyRequestsVariables = {
+  offset: ..., 
+};
+
+// Call the `getOwnerPrivacyRequests()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getOwnerPrivacyRequests(getOwnerPrivacyRequestsVars);
+// Variables can be defined inline as well.
+const { data } = await getOwnerPrivacyRequests({ offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getOwnerPrivacyRequests(dataConnect, getOwnerPrivacyRequestsVars);
+
+console.log(data.accountPrivacyRequests);
+
+// Or, you can use the `Promise` API.
+getOwnerPrivacyRequests(getOwnerPrivacyRequestsVars).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequests);
+});
+```
+
+### Using `GetOwnerPrivacyRequests`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getOwnerPrivacyRequestsRef, GetOwnerPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+
+// The `GetOwnerPrivacyRequests` query requires an argument of type `GetOwnerPrivacyRequestsVariables`:
+const getOwnerPrivacyRequestsVars: GetOwnerPrivacyRequestsVariables = {
+  offset: ..., 
+};
+
+// Call the `getOwnerPrivacyRequestsRef()` function to get a reference to the query.
+const ref = getOwnerPrivacyRequestsRef(getOwnerPrivacyRequestsVars);
+// Variables can be defined inline as well.
+const ref = getOwnerPrivacyRequestsRef({ offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getOwnerPrivacyRequestsRef(dataConnect, getOwnerPrivacyRequestsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.accountPrivacyRequests);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequests);
+});
+```
+
+## GetCircleCommunicationContext
+You can execute the `GetCircleCommunicationContext` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleCommunicationContext(vars: GetCircleCommunicationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+
+interface GetCircleCommunicationContextRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleCommunicationContextVariables): QueryRef<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+}
+export const getCircleCommunicationContextRef: GetCircleCommunicationContextRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleCommunicationContext(dc: DataConnect, vars: GetCircleCommunicationContextVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+
+interface GetCircleCommunicationContextRef {
+  ...
+  (dc: DataConnect, vars: GetCircleCommunicationContextVariables): QueryRef<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+}
+export const getCircleCommunicationContextRef: GetCircleCommunicationContextRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleCommunicationContextRef:
+```typescript
+const name = getCircleCommunicationContextRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleCommunicationContext` query requires an argument of type `GetCircleCommunicationContextVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleCommunicationContextVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleCommunicationContext` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleCommunicationContextData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleCommunicationContextData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    commentsEnabled: boolean;
+    memberLimit: number;
+    pricingPlan: string;
+    pricingModelVersion: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    entityId: string;
+    metadata: string;
+    createdAt: TimestampString;
+    actor?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & ActivityLog_Key)[];
+}
+```
+### Using `GetCircleCommunicationContext`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommunicationContext, GetCircleCommunicationContextVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommunicationContext` query requires an argument of type `GetCircleCommunicationContextVariables`:
+const getCircleCommunicationContextVars: GetCircleCommunicationContextVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleCommunicationContext()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleCommunicationContext(getCircleCommunicationContextVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleCommunicationContext({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleCommunicationContext(dataConnect, getCircleCommunicationContextVars);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+getCircleCommunicationContext(getCircleCommunicationContextVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.activityLogs);
+});
+```
+
+### Using `GetCircleCommunicationContext`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommunicationContextRef, GetCircleCommunicationContextVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommunicationContext` query requires an argument of type `GetCircleCommunicationContextVariables`:
+const getCircleCommunicationContextVars: GetCircleCommunicationContextVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleCommunicationContextRef()` function to get a reference to the query.
+const ref = getCircleCommunicationContextRef(getCircleCommunicationContextVars);
+// Variables can be defined inline as well.
+const ref = getCircleCommunicationContextRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleCommunicationContextRef(dataConnect, getCircleCommunicationContextVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+console.log(data.activityLogs);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+  console.log(data.activityLogs);
+});
+```
+
+## GetCircleAnnouncementsPage
+You can execute the `GetCircleAnnouncementsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleAnnouncementsPage(vars: GetCircleAnnouncementsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+
+interface GetCircleAnnouncementsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleAnnouncementsPageVariables): QueryRef<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+}
+export const getCircleAnnouncementsPageRef: GetCircleAnnouncementsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleAnnouncementsPage(dc: DataConnect, vars: GetCircleAnnouncementsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+
+interface GetCircleAnnouncementsPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleAnnouncementsPageVariables): QueryRef<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+}
+export const getCircleAnnouncementsPageRef: GetCircleAnnouncementsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleAnnouncementsPageRef:
+```typescript
+const name = getCircleAnnouncementsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleAnnouncementsPage` query requires an argument of type `GetCircleAnnouncementsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleAnnouncementsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleAnnouncementsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleAnnouncementsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleAnnouncementsPageData {
+  announcements: ({
+    id: UUIDString;
+    title: string;
+    body: string;
+    pinned: boolean;
+    important: boolean;
+    commentsEnabled: boolean;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Announcement_Key)[];
+}
+```
+### Using `GetCircleAnnouncementsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleAnnouncementsPage, GetCircleAnnouncementsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleAnnouncementsPage` query requires an argument of type `GetCircleAnnouncementsPageVariables`:
+const getCircleAnnouncementsPageVars: GetCircleAnnouncementsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleAnnouncementsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleAnnouncementsPage(getCircleAnnouncementsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleAnnouncementsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleAnnouncementsPage(dataConnect, getCircleAnnouncementsPageVars);
+
+console.log(data.announcements);
+
+// Or, you can use the `Promise` API.
+getCircleAnnouncementsPage(getCircleAnnouncementsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcements);
+});
+```
+
+### Using `GetCircleAnnouncementsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleAnnouncementsPageRef, GetCircleAnnouncementsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleAnnouncementsPage` query requires an argument of type `GetCircleAnnouncementsPageVariables`:
+const getCircleAnnouncementsPageVars: GetCircleAnnouncementsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleAnnouncementsPageRef()` function to get a reference to the query.
+const ref = getCircleAnnouncementsPageRef(getCircleAnnouncementsPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleAnnouncementsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleAnnouncementsPageRef(dataConnect, getCircleAnnouncementsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.announcements);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcements);
+});
+```
+
+## GetCircleCommentsPage
+You can execute the `GetCircleCommentsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleCommentsPage(vars: GetCircleCommentsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+
+interface GetCircleCommentsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleCommentsPageVariables): QueryRef<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+}
+export const getCircleCommentsPageRef: GetCircleCommentsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleCommentsPage(dc: DataConnect, vars: GetCircleCommentsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+
+interface GetCircleCommentsPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleCommentsPageVariables): QueryRef<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+}
+export const getCircleCommentsPageRef: GetCircleCommentsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleCommentsPageRef:
+```typescript
+const name = getCircleCommentsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleCommentsPage` query requires an argument of type `GetCircleCommentsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleCommentsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleCommentsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleCommentsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleCommentsPageData {
+  comments: ({
+    id: UUIDString;
+    announcementId?: UUIDString | null;
+    parentCommentId?: UUIDString | null;
+    body: string;
+    status: string;
+    deletionReason?: string | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    author: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  } & Comment_Key)[];
+}
+```
+### Using `GetCircleCommentsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommentsPage, GetCircleCommentsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommentsPage` query requires an argument of type `GetCircleCommentsPageVariables`:
+const getCircleCommentsPageVars: GetCircleCommentsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleCommentsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleCommentsPage(getCircleCommentsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleCommentsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleCommentsPage(dataConnect, getCircleCommentsPageVars);
+
+console.log(data.comments);
+
+// Or, you can use the `Promise` API.
+getCircleCommentsPage(getCircleCommentsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.comments);
+});
+```
+
+### Using `GetCircleCommentsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommentsPageRef, GetCircleCommentsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommentsPage` query requires an argument of type `GetCircleCommentsPageVariables`:
+const getCircleCommentsPageVars: GetCircleCommentsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleCommentsPageRef()` function to get a reference to the query.
+const ref = getCircleCommentsPageRef(getCircleCommentsPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleCommentsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleCommentsPageRef(dataConnect, getCircleCommentsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.comments);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.comments);
+});
+```
+
+## GetCircleCommentReportsPage
+You can execute the `GetCircleCommentReportsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleCommentReportsPage(vars: GetCircleCommentReportsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+
+interface GetCircleCommentReportsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleCommentReportsPageVariables): QueryRef<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+}
+export const getCircleCommentReportsPageRef: GetCircleCommentReportsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleCommentReportsPage(dc: DataConnect, vars: GetCircleCommentReportsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+
+interface GetCircleCommentReportsPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleCommentReportsPageVariables): QueryRef<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+}
+export const getCircleCommentReportsPageRef: GetCircleCommentReportsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleCommentReportsPageRef:
+```typescript
+const name = getCircleCommentReportsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleCommentReportsPage` query requires an argument of type `GetCircleCommentReportsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleCommentReportsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleCommentReportsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleCommentReportsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleCommentReportsPageData {
+  commentReports: ({
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    comment: {
+      id: UUIDString;
+    } & Comment_Key;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & CommentReport_Key)[];
+}
+```
+### Using `GetCircleCommentReportsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommentReportsPage, GetCircleCommentReportsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommentReportsPage` query requires an argument of type `GetCircleCommentReportsPageVariables`:
+const getCircleCommentReportsPageVars: GetCircleCommentReportsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleCommentReportsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleCommentReportsPage(getCircleCommentReportsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleCommentReportsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleCommentReportsPage(dataConnect, getCircleCommentReportsPageVars);
+
+console.log(data.commentReports);
+
+// Or, you can use the `Promise` API.
+getCircleCommentReportsPage(getCircleCommentReportsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.commentReports);
+});
+```
+
+### Using `GetCircleCommentReportsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleCommentReportsPageRef, GetCircleCommentReportsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleCommentReportsPage` query requires an argument of type `GetCircleCommentReportsPageVariables`:
+const getCircleCommentReportsPageVars: GetCircleCommentReportsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleCommentReportsPageRef()` function to get a reference to the query.
+const ref = getCircleCommentReportsPageRef(getCircleCommentReportsPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleCommentReportsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleCommentReportsPageRef(dataConnect, getCircleCommentReportsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.commentReports);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.commentReports);
+});
+```
+
+## GetSupportUpdatesPage
+You can execute the `GetSupportUpdatesPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getSupportUpdatesPage(vars: GetSupportUpdatesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+
+interface GetSupportUpdatesPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSupportUpdatesPageVariables): QueryRef<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+}
+export const getSupportUpdatesPageRef: GetSupportUpdatesPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getSupportUpdatesPage(dc: DataConnect, vars: GetSupportUpdatesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+
+interface GetSupportUpdatesPageRef {
+  ...
+  (dc: DataConnect, vars: GetSupportUpdatesPageVariables): QueryRef<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+}
+export const getSupportUpdatesPageRef: GetSupportUpdatesPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getSupportUpdatesPageRef:
+```typescript
+const name = getSupportUpdatesPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetSupportUpdatesPage` query requires an argument of type `GetSupportUpdatesPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetSupportUpdatesPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetSupportUpdatesPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetSupportUpdatesPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetSupportUpdatesPageData {
+  supportUpdates: ({
+    id: UUIDString;
+    body: string;
+    createdAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & SupportUpdate_Key)[];
+}
+```
+### Using `GetSupportUpdatesPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getSupportUpdatesPage, GetSupportUpdatesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetSupportUpdatesPage` query requires an argument of type `GetSupportUpdatesPageVariables`:
+const getSupportUpdatesPageVars: GetSupportUpdatesPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getSupportUpdatesPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getSupportUpdatesPage(getSupportUpdatesPageVars);
+// Variables can be defined inline as well.
+const { data } = await getSupportUpdatesPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getSupportUpdatesPage(dataConnect, getSupportUpdatesPageVars);
+
+console.log(data.supportUpdates);
+
+// Or, you can use the `Promise` API.
+getSupportUpdatesPage(getSupportUpdatesPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.supportUpdates);
+});
+```
+
+### Using `GetSupportUpdatesPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getSupportUpdatesPageRef, GetSupportUpdatesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetSupportUpdatesPage` query requires an argument of type `GetSupportUpdatesPageVariables`:
+const getSupportUpdatesPageVars: GetSupportUpdatesPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getSupportUpdatesPageRef()` function to get a reference to the query.
+const ref = getSupportUpdatesPageRef(getSupportUpdatesPageVars);
+// Variables can be defined inline as well.
+const ref = getSupportUpdatesPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getSupportUpdatesPageRef(dataConnect, getSupportUpdatesPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.supportUpdates);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.supportUpdates);
+});
+```
+
+## GetUserDeviceRegistrations
+You can execute the `GetUserDeviceRegistrations` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getUserDeviceRegistrations(vars: GetUserDeviceRegistrationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+
+interface GetUserDeviceRegistrationsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserDeviceRegistrationsVariables): QueryRef<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+}
+export const getUserDeviceRegistrationsRef: GetUserDeviceRegistrationsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getUserDeviceRegistrations(dc: DataConnect, vars: GetUserDeviceRegistrationsVariables, options?: ExecuteQueryOptions): QueryPromise<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+
+interface GetUserDeviceRegistrationsRef {
+  ...
+  (dc: DataConnect, vars: GetUserDeviceRegistrationsVariables): QueryRef<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+}
+export const getUserDeviceRegistrationsRef: GetUserDeviceRegistrationsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getUserDeviceRegistrationsRef:
+```typescript
+const name = getUserDeviceRegistrationsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetUserDeviceRegistrations` query requires an argument of type `GetUserDeviceRegistrationsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetUserDeviceRegistrationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `GetUserDeviceRegistrations` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetUserDeviceRegistrationsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetUserDeviceRegistrationsData {
+  deviceRegistrations: ({
+    platform: string;
+    updatedAt: TimestampString;
+  })[];
+}
+```
+### Using `GetUserDeviceRegistrations`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getUserDeviceRegistrations, GetUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserDeviceRegistrations` query requires an argument of type `GetUserDeviceRegistrationsVariables`:
+const getUserDeviceRegistrationsVars: GetUserDeviceRegistrationsVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserDeviceRegistrations()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getUserDeviceRegistrations(getUserDeviceRegistrationsVars);
+// Variables can be defined inline as well.
+const { data } = await getUserDeviceRegistrations({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getUserDeviceRegistrations(dataConnect, getUserDeviceRegistrationsVars);
+
+console.log(data.deviceRegistrations);
+
+// Or, you can use the `Promise` API.
+getUserDeviceRegistrations(getUserDeviceRegistrationsVars).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistrations);
+});
+```
+
+### Using `GetUserDeviceRegistrations`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getUserDeviceRegistrationsRef, GetUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+
+// The `GetUserDeviceRegistrations` query requires an argument of type `GetUserDeviceRegistrationsVariables`:
+const getUserDeviceRegistrationsVars: GetUserDeviceRegistrationsVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserDeviceRegistrationsRef()` function to get a reference to the query.
+const ref = getUserDeviceRegistrationsRef(getUserDeviceRegistrationsVars);
+// Variables can be defined inline as well.
+const ref = getUserDeviceRegistrationsRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getUserDeviceRegistrationsRef(dataConnect, getUserDeviceRegistrationsVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.deviceRegistrations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistrations);
+});
+```
 
 ## GetCurrentUser
 You can execute the `GetCurrentUser` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
@@ -603,6 +1881,144 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## GetDashboardCirclesForUser
+You can execute the `GetDashboardCirclesForUser` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDashboardCirclesForUser(vars: GetDashboardCirclesForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+
+interface GetDashboardCirclesForUserRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDashboardCirclesForUserVariables): QueryRef<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+}
+export const getDashboardCirclesForUserRef: GetDashboardCirclesForUserRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDashboardCirclesForUser(dc: DataConnect, vars: GetDashboardCirclesForUserVariables, options?: ExecuteQueryOptions): QueryPromise<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+
+interface GetDashboardCirclesForUserRef {
+  ...
+  (dc: DataConnect, vars: GetDashboardCirclesForUserVariables): QueryRef<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+}
+export const getDashboardCirclesForUserRef: GetDashboardCirclesForUserRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDashboardCirclesForUserRef:
+```typescript
+const name = getDashboardCirclesForUserRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDashboardCirclesForUser` query requires an argument of type `GetDashboardCirclesForUserVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDashboardCirclesForUserVariables {
+  userId: string;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetDashboardCirclesForUser` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDashboardCirclesForUserData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDashboardCirclesForUserData {
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    user: {
+      id: string;
+    } & User_Key;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      imageUrl?: string | null;
+      targetAmount: number;
+      contributedAmount: number;
+      showTargetToMembers: boolean;
+      showConfirmedTotalToMembers: boolean;
+      memberCount: number;
+      memberLimit: number;
+      deadline?: DateString | null;
+      eventDate?: DateString | null;
+      status: string;
+      createdAt: TimestampString;
+      updatedAt: TimestampString;
+      creator: {
+        id: string;
+      } & User_Key;
+    } & Circle_Key;
+  })[];
+}
+```
+### Using `GetDashboardCirclesForUser`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDashboardCirclesForUser, GetDashboardCirclesForUserVariables } from '@bondcircle/dataconnect';
+
+// The `GetDashboardCirclesForUser` query requires an argument of type `GetDashboardCirclesForUserVariables`:
+const getDashboardCirclesForUserVars: GetDashboardCirclesForUserVariables = {
+  userId: ..., 
+  offset: ..., 
+};
+
+// Call the `getDashboardCirclesForUser()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDashboardCirclesForUser(getDashboardCirclesForUserVars);
+// Variables can be defined inline as well.
+const { data } = await getDashboardCirclesForUser({ userId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDashboardCirclesForUser(dataConnect, getDashboardCirclesForUserVars);
+
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+getDashboardCirclesForUser(getDashboardCirclesForUserVars).then((response) => {
+  const data = response.data;
+  console.log(data.circleMemberships);
+});
+```
+
+### Using `GetDashboardCirclesForUser`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDashboardCirclesForUserRef, GetDashboardCirclesForUserVariables } from '@bondcircle/dataconnect';
+
+// The `GetDashboardCirclesForUser` query requires an argument of type `GetDashboardCirclesForUserVariables`:
+const getDashboardCirclesForUserVars: GetDashboardCirclesForUserVariables = {
+  userId: ..., 
+  offset: ..., 
+};
+
+// Call the `getDashboardCirclesForUserRef()` function to get a reference to the query.
+const ref = getDashboardCirclesForUserRef(getDashboardCirclesForUserVars);
+// Variables can be defined inline as well.
+const ref = getDashboardCirclesForUserRef({ userId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDashboardCirclesForUserRef(dataConnect, getDashboardCirclesForUserVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circleMemberships);
+});
+```
+
 ## GetCircleEngineRecord
 You can execute the `GetCircleEngineRecord` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
@@ -652,6 +2068,7 @@ export interface GetCircleEngineRecordData {
     type: string;
     description: string;
     targetAmount: number;
+    contributionMode?: string | null;
     pricingPlan: string;
     memberLimit: number;
     activationPrice: number;
@@ -676,6 +2093,7 @@ export interface GetCircleEngineRecordData {
   } & Circle_Key;
   circleMemberships: ({
     role: string;
+    expectedAmount: number;
     membershipStatus: string;
     user: {
       id: string;
@@ -1540,6 +2958,253 @@ executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.circle);
   console.log(data.circleActivations);
+});
+```
+
+## GetCirclePaymentCheckout
+You can execute the `GetCirclePaymentCheckout` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCirclePaymentCheckout(vars: GetCirclePaymentCheckoutVariables, options?: ExecuteQueryOptions): QueryPromise<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+
+interface GetCirclePaymentCheckoutRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCirclePaymentCheckoutVariables): QueryRef<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+}
+export const getCirclePaymentCheckoutRef: GetCirclePaymentCheckoutRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCirclePaymentCheckout(dc: DataConnect, vars: GetCirclePaymentCheckoutVariables, options?: ExecuteQueryOptions): QueryPromise<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+
+interface GetCirclePaymentCheckoutRef {
+  ...
+  (dc: DataConnect, vars: GetCirclePaymentCheckoutVariables): QueryRef<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+}
+export const getCirclePaymentCheckoutRef: GetCirclePaymentCheckoutRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCirclePaymentCheckoutRef:
+```typescript
+const name = getCirclePaymentCheckoutRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCirclePaymentCheckout` query requires an argument of type `GetCirclePaymentCheckoutVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCirclePaymentCheckoutVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCirclePaymentCheckout` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCirclePaymentCheckoutData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCirclePaymentCheckoutData {
+  circlePaymentCheckout?: {
+    checkoutUrl?: string | null;
+    activation: {
+      id: UUIDString;
+    } & CircleActivation_Key;
+  };
+}
+```
+### Using `GetCirclePaymentCheckout`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCirclePaymentCheckout, GetCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+
+// The `GetCirclePaymentCheckout` query requires an argument of type `GetCirclePaymentCheckoutVariables`:
+const getCirclePaymentCheckoutVars: GetCirclePaymentCheckoutVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCirclePaymentCheckout()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCirclePaymentCheckout(getCirclePaymentCheckoutVars);
+// Variables can be defined inline as well.
+const { data } = await getCirclePaymentCheckout({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCirclePaymentCheckout(dataConnect, getCirclePaymentCheckoutVars);
+
+console.log(data.circlePaymentCheckout);
+
+// Or, you can use the `Promise` API.
+getCirclePaymentCheckout(getCirclePaymentCheckoutVars).then((response) => {
+  const data = response.data;
+  console.log(data.circlePaymentCheckout);
+});
+```
+
+### Using `GetCirclePaymentCheckout`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCirclePaymentCheckoutRef, GetCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+
+// The `GetCirclePaymentCheckout` query requires an argument of type `GetCirclePaymentCheckoutVariables`:
+const getCirclePaymentCheckoutVars: GetCirclePaymentCheckoutVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCirclePaymentCheckoutRef()` function to get a reference to the query.
+const ref = getCirclePaymentCheckoutRef(getCirclePaymentCheckoutVars);
+// Variables can be defined inline as well.
+const ref = getCirclePaymentCheckoutRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCirclePaymentCheckoutRef(dataConnect, getCirclePaymentCheckoutVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circlePaymentCheckout);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circlePaymentCheckout);
+});
+```
+
+## GetCircleActivationAttempt
+You can execute the `GetCircleActivationAttempt` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleActivationAttempt(vars: GetCircleActivationAttemptVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+
+interface GetCircleActivationAttemptRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleActivationAttemptVariables): QueryRef<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+}
+export const getCircleActivationAttemptRef: GetCircleActivationAttemptRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleActivationAttempt(dc: DataConnect, vars: GetCircleActivationAttemptVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+
+interface GetCircleActivationAttemptRef {
+  ...
+  (dc: DataConnect, vars: GetCircleActivationAttemptVariables): QueryRef<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+}
+export const getCircleActivationAttemptRef: GetCircleActivationAttemptRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleActivationAttemptRef:
+```typescript
+const name = getCircleActivationAttemptRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleActivationAttempt` query requires an argument of type `GetCircleActivationAttemptVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleActivationAttemptVariables {
+  activationId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleActivationAttempt` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleActivationAttemptData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleActivationAttemptData {
+  circleActivation?: {
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+    creator: {
+      id: string;
+    } & User_Key;
+    planDefinition?: {
+      id: string;
+      memberLimit: number;
+      priceMinor: number;
+    } & PricingPlanDefinition_Key;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    providerReference?: string | null;
+    previousActivationId?: UUIDString | null;
+  } & CircleActivation_Key;
+}
+```
+### Using `GetCircleActivationAttempt`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleActivationAttempt, GetCircleActivationAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleActivationAttempt` query requires an argument of type `GetCircleActivationAttemptVariables`:
+const getCircleActivationAttemptVars: GetCircleActivationAttemptVariables = {
+  activationId: ..., 
+};
+
+// Call the `getCircleActivationAttempt()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleActivationAttempt(getCircleActivationAttemptVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleActivationAttempt({ activationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleActivationAttempt(dataConnect, getCircleActivationAttemptVars);
+
+console.log(data.circleActivation);
+
+// Or, you can use the `Promise` API.
+getCircleActivationAttempt(getCircleActivationAttemptVars).then((response) => {
+  const data = response.data;
+  console.log(data.circleActivation);
+});
+```
+
+### Using `GetCircleActivationAttempt`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleActivationAttemptRef, GetCircleActivationAttemptVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleActivationAttempt` query requires an argument of type `GetCircleActivationAttemptVariables`:
+const getCircleActivationAttemptVars: GetCircleActivationAttemptVariables = {
+  activationId: ..., 
+};
+
+// Call the `getCircleActivationAttemptRef()` function to get a reference to the query.
+const ref = getCircleActivationAttemptRef(getCircleActivationAttemptVars);
+// Variables can be defined inline as well.
+const ref = getCircleActivationAttemptRef({ activationId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleActivationAttemptRef(dataConnect, getCircleActivationAttemptVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circleActivation);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circleActivation);
 });
 ```
 
@@ -3688,6 +5353,7 @@ The `GetDeadlineNotificationCandidates` query requires an argument of type `GetD
 export interface GetDeadlineNotificationCandidatesVariables {
   from: DateString;
   to: DateString;
+  after?: UUIDString | null;
 }
 ```
 ### Return Type
@@ -3696,12 +5362,7 @@ Recall that executing the `GetDeadlineNotificationCandidates` query returns a `Q
 The `data` property is an object of type `GetDeadlineNotificationCandidatesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface GetDeadlineNotificationCandidatesData {
-  circles: ({
-    id: UUIDString;
-    name: string;
-    type: string;
-    deadline?: DateString | null;
-  } & Circle_Key)[];
+  circles?: unknown[] | null;
 }
 ```
 ### Using `GetDeadlineNotificationCandidates`'s action shortcut function
@@ -3714,13 +5375,14 @@ import { connectorConfig, getDeadlineNotificationCandidates, GetDeadlineNotifica
 const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
   from: ..., 
   to: ..., 
+  after: ..., // optional
 };
 
 // Call the `getDeadlineNotificationCandidates()` function to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await getDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars);
 // Variables can be defined inline as well.
-const { data } = await getDeadlineNotificationCandidates({ from: ..., to: ..., });
+const { data } = await getDeadlineNotificationCandidates({ from: ..., to: ..., after: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -3745,12 +5407,13 @@ import { connectorConfig, getDeadlineNotificationCandidatesRef, GetDeadlineNotif
 const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
   from: ..., 
   to: ..., 
+  after: ..., // optional
 };
 
 // Call the `getDeadlineNotificationCandidatesRef()` function to get a reference to the query.
 const ref = getDeadlineNotificationCandidatesRef(getDeadlineNotificationCandidatesVars);
 // Variables can be defined inline as well.
-const ref = getDeadlineNotificationCandidatesRef({ from: ..., to: ..., });
+const ref = getDeadlineNotificationCandidatesRef({ from: ..., to: ..., after: ..., });
 
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -5499,6 +7162,1302 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## GetRateLimitBucket
+You can execute the `GetRateLimitBucket` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getRateLimitBucket(vars: GetRateLimitBucketVariables, options?: ExecuteQueryOptions): QueryPromise<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+
+interface GetRateLimitBucketRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRateLimitBucketVariables): QueryRef<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+}
+export const getRateLimitBucketRef: GetRateLimitBucketRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRateLimitBucket(dc: DataConnect, vars: GetRateLimitBucketVariables, options?: ExecuteQueryOptions): QueryPromise<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+
+interface GetRateLimitBucketRef {
+  ...
+  (dc: DataConnect, vars: GetRateLimitBucketVariables): QueryRef<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+}
+export const getRateLimitBucketRef: GetRateLimitBucketRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRateLimitBucketRef:
+```typescript
+const name = getRateLimitBucketRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRateLimitBucket` query requires an argument of type `GetRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRateLimitBucketVariables {
+  bucketKey: string;
+}
+```
+### Return Type
+Recall that executing the `GetRateLimitBucket` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRateLimitBucketData {
+  rateLimitBucket?: {
+    attemptsJson: string;
+    revision: number;
+  };
+}
+```
+### Using `GetRateLimitBucket`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRateLimitBucket, GetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `GetRateLimitBucket` query requires an argument of type `GetRateLimitBucketVariables`:
+const getRateLimitBucketVars: GetRateLimitBucketVariables = {
+  bucketKey: ..., 
+};
+
+// Call the `getRateLimitBucket()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRateLimitBucket(getRateLimitBucketVars);
+// Variables can be defined inline as well.
+const { data } = await getRateLimitBucket({ bucketKey: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRateLimitBucket(dataConnect, getRateLimitBucketVars);
+
+console.log(data.rateLimitBucket);
+
+// Or, you can use the `Promise` API.
+getRateLimitBucket(getRateLimitBucketVars).then((response) => {
+  const data = response.data;
+  console.log(data.rateLimitBucket);
+});
+```
+
+### Using `GetRateLimitBucket`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRateLimitBucketRef, GetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `GetRateLimitBucket` query requires an argument of type `GetRateLimitBucketVariables`:
+const getRateLimitBucketVars: GetRateLimitBucketVariables = {
+  bucketKey: ..., 
+};
+
+// Call the `getRateLimitBucketRef()` function to get a reference to the query.
+const ref = getRateLimitBucketRef(getRateLimitBucketVars);
+// Variables can be defined inline as well.
+const ref = getRateLimitBucketRef({ bucketKey: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRateLimitBucketRef(dataConnect, getRateLimitBucketVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.rateLimitBucket);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.rateLimitBucket);
+});
+```
+
+## GetCircleRetentionState
+You can execute the `GetCircleRetentionState` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleRetentionState(vars: GetCircleRetentionStateVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+
+interface GetCircleRetentionStateRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleRetentionStateVariables): QueryRef<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+}
+export const getCircleRetentionStateRef: GetCircleRetentionStateRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleRetentionState(dc: DataConnect, vars: GetCircleRetentionStateVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+
+interface GetCircleRetentionStateRef {
+  ...
+  (dc: DataConnect, vars: GetCircleRetentionStateVariables): QueryRef<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+}
+export const getCircleRetentionStateRef: GetCircleRetentionStateRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleRetentionStateRef:
+```typescript
+const name = getCircleRetentionStateRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleRetentionState` query requires an argument of type `GetCircleRetentionStateVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleRetentionStateVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetCircleRetentionState` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleRetentionStateData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleRetentionStateData {
+  circle?: {
+    id: UUIDString;
+    type: string;
+    status: string;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    imageStoragePath?: string | null;
+  } & Circle_Key;
+  retentionPurgeAttempts: ({
+    attemptNumber: number;
+    status: string;
+    startedAt: TimestampString;
+    nextRetryAt?: TimestampString | null;
+  })[];
+}
+```
+### Using `GetCircleRetentionState`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionState, GetCircleRetentionStateVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionState` query requires an argument of type `GetCircleRetentionStateVariables`:
+const getCircleRetentionStateVars: GetCircleRetentionStateVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleRetentionState()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleRetentionState(getCircleRetentionStateVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleRetentionState({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleRetentionState(dataConnect, getCircleRetentionStateVars);
+
+console.log(data.circle);
+console.log(data.retentionPurgeAttempts);
+
+// Or, you can use the `Promise` API.
+getCircleRetentionState(getCircleRetentionStateVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.retentionPurgeAttempts);
+});
+```
+
+### Using `GetCircleRetentionState`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionStateRef, GetCircleRetentionStateVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionState` query requires an argument of type `GetCircleRetentionStateVariables`:
+const getCircleRetentionStateVars: GetCircleRetentionStateVariables = {
+  circleId: ..., 
+};
+
+// Call the `getCircleRetentionStateRef()` function to get a reference to the query.
+const ref = getCircleRetentionStateRef(getCircleRetentionStateVars);
+// Variables can be defined inline as well.
+const ref = getCircleRetentionStateRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleRetentionStateRef(dataConnect, getCircleRetentionStateVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.retentionPurgeAttempts);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.retentionPurgeAttempts);
+});
+```
+
+## GetCircleRetentionPage
+You can execute the `GetCircleRetentionPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleRetentionPage(vars: GetCircleRetentionPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+
+interface GetCircleRetentionPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleRetentionPageVariables): QueryRef<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+}
+export const getCircleRetentionPageRef: GetCircleRetentionPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleRetentionPage(dc: DataConnect, vars: GetCircleRetentionPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+
+interface GetCircleRetentionPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleRetentionPageVariables): QueryRef<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+}
+export const getCircleRetentionPageRef: GetCircleRetentionPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleRetentionPageRef:
+```typescript
+const name = getCircleRetentionPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleRetentionPage` query requires an argument of type `GetCircleRetentionPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleRetentionPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleRetentionPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleRetentionPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleRetentionPageData {
+  receipts: ({
+    id: UUIDString;
+    imageStoragePath: string;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    receiptStoragePath?: string | null;
+  })[];
+  asoEbiTiers: ({
+    fabricImageStoragePath?: string | null;
+    appreciationGiftImageStoragePath?: string | null;
+  })[];
+  invitations: ({
+    id: UUIDString;
+  } & Invitation_Key)[];
+}
+```
+### Using `GetCircleRetentionPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionPage, GetCircleRetentionPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionPage` query requires an argument of type `GetCircleRetentionPageVariables`:
+const getCircleRetentionPageVars: GetCircleRetentionPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleRetentionPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleRetentionPage(getCircleRetentionPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleRetentionPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleRetentionPage(dataConnect, getCircleRetentionPageVars);
+
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.asoEbiTiers);
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+getCircleRetentionPage(getCircleRetentionPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.asoEbiTiers);
+  console.log(data.invitations);
+});
+```
+
+### Using `GetCircleRetentionPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleRetentionPageRef, GetCircleRetentionPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleRetentionPage` query requires an argument of type `GetCircleRetentionPageVariables`:
+const getCircleRetentionPageVars: GetCircleRetentionPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleRetentionPageRef()` function to get a reference to the query.
+const ref = getCircleRetentionPageRef(getCircleRetentionPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleRetentionPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleRetentionPageRef(dataConnect, getCircleRetentionPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.asoEbiTiers);
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.asoEbiTiers);
+  console.log(data.invitations);
+});
+```
+
+## GetRetentionExternalStorageReferences
+You can execute the `GetRetentionExternalStorageReferences` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getRetentionExternalStorageReferences(vars: GetRetentionExternalStorageReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+
+interface GetRetentionExternalStorageReferencesRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetRetentionExternalStorageReferencesVariables): QueryRef<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+}
+export const getRetentionExternalStorageReferencesRef: GetRetentionExternalStorageReferencesRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getRetentionExternalStorageReferences(dc: DataConnect, vars: GetRetentionExternalStorageReferencesVariables, options?: ExecuteQueryOptions): QueryPromise<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+
+interface GetRetentionExternalStorageReferencesRef {
+  ...
+  (dc: DataConnect, vars: GetRetentionExternalStorageReferencesVariables): QueryRef<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+}
+export const getRetentionExternalStorageReferencesRef: GetRetentionExternalStorageReferencesRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getRetentionExternalStorageReferencesRef:
+```typescript
+const name = getRetentionExternalStorageReferencesRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetRetentionExternalStorageReferences` query requires an argument of type `GetRetentionExternalStorageReferencesVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetRetentionExternalStorageReferencesVariables {
+  path: string;
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetRetentionExternalStorageReferences` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetRetentionExternalStorageReferencesData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetRetentionExternalStorageReferencesData {
+  circles: ({
+    id: UUIDString;
+  } & Circle_Key)[];
+  receipts: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  })[];
+  fabricReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
+  giftReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
+}
+```
+### Using `GetRetentionExternalStorageReferences`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getRetentionExternalStorageReferences, GetRetentionExternalStorageReferencesVariables } from '@bondcircle/dataconnect';
+
+// The `GetRetentionExternalStorageReferences` query requires an argument of type `GetRetentionExternalStorageReferencesVariables`:
+const getRetentionExternalStorageReferencesVars: GetRetentionExternalStorageReferencesVariables = {
+  path: ..., 
+  circleId: ..., 
+};
+
+// Call the `getRetentionExternalStorageReferences()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getRetentionExternalStorageReferences(getRetentionExternalStorageReferencesVars);
+// Variables can be defined inline as well.
+const { data } = await getRetentionExternalStorageReferences({ path: ..., circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getRetentionExternalStorageReferences(dataConnect, getRetentionExternalStorageReferencesVars);
+
+console.log(data.circles);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.fabricReferences);
+console.log(data.giftReferences);
+
+// Or, you can use the `Promise` API.
+getRetentionExternalStorageReferences(getRetentionExternalStorageReferencesVars).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.fabricReferences);
+  console.log(data.giftReferences);
+});
+```
+
+### Using `GetRetentionExternalStorageReferences`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getRetentionExternalStorageReferencesRef, GetRetentionExternalStorageReferencesVariables } from '@bondcircle/dataconnect';
+
+// The `GetRetentionExternalStorageReferences` query requires an argument of type `GetRetentionExternalStorageReferencesVariables`:
+const getRetentionExternalStorageReferencesVars: GetRetentionExternalStorageReferencesVariables = {
+  path: ..., 
+  circleId: ..., 
+};
+
+// Call the `getRetentionExternalStorageReferencesRef()` function to get a reference to the query.
+const ref = getRetentionExternalStorageReferencesRef(getRetentionExternalStorageReferencesVars);
+// Variables can be defined inline as well.
+const ref = getRetentionExternalStorageReferencesRef({ path: ..., circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getRetentionExternalStorageReferencesRef(dataConnect, getRetentionExternalStorageReferencesVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circles);
+console.log(data.receipts);
+console.log(data.circleMemberships);
+console.log(data.fabricReferences);
+console.log(data.giftReferences);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circles);
+  console.log(data.receipts);
+  console.log(data.circleMemberships);
+  console.log(data.fabricReferences);
+  console.log(data.giftReferences);
+});
+```
+
+## GetContributionWorkspaceMetadata
+You can execute the `GetContributionWorkspaceMetadata` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getContributionWorkspaceMetadata(vars: GetContributionWorkspaceMetadataVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+
+interface GetContributionWorkspaceMetadataRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetContributionWorkspaceMetadataVariables): QueryRef<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+}
+export const getContributionWorkspaceMetadataRef: GetContributionWorkspaceMetadataRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getContributionWorkspaceMetadata(dc: DataConnect, vars: GetContributionWorkspaceMetadataVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+
+interface GetContributionWorkspaceMetadataRef {
+  ...
+  (dc: DataConnect, vars: GetContributionWorkspaceMetadataVariables): QueryRef<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+}
+export const getContributionWorkspaceMetadataRef: GetContributionWorkspaceMetadataRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getContributionWorkspaceMetadataRef:
+```typescript
+const name = getContributionWorkspaceMetadataRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetContributionWorkspaceMetadata` query requires an argument of type `GetContributionWorkspaceMetadataVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetContributionWorkspaceMetadataVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetContributionWorkspaceMetadata` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetContributionWorkspaceMetadataData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetContributionWorkspaceMetadataData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    targetAmount: number;
+    contributedAmount: number;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+### Using `GetContributionWorkspaceMetadata`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getContributionWorkspaceMetadata, GetContributionWorkspaceMetadataVariables } from '@bondcircle/dataconnect';
+
+// The `GetContributionWorkspaceMetadata` query requires an argument of type `GetContributionWorkspaceMetadataVariables`:
+const getContributionWorkspaceMetadataVars: GetContributionWorkspaceMetadataVariables = {
+  circleId: ..., 
+};
+
+// Call the `getContributionWorkspaceMetadata()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getContributionWorkspaceMetadata(getContributionWorkspaceMetadataVars);
+// Variables can be defined inline as well.
+const { data } = await getContributionWorkspaceMetadata({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getContributionWorkspaceMetadata(dataConnect, getContributionWorkspaceMetadataVars);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+getContributionWorkspaceMetadata(getContributionWorkspaceMetadataVars).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+});
+```
+
+### Using `GetContributionWorkspaceMetadata`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getContributionWorkspaceMetadataRef, GetContributionWorkspaceMetadataVariables } from '@bondcircle/dataconnect';
+
+// The `GetContributionWorkspaceMetadata` query requires an argument of type `GetContributionWorkspaceMetadataVariables`:
+const getContributionWorkspaceMetadataVars: GetContributionWorkspaceMetadataVariables = {
+  circleId: ..., 
+};
+
+// Call the `getContributionWorkspaceMetadataRef()` function to get a reference to the query.
+const ref = getContributionWorkspaceMetadataRef(getContributionWorkspaceMetadataVars);
+// Variables can be defined inline as well.
+const ref = getContributionWorkspaceMetadataRef({ circleId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getContributionWorkspaceMetadataRef(dataConnect, getContributionWorkspaceMetadataVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circle);
+console.log(data.circleMemberships);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circle);
+  console.log(data.circleMemberships);
+});
+```
+
+## GetContributionReceiptsPage
+You can execute the `GetContributionReceiptsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getContributionReceiptsPage(vars: GetContributionReceiptsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+
+interface GetContributionReceiptsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetContributionReceiptsPageVariables): QueryRef<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+}
+export const getContributionReceiptsPageRef: GetContributionReceiptsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getContributionReceiptsPage(dc: DataConnect, vars: GetContributionReceiptsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+
+interface GetContributionReceiptsPageRef {
+  ...
+  (dc: DataConnect, vars: GetContributionReceiptsPageVariables): QueryRef<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+}
+export const getContributionReceiptsPageRef: GetContributionReceiptsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getContributionReceiptsPageRef:
+```typescript
+const name = getContributionReceiptsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetContributionReceiptsPage` query requires an argument of type `GetContributionReceiptsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetContributionReceiptsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetContributionReceiptsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetContributionReceiptsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetContributionReceiptsPageData {
+  receipts: ({
+    id: UUIDString;
+    amount: number;
+    note?: string | null;
+    imageUrl: string;
+    imageStoragePath: string;
+    contentType: string;
+    status: string;
+    overpaymentAmount: number;
+    replacementOfId?: UUIDString | null;
+    rejectionReason?: string | null;
+    submittedAt: TimestampString;
+    reviewedAt?: TimestampString | null;
+    uploadedBy: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+    reviewedBy?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Receipt_Key)[];
+}
+```
+### Using `GetContributionReceiptsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getContributionReceiptsPage, GetContributionReceiptsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetContributionReceiptsPage` query requires an argument of type `GetContributionReceiptsPageVariables`:
+const getContributionReceiptsPageVars: GetContributionReceiptsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getContributionReceiptsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getContributionReceiptsPage(getContributionReceiptsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getContributionReceiptsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getContributionReceiptsPage(dataConnect, getContributionReceiptsPageVars);
+
+console.log(data.receipts);
+
+// Or, you can use the `Promise` API.
+getContributionReceiptsPage(getContributionReceiptsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.receipts);
+});
+```
+
+### Using `GetContributionReceiptsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getContributionReceiptsPageRef, GetContributionReceiptsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetContributionReceiptsPage` query requires an argument of type `GetContributionReceiptsPageVariables`:
+const getContributionReceiptsPageVars: GetContributionReceiptsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getContributionReceiptsPageRef()` function to get a reference to the query.
+const ref = getContributionReceiptsPageRef(getContributionReceiptsPageVars);
+// Variables can be defined inline as well.
+const ref = getContributionReceiptsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getContributionReceiptsPageRef(dataConnect, getContributionReceiptsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.receipts);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.receipts);
+});
+```
+
+## GetCircleInvitationsPage
+You can execute the `GetCircleInvitationsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleInvitationsPage(vars: GetCircleInvitationsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+
+interface GetCircleInvitationsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleInvitationsPageVariables): QueryRef<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+}
+export const getCircleInvitationsPageRef: GetCircleInvitationsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleInvitationsPage(dc: DataConnect, vars: GetCircleInvitationsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+
+interface GetCircleInvitationsPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleInvitationsPageVariables): QueryRef<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+}
+export const getCircleInvitationsPageRef: GetCircleInvitationsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleInvitationsPageRef:
+```typescript
+const name = getCircleInvitationsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleInvitationsPage` query requires an argument of type `GetCircleInvitationsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleInvitationsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleInvitationsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleInvitationsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleInvitationsPageData {
+  invitations: ({
+    id: UUIDString;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & Invitation_Key)[];
+}
+```
+### Using `GetCircleInvitationsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleInvitationsPage, GetCircleInvitationsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleInvitationsPage` query requires an argument of type `GetCircleInvitationsPageVariables`:
+const getCircleInvitationsPageVars: GetCircleInvitationsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleInvitationsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleInvitationsPage(getCircleInvitationsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleInvitationsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleInvitationsPage(dataConnect, getCircleInvitationsPageVars);
+
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+getCircleInvitationsPage(getCircleInvitationsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitations);
+});
+```
+
+### Using `GetCircleInvitationsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleInvitationsPageRef, GetCircleInvitationsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleInvitationsPage` query requires an argument of type `GetCircleInvitationsPageVariables`:
+const getCircleInvitationsPageVars: GetCircleInvitationsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleInvitationsPageRef()` function to get a reference to the query.
+const ref = getCircleInvitationsPageRef(getCircleInvitationsPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleInvitationsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleInvitationsPageRef(dataConnect, getCircleInvitationsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.invitations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitations);
+});
+```
+
+## GetInvitationAcceptancesPage
+You can execute the `GetInvitationAcceptancesPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getInvitationAcceptancesPage(vars: GetInvitationAcceptancesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+
+interface GetInvitationAcceptancesPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetInvitationAcceptancesPageVariables): QueryRef<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+}
+export const getInvitationAcceptancesPageRef: GetInvitationAcceptancesPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getInvitationAcceptancesPage(dc: DataConnect, vars: GetInvitationAcceptancesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+
+interface GetInvitationAcceptancesPageRef {
+  ...
+  (dc: DataConnect, vars: GetInvitationAcceptancesPageVariables): QueryRef<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+}
+export const getInvitationAcceptancesPageRef: GetInvitationAcceptancesPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getInvitationAcceptancesPageRef:
+```typescript
+const name = getInvitationAcceptancesPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetInvitationAcceptancesPage` query requires an argument of type `GetInvitationAcceptancesPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetInvitationAcceptancesPageVariables {
+  invitationId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetInvitationAcceptancesPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetInvitationAcceptancesPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetInvitationAcceptancesPageData {
+  invitationAcceptances: ({
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+### Using `GetInvitationAcceptancesPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getInvitationAcceptancesPage, GetInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetInvitationAcceptancesPage` query requires an argument of type `GetInvitationAcceptancesPageVariables`:
+const getInvitationAcceptancesPageVars: GetInvitationAcceptancesPageVariables = {
+  invitationId: ..., 
+  offset: ..., 
+};
+
+// Call the `getInvitationAcceptancesPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getInvitationAcceptancesPage(getInvitationAcceptancesPageVars);
+// Variables can be defined inline as well.
+const { data } = await getInvitationAcceptancesPage({ invitationId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getInvitationAcceptancesPage(dataConnect, getInvitationAcceptancesPageVars);
+
+console.log(data.invitationAcceptances);
+
+// Or, you can use the `Promise` API.
+getInvitationAcceptancesPage(getInvitationAcceptancesPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptances);
+});
+```
+
+### Using `GetInvitationAcceptancesPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getInvitationAcceptancesPageRef, GetInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetInvitationAcceptancesPage` query requires an argument of type `GetInvitationAcceptancesPageVariables`:
+const getInvitationAcceptancesPageVars: GetInvitationAcceptancesPageVariables = {
+  invitationId: ..., 
+  offset: ..., 
+};
+
+// Call the `getInvitationAcceptancesPageRef()` function to get a reference to the query.
+const ref = getInvitationAcceptancesPageRef(getInvitationAcceptancesPageVars);
+// Variables can be defined inline as well.
+const ref = getInvitationAcceptancesPageRef({ invitationId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getInvitationAcceptancesPageRef(dataConnect, getInvitationAcceptancesPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.invitationAcceptances);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptances);
+});
+```
+
+## GetCircleActivationsPage
+You can execute the `GetCircleActivationsPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleActivationsPage(vars: GetCircleActivationsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+
+interface GetCircleActivationsPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleActivationsPageVariables): QueryRef<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+}
+export const getCircleActivationsPageRef: GetCircleActivationsPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleActivationsPage(dc: DataConnect, vars: GetCircleActivationsPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+
+interface GetCircleActivationsPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleActivationsPageVariables): QueryRef<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+}
+export const getCircleActivationsPageRef: GetCircleActivationsPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleActivationsPageRef:
+```typescript
+const name = getCircleActivationsPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleActivationsPage` query requires an argument of type `GetCircleActivationsPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleActivationsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleActivationsPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleActivationsPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleActivationsPageData {
+  circleActivations: ({
+    id: UUIDString;
+    activationType: string;
+    tier: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    providerReference?: string | null;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+    activatedAt?: TimestampString | null;
+  } & CircleActivation_Key)[];
+}
+```
+### Using `GetCircleActivationsPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleActivationsPage, GetCircleActivationsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleActivationsPage` query requires an argument of type `GetCircleActivationsPageVariables`:
+const getCircleActivationsPageVars: GetCircleActivationsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleActivationsPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleActivationsPage(getCircleActivationsPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleActivationsPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleActivationsPage(dataConnect, getCircleActivationsPageVars);
+
+console.log(data.circleActivations);
+
+// Or, you can use the `Promise` API.
+getCircleActivationsPage(getCircleActivationsPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.circleActivations);
+});
+```
+
+### Using `GetCircleActivationsPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleActivationsPageRef, GetCircleActivationsPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleActivationsPage` query requires an argument of type `GetCircleActivationsPageVariables`:
+const getCircleActivationsPageVars: GetCircleActivationsPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleActivationsPageRef()` function to get a reference to the query.
+const ref = getCircleActivationsPageRef(getCircleActivationsPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleActivationsPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleActivationsPageRef(dataConnect, getCircleActivationsPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.circleActivations);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circleActivations);
+});
+```
+
+## GetCircleInvitationAcceptancesPage
+You can execute the `GetCircleInvitationAcceptancesPage` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getCircleInvitationAcceptancesPage(vars: GetCircleInvitationAcceptancesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+
+interface GetCircleInvitationAcceptancesPageRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetCircleInvitationAcceptancesPageVariables): QueryRef<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+}
+export const getCircleInvitationAcceptancesPageRef: GetCircleInvitationAcceptancesPageRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getCircleInvitationAcceptancesPage(dc: DataConnect, vars: GetCircleInvitationAcceptancesPageVariables, options?: ExecuteQueryOptions): QueryPromise<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+
+interface GetCircleInvitationAcceptancesPageRef {
+  ...
+  (dc: DataConnect, vars: GetCircleInvitationAcceptancesPageVariables): QueryRef<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+}
+export const getCircleInvitationAcceptancesPageRef: GetCircleInvitationAcceptancesPageRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getCircleInvitationAcceptancesPageRef:
+```typescript
+const name = getCircleInvitationAcceptancesPageRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetCircleInvitationAcceptancesPage` query requires an argument of type `GetCircleInvitationAcceptancesPageVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetCircleInvitationAcceptancesPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that executing the `GetCircleInvitationAcceptancesPage` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetCircleInvitationAcceptancesPageData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetCircleInvitationAcceptancesPageData {
+  invitationAcceptances: ({
+    invitation: {
+      id: UUIDString;
+    } & Invitation_Key;
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+### Using `GetCircleInvitationAcceptancesPage`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getCircleInvitationAcceptancesPage, GetCircleInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleInvitationAcceptancesPage` query requires an argument of type `GetCircleInvitationAcceptancesPageVariables`:
+const getCircleInvitationAcceptancesPageVars: GetCircleInvitationAcceptancesPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleInvitationAcceptancesPage()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getCircleInvitationAcceptancesPage(getCircleInvitationAcceptancesPageVars);
+// Variables can be defined inline as well.
+const { data } = await getCircleInvitationAcceptancesPage({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getCircleInvitationAcceptancesPage(dataConnect, getCircleInvitationAcceptancesPageVars);
+
+console.log(data.invitationAcceptances);
+
+// Or, you can use the `Promise` API.
+getCircleInvitationAcceptancesPage(getCircleInvitationAcceptancesPageVars).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptances);
+});
+```
+
+### Using `GetCircleInvitationAcceptancesPage`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getCircleInvitationAcceptancesPageRef, GetCircleInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+
+// The `GetCircleInvitationAcceptancesPage` query requires an argument of type `GetCircleInvitationAcceptancesPageVariables`:
+const getCircleInvitationAcceptancesPageVars: GetCircleInvitationAcceptancesPageVariables = {
+  circleId: ..., 
+  offset: ..., 
+};
+
+// Call the `getCircleInvitationAcceptancesPageRef()` function to get a reference to the query.
+const ref = getCircleInvitationAcceptancesPageRef(getCircleInvitationAcceptancesPageVars);
+// Variables can be defined inline as well.
+const ref = getCircleInvitationAcceptancesPageRef({ circleId: ..., offset: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getCircleInvitationAcceptancesPageRef(dataConnect, getCircleInvitationAcceptancesPageVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.invitationAcceptances);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.invitationAcceptances);
+});
+```
+
 # Mutations
 
 There are two ways to execute a Data Connect Mutation using the generated Web SDK:
@@ -5513,6 +8472,580 @@ The following is true for both the action shortcut function and the `MutationRef
 - Both functions can be called with or without passing in a `DataConnect` instance as an argument. If no `DataConnect` argument is passed in, then the generated SDK will call `getDataConnect(connectorConfig)` behind the scenes for you.
 
 Below are examples of how to use the `bondcircle` connector's generated functions to execute each mutation. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#using-mutations).
+
+## CreateAccountPrivacyRequest
+You can execute the `CreateAccountPrivacyRequest` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createAccountPrivacyRequest(vars: CreateAccountPrivacyRequestVariables): MutationPromise<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+
+interface CreateAccountPrivacyRequestRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateAccountPrivacyRequestVariables): MutationRef<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+}
+export const createAccountPrivacyRequestRef: CreateAccountPrivacyRequestRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createAccountPrivacyRequest(dc: DataConnect, vars: CreateAccountPrivacyRequestVariables): MutationPromise<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+
+interface CreateAccountPrivacyRequestRef {
+  ...
+  (dc: DataConnect, vars: CreateAccountPrivacyRequestVariables): MutationRef<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+}
+export const createAccountPrivacyRequestRef: CreateAccountPrivacyRequestRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createAccountPrivacyRequestRef:
+```typescript
+const name = createAccountPrivacyRequestRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateAccountPrivacyRequest` mutation requires an argument of type `CreateAccountPrivacyRequestVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateAccountPrivacyRequestVariables {
+  id: string;
+  userId: string;
+  kind: string;
+}
+```
+### Return Type
+Recall that executing the `CreateAccountPrivacyRequest` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateAccountPrivacyRequestData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateAccountPrivacyRequestData {
+  accountPrivacyRequest_insert: AccountPrivacyRequest_Key;
+}
+```
+### Using `CreateAccountPrivacyRequest`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createAccountPrivacyRequest, CreateAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+
+// The `CreateAccountPrivacyRequest` mutation requires an argument of type `CreateAccountPrivacyRequestVariables`:
+const createAccountPrivacyRequestVars: CreateAccountPrivacyRequestVariables = {
+  id: ..., 
+  userId: ..., 
+  kind: ..., 
+};
+
+// Call the `createAccountPrivacyRequest()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createAccountPrivacyRequest(createAccountPrivacyRequestVars);
+// Variables can be defined inline as well.
+const { data } = await createAccountPrivacyRequest({ id: ..., userId: ..., kind: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createAccountPrivacyRequest(dataConnect, createAccountPrivacyRequestVars);
+
+console.log(data.accountPrivacyRequest_insert);
+
+// Or, you can use the `Promise` API.
+createAccountPrivacyRequest(createAccountPrivacyRequestVars).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequest_insert);
+});
+```
+
+### Using `CreateAccountPrivacyRequest`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createAccountPrivacyRequestRef, CreateAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+
+// The `CreateAccountPrivacyRequest` mutation requires an argument of type `CreateAccountPrivacyRequestVariables`:
+const createAccountPrivacyRequestVars: CreateAccountPrivacyRequestVariables = {
+  id: ..., 
+  userId: ..., 
+  kind: ..., 
+};
+
+// Call the `createAccountPrivacyRequestRef()` function to get a reference to the mutation.
+const ref = createAccountPrivacyRequestRef(createAccountPrivacyRequestVars);
+// Variables can be defined inline as well.
+const ref = createAccountPrivacyRequestRef({ id: ..., userId: ..., kind: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createAccountPrivacyRequestRef(dataConnect, createAccountPrivacyRequestVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.accountPrivacyRequest_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequest_insert);
+});
+```
+
+## AcknowledgeAccountPrivacyRequest
+You can execute the `AcknowledgeAccountPrivacyRequest` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+acknowledgeAccountPrivacyRequest(vars: AcknowledgeAccountPrivacyRequestVariables): MutationPromise<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+
+interface AcknowledgeAccountPrivacyRequestRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: AcknowledgeAccountPrivacyRequestVariables): MutationRef<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+}
+export const acknowledgeAccountPrivacyRequestRef: AcknowledgeAccountPrivacyRequestRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+acknowledgeAccountPrivacyRequest(dc: DataConnect, vars: AcknowledgeAccountPrivacyRequestVariables): MutationPromise<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+
+interface AcknowledgeAccountPrivacyRequestRef {
+  ...
+  (dc: DataConnect, vars: AcknowledgeAccountPrivacyRequestVariables): MutationRef<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+}
+export const acknowledgeAccountPrivacyRequestRef: AcknowledgeAccountPrivacyRequestRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the acknowledgeAccountPrivacyRequestRef:
+```typescript
+const name = acknowledgeAccountPrivacyRequestRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `AcknowledgeAccountPrivacyRequest` mutation requires an argument of type `AcknowledgeAccountPrivacyRequestVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface AcknowledgeAccountPrivacyRequestVariables {
+  id: string;
+  actorId: string;
+}
+```
+### Return Type
+Recall that executing the `AcknowledgeAccountPrivacyRequest` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `AcknowledgeAccountPrivacyRequestData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface AcknowledgeAccountPrivacyRequestData {
+  accountPrivacyRequest_update?: AccountPrivacyRequest_Key | null;
+  ownerAdminAuditEvent_insert: OwnerAdminAuditEvent_Key;
+}
+```
+### Using `AcknowledgeAccountPrivacyRequest`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, acknowledgeAccountPrivacyRequest, AcknowledgeAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+
+// The `AcknowledgeAccountPrivacyRequest` mutation requires an argument of type `AcknowledgeAccountPrivacyRequestVariables`:
+const acknowledgeAccountPrivacyRequestVars: AcknowledgeAccountPrivacyRequestVariables = {
+  id: ..., 
+  actorId: ..., 
+};
+
+// Call the `acknowledgeAccountPrivacyRequest()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await acknowledgeAccountPrivacyRequest(acknowledgeAccountPrivacyRequestVars);
+// Variables can be defined inline as well.
+const { data } = await acknowledgeAccountPrivacyRequest({ id: ..., actorId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await acknowledgeAccountPrivacyRequest(dataConnect, acknowledgeAccountPrivacyRequestVars);
+
+console.log(data.accountPrivacyRequest_update);
+console.log(data.ownerAdminAuditEvent_insert);
+
+// Or, you can use the `Promise` API.
+acknowledgeAccountPrivacyRequest(acknowledgeAccountPrivacyRequestVars).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequest_update);
+  console.log(data.ownerAdminAuditEvent_insert);
+});
+```
+
+### Using `AcknowledgeAccountPrivacyRequest`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, acknowledgeAccountPrivacyRequestRef, AcknowledgeAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+
+// The `AcknowledgeAccountPrivacyRequest` mutation requires an argument of type `AcknowledgeAccountPrivacyRequestVariables`:
+const acknowledgeAccountPrivacyRequestVars: AcknowledgeAccountPrivacyRequestVariables = {
+  id: ..., 
+  actorId: ..., 
+};
+
+// Call the `acknowledgeAccountPrivacyRequestRef()` function to get a reference to the mutation.
+const ref = acknowledgeAccountPrivacyRequestRef(acknowledgeAccountPrivacyRequestVars);
+// Variables can be defined inline as well.
+const ref = acknowledgeAccountPrivacyRequestRef({ id: ..., actorId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = acknowledgeAccountPrivacyRequestRef(dataConnect, acknowledgeAccountPrivacyRequestVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.accountPrivacyRequest_update);
+console.log(data.ownerAdminAuditEvent_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.accountPrivacyRequest_update);
+  console.log(data.ownerAdminAuditEvent_insert);
+});
+```
+
+## RegisterDeviceRegistration
+You can execute the `RegisterDeviceRegistration` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+registerDeviceRegistration(vars: RegisterDeviceRegistrationVariables): MutationPromise<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+
+interface RegisterDeviceRegistrationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RegisterDeviceRegistrationVariables): MutationRef<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+}
+export const registerDeviceRegistrationRef: RegisterDeviceRegistrationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+registerDeviceRegistration(dc: DataConnect, vars: RegisterDeviceRegistrationVariables): MutationPromise<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+
+interface RegisterDeviceRegistrationRef {
+  ...
+  (dc: DataConnect, vars: RegisterDeviceRegistrationVariables): MutationRef<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+}
+export const registerDeviceRegistrationRef: RegisterDeviceRegistrationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the registerDeviceRegistrationRef:
+```typescript
+const name = registerDeviceRegistrationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RegisterDeviceRegistration` mutation requires an argument of type `RegisterDeviceRegistrationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RegisterDeviceRegistrationVariables {
+  tokenId: string;
+  userId: string;
+  token: string;
+  platform: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `RegisterDeviceRegistration` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RegisterDeviceRegistrationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RegisterDeviceRegistrationData {
+  deviceRegistration_upsert: DeviceRegistration_Key;
+}
+```
+### Using `RegisterDeviceRegistration`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, registerDeviceRegistration, RegisterDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+
+// The `RegisterDeviceRegistration` mutation requires an argument of type `RegisterDeviceRegistrationVariables`:
+const registerDeviceRegistrationVars: RegisterDeviceRegistrationVariables = {
+  tokenId: ..., 
+  userId: ..., 
+  token: ..., 
+  platform: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `registerDeviceRegistration()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await registerDeviceRegistration(registerDeviceRegistrationVars);
+// Variables can be defined inline as well.
+const { data } = await registerDeviceRegistration({ tokenId: ..., userId: ..., token: ..., platform: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await registerDeviceRegistration(dataConnect, registerDeviceRegistrationVars);
+
+console.log(data.deviceRegistration_upsert);
+
+// Or, you can use the `Promise` API.
+registerDeviceRegistration(registerDeviceRegistrationVars).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_upsert);
+});
+```
+
+### Using `RegisterDeviceRegistration`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, registerDeviceRegistrationRef, RegisterDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+
+// The `RegisterDeviceRegistration` mutation requires an argument of type `RegisterDeviceRegistrationVariables`:
+const registerDeviceRegistrationVars: RegisterDeviceRegistrationVariables = {
+  tokenId: ..., 
+  userId: ..., 
+  token: ..., 
+  platform: ..., 
+  updatedAt: ..., 
+};
+
+// Call the `registerDeviceRegistrationRef()` function to get a reference to the mutation.
+const ref = registerDeviceRegistrationRef(registerDeviceRegistrationVars);
+// Variables can be defined inline as well.
+const ref = registerDeviceRegistrationRef({ tokenId: ..., userId: ..., token: ..., platform: ..., updatedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = registerDeviceRegistrationRef(dataConnect, registerDeviceRegistrationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.deviceRegistration_upsert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_upsert);
+});
+```
+
+## DeleteDeviceRegistration
+You can execute the `DeleteDeviceRegistration` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteDeviceRegistration(vars: DeleteDeviceRegistrationVariables): MutationPromise<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+
+interface DeleteDeviceRegistrationRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDeviceRegistrationVariables): MutationRef<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+}
+export const deleteDeviceRegistrationRef: DeleteDeviceRegistrationRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteDeviceRegistration(dc: DataConnect, vars: DeleteDeviceRegistrationVariables): MutationPromise<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+
+interface DeleteDeviceRegistrationRef {
+  ...
+  (dc: DataConnect, vars: DeleteDeviceRegistrationVariables): MutationRef<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+}
+export const deleteDeviceRegistrationRef: DeleteDeviceRegistrationRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteDeviceRegistrationRef:
+```typescript
+const name = deleteDeviceRegistrationRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteDeviceRegistration` mutation requires an argument of type `DeleteDeviceRegistrationVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteDeviceRegistrationVariables {
+  tokenId: string;
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `DeleteDeviceRegistration` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteDeviceRegistrationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteDeviceRegistrationData {
+  deviceRegistration_deleteMany: number;
+}
+```
+### Using `DeleteDeviceRegistration`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteDeviceRegistration, DeleteDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteDeviceRegistration` mutation requires an argument of type `DeleteDeviceRegistrationVariables`:
+const deleteDeviceRegistrationVars: DeleteDeviceRegistrationVariables = {
+  tokenId: ..., 
+  userId: ..., 
+};
+
+// Call the `deleteDeviceRegistration()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteDeviceRegistration(deleteDeviceRegistrationVars);
+// Variables can be defined inline as well.
+const { data } = await deleteDeviceRegistration({ tokenId: ..., userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteDeviceRegistration(dataConnect, deleteDeviceRegistrationVars);
+
+console.log(data.deviceRegistration_deleteMany);
+
+// Or, you can use the `Promise` API.
+deleteDeviceRegistration(deleteDeviceRegistrationVars).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_deleteMany);
+});
+```
+
+### Using `DeleteDeviceRegistration`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteDeviceRegistrationRef, DeleteDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteDeviceRegistration` mutation requires an argument of type `DeleteDeviceRegistrationVariables`:
+const deleteDeviceRegistrationVars: DeleteDeviceRegistrationVariables = {
+  tokenId: ..., 
+  userId: ..., 
+};
+
+// Call the `deleteDeviceRegistrationRef()` function to get a reference to the mutation.
+const ref = deleteDeviceRegistrationRef(deleteDeviceRegistrationVars);
+// Variables can be defined inline as well.
+const ref = deleteDeviceRegistrationRef({ tokenId: ..., userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteDeviceRegistrationRef(dataConnect, deleteDeviceRegistrationVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.deviceRegistration_deleteMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_deleteMany);
+});
+```
+
+## DeleteUserDeviceRegistrations
+You can execute the `DeleteUserDeviceRegistrations` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteUserDeviceRegistrations(vars: DeleteUserDeviceRegistrationsVariables): MutationPromise<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+
+interface DeleteUserDeviceRegistrationsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteUserDeviceRegistrationsVariables): MutationRef<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+}
+export const deleteUserDeviceRegistrationsRef: DeleteUserDeviceRegistrationsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteUserDeviceRegistrations(dc: DataConnect, vars: DeleteUserDeviceRegistrationsVariables): MutationPromise<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+
+interface DeleteUserDeviceRegistrationsRef {
+  ...
+  (dc: DataConnect, vars: DeleteUserDeviceRegistrationsVariables): MutationRef<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+}
+export const deleteUserDeviceRegistrationsRef: DeleteUserDeviceRegistrationsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteUserDeviceRegistrationsRef:
+```typescript
+const name = deleteUserDeviceRegistrationsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteUserDeviceRegistrations` mutation requires an argument of type `DeleteUserDeviceRegistrationsVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteUserDeviceRegistrationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that executing the `DeleteUserDeviceRegistrations` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteUserDeviceRegistrationsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteUserDeviceRegistrationsData {
+  deviceRegistration_deleteMany: number;
+}
+```
+### Using `DeleteUserDeviceRegistrations`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteUserDeviceRegistrations, DeleteUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteUserDeviceRegistrations` mutation requires an argument of type `DeleteUserDeviceRegistrationsVariables`:
+const deleteUserDeviceRegistrationsVars: DeleteUserDeviceRegistrationsVariables = {
+  userId: ..., 
+};
+
+// Call the `deleteUserDeviceRegistrations()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteUserDeviceRegistrations(deleteUserDeviceRegistrationsVars);
+// Variables can be defined inline as well.
+const { data } = await deleteUserDeviceRegistrations({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteUserDeviceRegistrations(dataConnect, deleteUserDeviceRegistrationsVars);
+
+console.log(data.deviceRegistration_deleteMany);
+
+// Or, you can use the `Promise` API.
+deleteUserDeviceRegistrations(deleteUserDeviceRegistrationsVars).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_deleteMany);
+});
+```
+
+### Using `DeleteUserDeviceRegistrations`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteUserDeviceRegistrationsRef, DeleteUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+
+// The `DeleteUserDeviceRegistrations` mutation requires an argument of type `DeleteUserDeviceRegistrationsVariables`:
+const deleteUserDeviceRegistrationsVars: DeleteUserDeviceRegistrationsVariables = {
+  userId: ..., 
+};
+
+// Call the `deleteUserDeviceRegistrationsRef()` function to get a reference to the mutation.
+const ref = deleteUserDeviceRegistrationsRef(deleteUserDeviceRegistrationsVars);
+// Variables can be defined inline as well.
+const ref = deleteUserDeviceRegistrationsRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteUserDeviceRegistrationsRef(dataConnect, deleteUserDeviceRegistrationsVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.deviceRegistration_deleteMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.deviceRegistration_deleteMany);
+});
+```
 
 ## RecordAbuseAttempt
 You can execute the `RecordAbuseAttempt` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
@@ -6370,6 +9903,121 @@ executeMutation(ref).then((response) => {
 });
 ```
 
+## SaveCirclePaymentCheckout
+You can execute the `SaveCirclePaymentCheckout` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+saveCirclePaymentCheckout(vars: SaveCirclePaymentCheckoutVariables): MutationPromise<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+
+interface SaveCirclePaymentCheckoutRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SaveCirclePaymentCheckoutVariables): MutationRef<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+}
+export const saveCirclePaymentCheckoutRef: SaveCirclePaymentCheckoutRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+saveCirclePaymentCheckout(dc: DataConnect, vars: SaveCirclePaymentCheckoutVariables): MutationPromise<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+
+interface SaveCirclePaymentCheckoutRef {
+  ...
+  (dc: DataConnect, vars: SaveCirclePaymentCheckoutVariables): MutationRef<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+}
+export const saveCirclePaymentCheckoutRef: SaveCirclePaymentCheckoutRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the saveCirclePaymentCheckoutRef:
+```typescript
+const name = saveCirclePaymentCheckoutRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SaveCirclePaymentCheckout` mutation requires an argument of type `SaveCirclePaymentCheckoutVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SaveCirclePaymentCheckoutVariables {
+  circleId: UUIDString;
+  activationId: UUIDString;
+  checkoutUrl: string;
+}
+```
+### Return Type
+Recall that executing the `SaveCirclePaymentCheckout` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SaveCirclePaymentCheckoutData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SaveCirclePaymentCheckoutData {
+  circlePaymentCheckout_updateMany: number;
+}
+```
+### Using `SaveCirclePaymentCheckout`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, saveCirclePaymentCheckout, SaveCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+
+// The `SaveCirclePaymentCheckout` mutation requires an argument of type `SaveCirclePaymentCheckoutVariables`:
+const saveCirclePaymentCheckoutVars: SaveCirclePaymentCheckoutVariables = {
+  circleId: ..., 
+  activationId: ..., 
+  checkoutUrl: ..., 
+};
+
+// Call the `saveCirclePaymentCheckout()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await saveCirclePaymentCheckout(saveCirclePaymentCheckoutVars);
+// Variables can be defined inline as well.
+const { data } = await saveCirclePaymentCheckout({ circleId: ..., activationId: ..., checkoutUrl: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await saveCirclePaymentCheckout(dataConnect, saveCirclePaymentCheckoutVars);
+
+console.log(data.circlePaymentCheckout_updateMany);
+
+// Or, you can use the `Promise` API.
+saveCirclePaymentCheckout(saveCirclePaymentCheckoutVars).then((response) => {
+  const data = response.data;
+  console.log(data.circlePaymentCheckout_updateMany);
+});
+```
+
+### Using `SaveCirclePaymentCheckout`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, saveCirclePaymentCheckoutRef, SaveCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+
+// The `SaveCirclePaymentCheckout` mutation requires an argument of type `SaveCirclePaymentCheckoutVariables`:
+const saveCirclePaymentCheckoutVars: SaveCirclePaymentCheckoutVariables = {
+  circleId: ..., 
+  activationId: ..., 
+  checkoutUrl: ..., 
+};
+
+// Call the `saveCirclePaymentCheckoutRef()` function to get a reference to the mutation.
+const ref = saveCirclePaymentCheckoutRef(saveCirclePaymentCheckoutVars);
+// Variables can be defined inline as well.
+const ref = saveCirclePaymentCheckoutRef({ circleId: ..., activationId: ..., checkoutUrl: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = saveCirclePaymentCheckoutRef(dataConnect, saveCirclePaymentCheckoutVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.circlePaymentCheckout_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.circlePaymentCheckout_updateMany);
+});
+```
+
 ## CreateCircleActivationAttempt
 You can execute the `CreateCircleActivationAttempt` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
@@ -6426,7 +10074,8 @@ The `data` property is an object of type `CreateCircleActivationAttemptData`, wh
 ```typescript
 export interface CreateCircleActivationAttemptData {
   circleActivation_insert: CircleActivation_Key;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_insert: CirclePaymentCheckout_Key;
+  circle_updateMany: number;
 }
 ```
 ### Using `CreateCircleActivationAttempt`'s action shortcut function
@@ -6463,13 +10112,15 @@ const dataConnect = getDataConnect(connectorConfig);
 const { data } = await createCircleActivationAttempt(dataConnect, createCircleActivationAttemptVars);
 
 console.log(data.circleActivation_insert);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_insert);
+console.log(data.circle_updateMany);
 
 // Or, you can use the `Promise` API.
 createCircleActivationAttempt(createCircleActivationAttemptVars).then((response) => {
   const data = response.data;
   console.log(data.circleActivation_insert);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_insert);
+  console.log(data.circle_updateMany);
 });
 ```
 
@@ -6510,13 +10161,15 @@ const ref = createCircleActivationAttemptRef(dataConnect, createCircleActivation
 const { data } = await executeMutation(ref);
 
 console.log(data.circleActivation_insert);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_insert);
+console.log(data.circle_updateMany);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.circleActivation_insert);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_insert);
+  console.log(data.circle_updateMany);
 });
 ```
 
@@ -6566,7 +10219,8 @@ Recall that executing the `FailCircleActivationAttempt` mutation returns a `Muta
 The `data` property is an object of type `FailCircleActivationAttemptData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface FailCircleActivationAttemptData {
-  circleActivation_update?: CircleActivation_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
   circle_update?: Circle_Key | null;
 }
 ```
@@ -6594,13 +10248,15 @@ const { data } = await failCircleActivationAttempt({ activationId: ..., circleId
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await failCircleActivationAttempt(dataConnect, failCircleActivationAttemptVars);
 
-console.log(data.circleActivation_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
 console.log(data.circle_update);
 
 // Or, you can use the `Promise` API.
 failCircleActivationAttempt(failCircleActivationAttemptVars).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
   console.log(data.circle_update);
 });
 ```
@@ -6632,13 +10288,15 @@ const ref = failCircleActivationAttemptRef(dataConnect, failCircleActivationAtte
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleActivation_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
 console.log(data.circle_update);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
   console.log(data.circle_update);
 });
 ```
@@ -6690,8 +10348,9 @@ Recall that executing the `CompletePaidCircleActivation` mutation returns a `Mut
 The `data` property is an object of type `CompletePaidCircleActivationData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface CompletePaidCircleActivationData {
-  circleActivation_update?: CircleActivation_Key | null;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
+  circle_updateMany: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -6720,15 +10379,17 @@ const { data } = await completePaidCircleActivation({ activationId: ..., circleI
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await completePaidCircleActivation(dataConnect, completePaidCircleActivationVars);
 
-console.log(data.circleActivation_update);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
+console.log(data.circle_updateMany);
 console.log(data.circleAuditEntry_insert);
 
 // Or, you can use the `Promise` API.
 completePaidCircleActivation(completePaidCircleActivationVars).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
+  console.log(data.circle_updateMany);
   console.log(data.circleAuditEntry_insert);
 });
 ```
@@ -6761,15 +10422,17 @@ const ref = completePaidCircleActivationRef(dataConnect, completePaidCircleActiv
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleActivation_update);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
+console.log(data.circle_updateMany);
 console.log(data.circleAuditEntry_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
+  console.log(data.circle_updateMany);
   console.log(data.circleAuditEntry_insert);
 });
 ```
@@ -6826,8 +10489,9 @@ Recall that executing the `CompleteCirclePlanUpgrade` mutation returns a `Mutati
 The `data` property is an object of type `CompleteCirclePlanUpgradeData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface CompleteCirclePlanUpgradeData {
-  circleActivation_update?: CircleActivation_Key | null;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
+  circle_updateMany: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -6861,15 +10525,17 @@ const { data } = await completeCirclePlanUpgrade({ activationId: ..., circleId: 
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await completeCirclePlanUpgrade(dataConnect, completeCirclePlanUpgradeVars);
 
-console.log(data.circleActivation_update);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
+console.log(data.circle_updateMany);
 console.log(data.circleAuditEntry_insert);
 
 // Or, you can use the `Promise` API.
 completeCirclePlanUpgrade(completeCirclePlanUpgradeVars).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
+  console.log(data.circle_updateMany);
   console.log(data.circleAuditEntry_insert);
 });
 ```
@@ -6907,15 +10573,17 @@ const ref = completeCirclePlanUpgradeRef(dataConnect, completeCirclePlanUpgradeV
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleActivation_update);
-console.log(data.circle_update);
+console.log(data.circlePaymentCheckout_deleteMany);
+console.log(data.circleActivation_updateMany);
+console.log(data.circle_updateMany);
 console.log(data.circleAuditEntry_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleActivation_update);
-  console.log(data.circle_update);
+  console.log(data.circlePaymentCheckout_deleteMany);
+  console.log(data.circleActivation_updateMany);
+  console.log(data.circle_updateMany);
   console.log(data.circleAuditEntry_insert);
 });
 ```
@@ -9432,10 +13100,10 @@ Recall that executing the `AcceptInvitationWithMembership` mutation returns a `M
 The `data` property is an object of type `AcceptInvitationWithMembershipData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface AcceptInvitationWithMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -9469,20 +13137,20 @@ const { data } = await acceptInvitationWithMembership({ invitationId: ..., circl
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await acceptInvitationWithMembership(dataConnect, acceptInvitationWithMembershipVars);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_insert);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 acceptInvitationWithMembership(acceptInvitationWithMembershipVars).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_insert);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_insert);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -9520,20 +13188,20 @@ const ref = acceptInvitationWithMembershipRef(dataConnect, acceptInvitationWithM
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_insert);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_insert);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_insert);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_insert);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -9585,8 +13253,9 @@ Recall that executing the `RequestInvitationApproval` mutation returns a `Mutati
 The `data` property is an object of type `RequestInvitationApprovalData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface RequestInvitationApprovalData {
+  circleApprovalRequestGuard: number;
   invitationAcceptance_insert: InvitationAcceptance_Key;
-  invitation_update?: Invitation_Key | null;
+  invitation_update: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -9614,6 +13283,7 @@ const { data } = await requestInvitationApproval({ invitationId: ..., circleId: 
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await requestInvitationApproval(dataConnect, requestInvitationApprovalVars);
 
+console.log(data.circleApprovalRequestGuard);
 console.log(data.invitationAcceptance_insert);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
@@ -9621,6 +13291,7 @@ console.log(data.circleAuditEntry_insert);
 // Or, you can use the `Promise` API.
 requestInvitationApproval(requestInvitationApprovalVars).then((response) => {
   const data = response.data;
+  console.log(data.circleApprovalRequestGuard);
   console.log(data.invitationAcceptance_insert);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
@@ -9654,6 +13325,7 @@ const ref = requestInvitationApprovalRef(dataConnect, requestInvitationApprovalV
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
+console.log(data.circleApprovalRequestGuard);
 console.log(data.invitationAcceptance_insert);
 console.log(data.invitation_update);
 console.log(data.circleAuditEntry_insert);
@@ -9661,6 +13333,7 @@ console.log(data.circleAuditEntry_insert);
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
+  console.log(data.circleApprovalRequestGuard);
   console.log(data.invitationAcceptance_insert);
   console.log(data.invitation_update);
   console.log(data.circleAuditEntry_insert);
@@ -10197,10 +13870,10 @@ Recall that executing the `ApproveInvitationMembership` mutation returns a `Muta
 The `data` property is an object of type `ApproveInvitationMembershipData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
 export interface ApproveInvitationMembershipData {
+  circle_update: number;
+  invitation_update: number;
   circleMembership_insert: CircleMembership_Key;
   invitationAcceptance_update?: InvitationAcceptance_Key | null;
-  circle_update?: Circle_Key | null;
-  invitation_update?: Invitation_Key | null;
   circleAuditEntry_insert: CircleAuditEntry_Key;
   activityLog_insert: ActivityLog_Key;
 }
@@ -10235,20 +13908,20 @@ const { data } = await approveInvitationMembership({ invitationId: ..., circleId
 const dataConnect = getDataConnect(connectorConfig);
 const { data } = await approveInvitationMembership(dataConnect, approveInvitationMembershipVars);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_update);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 approveInvitationMembership(approveInvitationMembershipVars).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_update);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_update);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -10287,20 +13960,20 @@ const ref = approveInvitationMembershipRef(dataConnect, approveInvitationMembers
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.circleMembership_insert);
-console.log(data.invitationAcceptance_update);
 console.log(data.circle_update);
 console.log(data.invitation_update);
+console.log(data.circleMembership_insert);
+console.log(data.invitationAcceptance_update);
 console.log(data.circleAuditEntry_insert);
 console.log(data.activityLog_insert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.circleMembership_insert);
-  console.log(data.invitationAcceptance_update);
   console.log(data.circle_update);
   console.log(data.invitation_update);
+  console.log(data.circleMembership_insert);
+  console.log(data.invitationAcceptance_update);
   console.log(data.circleAuditEntry_insert);
   console.log(data.activityLog_insert);
 });
@@ -14063,6 +17736,236 @@ console.log(data.ownerAdministrator_upsert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.ownerAdministrator_upsert);
+});
+```
+
+## CreateRateLimitBucket
+You can execute the `CreateRateLimitBucket` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createRateLimitBucket(vars: CreateRateLimitBucketVariables): MutationPromise<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+
+interface CreateRateLimitBucketRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateRateLimitBucketVariables): MutationRef<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+}
+export const createRateLimitBucketRef: CreateRateLimitBucketRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createRateLimitBucket(dc: DataConnect, vars: CreateRateLimitBucketVariables): MutationPromise<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+
+interface CreateRateLimitBucketRef {
+  ...
+  (dc: DataConnect, vars: CreateRateLimitBucketVariables): MutationRef<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+}
+export const createRateLimitBucketRef: CreateRateLimitBucketRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createRateLimitBucketRef:
+```typescript
+const name = createRateLimitBucketRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateRateLimitBucket` mutation requires an argument of type `CreateRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateRateLimitBucketVariables {
+  bucketKey: string;
+  attemptsJson: string;
+}
+```
+### Return Type
+Recall that executing the `CreateRateLimitBucket` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateRateLimitBucketData {
+  rateLimitBucket_insert: RateLimitBucket_Key;
+}
+```
+### Using `CreateRateLimitBucket`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createRateLimitBucket, CreateRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `CreateRateLimitBucket` mutation requires an argument of type `CreateRateLimitBucketVariables`:
+const createRateLimitBucketVars: CreateRateLimitBucketVariables = {
+  bucketKey: ..., 
+  attemptsJson: ..., 
+};
+
+// Call the `createRateLimitBucket()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createRateLimitBucket(createRateLimitBucketVars);
+// Variables can be defined inline as well.
+const { data } = await createRateLimitBucket({ bucketKey: ..., attemptsJson: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createRateLimitBucket(dataConnect, createRateLimitBucketVars);
+
+console.log(data.rateLimitBucket_insert);
+
+// Or, you can use the `Promise` API.
+createRateLimitBucket(createRateLimitBucketVars).then((response) => {
+  const data = response.data;
+  console.log(data.rateLimitBucket_insert);
+});
+```
+
+### Using `CreateRateLimitBucket`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createRateLimitBucketRef, CreateRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `CreateRateLimitBucket` mutation requires an argument of type `CreateRateLimitBucketVariables`:
+const createRateLimitBucketVars: CreateRateLimitBucketVariables = {
+  bucketKey: ..., 
+  attemptsJson: ..., 
+};
+
+// Call the `createRateLimitBucketRef()` function to get a reference to the mutation.
+const ref = createRateLimitBucketRef(createRateLimitBucketVars);
+// Variables can be defined inline as well.
+const ref = createRateLimitBucketRef({ bucketKey: ..., attemptsJson: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createRateLimitBucketRef(dataConnect, createRateLimitBucketVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.rateLimitBucket_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.rateLimitBucket_insert);
+});
+```
+
+## CompareAndSetRateLimitBucket
+You can execute the `CompareAndSetRateLimitBucket` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+compareAndSetRateLimitBucket(vars: CompareAndSetRateLimitBucketVariables): MutationPromise<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+
+interface CompareAndSetRateLimitBucketRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CompareAndSetRateLimitBucketVariables): MutationRef<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+}
+export const compareAndSetRateLimitBucketRef: CompareAndSetRateLimitBucketRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+compareAndSetRateLimitBucket(dc: DataConnect, vars: CompareAndSetRateLimitBucketVariables): MutationPromise<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+
+interface CompareAndSetRateLimitBucketRef {
+  ...
+  (dc: DataConnect, vars: CompareAndSetRateLimitBucketVariables): MutationRef<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+}
+export const compareAndSetRateLimitBucketRef: CompareAndSetRateLimitBucketRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the compareAndSetRateLimitBucketRef:
+```typescript
+const name = compareAndSetRateLimitBucketRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CompareAndSetRateLimitBucket` mutation requires an argument of type `CompareAndSetRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CompareAndSetRateLimitBucketVariables {
+  bucketKey: string;
+  revision: number;
+  nextRevision: number;
+  attemptsJson: string;
+}
+```
+### Return Type
+Recall that executing the `CompareAndSetRateLimitBucket` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CompareAndSetRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CompareAndSetRateLimitBucketData {
+  updated: number;
+}
+```
+### Using `CompareAndSetRateLimitBucket`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, compareAndSetRateLimitBucket, CompareAndSetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `CompareAndSetRateLimitBucket` mutation requires an argument of type `CompareAndSetRateLimitBucketVariables`:
+const compareAndSetRateLimitBucketVars: CompareAndSetRateLimitBucketVariables = {
+  bucketKey: ..., 
+  revision: ..., 
+  nextRevision: ..., 
+  attemptsJson: ..., 
+};
+
+// Call the `compareAndSetRateLimitBucket()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await compareAndSetRateLimitBucket(compareAndSetRateLimitBucketVars);
+// Variables can be defined inline as well.
+const { data } = await compareAndSetRateLimitBucket({ bucketKey: ..., revision: ..., nextRevision: ..., attemptsJson: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await compareAndSetRateLimitBucket(dataConnect, compareAndSetRateLimitBucketVars);
+
+console.log(data.updated);
+
+// Or, you can use the `Promise` API.
+compareAndSetRateLimitBucket(compareAndSetRateLimitBucketVars).then((response) => {
+  const data = response.data;
+  console.log(data.updated);
+});
+```
+
+### Using `CompareAndSetRateLimitBucket`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, compareAndSetRateLimitBucketRef, CompareAndSetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+
+// The `CompareAndSetRateLimitBucket` mutation requires an argument of type `CompareAndSetRateLimitBucketVariables`:
+const compareAndSetRateLimitBucketVars: CompareAndSetRateLimitBucketVariables = {
+  bucketKey: ..., 
+  revision: ..., 
+  nextRevision: ..., 
+  attemptsJson: ..., 
+};
+
+// Call the `compareAndSetRateLimitBucketRef()` function to get a reference to the mutation.
+const ref = compareAndSetRateLimitBucketRef(compareAndSetRateLimitBucketVars);
+// Variables can be defined inline as well.
+const ref = compareAndSetRateLimitBucketRef({ bucketKey: ..., revision: ..., nextRevision: ..., attemptsJson: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = compareAndSetRateLimitBucketRef(dataConnect, compareAndSetRateLimitBucketVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.updated);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.updated);
 });
 ```
 

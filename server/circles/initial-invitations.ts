@@ -143,11 +143,11 @@ export async function createInitialShareInvitation(input: {
       },
       shareStatus: "ready",
     };
-  } catch (error) {
+  } catch {
     logger.error("initial_circle_share_invitation_failed", {
       circleId: input.circleId,
       creatorId: input.creatorId,
-      error: error instanceof Error ? error.message : "unknown_error",
+      reasonCode: "INITIAL_SHARE_INVITATION_FAILED",
     });
     return { share: null, shareStatus: "unavailable" };
   }

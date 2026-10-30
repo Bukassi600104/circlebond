@@ -18,6 +18,14 @@ type User @table {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
+type DeviceRegistration @table(key: ["id"]) {
+  id: String!
+  user: User!
+  token: String!
+  platform: String!
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
 type OwnerAdministrator @table(key: ["user"]) {
   user: User!
   role: String! @default(value: "owner")
@@ -162,6 +170,13 @@ type CircleActivation @table {
   createdAt: Timestamp! @default(expr: "request.time")
   paidAt: Timestamp
   activatedAt: Timestamp
+}
+
+# One open checkout per circle; released only after verified settlement/failure.
+type CirclePaymentCheckout @table(key: ["circle"]) {
+  circle: Circle!
+  activation: CircleActivation!
+  checkoutUrl: String
 }
 
 type PricingChangeAudit @table {
