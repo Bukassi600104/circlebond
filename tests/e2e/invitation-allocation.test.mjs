@@ -88,10 +88,11 @@ async function circle({
   mode = "equal",
   type = "gift",
   creatorAmount,
+  plan,
 } = {}) {
   const creator = await user("creator");
   const id = randomUUID();
-  await database.upsert("circle", {
+  const record = {
     id,
     creatorId: creator.id,
     name: "Synthetic invitation allocation",
@@ -102,11 +103,12 @@ async function circle({
     memberCount: 1,
     status: "active",
     visibility: "private",
-    pricingPlan: mode === "custom" ? "standard" : "starter",
+    pricingPlan: plan ?? (mode === "custom" ? "standard" : "starter"),
     pricingModelVersion: "model_specific_v1",
     activationStatus: "active",
     requireCreatorApproval: false,
-  });
+  };
+  await database.upsert("circle", record);
   await database.upsert("circleMembership", {
     circleId: id,
     userId: creator.id,
@@ -115,11 +117,15 @@ async function circle({
     contributionStatus: "joined",
     expectedAmount:
       creatorAmount ??
-      (type === "gift" && mode === "equal"
+      (["gift", "support"].includes(type) && mode === "equal"
         ? gift.calculateEqualSlotAllocations(target, capacity)[0]
         : 0),
   });
-  return { id, creator };
+  return { id, creator, record };
+}
+
+async function writeCircle(fixture, changes) {
+  await database.upsert("circle", { ...fixture.record, ...changes });
 }
 
 async function invitation(repo, fixture, options = {}) {
@@ -259,7 +265,7 @@ test("real equal replacement reuses the unassigned remainder slot without rewrit
       contributionStatus: membershipStatus,
       expectedAmount,
     });
-  await database.upsert("circle", { id: fixture.id, memberCount: 2 });
+  await writeCircle(fixture, { memberCount: 2 });
   const created = await invitation(repo, fixture);
   const replacement = await user("replacement");
   await accept(repo, created, replacement);
@@ -281,8 +287,8 @@ test("real equal replacement reuses the unassigned remainder slot without rewrit
 test("real custom Gift and Support invitations preserve their existing specified amounts", async () => {
   for (const [type, mode, amount] of [
     ["gift", "custom", 777],
-    ["support", "equal", 456],
-    ["support", "equal", 0],
+    ["support", "custom", 456],
+    ["support", "custom", 0],
   ]) {
     const repo = await repository();
     const fixture = await circle({
@@ -317,7 +323,7 @@ test("real inconsistent legacy equal rows fail closed without rewriting historic
     contributionStatus: "joined",
     expectedAmount: 0,
   });
-  await database.upsert("circle", { id: fixture.id, memberCount: 2 });
+  await writeCircle(fixture, { memberCount: 2 });
   const created = await invitation(repo, fixture);
   const member = await user("legacy-next");
   const result = await Promise.allSettled([accept(repo, created, member)]);
@@ -396,3 +402,191 @@ for (const [approval, capacity] of [
     }
   });
 }
+
+for (const approval of [false, true]) {
+  test(`real equal Support ${approval ? "approval" : "acceptance"} assigns the existing planned shares`, async () => {
+    const repo = await repository();
+    const fixture = await circle({ type: "support", plan: "premium" });
+    const created = await invitation(repo, fixture, {
+      maxUses: 2,
+      requireApproval: approval,
+    });
+    const joined = [fixture.creator];
+    for (let index = 0; index < 2; index++) {
+      const member = await user("support-equal");
+      const outcome = await accept(repo, created, member);
+      assert.equal(outcome.status, approval ? "approval_pending" : "joined");
+      if (approval)
+        await repo.approveInvitationMembership(
+          fixture.id,
+          created.id,
+          member.id,
+          fixture.creator.id,
+        );
+      joined.push(member);
+    }
+    const stored = await members(fixture.id);
+    assert.deepEqual(
+      joined.map(
+        ({ id }) => stored.find((row) => row.user.id === id).expectedAmount,
+      ),
+      [1000, 1000, 1000],
+    );
+  });
+}
+
+async function expireInvitation(fixture, created, detail) {
+  await database.upsert("invitation", {
+    id: created.id,
+    circleId: fixture.id,
+    invitedById: fixture.creator.id,
+    tokenHash: rules.createSecureInvitationToken(created.token).tokenHash,
+    mode: detail.mode,
+    expectedAmount: detail.expectedAmount,
+    requireApproval: detail.requireApproval,
+    state: detail.state,
+    maxUses: detail.maxUses,
+    useCount: detail.useCount,
+    expiresAt: new Date(Date.now() - 1000).toISOString(),
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+for (const approval of [false, true]) {
+  for (const state of ["completed", "revoked", "expired"]) {
+    test(`real prechecked ${approval ? "approval" : "acceptance"} rejects a newly ${state} transaction state`, async () => {
+      const setup = await repository();
+      const fixture = await circle();
+      const created = await invitation(setup, fixture, {
+        requireApproval: approval,
+      });
+      const member = await user("closed-state");
+      if (approval)
+        assert.equal(
+          (await accept(setup, created, member)).status,
+          "approval_pending",
+        );
+      let changed = false;
+      const repo = await repository(async (operation) => {
+        if (
+          operation !==
+            (approval
+              ? "ApproveInvitationMembership"
+              : "AcceptInvitationWithMembership") ||
+          changed
+        )
+          return;
+        changed = true;
+        if (state === "completed")
+          await writeCircle(fixture, {
+            status: "completed",
+            completedAt: new Date().toISOString(),
+          });
+        if (state === "revoked")
+          await setup.revokeInvitation(
+            created.id,
+            fixture.id,
+            fixture.creator.id,
+          );
+        if (state === "expired")
+          await expireInvitation(
+            fixture,
+            created,
+            await setup.loadInvitationByToken(created.token),
+          );
+      });
+      const result = await Promise.allSettled([
+        approval
+          ? repo.approveInvitationMembership(
+              fixture.id,
+              created.id,
+              member.id,
+              fixture.creator.id,
+            )
+          : accept(repo, created, member),
+      ]);
+      assert.equal(
+        changed,
+        true,
+        "The state change must occur after real prechecks and before the actual mutation.",
+      );
+      const detail = await setup.loadInvitationByToken(created.token);
+      assert.deepEqual(
+        {
+          outcome: result[0].status,
+          joinedMembers: (await members(fixture.id)).length,
+          state: detail.state,
+          useCount: detail.useCount,
+        },
+        {
+          outcome: "rejected",
+          joinedMembers: 1,
+          state:
+            state === "revoked"
+              ? "revoked"
+              : approval
+                ? "approval_pending"
+                : "created",
+          useCount: 0,
+        },
+      );
+    });
+  }
+
+  test(`real ${approval ? "approval" : "acceptance"} cannot join an unpaid draft while invitation preparation stays available`, async () => {
+    const repo = await repository();
+    const fixture = await circle();
+    await writeCircle(fixture, {
+      status: "draft",
+      activationStatus: "pending_payment",
+    });
+    const created = await invitation(repo, fixture, {
+      requireApproval: approval,
+    });
+    assert.ok(created.id, "Preparing the invitation must remain available.");
+    const member = await user("unpaid-draft");
+    if (approval) {
+      // A pre-existing pending request must not bypass publication on approval.
+      await database.executeMutation("RequestInvitationApproval", {
+        invitationId: created.id,
+        circleId: fixture.id,
+        userId: member.id,
+        respondedAt: new Date().toISOString(),
+      });
+    }
+    const result = await Promise.allSettled([
+      approval
+        ? repo.approveInvitationMembership(
+            fixture.id,
+            created.id,
+            member.id,
+            fixture.creator.id,
+          )
+        : accept(repo, created, member),
+    ]);
+    const detail = await repo.loadInvitationByToken(created.token);
+    assert.deepEqual(
+      {
+        outcome: result[0].status,
+        joinedMembers: (await members(fixture.id)).length,
+        useCount: detail.useCount,
+      },
+      { outcome: "rejected", joinedMembers: 1, useCount: 0 },
+    );
+  });
+}
+
+test("real active grandfathered circles retain valid invitation membership", async () => {
+  const repo = await repository();
+  const fixture = await circle();
+  await writeCircle(fixture, {
+    pricingPlan: "free",
+    pricingModelVersion: "legacy",
+    activationStatus: "not_required",
+  });
+  const created = await invitation(repo, fixture);
+  const member = await user("grandfathered");
+  assert.equal((await accept(repo, created, member)).status, "joined");
+  assert.equal((await members(fixture.id)).length, 2);
+});
