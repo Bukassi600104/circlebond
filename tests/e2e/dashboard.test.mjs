@@ -39,7 +39,7 @@ test("actual dashboard query scopes before limiting and retrieves more than200 p
     name: "Synthetic dashboard circle",
     type: "gift",
     targetAmount: 1000,
-    memberCount: 175,
+    memberCount: 75,
     status: "active",
   }));
   await db.upsertMany("circle", rows);
@@ -63,7 +63,7 @@ test("actual dashboard query scopes before limiting and retrieves more than200 p
   assert.equal(new Set(result.map((row) => row.id)).size, 201);
   assert.ok(result.some((row) => row.id === rows[0].id));
   assert.ok(
-    result.every((row) => row.createdByCurrentUser && row.memberCount === 175),
+    result.every((row) => row.createdByCurrentUser && row.memberCount === 75),
   );
   assert.equal(
     result.some((row) => rows.slice(201).some((other) => other.id === row.id)),

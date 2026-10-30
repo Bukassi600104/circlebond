@@ -14,8 +14,8 @@ const membership = (userId, index) => ({
     contributedAmount: 500,
     showTargetToMembers: false,
     showConfirmedTotalToMembers: false,
-    memberCount: 175,
-    memberLimit: 200,
+    memberCount: 75,
+    memberLimit: 100,
     status: "active",
     createdAt: "2026-10-30",
     creator: { id: "organizer" },
@@ -55,7 +55,7 @@ for (const ownCount of [1, 201]) {
     const result = await repo.loadDashboardCircles("self");
     assert.equal(result.length, ownCount);
     assert.equal(result.at(-1).id, `self-${ownCount - 1}`);
-    assert.equal(result[0].memberCount, 175);
+    assert.equal(result[0].memberCount, 75);
     assert.equal(result[0].targetAmount, null);
     assert.equal(result[0].contributedAmount, null);
     assert.equal(result[0].progress, null);
