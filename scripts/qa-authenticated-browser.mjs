@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
-import { createWriteStream } from "node:fs";
+import { createWriteStream, existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createConnection } from "node:net";
 import { resolve } from "node:path";
@@ -8,6 +8,18 @@ import { pathToFileURL } from "node:url";
 
 // Run only after the owner of the completed build hands off this checkout.
 const root = process.cwd();
+for (const name of [
+  ".env",
+  ".env.local",
+  ".env.production",
+  ".env.production.local",
+]) {
+  assert.equal(
+    existsSync(resolve(root, name)),
+    false,
+    "Use a clean QA checkout without environment files",
+  );
+}
 const base = new URL(process.env.BONDCIRCLE_QA_URL ?? "http://127.0.0.1:3100");
 assert.ok(["127.0.0.1", "localhost"].includes(base.hostname));
 assert.equal(base.protocol, "http:");
@@ -204,6 +216,26 @@ try {
       if ((await fetch(new URL("/sign-in", base))).ok) break;
     } catch {}
     await new Promise((done) => setTimeout(done, 250));
+  }
+  if (process.env.BONDCIRCLE_PUBLIC_HARNESS_PATH) {
+    const child = spawn(
+      process.execPath,
+      [process.env.BONDCIRCLE_PUBLIC_HARNESS_PATH],
+      {
+        cwd: root,
+        env: { ...env, BONDCIRCLE_QA_URL: base.href },
+        windowsHide: true,
+        stdio: "inherit",
+      },
+    );
+    const exit = await new Promise((done, reject) => {
+      child.once("error", reject);
+      child.once("exit", (code) => done(code ?? 1));
+    });
+    report.checks.push({
+      name: "separate public browser acceptance and lab harness",
+      status: exit === 0 ? "PASS" : "FAIL",
+    });
   }
   browser = await chromium.launch({
     executablePath:
