@@ -202,6 +202,7 @@ async function expectedMembershipAmount(
     );
   for (const member of data.circleMemberships) {
     const slot = available.indexOf(member.expectedAmount);
+    // A prior capacity can leave valid amounts here; an approved policy must precede any reassignment.
     if (slot < 0)
       throw new CircleRuleError(
         "Existing equal contributions need organizer review before more members can join.",
