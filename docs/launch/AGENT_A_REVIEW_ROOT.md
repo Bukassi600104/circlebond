@@ -4,15 +4,14 @@ What this change does: `65155110286b11f4e5e75eccae79818f976b765e` strengthens ve
 
 Reviewer: Agent A, a non-author of these product changes, using the actual installed Ponytail 5.3.3 review skill. Date: 30 October 2026 (Africa/Lagos). This review does not approve Agent A's own dependency or CI changes; Agent H independently reviews those.
 
-## Must fix
+## Review cycle and resolved findings
 
-2. **A concurrent circle completion skips another circle's deadline reminder** (`server/repositories/notifications.ts`, `dataconnect/bondcircle/queries.gql`). Classification: **FAIL** at `7e5957d`/`e3791dd`.
+2. **A concurrent circle completion skips another circle's deadline reminder** (`server/repositories/notifications.ts`, `dataconnect/bondcircle/queries.gql`). Classification: **FAIL** at `7e5957d`/`e3791dd`, then **PASS** for the bounded correction at `566d05bddebfc8aa1fb656e3d6c435786db6638a`.
    - What this is: The job requests 200 active deadline candidates at a time, ordered by ID, and uses the number already processed as its next offset.
    - Problem: The eligible query result changes when a creator completes a circle. In a 401-circle execution of the actual repository function, completing the first circle during the first page left 400 eligible circles and a reported 400 processed, but eligible `circle-0200` was never visited. A circle whose deadline is today can miss the daily reminder entirely.
-   - Fix: Traverse with a stable keyset cursor instead of an offset into the changing eligible set. Keep the 501-circle regression and add the concurrent-removal case.
+   - Correction: Traverse by the last UUID with a null initial cursor. The server-only `NO_ACCESS` query binds the date and cursor as SQL parameters, filters eligible states, and orders by UUID; SQL result rows are validated before use. This preserves traversal when earlier rows leave the eligible set and includes the zero UUID.
+   - Independent retest: **3 passed, zero failed/skipped/cancelled**, 2,619.227 ms: 501 normal candidates, 401 candidates with concurrent completion, and malformed SQL rows failing closed. The real Data Connect SQL/UUID test is assigned to Agent H and is not claimed as executed here.
    - If skipped: Successful job counts can conceal missing reminders during ordinary concurrent circle activity.
-
-## Review cycle and resolved finding
 
 1. **A consumed registration OTP still changed the account before rejection.** Classification: **FAIL** at `6515511`, then **PASS** for the bounded correction in web `7e5957d` and native `e3791dd`.
    - The exact original web handler returned 409 only after `updateUser`, `setCustomUserClaims`, `persistUserProfile` and `createCustomToken`. Replaying a spent registration proof could restore stale profile or consent values despite its rejection.
@@ -27,8 +26,8 @@ Reviewer: Agent A, a non-author of these product changes, using the actual insta
 
 The snapshot tests redirect only TypeScript and Sharp imports to the already installed desktop libraries. TypeScript executes the committed production modules with controlled dependencies; this is module-level verification. The Sharp error-redaction check uses the existing library and does not validate the newly patched native codecs. No build, emulator, production data, actual device or external email was used for this review.
 
-Local raw evidence is retained under `TEMP/bondcircle-security-review-1793318718095/`: `review-tests.json`, `review-followup-tests.json`, and `deadline-concurrency-repro-result.json`, with the reproduction at `tests/unit/deadline-concurrency-repro.test.mjs`. Keep these records before cleanup. The parent owns central-ledger integration.
+Local raw evidence is retained under `TEMP/bondcircle-security-review-1793318718095/`: `review-tests.json`, `review-followup-tests.json`, and `deadline-concurrency-repro-result.json`, `review-cursor-tests.json`, with the reproduction at `tests/unit/deadline-concurrency-repro.test.mjs`. Keep these records before cleanup. The parent owns central-ledger integration.
 
-Verdict: fix finding 2 before accepting this combined change.
+Verdict: **PASS** for the bounded reviewed source and module-level regressions at `6515511` with corrections `7e5957d`, `e3791dd` and `566d05b`. Both reported defects are corrected; release-wide and provider acceptance remain separate gates.
 
 Not checked: final integrated build/dependency install, real Data Connect CAS concurrency, production schema deployment, browser/device authentication, SMTP provider delivery or complete native API acceptance. Those remain separate release gates; this review does not declare the product production-ready.
