@@ -1,6 +1,100 @@
-const { getCurrentUserRef, getRecentAbuseAttemptsRef, recordAbuseAttemptRef, getConsumedAuthChallengeRef, consumeAuthChallengeRef, upsertCurrentUserRef, getDashboardCirclesRef, getCircleEngineRecordRef, getCircleLifecycleSummaryRef, findUserByEmailRef, getGiftCircleDetailRef, getCircleAuditEntriesRef, createCircleDraftRef, createModelPricedCircleDraftRef, getCreatorTrialUsageRef, claimTrialAndPublishCircleRef, getCirclePricingStateRef, createCircleActivationAttemptRef, failCircleActivationAttemptRef, completePaidCircleActivationRef, completeCirclePlanUpgradeRef, updateCircleConfigurationWithAuditRef, updateModelPricedCircleConfigurationWithAuditRef, transitionCircleWithAuditRef, setCircleCompletionTypeWithAuditRef, addCircleMemberWithAuditRef, configureGiftCircleRef, setGiftMemberAllocationRef, getAsoEbiCircleDetailRef, configureAsoEbiCircleRef, createAsoEbiTierRef, selectAsoEbiTierRef, updateAsoEbiFulfilmentRef, getSupportCircleDetailRef, configureSupportCircleRef, recordSupportPledgeRef, setSupportMemberAllocationRef, createSupportUpdateRef, setSupportCompletionTypeRef, getInvitationByTokenHashRef, getCircleInvitationsRef, getInvitationAcceptancesRef, createInvitationRef, updateInvitationStateRef, acceptInvitationWithMembershipRef, requestInvitationApprovalRef, getContributionWorkspaceRef, submitReceiptWithAuditRef, replaceReceiptWithAuditRef, reviewReceiptWithAuditRef, approveInvitationMembershipRef, declineInvitationRef, requestReplacementInvitationRef, getCircleCommunicationRef, getRecentCommentsByAuthorRef, getOpenCommentReportsByReporterRef, getActivityLogsForCirclesRef, createAnnouncementWithActivityRef, updateAnnouncementWithAuditRef, deleteAnnouncementWithAuditRef, setCircleCommentsWithAuditRef, createCommentWithActivityRef, deleteOwnCommentWithAuditRef, moderateCommentWithAuditRef, reportCommentWithAuditRef, recordSystemActivityRef, getUserNotificationsRef, getNotificationContextRef, getNotificationDedupeRef, getRecentReminderNotificationsRef, findNotificationRecipientByEmailRef, getDeadlineNotificationCandidatesRef, getUserDeadlineNotificationCandidatesRef, createNotificationRef, markNotificationReadRef, dismissNotificationRef, markAllNotificationsReadRef, updateNotificationPreferencesRef, setCircleNotificationMuteRef, createEmailDeliveryRef, getRetentionCandidatesRef, getCircleRetentionPayloadRef, getStoragePathReferencesRef, createRetentionPurgeAttemptRef, completeRetentionPurgeAttemptRef, purgeInvitationAcceptancesRef, purgeCircleSensitiveDataRef, getOwnerAdministratorRef, getUserAccountStatusRef, getUserBootstrapProfileRef, getOwnerPlatformOverviewRef, getOwnerReportReviewRef, getOwnerUserByIdentifierRef, getOwnerOperationalExportRef, recordOperationalEventRef, recordOwnerAdminAuditRef, resolveOwnerCommentReportRef, dismissOwnerCommentReportRef, suspendOwnerTargetUserRef, revokeCompromisedInvitationRef, getOwnerInvitationRef, provisionOwnerAccountRef, provisionOwnerAdministratorRef, connectorConfig } = require('../index.cjs.js');
+const { getAccountExportPageRef, getAccountPrivacyRequestsRef, createAccountPrivacyRequestRef, getOwnerPrivacyRequestsRef, acknowledgeAccountPrivacyRequestRef, getCircleCommunicationContextRef, getCircleAnnouncementsPageRef, getCircleCommentsPageRef, getCircleCommentReportsPageRef, getSupportUpdatesPageRef, getUserDeviceRegistrationsRef, registerDeviceRegistrationRef, deleteDeviceRegistrationRef, deleteUserDeviceRegistrationsRef, getCurrentUserRef, getRecentAbuseAttemptsRef, recordAbuseAttemptRef, getConsumedAuthChallengeRef, consumeAuthChallengeRef, upsertCurrentUserRef, getDashboardCirclesRef, getDashboardCirclesForUserRef, getCircleEngineRecordRef, getCircleLifecycleSummaryRef, findUserByEmailRef, getGiftCircleDetailRef, getCircleAuditEntriesRef, createCircleDraftRef, createModelPricedCircleDraftRef, getCreatorTrialUsageRef, claimTrialAndPublishCircleRef, getCirclePricingStateRef, getCirclePaymentCheckoutRef, getCircleActivationAttemptRef, saveCirclePaymentCheckoutRef, createCircleActivationAttemptRef, failCircleActivationAttemptRef, completePaidCircleActivationRef, completeCirclePlanUpgradeRef, updateCircleConfigurationWithAuditRef, updateModelPricedCircleConfigurationWithAuditRef, transitionCircleWithAuditRef, setCircleCompletionTypeWithAuditRef, addCircleMemberWithAuditRef, configureGiftCircleRef, setGiftMemberAllocationRef, getAsoEbiCircleDetailRef, configureAsoEbiCircleRef, createAsoEbiTierRef, selectAsoEbiTierRef, updateAsoEbiFulfilmentRef, getSupportCircleDetailRef, configureSupportCircleRef, recordSupportPledgeRef, setSupportMemberAllocationRef, createSupportUpdateRef, setSupportCompletionTypeRef, getInvitationByTokenHashRef, getCircleInvitationsRef, getInvitationAcceptancesRef, createInvitationRef, updateInvitationStateRef, acceptInvitationWithMembershipRef, requestInvitationApprovalRef, getContributionWorkspaceRef, submitReceiptWithAuditRef, replaceReceiptWithAuditRef, reviewReceiptWithAuditRef, approveInvitationMembershipRef, declineInvitationRef, requestReplacementInvitationRef, getCircleCommunicationRef, getRecentCommentsByAuthorRef, getOpenCommentReportsByReporterRef, getActivityLogsForCirclesRef, createAnnouncementWithActivityRef, updateAnnouncementWithAuditRef, deleteAnnouncementWithAuditRef, setCircleCommentsWithAuditRef, createCommentWithActivityRef, deleteOwnCommentWithAuditRef, moderateCommentWithAuditRef, reportCommentWithAuditRef, recordSystemActivityRef, getUserNotificationsRef, getNotificationContextRef, getNotificationDedupeRef, getRecentReminderNotificationsRef, findNotificationRecipientByEmailRef, getDeadlineNotificationCandidatesRef, getUserDeadlineNotificationCandidatesRef, createNotificationRef, markNotificationReadRef, dismissNotificationRef, markAllNotificationsReadRef, updateNotificationPreferencesRef, setCircleNotificationMuteRef, createEmailDeliveryRef, getRetentionCandidatesRef, getCircleRetentionPayloadRef, getStoragePathReferencesRef, createRetentionPurgeAttemptRef, completeRetentionPurgeAttemptRef, purgeInvitationAcceptancesRef, purgeCircleSensitiveDataRef, getOwnerAdministratorRef, getUserAccountStatusRef, getUserBootstrapProfileRef, getOwnerPlatformOverviewRef, getOwnerReportReviewRef, getOwnerUserByIdentifierRef, getOwnerOperationalExportRef, recordOperationalEventRef, recordOwnerAdminAuditRef, resolveOwnerCommentReportRef, dismissOwnerCommentReportRef, suspendOwnerTargetUserRef, revokeCompromisedInvitationRef, getOwnerInvitationRef, provisionOwnerAccountRef, provisionOwnerAdministratorRef, getRateLimitBucketRef, createRateLimitBucketRef, compareAndSetRateLimitBucketRef, getCircleRetentionStateRef, getCircleRetentionPageRef, getRetentionExternalStorageReferencesRef, getContributionWorkspaceMetadataRef, getContributionReceiptsPageRef, getCircleInvitationsPageRef, getInvitationAcceptancesPageRef, getCircleActivationsPageRef, getCircleInvitationAcceptancesPageRef, connectorConfig } = require('../index.cjs.js');
 const { validateArgs, CallerSdkTypeEnum } = require('firebase/data-connect');
 const { useDataConnectQuery, useDataConnectMutation, validateReactArgs } = require('@tanstack-query-firebase/react/data-connect');
+
+
+exports.useGetAccountExportPage = function useGetAccountExportPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getAccountExportPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetAccountPrivacyRequests = function useGetAccountPrivacyRequests(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getAccountPrivacyRequestsRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+exports.useCreateAccountPrivacyRequest = function useCreateAccountPrivacyRequest(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return createAccountPrivacyRequestRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+exports.useGetOwnerPrivacyRequests = function useGetOwnerPrivacyRequests(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getOwnerPrivacyRequestsRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+exports.useAcknowledgeAccountPrivacyRequest = function useAcknowledgeAccountPrivacyRequest(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return acknowledgeAccountPrivacyRequestRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+exports.useGetCircleCommunicationContext = function useGetCircleCommunicationContext(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleCommunicationContextRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleAnnouncementsPage = function useGetCircleAnnouncementsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleAnnouncementsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleCommentsPage = function useGetCircleCommentsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleCommentsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleCommentReportsPage = function useGetCircleCommentReportsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleCommentReportsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetSupportUpdatesPage = function useGetSupportUpdatesPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getSupportUpdatesPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetUserDeviceRegistrations = function useGetUserDeviceRegistrations(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getUserDeviceRegistrationsRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+exports.useRegisterDeviceRegistration = function useRegisterDeviceRegistration(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return registerDeviceRegistrationRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useDeleteDeviceRegistration = function useDeleteDeviceRegistration(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return deleteDeviceRegistrationRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useDeleteUserDeviceRegistrations = function useDeleteUserDeviceRegistrations(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return deleteUserDeviceRegistrationsRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
 
 
 exports.useGetCurrentUser = function useGetCurrentUser(dcOrOptions, options) {
@@ -48,6 +142,12 @@ exports.useUpsertCurrentUser = function useUpsertCurrentUser(dcOrOptions, option
 exports.useGetDashboardCircles = function useGetDashboardCircles(dcOrOptions, options) {
   const { dc: dcInstance, options: inputOpts } = validateReactArgs(connectorConfig, dcOrOptions, options);
   const ref = getDashboardCirclesRef(dcInstance);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetDashboardCirclesForUser = function useGetDashboardCirclesForUser(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getDashboardCirclesForUserRef(dcInstance, inputVars);
   return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
@@ -116,6 +216,26 @@ exports.useGetCirclePricingState = function useGetCirclePricingState(dcOrVars, v
   const ref = getCirclePricingStateRef(dcInstance, inputVars);
   return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
+
+exports.useGetCirclePaymentCheckout = function useGetCirclePaymentCheckout(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCirclePaymentCheckoutRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleActivationAttempt = function useGetCircleActivationAttempt(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleActivationAttemptRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+exports.useSaveCirclePaymentCheckout = function useSaveCirclePaymentCheckout(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return saveCirclePaymentCheckoutRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
 exports.useCreateCircleActivationAttempt = function useCreateCircleActivationAttempt(dcOrOptions, options) {
   const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
@@ -746,4 +866,81 @@ exports.useProvisionOwnerAdministrator = function useProvisionOwnerAdministrator
     return provisionOwnerAdministratorRef(dcInstance, vars);
   }
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+exports.useGetRateLimitBucket = function useGetRateLimitBucket(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getRateLimitBucketRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+exports.useCreateRateLimitBucket = function useCreateRateLimitBucket(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return createRateLimitBucketRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useCompareAndSetRateLimitBucket = function useCompareAndSetRateLimitBucket(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return compareAndSetRateLimitBucketRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+
+exports.useGetCircleRetentionState = function useGetCircleRetentionState(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleRetentionStateRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleRetentionPage = function useGetCircleRetentionPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleRetentionPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetRetentionExternalStorageReferences = function useGetRetentionExternalStorageReferences(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getRetentionExternalStorageReferencesRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetContributionWorkspaceMetadata = function useGetContributionWorkspaceMetadata(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getContributionWorkspaceMetadataRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetContributionReceiptsPage = function useGetContributionReceiptsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getContributionReceiptsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleInvitationsPage = function useGetCircleInvitationsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleInvitationsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetInvitationAcceptancesPage = function useGetInvitationAcceptancesPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getInvitationAcceptancesPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleActivationsPage = function useGetCircleActivationsPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleActivationsPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetCircleInvitationAcceptancesPage = function useGetCircleInvitationAcceptancesPage(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getCircleInvitationAcceptancesPageRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }

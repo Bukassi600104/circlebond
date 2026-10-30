@@ -17,10 +17,20 @@ You can also follow the instructions from the [Data Connect documentation](https
 - [**Accessing the connector**](#accessing-the-connector)
   - [*Connecting to the local Emulator*](#connecting-to-the-local-emulator)
 - [**Queries**](#queries)
+  - [*GetAccountExportPage*](#getaccountexportpage)
+  - [*GetAccountPrivacyRequests*](#getaccountprivacyrequests)
+  - [*GetOwnerPrivacyRequests*](#getownerprivacyrequests)
+  - [*GetCircleCommunicationContext*](#getcirclecommunicationcontext)
+  - [*GetCircleAnnouncementsPage*](#getcircleannouncementspage)
+  - [*GetCircleCommentsPage*](#getcirclecommentspage)
+  - [*GetCircleCommentReportsPage*](#getcirclecommentreportspage)
+  - [*GetSupportUpdatesPage*](#getsupportupdatespage)
+  - [*GetUserDeviceRegistrations*](#getuserdeviceregistrations)
   - [*GetCurrentUser*](#getcurrentuser)
   - [*GetRecentAbuseAttempts*](#getrecentabuseattempts)
   - [*GetConsumedAuthChallenge*](#getconsumedauthchallenge)
   - [*GetDashboardCircles*](#getdashboardcircles)
+  - [*GetDashboardCirclesForUser*](#getdashboardcirclesforuser)
   - [*GetCircleEngineRecord*](#getcircleenginerecord)
   - [*GetCircleLifecycleSummary*](#getcirclelifecyclesummary)
   - [*FindUserByEmail*](#finduserbyemail)
@@ -28,6 +38,8 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetCircleAuditEntries*](#getcircleauditentries)
   - [*GetCreatorTrialUsage*](#getcreatortrialusage)
   - [*GetCirclePricingState*](#getcirclepricingstate)
+  - [*GetCirclePaymentCheckout*](#getcirclepaymentcheckout)
+  - [*GetCircleActivationAttempt*](#getcircleactivationattempt)
   - [*GetAsoEbiCircleDetail*](#getasoebicircledetail)
   - [*GetSupportCircleDetail*](#getsupportcircledetail)
   - [*GetInvitationByTokenHash*](#getinvitationbytokenhash)
@@ -56,13 +68,29 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*GetOwnerUserByIdentifier*](#getowneruserbyidentifier)
   - [*GetOwnerOperationalExport*](#getowneroperationalexport)
   - [*GetOwnerInvitation*](#getownerinvitation)
+  - [*GetRateLimitBucket*](#getratelimitbucket)
+  - [*GetCircleRetentionState*](#getcircleretentionstate)
+  - [*GetCircleRetentionPage*](#getcircleretentionpage)
+  - [*GetRetentionExternalStorageReferences*](#getretentionexternalstoragereferences)
+  - [*GetContributionWorkspaceMetadata*](#getcontributionworkspacemetadata)
+  - [*GetContributionReceiptsPage*](#getcontributionreceiptspage)
+  - [*GetCircleInvitationsPage*](#getcircleinvitationspage)
+  - [*GetInvitationAcceptancesPage*](#getinvitationacceptancespage)
+  - [*GetCircleActivationsPage*](#getcircleactivationspage)
+  - [*GetCircleInvitationAcceptancesPage*](#getcircleinvitationacceptancespage)
 - [**Mutations**](#mutations)
+  - [*CreateAccountPrivacyRequest*](#createaccountprivacyrequest)
+  - [*AcknowledgeAccountPrivacyRequest*](#acknowledgeaccountprivacyrequest)
+  - [*RegisterDeviceRegistration*](#registerdeviceregistration)
+  - [*DeleteDeviceRegistration*](#deletedeviceregistration)
+  - [*DeleteUserDeviceRegistrations*](#deleteuserdeviceregistrations)
   - [*RecordAbuseAttempt*](#recordabuseattempt)
   - [*ConsumeAuthChallenge*](#consumeauthchallenge)
   - [*UpsertCurrentUser*](#upsertcurrentuser)
   - [*CreateCircleDraft*](#createcircledraft)
   - [*CreateModelPricedCircleDraft*](#createmodelpricedcircledraft)
   - [*ClaimTrialAndPublishCircle*](#claimtrialandpublishcircle)
+  - [*SaveCirclePaymentCheckout*](#savecirclepaymentcheckout)
   - [*CreateCircleActivationAttempt*](#createcircleactivationattempt)
   - [*FailCircleActivationAttempt*](#failcircleactivationattempt)
   - [*CompletePaidCircleActivation*](#completepaidcircleactivation)
@@ -121,6 +149,8 @@ You can also follow the instructions from the [Data Connect documentation](https
   - [*RevokeCompromisedInvitation*](#revokecompromisedinvitation)
   - [*ProvisionOwnerAccount*](#provisionowneraccount)
   - [*ProvisionOwnerAdministrator*](#provisionowneradministrator)
+  - [*CreateRateLimitBucket*](#createratelimitbucket)
+  - [*CompareAndSetRateLimitBucket*](#compareandsetratelimitbucket)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `bondcircle`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -211,6 +241,976 @@ Here's a general overview of how to use the generated Query hooks in your code:
   - ***Special case:***  If the Query has all optional variables and you would like to provide an `options` argument to the Query hook function without providing any variables, you must pass `undefined` where you would normally pass the Query's variables, and then may provide the `options` argument.
 
 Below are examples of how to use the `bondcircle` connector's generated Query hook functions to execute each Query. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#operations-react-angular).
+
+## GetAccountExportPage
+You can execute the `GetAccountExportPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetAccountExportPage(dc: DataConnect, vars: GetAccountExportPageVariables, options?: useDataConnectQueryOptions<GetAccountExportPageData>): UseDataConnectQueryResult<GetAccountExportPageData, GetAccountExportPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetAccountExportPage(vars: GetAccountExportPageVariables, options?: useDataConnectQueryOptions<GetAccountExportPageData>): UseDataConnectQueryResult<GetAccountExportPageData, GetAccountExportPageVariables>;
+```
+
+### Variables
+The `GetAccountExportPage` Query requires an argument of type `GetAccountExportPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetAccountExportPageVariables {
+  userId: string;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetAccountExportPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetAccountExportPage` Query is of type `GetAccountExportPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetAccountExportPageData {
+  user?: {
+    id: string;
+    displayName: string;
+    email?: string | null;
+    phone?: string | null;
+    profileImage?: string | null;
+    termsAcceptedAt?: TimestampString | null;
+    privacyAcceptedAt?: TimestampString | null;
+    emailNotifications: boolean;
+    browserPushNotifications: boolean;
+    commentNotifications: boolean;
+    contributionReminders: boolean;
+    circleUpdateNotifications: boolean;
+    marketingCommunication: boolean;
+    accountStatus: string;
+    createdAt: TimestampString;
+  } & User_Key;
+  memberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    pledgedAmount: number;
+    confirmedAmount: number;
+    fulfilmentStatus: string;
+    notificationsMuted: boolean;
+    joinedAt: TimestampString;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      status: string;
+    } & Circle_Key;
+  })[];
+  receipts: ({
+    id: UUIDString;
+    amount: number;
+    note?: string | null;
+    status: string;
+    overpaymentAmount: number;
+    rejectionReason?: string | null;
+    submittedAt: TimestampString;
+    reviewedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Receipt_Key)[];
+  comments: ({
+    id: UUIDString;
+    body: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Comment_Key)[];
+  announcements: ({
+    id: UUIDString;
+    title: string;
+    body: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Announcement_Key)[];
+  supportUpdates: ({
+    id: UUIDString;
+    body: string;
+    createdAt: TimestampString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & SupportUpdate_Key)[];
+  notifications: ({
+    id: UUIDString;
+    type: string;
+    title: string;
+    body: string;
+    readAt?: TimestampString | null;
+    dismissedAt?: TimestampString | null;
+    createdAt: TimestampString;
+  } & Notification_Key)[];
+  activations: ({
+    id: UUIDString;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+    activatedAt?: TimestampString | null;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & CircleActivation_Key)[];
+  authEvents: ({
+    id: UUIDString;
+    event: string;
+    channel?: string | null;
+    outcome: string;
+    occurredAt: TimestampString;
+  } & AuthAuditEvent_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetAccountExportPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetAccountExportPageVariables } from '@bondcircle/dataconnect';
+import { useGetAccountExportPage } from '@bondcircle/dataconnect/react'
+
+export default function GetAccountExportPageComponent() {
+  // The `useGetAccountExportPage` Query hook requires an argument of type `GetAccountExportPageVariables`:
+  const getAccountExportPageVars: GetAccountExportPageVariables = {
+    userId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetAccountExportPage(getAccountExportPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetAccountExportPage({ userId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetAccountExportPage(dataConnect, getAccountExportPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAccountExportPage(getAccountExportPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAccountExportPage(dataConnect, getAccountExportPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.user);
+    console.log(query.data.memberships);
+    console.log(query.data.receipts);
+    console.log(query.data.comments);
+    console.log(query.data.announcements);
+    console.log(query.data.supportUpdates);
+    console.log(query.data.notifications);
+    console.log(query.data.activations);
+    console.log(query.data.authEvents);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetAccountPrivacyRequests
+You can execute the `GetAccountPrivacyRequests` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetAccountPrivacyRequests(dc: DataConnect, vars: GetAccountPrivacyRequestsVariables, options?: useDataConnectQueryOptions<GetAccountPrivacyRequestsData>): UseDataConnectQueryResult<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetAccountPrivacyRequests(vars: GetAccountPrivacyRequestsVariables, options?: useDataConnectQueryOptions<GetAccountPrivacyRequestsData>): UseDataConnectQueryResult<GetAccountPrivacyRequestsData, GetAccountPrivacyRequestsVariables>;
+```
+
+### Variables
+The `GetAccountPrivacyRequests` Query requires an argument of type `GetAccountPrivacyRequestsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetAccountPrivacyRequestsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetAccountPrivacyRequests` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetAccountPrivacyRequests` Query is of type `GetAccountPrivacyRequestsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetAccountPrivacyRequestsData {
+  accountPrivacyRequests: ({
+    id: string;
+    kind: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & AccountPrivacyRequest_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetAccountPrivacyRequests`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetAccountPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+import { useGetAccountPrivacyRequests } from '@bondcircle/dataconnect/react'
+
+export default function GetAccountPrivacyRequestsComponent() {
+  // The `useGetAccountPrivacyRequests` Query hook requires an argument of type `GetAccountPrivacyRequestsVariables`:
+  const getAccountPrivacyRequestsVars: GetAccountPrivacyRequestsVariables = {
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetAccountPrivacyRequests(getAccountPrivacyRequestsVars);
+  // Variables can be defined inline as well.
+  const query = useGetAccountPrivacyRequests({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetAccountPrivacyRequests(dataConnect, getAccountPrivacyRequestsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAccountPrivacyRequests(getAccountPrivacyRequestsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetAccountPrivacyRequests(dataConnect, getAccountPrivacyRequestsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.accountPrivacyRequests);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetOwnerPrivacyRequests
+You can execute the `GetOwnerPrivacyRequests` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetOwnerPrivacyRequests(dc: DataConnect, vars: GetOwnerPrivacyRequestsVariables, options?: useDataConnectQueryOptions<GetOwnerPrivacyRequestsData>): UseDataConnectQueryResult<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetOwnerPrivacyRequests(vars: GetOwnerPrivacyRequestsVariables, options?: useDataConnectQueryOptions<GetOwnerPrivacyRequestsData>): UseDataConnectQueryResult<GetOwnerPrivacyRequestsData, GetOwnerPrivacyRequestsVariables>;
+```
+
+### Variables
+The `GetOwnerPrivacyRequests` Query requires an argument of type `GetOwnerPrivacyRequestsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetOwnerPrivacyRequestsVariables {
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetOwnerPrivacyRequests` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetOwnerPrivacyRequests` Query is of type `GetOwnerPrivacyRequestsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetOwnerPrivacyRequestsData {
+  accountPrivacyRequests: ({
+    id: string;
+    kind: string;
+    status: string;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+    } & User_Key;
+  } & AccountPrivacyRequest_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetOwnerPrivacyRequests`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetOwnerPrivacyRequestsVariables } from '@bondcircle/dataconnect';
+import { useGetOwnerPrivacyRequests } from '@bondcircle/dataconnect/react'
+
+export default function GetOwnerPrivacyRequestsComponent() {
+  // The `useGetOwnerPrivacyRequests` Query hook requires an argument of type `GetOwnerPrivacyRequestsVariables`:
+  const getOwnerPrivacyRequestsVars: GetOwnerPrivacyRequestsVariables = {
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetOwnerPrivacyRequests(getOwnerPrivacyRequestsVars);
+  // Variables can be defined inline as well.
+  const query = useGetOwnerPrivacyRequests({ offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetOwnerPrivacyRequests(dataConnect, getOwnerPrivacyRequestsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerPrivacyRequests(getOwnerPrivacyRequestsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetOwnerPrivacyRequests(dataConnect, getOwnerPrivacyRequestsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.accountPrivacyRequests);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleCommunicationContext
+You can execute the `GetCircleCommunicationContext` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleCommunicationContext(dc: DataConnect, vars: GetCircleCommunicationContextVariables, options?: useDataConnectQueryOptions<GetCircleCommunicationContextData>): UseDataConnectQueryResult<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleCommunicationContext(vars: GetCircleCommunicationContextVariables, options?: useDataConnectQueryOptions<GetCircleCommunicationContextData>): UseDataConnectQueryResult<GetCircleCommunicationContextData, GetCircleCommunicationContextVariables>;
+```
+
+### Variables
+The `GetCircleCommunicationContext` Query requires an argument of type `GetCircleCommunicationContextVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleCommunicationContextVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleCommunicationContext` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleCommunicationContext` Query is of type `GetCircleCommunicationContextData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleCommunicationContextData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    status: string;
+    commentsEnabled: boolean;
+    memberLimit: number;
+    pricingPlan: string;
+    pricingModelVersion: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+  activityLogs: ({
+    id: UUIDString;
+    eventType: string;
+    entityId: string;
+    metadata: string;
+    createdAt: TimestampString;
+    actor?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & ActivityLog_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleCommunicationContext`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleCommunicationContextVariables } from '@bondcircle/dataconnect';
+import { useGetCircleCommunicationContext } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleCommunicationContextComponent() {
+  // The `useGetCircleCommunicationContext` Query hook requires an argument of type `GetCircleCommunicationContextVariables`:
+  const getCircleCommunicationContextVars: GetCircleCommunicationContextVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleCommunicationContext(getCircleCommunicationContextVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleCommunicationContext({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleCommunicationContext(dataConnect, getCircleCommunicationContextVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommunicationContext(getCircleCommunicationContextVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommunicationContext(dataConnect, getCircleCommunicationContextVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.activityLogs);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleAnnouncementsPage
+You can execute the `GetCircleAnnouncementsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleAnnouncementsPage(dc: DataConnect, vars: GetCircleAnnouncementsPageVariables, options?: useDataConnectQueryOptions<GetCircleAnnouncementsPageData>): UseDataConnectQueryResult<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleAnnouncementsPage(vars: GetCircleAnnouncementsPageVariables, options?: useDataConnectQueryOptions<GetCircleAnnouncementsPageData>): UseDataConnectQueryResult<GetCircleAnnouncementsPageData, GetCircleAnnouncementsPageVariables>;
+```
+
+### Variables
+The `GetCircleAnnouncementsPage` Query requires an argument of type `GetCircleAnnouncementsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleAnnouncementsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleAnnouncementsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleAnnouncementsPage` Query is of type `GetCircleAnnouncementsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleAnnouncementsPageData {
+  announcements: ({
+    id: UUIDString;
+    title: string;
+    body: string;
+    pinned: boolean;
+    important: boolean;
+    commentsEnabled: boolean;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Announcement_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleAnnouncementsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleAnnouncementsPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleAnnouncementsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleAnnouncementsPageComponent() {
+  // The `useGetCircleAnnouncementsPage` Query hook requires an argument of type `GetCircleAnnouncementsPageVariables`:
+  const getCircleAnnouncementsPageVars: GetCircleAnnouncementsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleAnnouncementsPage(getCircleAnnouncementsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleAnnouncementsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleAnnouncementsPage(dataConnect, getCircleAnnouncementsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleAnnouncementsPage(getCircleAnnouncementsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleAnnouncementsPage(dataConnect, getCircleAnnouncementsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.announcements);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleCommentsPage
+You can execute the `GetCircleCommentsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleCommentsPage(dc: DataConnect, vars: GetCircleCommentsPageVariables, options?: useDataConnectQueryOptions<GetCircleCommentsPageData>): UseDataConnectQueryResult<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleCommentsPage(vars: GetCircleCommentsPageVariables, options?: useDataConnectQueryOptions<GetCircleCommentsPageData>): UseDataConnectQueryResult<GetCircleCommentsPageData, GetCircleCommentsPageVariables>;
+```
+
+### Variables
+The `GetCircleCommentsPage` Query requires an argument of type `GetCircleCommentsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleCommentsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleCommentsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleCommentsPage` Query is of type `GetCircleCommentsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleCommentsPageData {
+  comments: ({
+    id: UUIDString;
+    announcementId?: UUIDString | null;
+    parentCommentId?: UUIDString | null;
+    body: string;
+    status: string;
+    deletionReason?: string | null;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+    deletedAt?: TimestampString | null;
+    author: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  } & Comment_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleCommentsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleCommentsPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleCommentsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleCommentsPageComponent() {
+  // The `useGetCircleCommentsPage` Query hook requires an argument of type `GetCircleCommentsPageVariables`:
+  const getCircleCommentsPageVars: GetCircleCommentsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleCommentsPage(getCircleCommentsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleCommentsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleCommentsPage(dataConnect, getCircleCommentsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommentsPage(getCircleCommentsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommentsPage(dataConnect, getCircleCommentsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.comments);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleCommentReportsPage
+You can execute the `GetCircleCommentReportsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleCommentReportsPage(dc: DataConnect, vars: GetCircleCommentReportsPageVariables, options?: useDataConnectQueryOptions<GetCircleCommentReportsPageData>): UseDataConnectQueryResult<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleCommentReportsPage(vars: GetCircleCommentReportsPageVariables, options?: useDataConnectQueryOptions<GetCircleCommentReportsPageData>): UseDataConnectQueryResult<GetCircleCommentReportsPageData, GetCircleCommentReportsPageVariables>;
+```
+
+### Variables
+The `GetCircleCommentReportsPage` Query requires an argument of type `GetCircleCommentReportsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleCommentReportsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleCommentReportsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleCommentReportsPage` Query is of type `GetCircleCommentReportsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleCommentReportsPageData {
+  commentReports: ({
+    id: UUIDString;
+    reason: string;
+    status: string;
+    createdAt: TimestampString;
+    comment: {
+      id: UUIDString;
+    } & Comment_Key;
+    reporter: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & CommentReport_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleCommentReportsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleCommentReportsPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleCommentReportsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleCommentReportsPageComponent() {
+  // The `useGetCircleCommentReportsPage` Query hook requires an argument of type `GetCircleCommentReportsPageVariables`:
+  const getCircleCommentReportsPageVars: GetCircleCommentReportsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleCommentReportsPage(getCircleCommentReportsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleCommentReportsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleCommentReportsPage(dataConnect, getCircleCommentReportsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommentReportsPage(getCircleCommentReportsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleCommentReportsPage(dataConnect, getCircleCommentReportsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.commentReports);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetSupportUpdatesPage
+You can execute the `GetSupportUpdatesPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetSupportUpdatesPage(dc: DataConnect, vars: GetSupportUpdatesPageVariables, options?: useDataConnectQueryOptions<GetSupportUpdatesPageData>): UseDataConnectQueryResult<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetSupportUpdatesPage(vars: GetSupportUpdatesPageVariables, options?: useDataConnectQueryOptions<GetSupportUpdatesPageData>): UseDataConnectQueryResult<GetSupportUpdatesPageData, GetSupportUpdatesPageVariables>;
+```
+
+### Variables
+The `GetSupportUpdatesPage` Query requires an argument of type `GetSupportUpdatesPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetSupportUpdatesPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetSupportUpdatesPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetSupportUpdatesPage` Query is of type `GetSupportUpdatesPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetSupportUpdatesPageData {
+  supportUpdates: ({
+    id: UUIDString;
+    body: string;
+    createdAt: TimestampString;
+    author: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & SupportUpdate_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetSupportUpdatesPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetSupportUpdatesPageVariables } from '@bondcircle/dataconnect';
+import { useGetSupportUpdatesPage } from '@bondcircle/dataconnect/react'
+
+export default function GetSupportUpdatesPageComponent() {
+  // The `useGetSupportUpdatesPage` Query hook requires an argument of type `GetSupportUpdatesPageVariables`:
+  const getSupportUpdatesPageVars: GetSupportUpdatesPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetSupportUpdatesPage(getSupportUpdatesPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetSupportUpdatesPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetSupportUpdatesPage(dataConnect, getSupportUpdatesPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetSupportUpdatesPage(getSupportUpdatesPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetSupportUpdatesPage(dataConnect, getSupportUpdatesPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.supportUpdates);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetUserDeviceRegistrations
+You can execute the `GetUserDeviceRegistrations` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetUserDeviceRegistrations(dc: DataConnect, vars: GetUserDeviceRegistrationsVariables, options?: useDataConnectQueryOptions<GetUserDeviceRegistrationsData>): UseDataConnectQueryResult<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetUserDeviceRegistrations(vars: GetUserDeviceRegistrationsVariables, options?: useDataConnectQueryOptions<GetUserDeviceRegistrationsData>): UseDataConnectQueryResult<GetUserDeviceRegistrationsData, GetUserDeviceRegistrationsVariables>;
+```
+
+### Variables
+The `GetUserDeviceRegistrations` Query requires an argument of type `GetUserDeviceRegistrationsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetUserDeviceRegistrationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `GetUserDeviceRegistrations` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetUserDeviceRegistrations` Query is of type `GetUserDeviceRegistrationsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetUserDeviceRegistrationsData {
+  deviceRegistrations: ({
+    platform: string;
+    updatedAt: TimestampString;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetUserDeviceRegistrations`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+import { useGetUserDeviceRegistrations } from '@bondcircle/dataconnect/react'
+
+export default function GetUserDeviceRegistrationsComponent() {
+  // The `useGetUserDeviceRegistrations` Query hook requires an argument of type `GetUserDeviceRegistrationsVariables`:
+  const getUserDeviceRegistrationsVars: GetUserDeviceRegistrationsVariables = {
+    userId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetUserDeviceRegistrations(getUserDeviceRegistrationsVars);
+  // Variables can be defined inline as well.
+  const query = useGetUserDeviceRegistrations({ userId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetUserDeviceRegistrations(dataConnect, getUserDeviceRegistrationsVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserDeviceRegistrations(getUserDeviceRegistrationsVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetUserDeviceRegistrations(dataConnect, getUserDeviceRegistrationsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.deviceRegistrations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
 
 ## GetCurrentUser
 You can execute the `GetCurrentUser` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
@@ -538,6 +1538,116 @@ export default function GetDashboardCirclesComponent() {
   const dataConnect = getDataConnect(connectorConfig);
   const options = { staleTime: 5 * 1000 };
   const query = useGetDashboardCircles(dataConnect, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetDashboardCirclesForUser
+You can execute the `GetDashboardCirclesForUser` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetDashboardCirclesForUser(dc: DataConnect, vars: GetDashboardCirclesForUserVariables, options?: useDataConnectQueryOptions<GetDashboardCirclesForUserData>): UseDataConnectQueryResult<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetDashboardCirclesForUser(vars: GetDashboardCirclesForUserVariables, options?: useDataConnectQueryOptions<GetDashboardCirclesForUserData>): UseDataConnectQueryResult<GetDashboardCirclesForUserData, GetDashboardCirclesForUserVariables>;
+```
+
+### Variables
+The `GetDashboardCirclesForUser` Query requires an argument of type `GetDashboardCirclesForUserVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetDashboardCirclesForUserVariables {
+  userId: string;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetDashboardCirclesForUser` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetDashboardCirclesForUser` Query is of type `GetDashboardCirclesForUserData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetDashboardCirclesForUserData {
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    user: {
+      id: string;
+    } & User_Key;
+    circle: {
+      id: UUIDString;
+      name: string;
+      type: string;
+      imageUrl?: string | null;
+      targetAmount: number;
+      contributedAmount: number;
+      showTargetToMembers: boolean;
+      showConfirmedTotalToMembers: boolean;
+      memberCount: number;
+      memberLimit: number;
+      deadline?: DateString | null;
+      eventDate?: DateString | null;
+      status: string;
+      createdAt: TimestampString;
+      updatedAt: TimestampString;
+      creator: {
+        id: string;
+      } & User_Key;
+    } & Circle_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetDashboardCirclesForUser`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetDashboardCirclesForUserVariables } from '@bondcircle/dataconnect';
+import { useGetDashboardCirclesForUser } from '@bondcircle/dataconnect/react'
+
+export default function GetDashboardCirclesForUserComponent() {
+  // The `useGetDashboardCirclesForUser` Query hook requires an argument of type `GetDashboardCirclesForUserVariables`:
+  const getDashboardCirclesForUserVars: GetDashboardCirclesForUserVariables = {
+    userId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetDashboardCirclesForUser(getDashboardCirclesForUserVars);
+  // Variables can be defined inline as well.
+  const query = useGetDashboardCirclesForUser({ userId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetDashboardCirclesForUser(dataConnect, getDashboardCirclesForUserVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetDashboardCirclesForUser(getDashboardCirclesForUserVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetDashboardCirclesForUser(dataConnect, getDashboardCirclesForUserVars, options);
 
   // Then, you can render your component dynamically based on the status of the Query.
   if (query.isPending) {
@@ -1287,6 +2397,199 @@ export default function GetCirclePricingStateComponent() {
   if (query.isSuccess) {
     console.log(query.data.circle);
     console.log(query.data.circleActivations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCirclePaymentCheckout
+You can execute the `GetCirclePaymentCheckout` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCirclePaymentCheckout(dc: DataConnect, vars: GetCirclePaymentCheckoutVariables, options?: useDataConnectQueryOptions<GetCirclePaymentCheckoutData>): UseDataConnectQueryResult<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCirclePaymentCheckout(vars: GetCirclePaymentCheckoutVariables, options?: useDataConnectQueryOptions<GetCirclePaymentCheckoutData>): UseDataConnectQueryResult<GetCirclePaymentCheckoutData, GetCirclePaymentCheckoutVariables>;
+```
+
+### Variables
+The `GetCirclePaymentCheckout` Query requires an argument of type `GetCirclePaymentCheckoutVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCirclePaymentCheckoutVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCirclePaymentCheckout` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCirclePaymentCheckout` Query is of type `GetCirclePaymentCheckoutData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCirclePaymentCheckoutData {
+  circlePaymentCheckout?: {
+    checkoutUrl?: string | null;
+    activation: {
+      id: UUIDString;
+    } & CircleActivation_Key;
+  };
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCirclePaymentCheckout`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+import { useGetCirclePaymentCheckout } from '@bondcircle/dataconnect/react'
+
+export default function GetCirclePaymentCheckoutComponent() {
+  // The `useGetCirclePaymentCheckout` Query hook requires an argument of type `GetCirclePaymentCheckoutVariables`:
+  const getCirclePaymentCheckoutVars: GetCirclePaymentCheckoutVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCirclePaymentCheckout(getCirclePaymentCheckoutVars);
+  // Variables can be defined inline as well.
+  const query = useGetCirclePaymentCheckout({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCirclePaymentCheckout(dataConnect, getCirclePaymentCheckoutVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCirclePaymentCheckout(getCirclePaymentCheckoutVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCirclePaymentCheckout(dataConnect, getCirclePaymentCheckoutVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circlePaymentCheckout);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleActivationAttempt
+You can execute the `GetCircleActivationAttempt` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleActivationAttempt(dc: DataConnect, vars: GetCircleActivationAttemptVariables, options?: useDataConnectQueryOptions<GetCircleActivationAttemptData>): UseDataConnectQueryResult<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleActivationAttempt(vars: GetCircleActivationAttemptVariables, options?: useDataConnectQueryOptions<GetCircleActivationAttemptData>): UseDataConnectQueryResult<GetCircleActivationAttemptData, GetCircleActivationAttemptVariables>;
+```
+
+### Variables
+The `GetCircleActivationAttempt` Query requires an argument of type `GetCircleActivationAttemptVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleActivationAttemptVariables {
+  activationId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleActivationAttempt` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleActivationAttempt` Query is of type `GetCircleActivationAttemptData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleActivationAttemptData {
+  circleActivation?: {
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+    creator: {
+      id: string;
+    } & User_Key;
+    planDefinition?: {
+      id: string;
+      memberLimit: number;
+      priceMinor: number;
+    } & PricingPlanDefinition_Key;
+    activationType: string;
+    circleType: string;
+    tier: string;
+    currency: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    providerReference?: string | null;
+    previousActivationId?: UUIDString | null;
+  } & CircleActivation_Key;
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleActivationAttempt`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleActivationAttemptVariables } from '@bondcircle/dataconnect';
+import { useGetCircleActivationAttempt } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleActivationAttemptComponent() {
+  // The `useGetCircleActivationAttempt` Query hook requires an argument of type `GetCircleActivationAttemptVariables`:
+  const getCircleActivationAttemptVars: GetCircleActivationAttemptVariables = {
+    activationId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleActivationAttempt(getCircleActivationAttemptVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleActivationAttempt({ activationId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleActivationAttempt(dataConnect, getCircleActivationAttemptVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleActivationAttempt(getCircleActivationAttemptVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleActivationAttempt(dataConnect, getCircleActivationAttemptVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circleActivation);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -2966,6 +4269,7 @@ The `GetDeadlineNotificationCandidates` Query requires an argument of type `GetD
 export interface GetDeadlineNotificationCandidatesVariables {
   from: DateString;
   to: DateString;
+  after?: UUIDString | null;
 }
 ```
 ### Return Type
@@ -2976,12 +4280,7 @@ To check the status of a Query, use the `UseQueryResult.status` field. You can a
 To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetDeadlineNotificationCandidates` Query is of type `GetDeadlineNotificationCandidatesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface GetDeadlineNotificationCandidatesData {
-  circles: ({
-    id: UUIDString;
-    name: string;
-    type: string;
-    deadline?: DateString | null;
-  } & Circle_Key)[];
+  circles?: unknown[] | null;
 }
 ```
 
@@ -2999,13 +4298,14 @@ export default function GetDeadlineNotificationCandidatesComponent() {
   const getDeadlineNotificationCandidatesVars: GetDeadlineNotificationCandidatesVariables = {
     from: ..., 
     to: ..., 
+    after: ..., // optional
   };
 
   // You don't have to do anything to "execute" the Query.
   // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
   const query = useGetDeadlineNotificationCandidates(getDeadlineNotificationCandidatesVars);
   // Variables can be defined inline as well.
-  const query = useGetDeadlineNotificationCandidates({ from: ..., to: ..., });
+  const query = useGetDeadlineNotificationCandidates({ from: ..., to: ..., after: ..., });
 
   // You can also pass in a `DataConnect` instance to the Query hook function.
   const dataConnect = getDataConnect(connectorConfig);
@@ -4359,6 +5659,998 @@ export default function GetOwnerInvitationComponent() {
 }
 ```
 
+## GetRateLimitBucket
+You can execute the `GetRateLimitBucket` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetRateLimitBucket(dc: DataConnect, vars: GetRateLimitBucketVariables, options?: useDataConnectQueryOptions<GetRateLimitBucketData>): UseDataConnectQueryResult<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetRateLimitBucket(vars: GetRateLimitBucketVariables, options?: useDataConnectQueryOptions<GetRateLimitBucketData>): UseDataConnectQueryResult<GetRateLimitBucketData, GetRateLimitBucketVariables>;
+```
+
+### Variables
+The `GetRateLimitBucket` Query requires an argument of type `GetRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetRateLimitBucketVariables {
+  bucketKey: string;
+}
+```
+### Return Type
+Recall that calling the `GetRateLimitBucket` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetRateLimitBucket` Query is of type `GetRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetRateLimitBucketData {
+  rateLimitBucket?: {
+    attemptsJson: string;
+    revision: number;
+  };
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetRateLimitBucket`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+import { useGetRateLimitBucket } from '@bondcircle/dataconnect/react'
+
+export default function GetRateLimitBucketComponent() {
+  // The `useGetRateLimitBucket` Query hook requires an argument of type `GetRateLimitBucketVariables`:
+  const getRateLimitBucketVars: GetRateLimitBucketVariables = {
+    bucketKey: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetRateLimitBucket(getRateLimitBucketVars);
+  // Variables can be defined inline as well.
+  const query = useGetRateLimitBucket({ bucketKey: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetRateLimitBucket(dataConnect, getRateLimitBucketVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRateLimitBucket(getRateLimitBucketVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRateLimitBucket(dataConnect, getRateLimitBucketVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.rateLimitBucket);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleRetentionState
+You can execute the `GetCircleRetentionState` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleRetentionState(dc: DataConnect, vars: GetCircleRetentionStateVariables, options?: useDataConnectQueryOptions<GetCircleRetentionStateData>): UseDataConnectQueryResult<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleRetentionState(vars: GetCircleRetentionStateVariables, options?: useDataConnectQueryOptions<GetCircleRetentionStateData>): UseDataConnectQueryResult<GetCircleRetentionStateData, GetCircleRetentionStateVariables>;
+```
+
+### Variables
+The `GetCircleRetentionState` Query requires an argument of type `GetCircleRetentionStateVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleRetentionStateVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetCircleRetentionState` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleRetentionState` Query is of type `GetCircleRetentionStateData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleRetentionStateData {
+  circle?: {
+    id: UUIDString;
+    type: string;
+    status: string;
+    retentionDueAt?: TimestampString | null;
+    purgeAt?: TimestampString | null;
+    imageStoragePath?: string | null;
+  } & Circle_Key;
+  retentionPurgeAttempts: ({
+    attemptNumber: number;
+    status: string;
+    startedAt: TimestampString;
+    nextRetryAt?: TimestampString | null;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleRetentionState`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleRetentionStateVariables } from '@bondcircle/dataconnect';
+import { useGetCircleRetentionState } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleRetentionStateComponent() {
+  // The `useGetCircleRetentionState` Query hook requires an argument of type `GetCircleRetentionStateVariables`:
+  const getCircleRetentionStateVars: GetCircleRetentionStateVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleRetentionState(getCircleRetentionStateVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleRetentionState({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleRetentionState(dataConnect, getCircleRetentionStateVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionState(getCircleRetentionStateVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionState(dataConnect, getCircleRetentionStateVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.retentionPurgeAttempts);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleRetentionPage
+You can execute the `GetCircleRetentionPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleRetentionPage(dc: DataConnect, vars: GetCircleRetentionPageVariables, options?: useDataConnectQueryOptions<GetCircleRetentionPageData>): UseDataConnectQueryResult<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleRetentionPage(vars: GetCircleRetentionPageVariables, options?: useDataConnectQueryOptions<GetCircleRetentionPageData>): UseDataConnectQueryResult<GetCircleRetentionPageData, GetCircleRetentionPageVariables>;
+```
+
+### Variables
+The `GetCircleRetentionPage` Query requires an argument of type `GetCircleRetentionPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleRetentionPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleRetentionPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleRetentionPage` Query is of type `GetCircleRetentionPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleRetentionPageData {
+  receipts: ({
+    id: UUIDString;
+    imageStoragePath: string;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    receiptStoragePath?: string | null;
+  })[];
+  asoEbiTiers: ({
+    fabricImageStoragePath?: string | null;
+    appreciationGiftImageStoragePath?: string | null;
+  })[];
+  invitations: ({
+    id: UUIDString;
+  } & Invitation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleRetentionPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleRetentionPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleRetentionPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleRetentionPageComponent() {
+  // The `useGetCircleRetentionPage` Query hook requires an argument of type `GetCircleRetentionPageVariables`:
+  const getCircleRetentionPageVars: GetCircleRetentionPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleRetentionPage(getCircleRetentionPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleRetentionPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleRetentionPage(dataConnect, getCircleRetentionPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionPage(getCircleRetentionPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleRetentionPage(dataConnect, getCircleRetentionPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.receipts);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.asoEbiTiers);
+    console.log(query.data.invitations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetRetentionExternalStorageReferences
+You can execute the `GetRetentionExternalStorageReferences` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetRetentionExternalStorageReferences(dc: DataConnect, vars: GetRetentionExternalStorageReferencesVariables, options?: useDataConnectQueryOptions<GetRetentionExternalStorageReferencesData>): UseDataConnectQueryResult<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetRetentionExternalStorageReferences(vars: GetRetentionExternalStorageReferencesVariables, options?: useDataConnectQueryOptions<GetRetentionExternalStorageReferencesData>): UseDataConnectQueryResult<GetRetentionExternalStorageReferencesData, GetRetentionExternalStorageReferencesVariables>;
+```
+
+### Variables
+The `GetRetentionExternalStorageReferences` Query requires an argument of type `GetRetentionExternalStorageReferencesVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetRetentionExternalStorageReferencesVariables {
+  path: string;
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetRetentionExternalStorageReferences` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetRetentionExternalStorageReferences` Query is of type `GetRetentionExternalStorageReferencesData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetRetentionExternalStorageReferencesData {
+  circles: ({
+    id: UUIDString;
+  } & Circle_Key)[];
+  receipts: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & Receipt_Key)[];
+  circleMemberships: ({
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  })[];
+  fabricReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
+  giftReferences: ({
+    id: UUIDString;
+    circle: {
+      id: UUIDString;
+    } & Circle_Key;
+  } & AsoEbiTier_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetRetentionExternalStorageReferences`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetRetentionExternalStorageReferencesVariables } from '@bondcircle/dataconnect';
+import { useGetRetentionExternalStorageReferences } from '@bondcircle/dataconnect/react'
+
+export default function GetRetentionExternalStorageReferencesComponent() {
+  // The `useGetRetentionExternalStorageReferences` Query hook requires an argument of type `GetRetentionExternalStorageReferencesVariables`:
+  const getRetentionExternalStorageReferencesVars: GetRetentionExternalStorageReferencesVariables = {
+    path: ..., 
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetRetentionExternalStorageReferences(getRetentionExternalStorageReferencesVars);
+  // Variables can be defined inline as well.
+  const query = useGetRetentionExternalStorageReferences({ path: ..., circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetRetentionExternalStorageReferences(dataConnect, getRetentionExternalStorageReferencesVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRetentionExternalStorageReferences(getRetentionExternalStorageReferencesVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetRetentionExternalStorageReferences(dataConnect, getRetentionExternalStorageReferencesVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circles);
+    console.log(query.data.receipts);
+    console.log(query.data.circleMemberships);
+    console.log(query.data.fabricReferences);
+    console.log(query.data.giftReferences);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetContributionWorkspaceMetadata
+You can execute the `GetContributionWorkspaceMetadata` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetContributionWorkspaceMetadata(dc: DataConnect, vars: GetContributionWorkspaceMetadataVariables, options?: useDataConnectQueryOptions<GetContributionWorkspaceMetadataData>): UseDataConnectQueryResult<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetContributionWorkspaceMetadata(vars: GetContributionWorkspaceMetadataVariables, options?: useDataConnectQueryOptions<GetContributionWorkspaceMetadataData>): UseDataConnectQueryResult<GetContributionWorkspaceMetadataData, GetContributionWorkspaceMetadataVariables>;
+```
+
+### Variables
+The `GetContributionWorkspaceMetadata` Query requires an argument of type `GetContributionWorkspaceMetadataVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetContributionWorkspaceMetadataVariables {
+  circleId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetContributionWorkspaceMetadata` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetContributionWorkspaceMetadata` Query is of type `GetContributionWorkspaceMetadataData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetContributionWorkspaceMetadataData {
+  circle?: {
+    id: UUIDString;
+    name: string;
+    type: string;
+    targetAmount: number;
+    contributedAmount: number;
+    status: string;
+    creator: {
+      id: string;
+    } & User_Key;
+  } & Circle_Key;
+  circleMemberships: ({
+    role: string;
+    membershipStatus: string;
+    contributionStatus: string;
+    expectedAmount: number;
+    confirmedAmount: number;
+    user: {
+      id: string;
+      displayName: string;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetContributionWorkspaceMetadata`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetContributionWorkspaceMetadataVariables } from '@bondcircle/dataconnect';
+import { useGetContributionWorkspaceMetadata } from '@bondcircle/dataconnect/react'
+
+export default function GetContributionWorkspaceMetadataComponent() {
+  // The `useGetContributionWorkspaceMetadata` Query hook requires an argument of type `GetContributionWorkspaceMetadataVariables`:
+  const getContributionWorkspaceMetadataVars: GetContributionWorkspaceMetadataVariables = {
+    circleId: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetContributionWorkspaceMetadata(getContributionWorkspaceMetadataVars);
+  // Variables can be defined inline as well.
+  const query = useGetContributionWorkspaceMetadata({ circleId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetContributionWorkspaceMetadata(dataConnect, getContributionWorkspaceMetadataVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionWorkspaceMetadata(getContributionWorkspaceMetadataVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionWorkspaceMetadata(dataConnect, getContributionWorkspaceMetadataVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circle);
+    console.log(query.data.circleMemberships);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetContributionReceiptsPage
+You can execute the `GetContributionReceiptsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetContributionReceiptsPage(dc: DataConnect, vars: GetContributionReceiptsPageVariables, options?: useDataConnectQueryOptions<GetContributionReceiptsPageData>): UseDataConnectQueryResult<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetContributionReceiptsPage(vars: GetContributionReceiptsPageVariables, options?: useDataConnectQueryOptions<GetContributionReceiptsPageData>): UseDataConnectQueryResult<GetContributionReceiptsPageData, GetContributionReceiptsPageVariables>;
+```
+
+### Variables
+The `GetContributionReceiptsPage` Query requires an argument of type `GetContributionReceiptsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetContributionReceiptsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetContributionReceiptsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetContributionReceiptsPage` Query is of type `GetContributionReceiptsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetContributionReceiptsPageData {
+  receipts: ({
+    id: UUIDString;
+    amount: number;
+    note?: string | null;
+    imageUrl: string;
+    imageStoragePath: string;
+    contentType: string;
+    status: string;
+    overpaymentAmount: number;
+    replacementOfId?: UUIDString | null;
+    rejectionReason?: string | null;
+    submittedAt: TimestampString;
+    reviewedAt?: TimestampString | null;
+    uploadedBy: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+    reviewedBy?: {
+      id: string;
+      displayName: string;
+    } & User_Key;
+  } & Receipt_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetContributionReceiptsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetContributionReceiptsPageVariables } from '@bondcircle/dataconnect';
+import { useGetContributionReceiptsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetContributionReceiptsPageComponent() {
+  // The `useGetContributionReceiptsPage` Query hook requires an argument of type `GetContributionReceiptsPageVariables`:
+  const getContributionReceiptsPageVars: GetContributionReceiptsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetContributionReceiptsPage(getContributionReceiptsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetContributionReceiptsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetContributionReceiptsPage(dataConnect, getContributionReceiptsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionReceiptsPage(getContributionReceiptsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetContributionReceiptsPage(dataConnect, getContributionReceiptsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.receipts);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleInvitationsPage
+You can execute the `GetCircleInvitationsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleInvitationsPage(dc: DataConnect, vars: GetCircleInvitationsPageVariables, options?: useDataConnectQueryOptions<GetCircleInvitationsPageData>): UseDataConnectQueryResult<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleInvitationsPage(vars: GetCircleInvitationsPageVariables, options?: useDataConnectQueryOptions<GetCircleInvitationsPageData>): UseDataConnectQueryResult<GetCircleInvitationsPageData, GetCircleInvitationsPageVariables>;
+```
+
+### Variables
+The `GetCircleInvitationsPage` Query requires an argument of type `GetCircleInvitationsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleInvitationsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleInvitationsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleInvitationsPage` Query is of type `GetCircleInvitationsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleInvitationsPageData {
+  invitations: ({
+    id: UUIDString;
+    mode: string;
+    recipientName?: string | null;
+    recipientEmail?: string | null;
+    recipientPhone?: string | null;
+    expectedAmount: number;
+    requireApproval: boolean;
+    state: string;
+    maxUses: number;
+    useCount: number;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    updatedAt: TimestampString;
+  } & Invitation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleInvitationsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleInvitationsPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleInvitationsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleInvitationsPageComponent() {
+  // The `useGetCircleInvitationsPage` Query hook requires an argument of type `GetCircleInvitationsPageVariables`:
+  const getCircleInvitationsPageVars: GetCircleInvitationsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleInvitationsPage(getCircleInvitationsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleInvitationsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleInvitationsPage(dataConnect, getCircleInvitationsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitationsPage(getCircleInvitationsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitationsPage(dataConnect, getCircleInvitationsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetInvitationAcceptancesPage
+You can execute the `GetInvitationAcceptancesPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetInvitationAcceptancesPage(dc: DataConnect, vars: GetInvitationAcceptancesPageVariables, options?: useDataConnectQueryOptions<GetInvitationAcceptancesPageData>): UseDataConnectQueryResult<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetInvitationAcceptancesPage(vars: GetInvitationAcceptancesPageVariables, options?: useDataConnectQueryOptions<GetInvitationAcceptancesPageData>): UseDataConnectQueryResult<GetInvitationAcceptancesPageData, GetInvitationAcceptancesPageVariables>;
+```
+
+### Variables
+The `GetInvitationAcceptancesPage` Query requires an argument of type `GetInvitationAcceptancesPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetInvitationAcceptancesPageVariables {
+  invitationId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetInvitationAcceptancesPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetInvitationAcceptancesPage` Query is of type `GetInvitationAcceptancesPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetInvitationAcceptancesPageData {
+  invitationAcceptances: ({
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetInvitationAcceptancesPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+import { useGetInvitationAcceptancesPage } from '@bondcircle/dataconnect/react'
+
+export default function GetInvitationAcceptancesPageComponent() {
+  // The `useGetInvitationAcceptancesPage` Query hook requires an argument of type `GetInvitationAcceptancesPageVariables`:
+  const getInvitationAcceptancesPageVars: GetInvitationAcceptancesPageVariables = {
+    invitationId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetInvitationAcceptancesPage(getInvitationAcceptancesPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetInvitationAcceptancesPage({ invitationId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetInvitationAcceptancesPage(dataConnect, getInvitationAcceptancesPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationAcceptancesPage(getInvitationAcceptancesPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetInvitationAcceptancesPage(dataConnect, getInvitationAcceptancesPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitationAcceptances);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleActivationsPage
+You can execute the `GetCircleActivationsPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleActivationsPage(dc: DataConnect, vars: GetCircleActivationsPageVariables, options?: useDataConnectQueryOptions<GetCircleActivationsPageData>): UseDataConnectQueryResult<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleActivationsPage(vars: GetCircleActivationsPageVariables, options?: useDataConnectQueryOptions<GetCircleActivationsPageData>): UseDataConnectQueryResult<GetCircleActivationsPageData, GetCircleActivationsPageVariables>;
+```
+
+### Variables
+The `GetCircleActivationsPage` Query requires an argument of type `GetCircleActivationsPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleActivationsPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleActivationsPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleActivationsPage` Query is of type `GetCircleActivationsPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleActivationsPageData {
+  circleActivations: ({
+    id: UUIDString;
+    activationType: string;
+    tier: string;
+    listPriceMinor: number;
+    amountDueMinor: number;
+    pricePaidMinor: number;
+    status: string;
+    provider?: string | null;
+    providerReference?: string | null;
+    createdAt: TimestampString;
+    paidAt?: TimestampString | null;
+    activatedAt?: TimestampString | null;
+  } & CircleActivation_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleActivationsPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleActivationsPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleActivationsPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleActivationsPageComponent() {
+  // The `useGetCircleActivationsPage` Query hook requires an argument of type `GetCircleActivationsPageVariables`:
+  const getCircleActivationsPageVars: GetCircleActivationsPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleActivationsPage(getCircleActivationsPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleActivationsPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleActivationsPage(dataConnect, getCircleActivationsPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleActivationsPage(getCircleActivationsPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleActivationsPage(dataConnect, getCircleActivationsPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.circleActivations);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetCircleInvitationAcceptancesPage
+You can execute the `GetCircleInvitationAcceptancesPage` Query using the following Query hook function, which is defined in [dataconnect/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetCircleInvitationAcceptancesPage(dc: DataConnect, vars: GetCircleInvitationAcceptancesPageVariables, options?: useDataConnectQueryOptions<GetCircleInvitationAcceptancesPageData>): UseDataConnectQueryResult<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetCircleInvitationAcceptancesPage(vars: GetCircleInvitationAcceptancesPageVariables, options?: useDataConnectQueryOptions<GetCircleInvitationAcceptancesPageData>): UseDataConnectQueryResult<GetCircleInvitationAcceptancesPageData, GetCircleInvitationAcceptancesPageVariables>;
+```
+
+### Variables
+The `GetCircleInvitationAcceptancesPage` Query requires an argument of type `GetCircleInvitationAcceptancesPageVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetCircleInvitationAcceptancesPageVariables {
+  circleId: UUIDString;
+  offset: number;
+}
+```
+### Return Type
+Recall that calling the `GetCircleInvitationAcceptancesPage` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetCircleInvitationAcceptancesPage` Query is of type `GetCircleInvitationAcceptancesPageData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetCircleInvitationAcceptancesPageData {
+  invitationAcceptances: ({
+    invitation: {
+      id: UUIDString;
+    } & Invitation_Key;
+    status: string;
+    createdAt: TimestampString;
+    respondedAt?: TimestampString | null;
+    user: {
+      id: string;
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+      profileImage?: string | null;
+    } & User_Key;
+  })[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetCircleInvitationAcceptancesPage`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetCircleInvitationAcceptancesPageVariables } from '@bondcircle/dataconnect';
+import { useGetCircleInvitationAcceptancesPage } from '@bondcircle/dataconnect/react'
+
+export default function GetCircleInvitationAcceptancesPageComponent() {
+  // The `useGetCircleInvitationAcceptancesPage` Query hook requires an argument of type `GetCircleInvitationAcceptancesPageVariables`:
+  const getCircleInvitationAcceptancesPageVars: GetCircleInvitationAcceptancesPageVariables = {
+    circleId: ..., 
+    offset: ..., 
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetCircleInvitationAcceptancesPage(getCircleInvitationAcceptancesPageVars);
+  // Variables can be defined inline as well.
+  const query = useGetCircleInvitationAcceptancesPage({ circleId: ..., offset: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetCircleInvitationAcceptancesPage(dataConnect, getCircleInvitationAcceptancesPageVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitationAcceptancesPage(getCircleInvitationAcceptancesPageVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetCircleInvitationAcceptancesPage(dataConnect, getCircleInvitationAcceptancesPageVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.invitationAcceptances);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
 # Mutations
 
 The React generated SDK provides Mutations hook functions that call and return [`useDataConnectMutation`](https://react-query-firebase.invertase.dev/react/data-connect/mutations) hooks from TanStack Query Firebase.
@@ -4383,6 +6675,494 @@ Here's a general overview of how to use the generated Mutation hooks in your cod
   - ***Special case:*** If the Mutation has no arguments (or all optional arguments and you wish to provide none), and you want to pass `options` to `UseMutationResult.mutate()`, you must pass `undefined` where you would normally pass the Mutation's arguments, and then may provide the options argument.
 
 Below are examples of how to use the `bondcircle` connector's generated Mutation hook functions to execute each Mutation. You can also follow the examples from the [Data Connect documentation](https://firebase.google.com/docs/data-connect/web-sdk#operations-react-angular).
+
+## CreateAccountPrivacyRequest
+You can execute the `CreateAccountPrivacyRequest` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateAccountPrivacyRequest(options?: useDataConnectMutationOptions<CreateAccountPrivacyRequestData, FirebaseError, CreateAccountPrivacyRequestVariables>): UseDataConnectMutationResult<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateAccountPrivacyRequest(dc: DataConnect, options?: useDataConnectMutationOptions<CreateAccountPrivacyRequestData, FirebaseError, CreateAccountPrivacyRequestVariables>): UseDataConnectMutationResult<CreateAccountPrivacyRequestData, CreateAccountPrivacyRequestVariables>;
+```
+
+### Variables
+The `CreateAccountPrivacyRequest` Mutation requires an argument of type `CreateAccountPrivacyRequestVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateAccountPrivacyRequestVariables {
+  id: string;
+  userId: string;
+  kind: string;
+}
+```
+### Return Type
+Recall that calling the `CreateAccountPrivacyRequest` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateAccountPrivacyRequest` Mutation is of type `CreateAccountPrivacyRequestData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateAccountPrivacyRequestData {
+  accountPrivacyRequest_insert: AccountPrivacyRequest_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateAccountPrivacyRequest`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+import { useCreateAccountPrivacyRequest } from '@bondcircle/dataconnect/react'
+
+export default function CreateAccountPrivacyRequestComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateAccountPrivacyRequest();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateAccountPrivacyRequest(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateAccountPrivacyRequest(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateAccountPrivacyRequest(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateAccountPrivacyRequest` Mutation requires an argument of type `CreateAccountPrivacyRequestVariables`:
+  const createAccountPrivacyRequestVars: CreateAccountPrivacyRequestVariables = {
+    id: ..., 
+    userId: ..., 
+    kind: ..., 
+  };
+  mutation.mutate(createAccountPrivacyRequestVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ id: ..., userId: ..., kind: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createAccountPrivacyRequestVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.accountPrivacyRequest_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## AcknowledgeAccountPrivacyRequest
+You can execute the `AcknowledgeAccountPrivacyRequest` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useAcknowledgeAccountPrivacyRequest(options?: useDataConnectMutationOptions<AcknowledgeAccountPrivacyRequestData, FirebaseError, AcknowledgeAccountPrivacyRequestVariables>): UseDataConnectMutationResult<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useAcknowledgeAccountPrivacyRequest(dc: DataConnect, options?: useDataConnectMutationOptions<AcknowledgeAccountPrivacyRequestData, FirebaseError, AcknowledgeAccountPrivacyRequestVariables>): UseDataConnectMutationResult<AcknowledgeAccountPrivacyRequestData, AcknowledgeAccountPrivacyRequestVariables>;
+```
+
+### Variables
+The `AcknowledgeAccountPrivacyRequest` Mutation requires an argument of type `AcknowledgeAccountPrivacyRequestVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface AcknowledgeAccountPrivacyRequestVariables {
+  id: string;
+  actorId: string;
+}
+```
+### Return Type
+Recall that calling the `AcknowledgeAccountPrivacyRequest` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `AcknowledgeAccountPrivacyRequest` Mutation is of type `AcknowledgeAccountPrivacyRequestData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface AcknowledgeAccountPrivacyRequestData {
+  accountPrivacyRequest_update?: AccountPrivacyRequest_Key | null;
+  ownerAdminAuditEvent_insert: OwnerAdminAuditEvent_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `AcknowledgeAccountPrivacyRequest`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, AcknowledgeAccountPrivacyRequestVariables } from '@bondcircle/dataconnect';
+import { useAcknowledgeAccountPrivacyRequest } from '@bondcircle/dataconnect/react'
+
+export default function AcknowledgeAccountPrivacyRequestComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useAcknowledgeAccountPrivacyRequest();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useAcknowledgeAccountPrivacyRequest(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAcknowledgeAccountPrivacyRequest(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useAcknowledgeAccountPrivacyRequest(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useAcknowledgeAccountPrivacyRequest` Mutation requires an argument of type `AcknowledgeAccountPrivacyRequestVariables`:
+  const acknowledgeAccountPrivacyRequestVars: AcknowledgeAccountPrivacyRequestVariables = {
+    id: ..., 
+    actorId: ..., 
+  };
+  mutation.mutate(acknowledgeAccountPrivacyRequestVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ id: ..., actorId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(acknowledgeAccountPrivacyRequestVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.accountPrivacyRequest_update);
+    console.log(mutation.data.ownerAdminAuditEvent_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## RegisterDeviceRegistration
+You can execute the `RegisterDeviceRegistration` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useRegisterDeviceRegistration(options?: useDataConnectMutationOptions<RegisterDeviceRegistrationData, FirebaseError, RegisterDeviceRegistrationVariables>): UseDataConnectMutationResult<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useRegisterDeviceRegistration(dc: DataConnect, options?: useDataConnectMutationOptions<RegisterDeviceRegistrationData, FirebaseError, RegisterDeviceRegistrationVariables>): UseDataConnectMutationResult<RegisterDeviceRegistrationData, RegisterDeviceRegistrationVariables>;
+```
+
+### Variables
+The `RegisterDeviceRegistration` Mutation requires an argument of type `RegisterDeviceRegistrationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface RegisterDeviceRegistrationVariables {
+  tokenId: string;
+  userId: string;
+  token: string;
+  platform: string;
+  updatedAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `RegisterDeviceRegistration` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `RegisterDeviceRegistration` Mutation is of type `RegisterDeviceRegistrationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface RegisterDeviceRegistrationData {
+  deviceRegistration_upsert: DeviceRegistration_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `RegisterDeviceRegistration`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, RegisterDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+import { useRegisterDeviceRegistration } from '@bondcircle/dataconnect/react'
+
+export default function RegisterDeviceRegistrationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useRegisterDeviceRegistration();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useRegisterDeviceRegistration(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRegisterDeviceRegistration(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useRegisterDeviceRegistration(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useRegisterDeviceRegistration` Mutation requires an argument of type `RegisterDeviceRegistrationVariables`:
+  const registerDeviceRegistrationVars: RegisterDeviceRegistrationVariables = {
+    tokenId: ..., 
+    userId: ..., 
+    token: ..., 
+    platform: ..., 
+    updatedAt: ..., 
+  };
+  mutation.mutate(registerDeviceRegistrationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ tokenId: ..., userId: ..., token: ..., platform: ..., updatedAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(registerDeviceRegistrationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.deviceRegistration_upsert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DeleteDeviceRegistration
+You can execute the `DeleteDeviceRegistration` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useDeleteDeviceRegistration(options?: useDataConnectMutationOptions<DeleteDeviceRegistrationData, FirebaseError, DeleteDeviceRegistrationVariables>): UseDataConnectMutationResult<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDeleteDeviceRegistration(dc: DataConnect, options?: useDataConnectMutationOptions<DeleteDeviceRegistrationData, FirebaseError, DeleteDeviceRegistrationVariables>): UseDataConnectMutationResult<DeleteDeviceRegistrationData, DeleteDeviceRegistrationVariables>;
+```
+
+### Variables
+The `DeleteDeviceRegistration` Mutation requires an argument of type `DeleteDeviceRegistrationVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DeleteDeviceRegistrationVariables {
+  tokenId: string;
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `DeleteDeviceRegistration` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DeleteDeviceRegistration` Mutation is of type `DeleteDeviceRegistrationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DeleteDeviceRegistrationData {
+  deviceRegistration_deleteMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DeleteDeviceRegistration`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DeleteDeviceRegistrationVariables } from '@bondcircle/dataconnect';
+import { useDeleteDeviceRegistration } from '@bondcircle/dataconnect/react'
+
+export default function DeleteDeviceRegistrationComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDeleteDeviceRegistration();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDeleteDeviceRegistration(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteDeviceRegistration(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteDeviceRegistration(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDeleteDeviceRegistration` Mutation requires an argument of type `DeleteDeviceRegistrationVariables`:
+  const deleteDeviceRegistrationVars: DeleteDeviceRegistrationVariables = {
+    tokenId: ..., 
+    userId: ..., 
+  };
+  mutation.mutate(deleteDeviceRegistrationVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ tokenId: ..., userId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(deleteDeviceRegistrationVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.deviceRegistration_deleteMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## DeleteUserDeviceRegistrations
+You can execute the `DeleteUserDeviceRegistrations` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useDeleteUserDeviceRegistrations(options?: useDataConnectMutationOptions<DeleteUserDeviceRegistrationsData, FirebaseError, DeleteUserDeviceRegistrationsVariables>): UseDataConnectMutationResult<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useDeleteUserDeviceRegistrations(dc: DataConnect, options?: useDataConnectMutationOptions<DeleteUserDeviceRegistrationsData, FirebaseError, DeleteUserDeviceRegistrationsVariables>): UseDataConnectMutationResult<DeleteUserDeviceRegistrationsData, DeleteUserDeviceRegistrationsVariables>;
+```
+
+### Variables
+The `DeleteUserDeviceRegistrations` Mutation requires an argument of type `DeleteUserDeviceRegistrationsVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface DeleteUserDeviceRegistrationsVariables {
+  userId: string;
+}
+```
+### Return Type
+Recall that calling the `DeleteUserDeviceRegistrations` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `DeleteUserDeviceRegistrations` Mutation is of type `DeleteUserDeviceRegistrationsData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface DeleteUserDeviceRegistrationsData {
+  deviceRegistration_deleteMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `DeleteUserDeviceRegistrations`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, DeleteUserDeviceRegistrationsVariables } from '@bondcircle/dataconnect';
+import { useDeleteUserDeviceRegistrations } from '@bondcircle/dataconnect/react'
+
+export default function DeleteUserDeviceRegistrationsComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useDeleteUserDeviceRegistrations();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useDeleteUserDeviceRegistrations(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteUserDeviceRegistrations(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useDeleteUserDeviceRegistrations(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useDeleteUserDeviceRegistrations` Mutation requires an argument of type `DeleteUserDeviceRegistrationsVariables`:
+  const deleteUserDeviceRegistrationsVars: DeleteUserDeviceRegistrationsVariables = {
+    userId: ..., 
+  };
+  mutation.mutate(deleteUserDeviceRegistrationsVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ userId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(deleteUserDeviceRegistrationsVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.deviceRegistration_deleteMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
 
 ## RecordAbuseAttempt
 You can execute the `RecordAbuseAttempt` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
@@ -5068,6 +7848,104 @@ export default function ClaimTrialAndPublishCircleComponent() {
 }
 ```
 
+## SaveCirclePaymentCheckout
+You can execute the `SaveCirclePaymentCheckout` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useSaveCirclePaymentCheckout(options?: useDataConnectMutationOptions<SaveCirclePaymentCheckoutData, FirebaseError, SaveCirclePaymentCheckoutVariables>): UseDataConnectMutationResult<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useSaveCirclePaymentCheckout(dc: DataConnect, options?: useDataConnectMutationOptions<SaveCirclePaymentCheckoutData, FirebaseError, SaveCirclePaymentCheckoutVariables>): UseDataConnectMutationResult<SaveCirclePaymentCheckoutData, SaveCirclePaymentCheckoutVariables>;
+```
+
+### Variables
+The `SaveCirclePaymentCheckout` Mutation requires an argument of type `SaveCirclePaymentCheckoutVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface SaveCirclePaymentCheckoutVariables {
+  circleId: UUIDString;
+  activationId: UUIDString;
+  checkoutUrl: string;
+}
+```
+### Return Type
+Recall that calling the `SaveCirclePaymentCheckout` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `SaveCirclePaymentCheckout` Mutation is of type `SaveCirclePaymentCheckoutData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface SaveCirclePaymentCheckoutData {
+  circlePaymentCheckout_updateMany: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `SaveCirclePaymentCheckout`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, SaveCirclePaymentCheckoutVariables } from '@bondcircle/dataconnect';
+import { useSaveCirclePaymentCheckout } from '@bondcircle/dataconnect/react'
+
+export default function SaveCirclePaymentCheckoutComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useSaveCirclePaymentCheckout();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useSaveCirclePaymentCheckout(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSaveCirclePaymentCheckout(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useSaveCirclePaymentCheckout(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useSaveCirclePaymentCheckout` Mutation requires an argument of type `SaveCirclePaymentCheckoutVariables`:
+  const saveCirclePaymentCheckoutVars: SaveCirclePaymentCheckoutVariables = {
+    circleId: ..., 
+    activationId: ..., 
+    checkoutUrl: ..., 
+  };
+  mutation.mutate(saveCirclePaymentCheckoutVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ circleId: ..., activationId: ..., checkoutUrl: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(saveCirclePaymentCheckoutVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.circlePaymentCheckout_updateMany);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
 ## CreateCircleActivationAttempt
 You can execute the `CreateCircleActivationAttempt` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
 ```javascript
@@ -5109,7 +7987,8 @@ To access the data returned by a Mutation, use the `UseMutationResult.data` fiel
 ```javascript
 export interface CreateCircleActivationAttemptData {
   circleActivation_insert: CircleActivation_Key;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_insert: CirclePaymentCheckout_Key;
+  circle_updateMany: number;
 }
 ```
 
@@ -5182,7 +8061,8 @@ export default function CreateCircleActivationAttemptComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.circleActivation_insert);
-    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circlePaymentCheckout_insert);
+    console.log(mutation.data.circle_updateMany);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -5219,7 +8099,8 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `FailCircleActivationAttempt` Mutation is of type `FailCircleActivationAttemptData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface FailCircleActivationAttemptData {
-  circleActivation_update?: CircleActivation_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
   circle_update?: Circle_Key | null;
 }
 ```
@@ -5283,7 +8164,8 @@ export default function FailCircleActivationAttemptComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.circleActivation_update);
+    console.log(mutation.data.circlePaymentCheckout_deleteMany);
+    console.log(mutation.data.circleActivation_updateMany);
     console.log(mutation.data.circle_update);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
@@ -5322,8 +8204,9 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CompletePaidCircleActivation` Mutation is of type `CompletePaidCircleActivationData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface CompletePaidCircleActivationData {
-  circleActivation_update?: CircleActivation_Key | null;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
+  circle_updateMany: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -5388,8 +8271,9 @@ export default function CompletePaidCircleActivationComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.circleActivation_update);
-    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circlePaymentCheckout_deleteMany);
+    console.log(mutation.data.circleActivation_updateMany);
+    console.log(mutation.data.circle_updateMany);
     console.log(mutation.data.circleAuditEntry_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
@@ -5433,8 +8317,9 @@ To execute the Mutation, call `UseMutationResult.mutate()`. This function execut
 To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CompleteCirclePlanUpgrade` Mutation is of type `CompleteCirclePlanUpgradeData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
 ```javascript
 export interface CompleteCirclePlanUpgradeData {
-  circleActivation_update?: CircleActivation_Key | null;
-  circle_update?: Circle_Key | null;
+  circlePaymentCheckout_deleteMany: number;
+  circleActivation_updateMany: number;
+  circle_updateMany: number;
   circleAuditEntry_insert: CircleAuditEntry_Key;
 }
 ```
@@ -5504,8 +8389,9 @@ export default function CompleteCirclePlanUpgradeComponent() {
 
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
-    console.log(mutation.data.circleActivation_update);
-    console.log(mutation.data.circle_update);
+    console.log(mutation.data.circlePaymentCheckout_deleteMany);
+    console.log(mutation.data.circleActivation_updateMany);
+    console.log(mutation.data.circle_updateMany);
     console.log(mutation.data.circleAuditEntry_insert);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
@@ -11335,6 +14221,202 @@ export default function ProvisionOwnerAdministratorComponent() {
   // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
   if (mutation.isSuccess) {
     console.log(mutation.data.ownerAdministrator_upsert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CreateRateLimitBucket
+You can execute the `CreateRateLimitBucket` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCreateRateLimitBucket(options?: useDataConnectMutationOptions<CreateRateLimitBucketData, FirebaseError, CreateRateLimitBucketVariables>): UseDataConnectMutationResult<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCreateRateLimitBucket(dc: DataConnect, options?: useDataConnectMutationOptions<CreateRateLimitBucketData, FirebaseError, CreateRateLimitBucketVariables>): UseDataConnectMutationResult<CreateRateLimitBucketData, CreateRateLimitBucketVariables>;
+```
+
+### Variables
+The `CreateRateLimitBucket` Mutation requires an argument of type `CreateRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CreateRateLimitBucketVariables {
+  bucketKey: string;
+  attemptsJson: string;
+}
+```
+### Return Type
+Recall that calling the `CreateRateLimitBucket` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CreateRateLimitBucket` Mutation is of type `CreateRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CreateRateLimitBucketData {
+  rateLimitBucket_insert: RateLimitBucket_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CreateRateLimitBucket`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CreateRateLimitBucketVariables } from '@bondcircle/dataconnect';
+import { useCreateRateLimitBucket } from '@bondcircle/dataconnect/react'
+
+export default function CreateRateLimitBucketComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCreateRateLimitBucket();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCreateRateLimitBucket(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateRateLimitBucket(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCreateRateLimitBucket(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCreateRateLimitBucket` Mutation requires an argument of type `CreateRateLimitBucketVariables`:
+  const createRateLimitBucketVars: CreateRateLimitBucketVariables = {
+    bucketKey: ..., 
+    attemptsJson: ..., 
+  };
+  mutation.mutate(createRateLimitBucketVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ bucketKey: ..., attemptsJson: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(createRateLimitBucketVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.rateLimitBucket_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## CompareAndSetRateLimitBucket
+You can execute the `CompareAndSetRateLimitBucket` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect/react/index.d.ts](./index.d.ts)):
+```javascript
+useCompareAndSetRateLimitBucket(options?: useDataConnectMutationOptions<CompareAndSetRateLimitBucketData, FirebaseError, CompareAndSetRateLimitBucketVariables>): UseDataConnectMutationResult<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useCompareAndSetRateLimitBucket(dc: DataConnect, options?: useDataConnectMutationOptions<CompareAndSetRateLimitBucketData, FirebaseError, CompareAndSetRateLimitBucketVariables>): UseDataConnectMutationResult<CompareAndSetRateLimitBucketData, CompareAndSetRateLimitBucketVariables>;
+```
+
+### Variables
+The `CompareAndSetRateLimitBucket` Mutation requires an argument of type `CompareAndSetRateLimitBucketVariables`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface CompareAndSetRateLimitBucketVariables {
+  bucketKey: string;
+  revision: number;
+  nextRevision: number;
+  attemptsJson: string;
+}
+```
+### Return Type
+Recall that calling the `CompareAndSetRateLimitBucket` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `CompareAndSetRateLimitBucket` Mutation is of type `CompareAndSetRateLimitBucketData`, which is defined in [dataconnect/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface CompareAndSetRateLimitBucketData {
+  updated: number;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `CompareAndSetRateLimitBucket`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, CompareAndSetRateLimitBucketVariables } from '@bondcircle/dataconnect';
+import { useCompareAndSetRateLimitBucket } from '@bondcircle/dataconnect/react'
+
+export default function CompareAndSetRateLimitBucketComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useCompareAndSetRateLimitBucket();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useCompareAndSetRateLimitBucket(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCompareAndSetRateLimitBucket(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useCompareAndSetRateLimitBucket(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useCompareAndSetRateLimitBucket` Mutation requires an argument of type `CompareAndSetRateLimitBucketVariables`:
+  const compareAndSetRateLimitBucketVars: CompareAndSetRateLimitBucketVariables = {
+    bucketKey: ..., 
+    revision: ..., 
+    nextRevision: ..., 
+    attemptsJson: ..., 
+  };
+  mutation.mutate(compareAndSetRateLimitBucketVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ bucketKey: ..., revision: ..., nextRevision: ..., attemptsJson: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(compareAndSetRateLimitBucketVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.updated);
   }
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
