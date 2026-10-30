@@ -153,6 +153,27 @@ async function accept(repo, created, member) {
   return repo.respondToInvitation(detail, member, "accept");
 }
 
+async function join(repo, fixture, created, member, approval) {
+  const result = await accept(repo, created, member);
+  assert.equal(result.status, approval ? "approval_pending" : "joined");
+  if (approval)
+    await repo.approveInvitationMembership(
+      fixture.id,
+      created.id,
+      member.id,
+      fixture.creator.id,
+    );
+}
+
+function assertExistingSharesPreserved(before, after) {
+  for (const existing of before) {
+    const stored = after.find((row) => row.user.id === existing.user.id);
+    assert.ok(stored, "An existing member must remain joined.");
+    assert.equal(stored.expectedAmount, existing.expectedAmount);
+    assert.equal(stored.confirmedAmount, existing.confirmedAmount);
+  }
+}
+
 function mutationBarrier(operation) {
   let count = 0;
   let release;
@@ -311,33 +332,43 @@ test("real custom Gift and Support invitations preserve their existing specified
   }
 });
 
-test("real inconsistent legacy equal rows fail closed without rewriting historical shares", async () => {
-  const repo = await repository();
-  const fixture = await circle({ target: 100 });
-  const legacy = await user("legacy");
-  await database.upsert("circleMembership", {
-    circleId: fixture.id,
-    userId: legacy.id,
-    role: "member",
-    membershipStatus: "joined",
-    contributionStatus: "joined",
-    expectedAmount: 0,
-  });
-  await writeCircle(fixture, { memberCount: 2 });
-  const created = await invitation(repo, fixture);
-  const member = await user("legacy-next");
-  const result = await Promise.allSettled([accept(repo, created, member)]);
-  const stored = await members(fixture.id);
-  assert.equal(result[0].status, "rejected");
-  assert.equal(stored.length, 2);
-  assert.equal(
-    stored.find((row) => row.user.id === legacy.id).expectedAmount,
-    0,
-  );
-  assert.equal(
-    stored.find((row) => row.user.id === member.id),
-    undefined,
-  );
+test("owner-approved remaining-budget rule preserves existing zero equal shares", async () => {
+  for (const type of ["gift", "support"])
+    for (const approval of [false, true]) {
+      const repo = await repository();
+      const fixture = await circle({
+        type,
+        target: 100,
+        plan: type === "support" ? "premium" : "starter",
+      });
+      const legacy = await user("legacy");
+      await database.upsert("circleMembership", {
+        circleId: fixture.id,
+        userId: legacy.id,
+        role: "member",
+        membershipStatus: "joined",
+        contributionStatus: "joined",
+        expectedAmount: 0,
+      });
+      await writeCircle(fixture, { memberCount: 2 });
+      const before = await members(fixture.id);
+      const created = await invitation(repo, fixture, {
+        requireApproval: approval,
+      });
+      const member = await user("legacy-next");
+      await join(repo, fixture, created, member, approval);
+      const stored = await members(fixture.id);
+      assert.equal(stored.length, 3);
+      assertExistingSharesPreserved(before, stored);
+      assert.equal(
+        stored.find((row) => row.user.id === member.id).expectedAmount,
+        66,
+      );
+      assert.equal(
+        stored.reduce((sum, row) => sum + row.expectedAmount, 0),
+        100,
+      );
+    }
 });
 
 for (const [approval, capacity] of [
@@ -719,32 +750,159 @@ for (const state of ["completed", "revoked", "expired"]) {
   });
 }
 
-test("real stored capacity upgrade permits joining with allocation policy unasserted", async (context) => {
-  const repo = await repository();
-  const fixture = await circle({ target: 3000, capacity: 3 });
-  const before = await members(fixture.id);
-  // Represent an already-upgraded stored circle; this fixture makes no provider
-  // or payment-settlement assertion. The new member's share policy is undecided.
-  await writeCircle(fixture, { memberLimit: 10, pricingPlan: "standard" });
-  const created = await invitation(repo, fixture);
-  const member = await user("capacity-upgrade");
-  const result = await Promise.allSettled([accept(repo, created, member)]);
-  const after = await members(fixture.id);
-  context.diagnostic(
-    JSON.stringify({
-      beforeAmounts: before.map((row) => row.expectedAmount),
-      afterAmounts: after.map((row) => row.expectedAmount),
-      outcome: result[0].status,
-      rejectionCode:
-        result[0].status === "rejected" ? result[0].reason.code : null,
-    }),
-  );
-  assert.equal(result[0].status, "fulfilled");
-  assert.equal(result[0].value.status, "joined");
-  assert.equal(after.length, before.length + 1);
-  for (const existing of before)
-    assert.ok(
-      after.some((row) => row.user.id === existing.user.id),
-      "Previously joined members must remain members after the new join.",
-    );
+for (const type of ["gift", "support"])
+  for (const approval of [false, true]) {
+    test(`real ${type} capacity upgrade ${approval ? "approval" : "acceptance"} preserves assigned and confirmed history and fills remaining places`, async () => {
+      const repo = await repository();
+      const fixture = await circle({
+        type,
+        target: 3000,
+        capacity: 3,
+        plan: type === "support" ? "premium" : "starter",
+      });
+      await database.upsert("circleMembership", {
+        circleId: fixture.id,
+        userId: fixture.creator.id,
+        role: "creator",
+        membershipStatus: "joined",
+        contributionStatus: "part_paid",
+        expectedAmount: 1000,
+        confirmedAmount: 700,
+      });
+      const before = await members(fixture.id);
+      // Stored upgraded state only: no checkout or provider settlement is claimed.
+      await writeCircle(fixture, {
+        memberLimit: 10,
+        pricingPlan: type === "support" ? "premium" : "standard",
+        contributedAmount: 700,
+      });
+      const created = await invitation(repo, fixture, {
+        maxUses: 9,
+        requireApproval: approval,
+      });
+      const joined = [];
+      for (let index = 0; index < 9; index++) {
+        const member = await user("capacity-upgrade");
+        await join(repo, fixture, created, member, approval);
+        joined.push(member);
+        assertExistingSharesPreserved(before, await members(fixture.id));
+      }
+      const stored = await members(fixture.id);
+      assert.equal(stored.length, 10);
+      assert.deepEqual(
+        joined.map(
+          ({ id }) => stored.find((row) => row.user.id === id).expectedAmount,
+        ),
+        [223, 223, 222, 222, 222, 222, 222, 222, 222],
+      );
+      assert.equal(
+        stored.reduce((sum, row) => sum + row.expectedAmount, 0),
+        3000,
+      );
+      const detail = await repo.loadInvitationByToken(created.token);
+      assert.equal(detail.circle.memberCount, 10);
+      assert.equal(detail.useCount, 9);
+    });
+  }
+
+test("owner-approved remaining-budget rule preserves unequal assigned shares", async () => {
+  for (const type of ["gift", "support"])
+    for (const approval of [false, true]) {
+      const repo = await repository();
+      const fixture = await circle({
+        type,
+        target: 3000,
+        capacity: 3,
+        plan: type === "support" ? "premium" : "starter",
+      });
+      const existing = await user("unequal-existing");
+      await database.upsert("circleMembership", {
+        circleId: fixture.id,
+        userId: existing.id,
+        role: "member",
+        membershipStatus: "joined",
+        contributionStatus: "part_paid",
+        expectedAmount: 777,
+        confirmedAmount: 111,
+      });
+      await writeCircle(fixture, {
+        memberCount: 2,
+        memberLimit: 10,
+        pricingPlan: type === "support" ? "premium" : "standard",
+        contributedAmount: 111,
+      });
+      const before = await members(fixture.id);
+      const created = await invitation(repo, fixture, {
+        requireApproval: approval,
+      });
+      const member = await user("unequal-next");
+      await join(repo, fixture, created, member, approval);
+      const stored = await members(fixture.id);
+      assertExistingSharesPreserved(before, stored);
+      assert.equal(stored.length, 3);
+      assert.equal(
+        stored.find((row) => row.user.id === member.id).expectedAmount,
+        153,
+      );
+    }
+});
+
+test("negative or overallocated existing shares reject joins without rewriting history", async () => {
+  for (const type of ["gift", "support"])
+    for (const approval of [false, true])
+      for (const creatorAmount of [-1, 101]) {
+        const repo = await repository();
+        const fixture = await circle({
+          type,
+          target: 100,
+          creatorAmount,
+          plan: type === "support" ? "premium" : "starter",
+        });
+        const before = await members(fixture.id);
+        const created = await invitation(repo, fixture, {
+          requireApproval: approval,
+        });
+        const member = await user("invalid-existing");
+        if (approval)
+          assert.equal(
+            (await accept(repo, created, member)).status,
+            "approval_pending",
+          );
+        const result = await Promise.allSettled([
+          approval
+            ? repo.approveInvitationMembership(
+                fixture.id,
+                created.id,
+                member.id,
+                fixture.creator.id,
+              )
+            : accept(repo, created, member),
+        ]);
+        assert.equal(result[0].status, "rejected");
+        const stored = await members(fixture.id);
+        assert.equal(stored.length, 1);
+        assertExistingSharesPreserved(before, stored);
+        const detail = await repo.loadInvitationByToken(created.token);
+        assert.equal(detail.useCount, 0);
+        assert.equal(detail.circle.memberCount, 1);
+      }
+});
+
+test("actual database Int validation rejects malformed assigned shares without altering records", async () => {
+  for (const type of ["gift", "support"]) {
+    const fixture = await circle({ type });
+    const before = await members(fixture.id);
+    for (const expectedAmount of ["not-a-number", 1.5])
+      await assert.rejects(
+        database.upsert("circleMembership", {
+          circleId: fixture.id,
+          userId: fixture.creator.id,
+          role: "creator",
+          membershipStatus: "joined",
+          contributionStatus: "joined",
+          expectedAmount,
+        }),
+      );
+    assertExistingSharesPreserved(before, await members(fixture.id));
+  }
 });
