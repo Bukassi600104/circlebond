@@ -1,4 +1,4 @@
-import { isPublicError } from "@/server/public-errors";
+import { isPublicError, RequestValidationError } from "@/server/public-errors";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { readSession } from "@/server/auth";
@@ -6,6 +6,7 @@ import { assertTrustedMutation } from "@/server/auth/request";
 import { getFirebaseAdminStorage } from "@/server/firebase/admin";
 import {
   loadContributionWorkspace,
+  loadPrivateContributionWorkspace,
   submitContributionReceipt,
 } from "@/server/repositories/contributions";
 import { recordUploadOutcome } from "@/server/repositories/operational-events";
@@ -57,6 +58,19 @@ export async function POST(
         { status: 429 },
       );
     }
+    const workspace = await loadPrivateContributionWorkspace(
+      circleId,
+      session.uid,
+    );
+    if (!workspace) {
+      return NextResponse.json({ error: "Circle not found." }, { status: 404 });
+    }
+    if (!["active", "published"].includes(workspace.circle.status)) {
+      return NextResponse.json(
+        { error: "This circle is not accepting contributions." },
+        { status: 409 },
+      );
+    }
     metricCircleId = circleId;
     uploadAttempted = true;
     const form = await request.formData();
@@ -66,8 +80,31 @@ export async function POST(
     const replacementOfId =
       String(form.get("replacementOfId") ?? "").trim() || null;
 
+    if (!Number.isInteger(amount) || amount < 1) {
+      throw new RequestValidationError("Enter a valid amount paid.");
+    }
+    if (note && note.length > 500) {
+      throw new RequestValidationError(
+        "Keep the receipt note within 500 characters.",
+      );
+    }
+    if (
+      replacementOfId &&
+      !workspace.receipts.some(
+        (receipt) =>
+          receipt.id === replacementOfId &&
+          receipt.uploaderId === session.uid &&
+          receipt.status === "rejected",
+      )
+    ) {
+      throw new RequestValidationError(
+        "Only your rejected receipt can be replaced.",
+      );
+    }
     if (!(receiptImage instanceof File)) {
-      throw new Error("Add a JPG, PNG or WebP receipt image up to 5 MB.");
+      throw new RequestValidationError(
+        "Add a JPG, PNG or WebP receipt image up to 5 MB.",
+      );
     }
     const sanitized = await sanitizeUploadedImage(
       receiptImage,
