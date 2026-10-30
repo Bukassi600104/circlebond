@@ -626,6 +626,22 @@ try {
         /^\s*₦\s*1,000\s+expected\s*$/,
         "Joined equal Gift members must receive their server-derived planned share.",
       );
+      const retainedCreator = memberPage
+        .locator(".bc-gift-members button")
+        .filter({ hasText: `qa-organizer-${suffix}` });
+      await retainedCreator.waitFor({ state: "visible" });
+      assert.match(
+        await retainedCreator.locator("small").textContent(),
+        /^\s*₦\s*1,000\s+expected\s*$/,
+        "The ordinary unupgraded Gift creator must retain the original planned share.",
+      );
+      report.equalGiftShares = {
+        target: 3000,
+        plannedCapacity: 3,
+        joinedMemberExpected: 1000,
+        retainedCreatorExpected: 1000,
+        invitationAmountSupplied: false,
+      };
     },
   );
   await check(
