@@ -201,7 +201,9 @@ query GetCircleEngineRecord($circleId: UUID!) @auth(level: NO_ACCESS) {
       id
     }
   }
-  circleMemberships(where: { circleId: { eq: $circleId } }) {
+  circleMemberships(
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
+  ) {
     role
     membershipStatus
     user {
@@ -292,7 +294,7 @@ query GetGiftCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1223,7 +1225,7 @@ query GetAsoEbiCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     sortOrder
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1425,7 +1427,7 @@ query GetSupportCircleDetail($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -1869,7 +1871,7 @@ query GetContributionWorkspace($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
@@ -2210,7 +2212,7 @@ query GetCircleCommunication($circleId: UUID!) @auth(level: NO_ACCESS) {
     }
   }
   circleMemberships(
-    where: { circleId: { eq: $circleId } }
+    where: { circleId: { eq: $circleId }, membershipStatus: { eq: "joined" } }
     orderBy: { joinedAt: ASC }
   ) {
     role
