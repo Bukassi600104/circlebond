@@ -235,7 +235,10 @@ try {
       await page
         .getByRole("button", { name: "Create account", exact: true })
         .click();
-      await page.getByRole("alert").waitFor();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "Accept the Terms and Privacy Policy to continue." })
+        .waitFor();
       assert.equal(mutations, 0);
       await page.unroute("**/api/auth/email-otp/request", handler);
     },
@@ -259,7 +262,10 @@ try {
       });
       await email.fill("synthetic@example.test");
       await page.getByRole("button", { name: "Continue", exact: true }).click();
-      await page.getByRole("alert").waitFor();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "Synthetic delivery outage. Try again." })
+        .waitFor();
       assert.equal(await email.inputValue(), "synthetic@example.test");
       assert.equal(new URL(page.url()).pathname, "/sign-in");
       assert.equal(

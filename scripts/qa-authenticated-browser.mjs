@@ -70,6 +70,7 @@ const report = {
   scope:
     "Synthetic loopback Auth/DataConnect/SMTP/DNS, actual UI OTP exchange; no Storage/provider/device acceptance",
   checks: [],
+  authNetwork: [],
 };
 const secrets = new Set();
 function safe(message) {
@@ -78,6 +79,10 @@ function safe(message) {
     if (secret) value = value.replaceAll(secret, "[redacted]");
   return value
     .replace(/\/invite\/[A-Za-z0-9_%.-]+/g, "/invite/[redacted]")
+    .replace(
+      /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g,
+      "[redacted-token]",
+    )
     .replace(/\b\d{6}\b/g, "[redacted]")
     .slice(0, 1200);
 }
@@ -302,7 +307,25 @@ try {
     serviceWorkers: "block",
     reducedMotion: "reduce",
   });
-  for (const context of [organizer, member])
+  for (const context of [organizer, member]) {
+    context.on("response", (response) => {
+      const url = new URL(response.url());
+      if (url.pathname.startsWith("/api/auth/") || url.port === "9099")
+        report.authNetwork.push({
+          path: safe(url.pathname),
+          host: url.host,
+          status: response.status(),
+        });
+    });
+    context.on("requestfailed", (request) => {
+      const url = new URL(request.url());
+      if (url.protocol.startsWith("http"))
+        report.authNetwork.push({
+          path: safe(url.pathname),
+          host: url.host,
+          failed: safe(request.failure()?.errorText ?? "request failed"),
+        });
+    });
     await context.route("**/*", (route) => {
       const url = new URL(route.request().url());
       return ["127.0.0.1", "localhost"].includes(url.hostname) ||
@@ -310,6 +333,7 @@ try {
         ? route.continue()
         : route.abort();
     });
+  }
   const ownerPage = await organizer.newPage();
   const memberPage = await member.newPage();
   const suffix = Date.now();
@@ -537,6 +561,19 @@ try {
     },
   );
 } catch (error) {
+  if (browser) {
+    report.failurePages = await Promise.all(
+      browser
+        .contexts()
+        .flatMap((context) => context.pages())
+        .map(async (page) => ({
+          path: safe(new URL(page.url()).pathname),
+          alerts: (await page.locator('[role="alert"]').allTextContents()).map(
+            safe,
+          ),
+        })),
+    );
+  }
   if (!report.checks.some((entry) => entry.status === "FAIL"))
     report.checks.push({
       name: "authenticated browser harness",

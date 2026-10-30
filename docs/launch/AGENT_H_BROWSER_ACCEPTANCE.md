@@ -35,3 +35,15 @@ Raw first-run reports are in the CI checkout's ignored `tmp/launch-evidence/publ
 Source preflight also corrected an unexecuted fixture assumption: the existing Gift creation handler automatically claims and publishes an eligible trial. The browser journey therefore saves/reloads a separate Starter draft without checkout, then creates an eligible Trial through its existing UI and asserts automatic activation before inviting a member. Both draft persistence and free activation outcomes remain required; no pricing or product rule is changed.
 
 The pre-consent negative case sends a valid, no-image Starter multipart payload with valid CSRF, because the handler validates form data before the repository's persisted legal boundary. It requires HTTP403 with `LEGAL_ACCEPTANCE_REQUIRED` and unchanged empty caller circle lists before/after; a malformed JSON request would not test that boundary.
+
+## Second actual run: candidate 4008ace
+
+Application/test-tooling commit `4008acec7e66d6d3fb42b4e70079f4f7f0441c3d`, clean tracked CI checkout, production-mode local build `C9BwsS1dP5v77CXiA9lsW`, same Edge version and synthetic configuration. The reviewed CLI-only readiness preload ran before the original emulator configure method; no application or dependency files were changed for the browser run.
+
+**Second-run result: FAIL.** Public suite: 37 PASS, 2 FAIL. The real dialog focus-restoration correction passed, including background inertness and Escape return to the opener. All 24 layouts and all six controlled samples passed; no external browser request was observed. The remaining public failures were exact `role=alert` selector ambiguity with Next's empty route announcer: the correct consent/error paragraphs were present. The fixture now targets the expected alert text and retains its behavioral assertions.
+
+Measured sign-in LCP samples were 1352/1396/1224ms (CLS at most 0.0001392). Onboarding samples were 2428/2428/2272ms (CLS 0.0243870), with controlled next-screen times 21.9/49.9/39.4ms. Warm unauthenticated API p95 was 13.80ms across 20 samples. All predeclared budgets remained unchanged.
+
+The authenticated suite submitted a genuine UI email OTP successfully (the local server recorded successful verification) but timed out before reaching the legal-acceptance page. Client exchange/session/navigation remained under diagnosis; no authenticated journey PASS is claimed. Subsequent diagnostic instrumentation records sanitized endpoint paths/statuses and visible error messages, excluding request/response bodies, token query strings, entered OTP values and verification screenshots.
+
+The second reports are preserved as `second-4008ace-report.json` beside each original ignored report. The first 129f1e1 reports remain retained separately.
