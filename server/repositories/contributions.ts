@@ -120,7 +120,7 @@ export async function loadPrivateContributionWorkspace(
     .map(mapReceipt)
     .map((receipt) => ({
       ...receipt,
-      imageUrl: `${receipt.imageUrl}?access=${encodeURIComponent(
+      imageUrl: `/api/circles/${encodeURIComponent(circleId)}/receipts/${encodeURIComponent(receipt.id)}/image?access=${encodeURIComponent(
         createPrivateFileAccess({
           circleId,
           resourceId: receipt.id,

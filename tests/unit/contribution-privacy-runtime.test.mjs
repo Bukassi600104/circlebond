@@ -6,6 +6,8 @@ const rules = await loadTypescriptModule("server/contributions/engine.ts", {});
 async function fixture({
   targetAmount = 987654321,
   contributedAmount = 876543210,
+  receiptId = "receipt",
+  storedImageUrl = "/private-image",
 } = {}) {
   const metadata = {
     circle: {
@@ -37,9 +39,9 @@ async function fixture({
     ],
   };
   const receipt = {
-    id: "receipt",
+    id: receiptId,
     amount: 500,
-    imageUrl: "/private-image",
+    imageUrl: storedImageUrl,
     imageStoragePath: "circles/circle/receipts/private-object",
     contentType: "image/jpeg",
     status: "awaiting_confirmation",
@@ -171,4 +173,20 @@ test("private receipt image route still authorizes and reads its server-only sto
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("cache-control"), "private, no-store");
   assert.deepEqual(paths, [f.receipt.imageStoragePath]);
+});
+
+test("legacy dashed receipt URLs use the canonical queried receipt identity", async () => {
+  const id = "77bbe67b030944d5a8e0766f288d5163";
+  const dashed = "77bbe67b-0309-44d5-a8e0-766f288d5163";
+  const f = await fixture({
+    receiptId: id,
+    storedImageUrl: `/api/circles/circle/receipts/${dashed}/image`,
+  });
+  const workspace = await f.repo.loadContributionWorkspace("circle", "self");
+  const imageUrl = new URL(
+    workspace.receipts[0].imageUrl,
+    "https://example.test",
+  );
+  assert.equal(imageUrl.pathname.split("/").at(-2), id);
+  assert.equal(workspace.receipts[0].id, id);
 });
