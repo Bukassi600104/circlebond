@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import test from "node:test";
 import { startSmtpSink } from "../helpers/smtp-sink.mjs";
+import { startDnsSink, E2E_EMAIL_DOMAIN } from "../helpers/dns-sink.mjs";
 
 const port = 3101;
 const baseUrl = `http://127.0.0.1:${port}`;
@@ -50,19 +51,31 @@ async function csrf() {
 
 test("Firebase email OTP creates a revocable protected session", async () => {
   const smtp = await startSmtpSink();
+  const dns = await startDnsSink();
   const server = spawn(
     process.execPath,
-    ["node_modules/next/dist/bin/next", "start", "-p", String(port)],
+    [
+      "--import",
+      dns.preload,
+      "node_modules/next/dist/bin/next",
+      "start",
+      "-p",
+      String(port),
+    ],
     {
       cwd: new URL("../../", import.meta.url),
       stdio: "ignore",
       env: {
         ...process.env,
         NODE_ENV: "production",
+        FIREBASE_PROJECT_ID: "bond-circle",
+        FIREBASE_SQL_CONNECT_LOCATION: "europe-west2",
+        FIREBASE_SQL_CONNECT_SERVICE_ID: "bondcircle-service",
+        FIREBASE_SQL_CONNECT_CONNECTOR_ID: "bondcircle",
         FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:9099",
         AUTH_EMAIL_OTP_MODE: "production",
         AUTH_EMAIL_SMTP_URL: smtp.url,
-        AUTH_EMAIL_FROM: "BondCircle Test <no-reply@example.test>",
+        AUTH_EMAIL_FROM: `BondCircle Test <no-reply@${E2E_EMAIL_DOMAIN}>`,
         AUTH_CHALLENGE_SECRET:
           "bondcircle-e2e-only-secret-with-more-than-thirty-two-bytes",
       },
@@ -71,7 +84,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
 
   try {
     await waitForServer();
-    const email = `e2e-${Date.now()}@example.com`;
+    const email = `e2e-${Date.now()}@${E2E_EMAIL_DOMAIN}`;
     const requestCode = await fetch(`${baseUrl}/api/auth/email-otp/request`, {
       method: "POST",
       headers: {
@@ -88,6 +101,11 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     });
     absorbCookies(requestCode);
     assert.equal(requestCode.status, 202);
+    assert.ok(
+      dns.queries.some(
+        ({ name, type }) => name === E2E_EMAIL_DOMAIN && type === 15,
+      ),
+    );
     const challenge = await requestCode.json();
     assert.equal(challenge.developmentCode, undefined);
     const code = smtp.takeCode(email);
@@ -132,7 +150,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
           operationName: "UpsertCurrentUser",
           variables: {
             displayName: "Untrusted direct writer",
-            email: "another@example.com",
+            email: `another@${E2E_EMAIL_DOMAIN}`,
             termsAcceptedAt: new Date().toISOString(),
             privacyAcceptedAt: new Date().toISOString(),
           },
@@ -204,7 +222,7 @@ test("Firebase email OTP creates a revocable protected session", async () => {
     assert.equal(restoreEmulatorUser.status, 200);
     assert.ok((await restoreEmulatorUser.json()).customToken);
 
-    const unknownEmail = `new-sign-in-${Date.now()}@example.com`;
+    const unknownEmail = `new-sign-in-${Date.now()}@${E2E_EMAIL_DOMAIN}`;
     const requestUnknownCode = await fetch(
       `${baseUrl}/api/auth/email-otp/request`,
       {
@@ -287,5 +305,6 @@ test("Firebase email OTP creates a revocable protected session", async () => {
   } finally {
     server.kill();
     await smtp.close();
+    await dns.close();
   }
 });
