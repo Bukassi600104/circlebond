@@ -1,6 +1,6 @@
 # BondCircle API and native readiness
 
-Assessment: 29 October 2026. Implementation owner: Agent G. Code acceptance: **PENDING REVIEW**. Native client delivery is a separate track and does not block web release by itself.
+Assessment: 29 October2026; reconciled30 October2026. Implementation owner: Agent G. Code acceptance: **PENDING REVIEW**. Native client delivery is a separate track and does not block web release by itself.
 
 ## Verified source defects and corrections
 
@@ -15,18 +15,18 @@ Assessment: 29 October 2026. Implementation owner: Agent G. Code acceptance: **P
 
 ## Contract and coverage
 
-| Capability                                           | Current source contract                                                     | Acceptance                                                                               |
-| ---------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Profile bootstrap/preferences read                   | `GET /api/v1/me`                                                            | PENDING REVIEW; route behavior tested with controlled dependencies                       |
-| Email OTP request/exchange                           | `POST /api/v1/auth/email-otp/request`, `POST /api/v1/auth/email-otp/verify` | PENDING REVIEW; real delivery remains BLOCKED until provider tests                       |
-| Circle listing/detail                                | `GET /api/v1/circles`, `GET /api/v1/circles/{id}`                           | PENDING REVIEW; membership scope and redaction exercised                                 |
-| Device token register/remove                         | `POST` and `DELETE /api/v1/devices/push-token`                              | PENDING REVIEW; schema compile/database/provider delivery are separate gates             |
-| Native circle creation/activation/upgrade            | No v1 mutation implemented                                                  | NOT STARTED; existing web repositories remain authoritative                              |
-| Native invitation acceptance/management              | No v1 mutation implemented                                                  | NOT STARTED; existing web invitation rules must be reused                                |
-| Native contributions/receipt submission/review       | No v1 contract implemented                                                  | NOT STARTED; existing private upload/review path remains authoritative                   |
-| Native notifications/preferences/lifecycle mutations | No v1 contract implemented                                                  | NOT STARTED; reuse existing rules when approved                                          |
-| Account export/deletion                              | No working endpoint found in baseline                                       | FAIL shared web capability; parent coordinating remediation, not a native-only exclusion |
-| Native binary/app-store readiness                    | No Android/iOS client built in this stabilization                           | NOT APPLICABLE to web release; physical native acceptance NOT STARTED                    |
+| Capability                                           | Current source contract                                                          | Acceptance                                                                                           |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Profile bootstrap/preferences read                   | `GET /api/v1/me`                                                                 | PENDING REVIEW; route behavior tested with controlled dependencies                                   |
+| Email OTP request/exchange                           | `POST /api/v1/auth/email-otp/request`, `POST /api/v1/auth/email-otp/verify`      | PENDING REVIEW; real delivery remains BLOCKED until provider tests                                   |
+| Circle listing/detail                                | `GET /api/v1/circles`, `GET /api/v1/circles/{id}`                                | PENDING REVIEW; membership scope and redaction exercised                                             |
+| Device token register/remove                         | `POST` and `DELETE /api/v1/devices/push-token`                                   | PENDING REVIEW; schema compile/database/provider delivery are separate gates                         |
+| Native circle creation/activation/upgrade            | No v1 mutation implemented                                                       | NOT STARTED; existing web repositories remain authoritative                                          |
+| Native invitation acceptance/management              | No v1 mutation implemented                                                       | NOT STARTED; existing web invitation rules must be reused                                            |
+| Native contributions/receipt submission/review       | No v1 contract implemented                                                       | NOT STARTED; existing private upload/review path remains authoritative                               |
+| Native notifications/preferences/lifecycle mutations | No v1 contract implemented                                                       | NOT STARTED; reuse existing rules when approved                                                      |
+| Account export/privacy requests                      | Existing authenticated web export and persisted intake endpoints now implemented | Bounded F review PASS; actual deletion fulfillment/operator policy BLOCKED; no native parity claimed |
+| Native binary/app-store readiness                    | No Android/iOS client built in this stabilization                                | NOT APPLICABLE to web release; physical native acceptance NOT STARTED                                |
 
 The six implemented path families in `docs/openapi.yaml` are the supported v1 foundation. The contract deliberately does not advertise absent endpoints as complete parity. Offset pagination is deterministic for an unchanged membership dataset; clients should restart after membership changes.
 
@@ -37,7 +37,7 @@ The six implemented path families in `docs/openapi.yaml` are the supported v1 fo
 - Cookie callers retain same-origin/CSRF requirements for mutations. Do not weaken this boundary to make a cross-origin browser prototype work.
 - Error status contracts: 400 validation/expired OTP; 401 missing or invalid credentials; 403 suspension/CSRF refusal; 404 absent or inaccessible resource; 409 consumed OTP; 429 throttled request; 500 generic service failure. Shared response codes are `INVALID_REQUEST`, `AUTHENTICATION_REQUIRED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `RATE_LIMITED`, `INTERNAL_ERROR` and `REQUEST_FAILED`. Unknown provider messages, tokens and credentials are never error payloads.
 - Creator/co-admin/member authorization stays in existing repositories. Circle reads return only membership-scoped records; hidden totals remain null. Native views must not treat organizer approval as independently verified bank settlement.
-- Legal acceptance is a server requirement, not a client navigation convention. Source inspection found web session issuance reporting `needsLegalAcceptance` while still setting a session cookie and web creation routes checking only that session. This shared defect was escalated to the parent/security owner; it must be fixed and verified before public release. No v1 creation endpoint was added around it.
+- Legal acceptance is a server requirement. Shared create/join repositories and protected pages now enforce persisted consent; acceptance/bootstrap routes remain accessible. Session recreation preserves recorded consent and display name. Strict consent, verified contact and claim-preservation regressions pass. No v1 creation endpoint bypasses these rules.
 
 ## Data and file strategy
 
@@ -59,7 +59,7 @@ React Native with Expo is a candidate for a later native client. That decision r
 
 Final focused route/repository run: `node --test tests/unit/mobile-api-v1.test.mjs` — **17 tests PASS, zero failures**, including the shared challenge-budget regression. Tests transpile actual route/repository source and control external dependencies; they do not establish real Firebase, email, push-provider or device acceptance.
 
-`mobile-auth-foundation.test.mjs` was also replaced with six runtime checks. On G's A-based isolated branch it records **five PASS, one FAIL**: the new unverified-header CSRF regression correctly fails against the original shared helper. Agent F's separately committed shared fix (`62e9f2c`) is an integration dependency. The parent must rerun both files together after that fix, retaining the full runtime replacement rather than the old unsafe source assertion.
+`mobile-auth-foundation.test.mjs` now executes six runtime checks. The initial isolated branch had five PASS/one FAIL against the old CSRF helper; after F integration and real verified-contact fixtures, all six pass. The original unsafe source assertions were not restored.
 
 Local schema and all connector operations, including metadata-only device lookup, compiled with the cached native Data Connect toolkit (`dataconnect-emulator-3.4.16.exe --logtostderr build --config_dir=<worktree>/dataconnect`). Process exit was zero and parsed output `.errors` was null. No `--project_id`, deployed sources, credentials, schema migration or SDK generation was used. This is compiler evidence, not database persistence acceptance.
 
@@ -67,6 +67,12 @@ A device persistence/reassignment/owner-only deletion E2E scenario was added to 
 
 The first scoped ESLint attempt was blocked by a missing file in A's still-running dependency install. A second check using the existing desktop config found one test variable violating Next's `no-assign-module-variable`; the variable was renamed. The final scoped ESLint check using the existing desktop config **PASS** with zero warnings/errors across all v1 routes, the two changed repositories, runtime test harness, two native unit files and circle-engine E2E file.
 
-`tsc --noEmit --incremental false` could not establish type acceptance in this partially installed checkout: Next.js/lucide modules and Firebase declarations were missing, with downstream inference errors. This is **BLOCKED** until dependencies finish installing or the parent checks the integrated source with complete dependencies; it is not a claimed typecheck pass. The original source dependency directory/config was used for the successful scoped linter only. No dependency or lockfile was changed by G.
+Initial partial-install typecheck was BLOCKED; after integration, G reran scoped ESLint and `tsc --noEmit --incremental false` successfully. G correction commit d593394 (integrated e3791dd) also passed43 focused API/auth/OTP/contract checks. The final updated-lock whole-application CI remains pending. No dependency or lockfile was changed by G.
 
 Required before API acceptance: final focused tests, integrated lint/type/build, combined Data Connect compilation and isolated DB tests, account lifecycle cleanup, independent Ponytail review and staging/provider checks. Do not classify API/native readiness PASS based only on these unit tests.
+
+## Reviewed contract correction — 30 October2026
+
+H's first review correctly rejected missing lifecycle enum values and inaccurate OTP expiry/202 schemas. The correction preserves all nine backend lifecycle states in list/detail/OpenAPI, documents Unix-millisecond integer expiry and message-only throttled202, and applies private API response handling to the request route. Both verifiers reserve valid proof before account mutation/token issuance; consumed proof returns409 with zero Auth/profile access. Stable IP and shared address/challenge budgets, strict purpose/consent, merged custom claims and existing-mailbox verification are covered by actual-source tests. Parent's integrated24 OTP/auth/contract checks pass; final independent/integrated evidence remains in the central test/review records.
+
+Supported native foundation remains the six documented path families, not complete web parity. Missing native mutations are a separate future delivery track. Token persistence is not push delivery; requests do not claim notification capability before provider/device acceptance.

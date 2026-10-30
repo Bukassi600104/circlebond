@@ -1,7 +1,7 @@
 # BondCircle payment integration
 
 Evidence date: 29 October 2026 (Africa/Lagos). Baseline: `c0b1f91`.
-Engineering acceptance: PENDING REVIEW. Live provider acceptance: BLOCKED.
+Engineering: bounded H independent review PASS after creator-control CSRF correction; final integrated CI PENDING REVIEW. Live provider acceptance: BLOCKED.
 
 ## Current evidence and boundary
 
@@ -82,7 +82,7 @@ route's public fallback text instead of internal exception messages.
 | Type checking                               | PASS: tsc --noEmit, including payment routes/components                                                                                                    |
 | Scoped lint and formatting                  | PASS: scoped lint/format; final changed-test checks before commit                                                                                          |
 | Integrated clean install/full build/full CI | PENDING REVIEW: parent integration gate                                                                                                                    |
-| Independent Ponytail review                 | PENDING REVIEW                                                                                                                                             |
+| Independent Ponytail review                 | PASS for bounded adapter/settlement/control changes; H28+6 regressions, AGENT_H_REVIEW_C.md; final integrated acceptance pending                           |
 | Real Paystack test checkout/webhook/refund  | BLOCKED: approved sandbox account, test credentials and publicly reachable staging webhook unavailable                                                     |
 | Live financial transactions                 | BLOCKED: explicit provider/policy/production approval required                                                                                             |
 
@@ -102,7 +102,7 @@ Commands/evidence:
 Unit tests mock Paystack HTTP and repository boundaries while executing the actual
 settlement/webhook source through the shared TypeScript test loader. Emulator
 tests use synthetic records and the real connector transactions. Neither is a
-real provider payment or independent review. The helper is identical to Agent G's
+real provider payment. Independent review is recorded separately. The helper reuses Agent G's
 shared `tests/helpers/typescript-module.mjs`.
 
 The first CLI emulator attempt failed during `/emulator/configure`; no tests ran.
