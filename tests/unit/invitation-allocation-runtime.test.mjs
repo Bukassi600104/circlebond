@@ -13,6 +13,7 @@ async function fixture({
   currentMembers = 1,
   expectedAmount = 0,
   existingAllocations,
+  reportedMemberCount,
 } = {}) {
   const circle = {
     id: "allocation-circle",
@@ -143,7 +144,7 @@ async function fixture({
       "@/server/repositories/circles": {
         firebaseCircleStore: {
           findById: async () => circle,
-          memberCount: async () => currentMembers,
+          memberCount: async () => reportedMemberCount ?? currentMembers,
           roleFor: async (_circleId, userId) => roles.get(userId) ?? null,
         },
       },
@@ -156,6 +157,7 @@ async function fixture({
   return {
     circle,
     invitation,
+    joined,
     mutations,
     notifications,
     async join(userId, approval = false) {
@@ -325,12 +327,78 @@ for (const approval of [false, true]) {
     }
   });
 
-  test(`inconsistent historical equal allocations reject ${path} membership without rewriting members`, async () => {
-    for (const existingAllocations of [[0], [999999], [34, 34]]) {
-      const f = await fixture({ targetAmount: 100, existingAllocations });
-      await assert.rejects(f.join("member-one", approval));
-      assert.equal(f.mutations.length, 0);
-      assert.equal(f.notifications.length, 0);
+  test(`approved remaining-target policy preserves zero and unequal allocations on ${path} joins`, async () => {
+    for (const type of ["gift", "support"]) {
+      for (const [existingAllocations, nextAmount] of [
+        [[34, 0], 66],
+        [[34, 34], 32],
+        [[0], 50],
+      ]) {
+        const f = await fixture({
+          type,
+          targetAmount: 100,
+          existingAllocations,
+        });
+        await f.join("member-one", approval);
+        assert.equal(f.mutations.length, 1);
+        assert.equal(f.mutations[0].variables.expectedAmount, nextAmount);
+        assert.deepEqual(
+          f.joined
+            .slice(0, existingAllocations.length)
+            .map((m) => m.expectedAmount),
+          existingAllocations,
+        );
+      }
+    }
+  });
+
+  test(`a fully assigned target gives new ${path} members zero without rewriting shares`, async () => {
+    for (const type of ["gift", "support"]) {
+      const f = await fixture({
+        type,
+        targetAmount: 100,
+        existingAllocations: [100],
+      });
+      await f.join("member-one", approval);
+      await f.join("member-two", approval);
+      assert.deepEqual(
+        f.mutations.map((m) => m.variables.expectedAmount),
+        [0, 0],
+      );
+      assert.equal(f.joined[0].expectedAmount, 100);
+    }
+  });
+
+  test(`invalid or over-target historical amounts reject ${path} membership without writes`, async () => {
+    for (const type of ["gift", "support"]) {
+      for (const existingAllocations of [
+        [-1],
+        [999999],
+        [34, 67],
+        [34, 33.5],
+        [34, Number.NaN],
+        [34, Number.POSITIVE_INFINITY],
+      ]) {
+        const f = await fixture({
+          type,
+          targetAmount: 100,
+          existingAllocations,
+        });
+        await assert.rejects(f.join("member-one", approval));
+        assert.equal(f.mutations.length, 0);
+        assert.equal(f.notifications.length, 0);
+      }
+    }
+  });
+
+  test(`stale or malformed joined counts reject ${path} membership without writes`, async () => {
+    for (const type of ["gift", "support"]) {
+      for (const reportedMemberCount of [-1, 0, 1.5, 2]) {
+        const f = await fixture({ type, reportedMemberCount });
+        await assert.rejects(f.join("member-one", approval));
+        assert.equal(f.mutations.length, 0);
+        assert.equal(f.notifications.length, 0);
+      }
     }
   });
 }

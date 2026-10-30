@@ -29,6 +29,8 @@ async function upgradedFixture(type) {
     },
   ];
   const beforeMembers = structuredClone(existingMembers);
+  const pending = new Set();
+  const roles = new Map([["creator", "creator"]]);
   const invitation = {
     id: "upgraded-allocation-invitation",
     mode: "open",
@@ -36,7 +38,7 @@ async function upgradedFixture(type) {
     requireApproval: false,
     state: "sent",
     effectiveState: "sent",
-    maxUses: 1,
+    maxUses: 9,
     useCount: 0,
     expiresAt: "2099-01-01T00:00:00.000Z",
     createdAt: "2026-10-30T00:00:00.000Z",
@@ -58,19 +60,35 @@ async function upgradedFixture(type) {
       assert.equal(operation, "GetCircleInvitationAcceptancesPage");
       return {
         data: {
-          invitationAcceptances: [
-            {
-              invitation: { id: invitation.id },
-              user: { id: "new-member", displayName: "Pending fixture" },
-              status: "pending",
-              createdAt: "2026-10-30T00:00:00.000Z",
-            },
-          ],
+          invitationAcceptances: [...pending].map((userId) => ({
+            invitation: { id: invitation.id },
+            user: { id: userId, displayName: "Pending fixture" },
+            status: "pending",
+            createdAt: "2026-10-30T00:00:00.000Z",
+          })),
         },
       };
     },
     async executeMutation(operation, variables) {
       mutations.push({ operation, variables });
+      if (
+        [
+          "AcceptInvitationWithMembership",
+          "ApproveInvitationMembership",
+        ].includes(operation)
+      ) {
+        existingMembers.push({
+          id: `membership-${variables.userId}`,
+          user: { id: variables.userId },
+          role: "member",
+          membershipStatus: "joined",
+          expectedAmount: variables.expectedAmount,
+          confirmedAmount: 0,
+        });
+        invitation.useCount = variables.nextUseCount;
+        roles.set(variables.userId, "member");
+        pending.delete(variables.userId);
+      }
       return { data: {} };
     },
   };
@@ -93,8 +111,7 @@ async function upgradedFixture(type) {
         firebaseCircleStore: {
           findById: async () => circle,
           memberCount: async () => existingMembers.length,
-          roleFor: async (_circleId, userId) =>
-            userId === "creator" ? "creator" : null,
+          roleFor: async (_circleId, userId) => roles.get(userId) ?? null,
         },
       },
       "@/server/repositories/notifications": {
@@ -110,6 +127,24 @@ async function upgradedFixture(type) {
     mutations,
     existingMembers,
     beforeMembers,
+    async join(userId, approval) {
+      if (approval) {
+        pending.add(userId);
+        await repo.approveInvitationMembership(
+          circle.id,
+          invitation.id,
+          userId,
+          "creator",
+        );
+      } else {
+        const result = await repo.respondToInvitation(
+          invitation,
+          { id: userId, email: null, phone: null },
+          "accept",
+        );
+        assert.equal(result.status, "joined");
+      }
+    },
   };
 }
 
@@ -133,29 +168,16 @@ function allocationObservations(members) {
   }));
 }
 
-// A capacity upgrade must preserve membership identity and confirmed history.
-// Existing unpaid allocations and new-member shares are observed, not asserted:
-// retaining them or recalculating them with an audit requires an owner decision.
+// Owner-approved policy: keep every existing assigned/confirmed amount, then
+// split only the remaining target across unfilled places for new members.
 for (const type of ["gift", "support"]) {
   for (const approval of [false, true]) {
     const path = approval ? "approved" : "direct";
-    test(`upgraded equal ${type} permits ${path} joining while preserving membership and confirmed history`, async (t) => {
+    test(`upgraded equal ${type} ${path} joins split the remaining target and preserve assigned/confirmed history`, async (t) => {
       const f = await upgradedFixture(type);
       try {
-        if (approval) {
-          await f.repo.approveInvitationMembership(
-            f.circle.id,
-            f.invitation.id,
-            "new-member",
-            "creator",
-          );
-        } else {
-          const result = await f.repo.respondToInvitation(
-            f.invitation,
-            { id: "new-member", email: null, phone: null },
-            "accept",
-          );
-          assert.equal(result.status, "joined");
+        for (let index = 0; index < 9; index++) {
+          await f.join(`new-member-${index}`, approval);
         }
         const joins = f.mutations.filter((entry) =>
           [
@@ -163,24 +185,40 @@ for (const type of ["gift", "support"]) {
             "AcceptInvitationWithMembership",
           ].includes(entry.operation),
         );
-        assert.equal(joins.length, 1);
-        assert.equal(
-          joins[0].operation,
-          approval
-            ? "ApproveInvitationMembership"
-            : "AcceptInvitationWithMembership",
-        );
-        assert.equal(joins[0].variables.userId, "new-member");
-        assert.equal(joins[0].variables.nextMemberCount, 2);
+        assert.equal(joins.length, 9);
         assert.deepEqual(
-          membershipHistory(f.existingMembers),
+          joins.map((m) => m.variables.expectedAmount),
+          [223, 223, 222, 222, 222, 222, 222, 222, 222],
+        );
+        for (let index = 0; index < joins.length; index++) {
+          assert.equal(
+            joins[index].operation,
+            approval
+              ? "ApproveInvitationMembership"
+              : "AcceptInvitationWithMembership",
+          );
+          assert.equal(joins[index].variables.userId, `new-member-${index}`);
+          assert.equal(joins[index].variables.nextMemberCount, index + 2);
+        }
+        assert.equal(
+          f.existingMembers.reduce((sum, m) => sum + m.expectedAmount, 0),
+          3000,
+        );
+        assert.deepEqual(
+          f.existingMembers.slice(0, f.beforeMembers.length),
+          f.beforeMembers,
+        );
+        assert.deepEqual(
+          membershipHistory(f.existingMembers.slice(0, f.beforeMembers.length)),
           membershipHistory(f.beforeMembers),
         );
       } finally {
         t.diagnostic(
           `Unpaid allocation observations: ${JSON.stringify({
             before: allocationObservations(f.beforeMembers),
-            after: allocationObservations(f.existingMembers),
+            after: allocationObservations(
+              f.existingMembers.slice(0, f.beforeMembers.length),
+            ),
           })}`,
         );
       }
