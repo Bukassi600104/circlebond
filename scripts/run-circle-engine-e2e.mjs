@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { createConnection } from "node:net";
+import { pathToFileURL } from "node:url";
 
 const root = resolve(import.meta.dirname, "..");
 const portableRoot = join(root, ".tools", "temurin-jre21");
@@ -57,6 +58,9 @@ const child = (await portIsOpen(9399))
   : spawn(
       process.execPath,
       [
+        "--import",
+        pathToFileURL(join(root, "tests/helpers/firebase-cli-readiness.mjs"))
+          .href,
         firebaseCli,
         "emulators:exec",
         "--only",
