@@ -662,3 +662,23 @@ for (const approval of [false, true]) {
     );
   });
 }
+
+test("real stored capacity upgrade permits joining while preserving existing equal shares", async () => {
+  const repo = await repository();
+  const fixture = await circle({ target: 3000, capacity: 3 });
+  const before = await members(fixture.id);
+  // Represent an already-upgraded stored circle; this fixture makes no provider
+  // or payment-settlement assertion. The new member's share policy is undecided.
+  await writeCircle(fixture, { memberLimit: 10, pricingPlan: "standard" });
+  const created = await invitation(repo, fixture);
+  const member = await user("capacity-upgrade");
+  assert.equal((await accept(repo, created, member)).status, "joined");
+  const after = await members(fixture.id);
+  assert.equal(after.length, before.length + 1);
+  for (const existing of before)
+    assert.equal(
+      after.find((row) => row.user.id === existing.user.id).expectedAmount,
+      existing.expectedAmount,
+      "An upgrade must preserve previously assigned contribution amounts.",
+    );
+});
