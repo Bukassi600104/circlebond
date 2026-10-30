@@ -1863,6 +1863,27 @@ mutation RequestInvitationApproval(
   $userId: String!
   $respondedAt: Timestamp!
 ) @auth(level: NO_ACCESS) @transaction {
+  circleApprovalRequestGuard: circle_updateMany(
+    where: {
+      id: { eq: $circleId }
+      status: { in: ["published", "active", "target_reached", "fulfilment"] }
+      activationStatus: { in: ["active", "grandfathered"] }
+    }
+    data: { updatedAt: $respondedAt }
+  ) @check(expr: "this == 1", message: "Circle is not available for joining")
+  query @redact {
+    invitation(key: { id: $invitationId })
+      @check(
+        expr: "this != null && this.circleId == vars.circleId && this.useCount < this.maxUses && this.expiresAt > request.time && this.state in ['created', 'sent', 'opened', 'approval_pending']"
+        message: "Invitation is no longer available"
+      ) {
+      circleId
+      useCount
+      maxUses
+      expiresAt
+      state
+    }
+  }
   invitationAcceptance_insert(
     data: {
       invitation: { id: $invitationId }
