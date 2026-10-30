@@ -352,7 +352,16 @@ try {
         window.__bondcircleLab = { lcpMs: null, cls: 0 };
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries())
-            window.__bondcircleLab.lcpMs = entry.startTime;
+            window.__bondcircleLab = {
+              ...window.__bondcircleLab,
+              lcpMs: entry.startTime,
+              lcpElement: {
+                tag: entry.element?.tagName ?? null,
+                size: entry.size,
+                renderTime: entry.renderTime,
+                loadTime: entry.loadTime,
+              },
+            };
         }).observe({ type: "largest-contentful-paint", buffered: true });
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries())
@@ -362,10 +371,36 @@ try {
       });
       await check(`${path} slow-network lab sample ${sample}`, async () => {
         await ready(perfPage, path);
-        const metrics = await perfPage.evaluate(() => ({
-          ...window.__bondcircleLab,
-          durationMs: performance.now(),
-        }));
+        const metrics = await perfPage.evaluate(() => {
+          const image = document.querySelector(".bc-onboarding__art img");
+          const resource = image
+            ? performance.getEntriesByName(image.currentSrc).at(-1)
+            : null;
+          return {
+            ...window.__bondcircleLab,
+            durationMs: performance.now(),
+            onboardingImage: image
+              ? {
+                  renderedWidth: image.getBoundingClientRect().width,
+                  naturalWidth: image.naturalWidth,
+                  currentSrc: image.currentSrc,
+                  requestedWidth: new URL(image.currentSrc).searchParams.get(
+                    "w",
+                  ),
+                  sizes: image.sizes,
+                  resource: resource
+                    ? {
+                        transferSize: resource.transferSize,
+                        encodedBodySize: resource.encodedBodySize,
+                        duration: resource.duration,
+                        responseStart: resource.responseStart,
+                        responseEnd: resource.responseEnd,
+                      }
+                    : null,
+                }
+              : null,
+          };
+        });
         if (path === "/onboarding") {
           metrics.interactionMs = await perfPage.evaluate(
             () =>
@@ -403,6 +438,12 @@ try {
           profile: "150ms/1.6Mbps down/750kbps up/4x CPU",
           ...metrics,
         });
+        if (path === "/onboarding")
+          assert.ok(
+            metrics.onboardingImage?.naturalWidth > 0 &&
+              metrics.onboardingImage.renderedWidth > 0,
+            "The onboarding image must load and remain visible",
+          );
         assert.ok(metrics.lcpMs !== null, "LCP measurement unavailable");
         assert.ok(
           metrics.lcpMs <= report.budgets.lcpMs,
