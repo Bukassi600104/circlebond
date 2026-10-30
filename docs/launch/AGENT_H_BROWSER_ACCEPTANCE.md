@@ -1,8 +1,56 @@
 # Independent browser acceptance evidence
 
-All runs described here use synthetic loopback data and desktop Edge controlled through Playwright. Simulated phone/tablet viewports are not physical-device acceptance. Provider, Storage, physical iPhone/Android and real Safari acceptance remain **BLOCKED**.
+All runs described here use synthetic loopback data and desktop browsers controlled through Playwright, identified separately as Edge or Chrome. Simulated phone/tablet viewports are not physical-device acceptance. Provider, Storage, physical iPhone/Android and real Safari acceptance remain **BLOCKED**.
 
-## Final integrated local run: 3b56d82
+## Additional actual desktop Chrome run: 3b56d82
+
+The same clean `3b56d820031e7234b32e87805248bde8f2441e35` checkout and frozen
+`Rk5aHEWUVu4sxKLFjosoY` build were exercised with actual installed Google Chrome
+**156.0.8078.49** at
+`C:/Program Files/Google/Chrome/Application/chrome.exe`. Installed product/version
+metadata matched the actual Playwright browser version. Only the ignored launch
+wrapper's browser executable changed; scripts, assertions, budgets, local
+fixtures, source, schema, SDK, lock and build remained unchanged.
+
+**Actual result: 39/39 public checks and all seven authenticated phases PASS. Independent
+Chrome acceptance: PASS.** Auth JSON reports eight PASS entries because
+one delegates to the public harness. This separately exercises the same consent,
+OTP/session, draft/trial, invitation/share, permissions, export and logout outcomes
+as Edge. Both actual ordinary creator/member rows show ₦1,000 with no invitation
+amount supplied. There is no provider, production-policy or physical-device claim.
+
+| Route      | Three LCP samples, ms | Maximum CLS | Three next-screen samples, ms |
+| ---------- | --------------------- | ----------- | ----------------------------- |
+| Sign-in    | 1328 / 1504 / 1208    | 0.0001391   | NOT APPLICABLE                |
+| Onboarding | 1344 / 1328 / 1324    | 0.0243870   | 21.0 / 13.6 / 20.8            |
+
+All six samples pass the unchanged profile/budgets recorded below. Onboarding
+again selected width 640 / encoded 24,062 bytes; warm **unauthenticated** session401
+p95 was 10.22 ms over 20 samples. All 24 public layouts pass and external blocked
+requests remain zero. The actual authenticated fixtures again record 12 loopback
+CSP document adjustments, one pre-OTP refresh and the read-only
+APIRequest401/browser200 transport comparison.
+
+The ordinary CLI wrapper exited 0 from 2026-10-30 11:18:29.448Z to 11:21:01.971Z.
+Distinct CI reports are `public-browser/3b56d82-chrome-public-pass.json` and
+`authenticated-browser/3b56d82-chrome-authenticated-pass.json`, with separate
+`h-browser-3b56d82-chrome-wrapper.json` and
+`h-browser-3b56d82-chrome-handoff.json` under `tmp/launch-evidence/`. The latter
+records executable/version provenance, report hashes, unchanged lock/build/head,
+clean tracked source and all ten closed ports. Safe copies and verified 24
+public/three authenticated screenshots are in primary
+`tmp/launch-evidence/qa-h-3b56d82-chrome-browser-20261030T1121/`.
+Original Edge immutable reports were rehashed and still match the prior handoff;
+its separate screenshots remain preserved. No cleanup or production action occurred.
+
+The non-author Ponytail skill reviewer independently accepted the distinct Chrome
+reports, actual executable/product/version provenance, wrapper exit, matching
+report hashes and current member/draft/settings screenshots. It also confirmed
+the prior Edge hashes remained unchanged. This accepts the bounded local Chrome
+checks; provider, physical-device, production-policy and overall public-launch
+gates remain separate.
+
+## Final integrated local Edge run: 3b56d82
 
 Exact clean application/test commit:
 `3b56d820031e7234b32e87805248bde8f2441e35`. Final local build:
