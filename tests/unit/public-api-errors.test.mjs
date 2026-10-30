@@ -149,3 +149,25 @@ test("upload rejection remains a caller-safe validation error without decoder de
     });
   }
 });
+
+test("circle creation preserves the legal refusal status and hides unknown failures", async () => {
+  const { pricingErrorResponse } = await loadTypescriptModule(
+    "server/pricing/http.ts",
+    {
+      "next/server": { NextResponse: Response },
+      "./entitlements.ts": entitlements,
+      "@/server/auth/legal": legal,
+    },
+  );
+  const denied = pricingErrorResponse(
+    new legal.LegalAcceptanceError(),
+    "Unable to create circle.",
+  );
+  assert.equal(denied.status, 403);
+  assert.equal((await denied.json()).code, "LEGAL_ACCEPTANCE_REQUIRED");
+  const unknown = pricingErrorResponse(
+    new Error("private infrastructure detail"),
+    "Unable to create circle.",
+  );
+  assert.deepEqual(await unknown.json(), { error: "Unable to create circle." });
+});
