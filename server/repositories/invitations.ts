@@ -1,4 +1,5 @@
 import "server-only";
+import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { assertLegalAcceptance } from "@/server/auth/legal";
 import { assertPermission, type CircleRole } from "@/server/circles/engine";
@@ -97,11 +98,12 @@ const activeInvitationStates = new Set<InvitationState>([
 ]);
 
 async function acceptancesFor(invitationId: string) {
-  const response = await getBondCircleDataConnect().executeQuery<
-    { invitationAcceptances: InvitationAcceptance[] },
-    { invitationId: string }
-  >("GetInvitationAcceptances", { invitationId });
-  return response.data.invitationAcceptances;
+  const rows = await readAllRows<InvitationAcceptance>(
+    "GetInvitationAcceptancesPage",
+    { invitationId },
+    "invitationAcceptances",
+  );
+  return [...new Map(rows.map((row) => [row.user.id, row])).values()];
 }
 
 export async function loadInvitationByToken(
@@ -130,18 +132,33 @@ export async function loadInvitationByToken(
 }
 
 export async function listCircleInvitations(circleId: string) {
-  const response = await getBondCircleDataConnect().executeQuery<
-    { invitations: InvitationRow[] },
-    { circleId: string }
-  >("GetCircleInvitations", { circleId });
-  return Promise.all(
-    response.data.invitations.map(async (invitation) => ({
+  const invitations = await readAllRows<InvitationRow>(
+    "GetCircleInvitationsPage",
+    { circleId },
+    "invitations",
+  );
+  const acceptanceRows = await readAllRows<
+    InvitationAcceptance & { invitation: { id: string } }
+  >(
+    "GetCircleInvitationAcceptancesPage",
+    { circleId },
+    "invitationAcceptances",
+  );
+  const grouped = new Map<string, Map<string, InvitationAcceptance>>();
+  for (const { invitation, ...acceptance } of acceptanceRows) {
+    const group =
+      grouped.get(invitation.id) ?? new Map<string, InvitationAcceptance>();
+    group.set(acceptance.user.id, acceptance);
+    grouped.set(invitation.id, group);
+  }
+  return [...new Map(invitations.map((row) => [row.id, row])).values()].map(
+    (invitation) => ({
       ...invitation,
       effectiveState: isInvitationExpired(invitation.expiresAt)
         ? ("expired" as const)
         : invitation.state,
-      acceptances: await acceptancesFor(invitation.id),
-    })),
+      acceptances: [...(grouped.get(invitation.id)?.values() ?? [])],
+    }),
   );
 }
 
@@ -248,10 +265,10 @@ export async function markInvitationSent(
   circleId: string,
   actorId: string,
 ) {
+  await assertCanManageInvitations(circleId, actorId);
   const invitations = await listCircleInvitations(circleId);
   const invitation = invitations.find((item) => item.id === invitationId);
   if (!invitation) throw new Error("Invitation not found.");
-  await assertCanManageInvitations(circleId, actorId);
   if (invitation.state === "created") {
     assertInvitationTransition(invitation.state, "sent");
     await updateInvitationState(

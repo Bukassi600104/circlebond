@@ -32,6 +32,7 @@ const testFiles = [
   "tests/e2e/account-privacy.test.mjs",
   "tests/e2e/rate-limit.test.mjs",
   "tests/e2e/dashboard.test.mjs",
+  "tests/e2e/retention-pagination.test.mjs",
 ];
 const testCommand = `"${process.execPath}" --test ${testFiles.join(" ")}`;
 

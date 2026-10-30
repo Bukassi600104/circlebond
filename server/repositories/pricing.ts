@@ -1,6 +1,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
+import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import {
   PricingRuleError,
@@ -145,6 +146,10 @@ export async function loadCirclePricingState(
   >("GetCirclePricingState", { circleId });
   const circle = response.data.circle;
   if (!circle) return null;
+  const rows = await readAllRows<
+    CirclePricingStateQuery["circleActivations"][number]
+  >("GetCircleActivationsPage", { circleId }, "circleActivations");
+  const activations = [...new Map(rows.map((row) => [row.id, row])).values()];
   return {
     id: circle.id,
     creatorId: circle.creator.id,
@@ -157,7 +162,7 @@ export async function loadCirclePricingState(
     activationPriceMinor: circle.activationPriceMinor,
     activatedAt: circle.activatedAt ?? null,
     status: circle.status,
-    activations: response.data.circleActivations.map((activation) => ({
+    activations: activations.map((activation) => ({
       ...activation,
       provider: activation.provider ?? null,
       providerReference: activation.providerReference ?? null,

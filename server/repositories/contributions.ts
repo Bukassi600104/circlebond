@@ -1,4 +1,5 @@
 import "server-only";
+import { readAllRows } from "@/server/repositories/pages";
 import { getBondCircleDataConnect } from "@/server/firebase/data-connect";
 import { recordSystemActivity } from "@/server/repositories/communication";
 import { safelyEmitNotification } from "@/server/repositories/notifications";
@@ -92,9 +93,9 @@ export async function loadContributionWorkspace(
   viewerId: string,
 ) {
   const response = await getBondCircleDataConnect().executeQuery<
-    WorkspaceQuery,
+    Omit<WorkspaceQuery, "receipts">,
     { circleId: string }
-  >("GetContributionWorkspace", { circleId });
+  >("GetContributionWorkspaceMetadata", { circleId });
   const circle = response.data.circle;
   const viewer = response.data.circleMemberships.find(
     (membership) =>
@@ -103,8 +104,16 @@ export async function loadContributionWorkspace(
   );
   if (!circle || !viewer) return null;
 
+  const allReceipts = await readAllRows<WorkspaceQuery["receipts"][number]>(
+    "GetContributionReceiptsPage",
+    { circleId },
+    "receipts",
+  );
+  const receipts = [
+    ...new Map(allReceipts.map((receipt) => [receipt.id, receipt])).values(),
+  ];
   const canReview = canReviewReceipts(viewer.role);
-  const visibleReceipts = response.data.receipts
+  const visibleReceipts = receipts
     .filter((receipt) =>
       canViewReceipt(receipt.uploadedBy.id, viewerId, viewer.role),
     )
@@ -119,7 +128,7 @@ export async function loadContributionWorkspace(
         }),
       )}`,
     }));
-  const ownPending = response.data.receipts
+  const ownPending = receipts
     .filter(
       (receipt) =>
         receipt.uploadedBy.id === viewerId &&
@@ -249,7 +258,7 @@ export async function reviewContributionReceipt(input: {
     await getBondCircleDataConnect().executeQuery<
       WorkspaceQuery,
       { circleId: string }
-    >("GetContributionWorkspace", { circleId: input.circleId })
+    >("GetContributionWorkspaceMetadata", { circleId: input.circleId })
   ).data.circleMemberships.find(
     (membership) => membership.user.id === receipt.uploaderId,
   );

@@ -304,6 +304,7 @@ test("shared circle creation and membership writes cannot bypass legal acceptanc
 test("invitation acceptance requires persisted acceptance before admitting membership", async () => {
   let writes = 0;
   const invitations = await load("server/repositories/invitations.ts", {
+    "@/server/repositories/pages": {},
     "server-only": {},
     "@/server/firebase/data-connect": {
       getBondCircleDataConnect: () => ({
